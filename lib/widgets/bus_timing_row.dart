@@ -1,8 +1,15 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
-
 import '../modals/app_colors.dart';
+
+enum CrowdLvl {
+  SEA, // for Seats Available
+  SDA, // for Standing Available
+  LSD // for Limited Standing
+}
+
+// enum BusType {
+//
+// }
 
 class BusTimingRow extends StatefulWidget {
   const BusTimingRow({Key? key}) : super(key: key);
@@ -18,25 +25,39 @@ class _BusTimingRowState extends State<BusTimingRow> {
       crossAxisAlignment: CrossAxisAlignment.baseline,
       textBaseline: TextBaseline.ideographic,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('8', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
-            Text(
-              'about 500m away',
-              style:
-                  TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
-            ),
-          ],
+        Expanded(
+          flex: 2,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('8', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500)),
+              Text(
+                'about 500m away',
+                style: TextStyle(
+                    fontSize: 16, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
+              ),
+            ],
+          ),
         ),
-        SizedBox(width: 48),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ArrivalInfo(),
-            ArrivalInfo(),
-            ArrivalInfo(),
-          ],
+        Expanded(
+          flex: 3,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ArrivalInfo(
+                accessible: true,
+                crowdLvl: CrowdLvl.SEA,
+              ),
+              ArrivalInfo(
+                accessible: true,
+                crowdLvl: CrowdLvl.SDA,
+              ),
+              ArrivalInfo(
+                accessible: true,
+                crowdLvl: CrowdLvl.LSD,
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -44,7 +65,10 @@ class _BusTimingRowState extends State<BusTimingRow> {
 }
 
 class ArrivalInfo extends StatefulWidget {
-  const ArrivalInfo({Key? key}) : super(key: key);
+  const ArrivalInfo({Key? key, required this.accessible, required this.crowdLvl}) : super(key: key);
+
+  final bool accessible;
+  final CrowdLvl crowdLvl;
 
   @override
   State<ArrivalInfo> createState() => _ArrivalInfoState();
@@ -53,15 +77,21 @@ class ArrivalInfo extends StatefulWidget {
 class _ArrivalInfoState extends State<ArrivalInfo> {
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          '8',
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500, color: AppColors.sortaRed),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
+          child: Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey),
         ),
-        Row(
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey),
+            Text(
+              '8',
+              style:
+                  TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: AppColors.sortaRed),
+            ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
               decoration: BoxDecoration(
@@ -70,13 +100,13 @@ class _ArrivalInfoState extends State<ArrivalInfo> {
               child: Text(
                 'Single',
                 style: TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   color: AppColors.kindaGrey,
                 ),
               ),
             ),
           ],
-        )
+        ),
       ],
     );
   }
