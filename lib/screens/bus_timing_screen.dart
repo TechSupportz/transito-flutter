@@ -16,7 +16,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       appBar: AppBar(
         title: const Text("Bus stop name"),
       ),
-      body: Container(height: 70, child: const BusTimingRow()),
+      body: Wrap(children: [const BusTimingRow()]),
     );
   }
 }
