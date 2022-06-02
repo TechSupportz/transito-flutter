@@ -1,5 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
+
+import '../modals/mock_data.dart';
 
 class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen({Key? key}) : super(key: key);
@@ -17,11 +21,10 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
         title: const Text("Bus stop name"),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: Wrap(children: [
-          const BusTimingRow(
-            busServiceNum: '8',
-            distance: '500m',
+          BusTimingRow(
+            arrivalInfo: jsonDecode(mockTestingData.mockData),
           )
         ]),
       ),

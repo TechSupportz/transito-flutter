@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:transito/modals/app_colors.dart';
 
 enum CrowdLvl {
@@ -16,17 +17,69 @@ enum BusType {
 }
 
 class BusTimingRow extends StatefulWidget {
-  const BusTimingRow({Key? key, required this.busServiceNum, required this.distance})
-      : super(key: key);
+  const BusTimingRow({Key? key, required this.arrivalInfo}) : super(key: key);
 
-  final String busServiceNum;
-  final String distance;
+  final arrivalInfo;
 
   @override
   State<BusTimingRow> createState() => _BusTimingRowState();
 }
 
 class _BusTimingRowState extends State<BusTimingRow> {
+  CrowdLvl decodeCrowdLvl(crowdLvlString) {
+    switch (crowdLvlString) {
+      case "SEA":
+        {
+          return CrowdLvl.SEA;
+        }
+      case "SDA":
+        {
+          return CrowdLvl.SDA;
+        }
+      case "LSD":
+        {
+          return CrowdLvl.LSD;
+        }
+      default:
+        {
+          return CrowdLvl.NA;
+        }
+    }
+  }
+
+  BusType decodeBusType(busTypeString) {
+    switch (busTypeString) {
+      case "SD":
+        {
+          return BusType.SD;
+        }
+      case "DD":
+        {
+          return BusType.DD;
+        }
+      case "BD":
+        {
+          return BusType.BD;
+        }
+      default:
+        {
+          return BusType.NA;
+        }
+    }
+  }
+
+  String formatArrivalTime(arrivalTime) {
+    num minutesToArrival = Jiffy(arrivalTime).diff(Jiffy().format(), Units.MINUTE);
+
+    if (minutesToArrival < 0) {
+      return "left";
+    } else if (minutesToArrival <= 1) {
+      return "arr";
+    } else {
+      return minutesToArrival.toString();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -39,12 +92,12 @@ class _BusTimingRowState extends State<BusTimingRow> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.busServiceNum,
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+                widget.arrivalInfo['ServiceNo'],
+                style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
               Text(
-                'about ${widget.distance} away',
-                style: TextStyle(
+                'about 500m away',
+                style: const TextStyle(
                     fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
               ),
             ],
@@ -54,24 +107,24 @@ class _BusTimingRowState extends State<BusTimingRow> {
           flex: 3,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
+            children: [
               ArrivalInfo(
-                eta: "arr",
-                accessible: true,
-                crowdLvl: CrowdLvl.SEA,
-                busType: BusType.SD,
+                eta: formatArrivalTime(widget.arrivalInfo['NextBus']['EstimatedArrival']),
+                accessible: widget.arrivalInfo['NextBus']['Feature'] == "WAB",
+                crowdLvl: decodeCrowdLvl(widget.arrivalInfo['NextBus']['Load']),
+                busType: decodeBusType(widget.arrivalInfo['NextBus']['Type']),
               ),
               ArrivalInfo(
-                eta: "8",
-                accessible: true,
-                crowdLvl: CrowdLvl.SDA,
-                busType: BusType.DD,
+                eta: formatArrivalTime(widget.arrivalInfo['NextBus2']['EstimatedArrival']),
+                accessible: widget.arrivalInfo['NextBus2']['Feature'] == "WAB",
+                crowdLvl: decodeCrowdLvl(widget.arrivalInfo['NextBus2']['Load']),
+                busType: decodeBusType(widget.arrivalInfo['NextBus2']['Type']),
               ),
               ArrivalInfo(
-                eta: "16",
-                accessible: true,
-                crowdLvl: CrowdLvl.LSD,
-                busType: BusType.BD,
+                eta: formatArrivalTime(widget.arrivalInfo['NextBus3']['EstimatedArrival']),
+                accessible: widget.arrivalInfo['NextBus3']['Feature'] == "WAB",
+                crowdLvl: decodeCrowdLvl(widget.arrivalInfo['NextBus3']['Load']),
+                busType: decodeBusType(widget.arrivalInfo['NextBus3']['Type']),
               ),
             ],
           ),
@@ -107,10 +160,10 @@ class _ArrivalInfoState extends State<ArrivalInfo> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
+                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
                 child: widget.accessible
-                    ? Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
-                    : SizedBox(width: 16, height: 16),
+                    ? const Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
+                    : const SizedBox(width: 16, height: 16),
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -145,10 +198,10 @@ class _ArrivalInfoState extends State<ArrivalInfo> {
                     ),
                   ),
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
                     decoration: BoxDecoration(
                         border: Border.all(color: AppColors.kindaGrey),
-                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                        borderRadius: const BorderRadius.all(Radius.circular(5))),
                     child: Text(
                       (() {
                         switch (widget.busType) {
