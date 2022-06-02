@@ -4,13 +4,15 @@ import 'package:transito/modals/app_colors.dart';
 enum CrowdLvl {
   SEA, // for Seats Available
   SDA, // for Standing Available
-  LSD // for Limited Standing
+  LSD, // for Limited Standing
+  NA // No value
 }
 
 enum BusType {
   SD, // Single decker
   DD, // Double decker
-  BD // Bendy
+  BD, // Bendy
+  NA // No value
 }
 
 class BusTimingRow extends StatefulWidget {
@@ -93,76 +95,90 @@ class ArrivalInfo extends StatefulWidget {
 class _ArrivalInfoState extends State<ArrivalInfo> {
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
-          child: widget.accessible
-              ? Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
-              : SizedBox(width: 16, height: 16),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              widget.eta,
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w500,
-                color: (() {
-                  switch (widget.crowdLvl) {
-                    case CrowdLvl.SEA:
-                      {
-                        return AppColors.prettyGreen;
-                      }
-
-                    case CrowdLvl.SDA:
-                      {
-                        return AppColors.notReallyYellow;
-                      }
-
-                    case CrowdLvl.LSD:
-                      {
-                        return AppColors.sortaRed;
-                      }
-                  }
-                })(),
+    return widget.eta != '-'
+        ? Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
+                child: widget.accessible
+                    ? Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
+                    : SizedBox(width: 16, height: 16),
               ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
-              decoration: BoxDecoration(
-                  border: Border.all(color: AppColors.kindaGrey),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Text(
-                (() {
-                  switch (widget.busType) {
-                    case BusType.SD:
-                      {
-                        return "Single";
-                      }
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    widget.eta,
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w500,
+                      color: (() {
+                        switch (widget.crowdLvl) {
+                          case CrowdLvl.SEA:
+                            {
+                              return AppColors.prettyGreen;
+                            }
 
-                    case BusType.DD:
-                      {
-                        return "Double";
-                      }
+                          case CrowdLvl.SDA:
+                            {
+                              return AppColors.notReallyYellow;
+                            }
 
-                    case BusType.BD:
-                      {
-                        return "Bendy";
-                      }
-                  }
-                })(),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.kindaGrey,
-                ),
+                          case CrowdLvl.LSD:
+                            {
+                              return AppColors.sortaRed;
+                            }
+                          case CrowdLvl.NA:
+                            {
+                              return Colors.white;
+                            }
+                        }
+                      })(),
+                    ),
+                  ),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
+                    decoration: BoxDecoration(
+                        border: Border.all(color: AppColors.kindaGrey),
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
+                    child: Text(
+                      (() {
+                        switch (widget.busType) {
+                          case BusType.SD:
+                            {
+                              return "Single";
+                            }
+
+                          case BusType.DD:
+                            {
+                              return "Double";
+                            }
+
+                          case BusType.BD:
+                            {
+                              return "Bendy";
+                            }
+                          case BusType.NA:
+                            {
+                              return "Error";
+                            }
+                        }
+                      })(),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.kindaGrey,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ],
-        ),
-      ],
-    );
+            ],
+          )
+        : const Center(
+            child: Text(
+            '  -  ',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.white),
+          ));
   }
 }

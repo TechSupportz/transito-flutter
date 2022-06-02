@@ -16,7 +16,10 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       appBar: AppBar(
         title: const Text("Bus stop name"),
       ),
-      body: Wrap(children: [const BusTimingRow()]),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+        child: Wrap(children: [const BusTimingRow()]),
+      ),
     );
   }
 }
