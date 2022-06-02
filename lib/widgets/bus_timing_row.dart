@@ -16,7 +16,11 @@ enum BusType {
 }
 
 class BusTimingRow extends StatefulWidget {
-  const BusTimingRow({Key? key}) : super(key: key);
+  const BusTimingRow({Key? key, required this.busServiceNum, required this.distance})
+      : super(key: key);
+
+  final String busServiceNum;
+  final String distance;
 
   @override
   State<BusTimingRow> createState() => _BusTimingRowState();
@@ -34,9 +38,12 @@ class _BusTimingRowState extends State<BusTimingRow> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('8', style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500)),
               Text(
-                'about 500m away',
+                widget.busServiceNum,
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+              ),
+              Text(
+                'about ${widget.distance} away',
                 style: TextStyle(
                     fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
               ),

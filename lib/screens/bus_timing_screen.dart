@@ -18,7 +18,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Wrap(children: [const BusTimingRow()]),
+        child: Wrap(children: [
+          const BusTimingRow(
+            busServiceNum: '8',
+            distance: '500m',
+          )
+        ]),
       ),
     );
   }
