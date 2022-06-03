@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:transito/modals/app_colors.dart';
 
 enum CrowdLvl {
@@ -17,15 +18,19 @@ enum BusType {
 }
 
 class BusTimingRow extends StatefulWidget {
-  const BusTimingRow({Key? key, required this.arrivalInfo}) : super(key: key);
+  const BusTimingRow({Key? key, required this.arrivalInfo, required this.userLatLng})
+      : super(key: key);
 
   final arrivalInfo;
+  final LatLng userLatLng; // user's current latitude and longitude
 
   @override
   State<BusTimingRow> createState() => _BusTimingRowState();
 }
 
 class _BusTimingRowState extends State<BusTimingRow> {
+  final Distance distance = new Distance();
+
   CrowdLvl decodeCrowdLvl(crowdLvlString) {
     switch (crowdLvlString) {
       case "SEA":
@@ -96,7 +101,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
               Text(
-                'about 500m away',
+                'about ${distance(new LatLng(double.parse(widget.arrivalInfo['NextBus']['Latitude']), double.parse(widget.arrivalInfo['NextBus']['Longitude'])), widget.userLatLng)}m away',
                 style: const TextStyle(
                     fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
               ),

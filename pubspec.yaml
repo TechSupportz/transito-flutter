@@ -14,6 +14,8 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   jiffy: ^5.0.0
+  latlong2: ^0.8.1
+  geolocator: ^8.2.1
 
 dev_dependencies:
   flutter_test:
