@@ -24,23 +24,29 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return position;
   }
 
+  final BusTimingInfo = jsonDecode(mockTestingData.mockData);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Bus stop name"),
+        title: Text('${BusTimingInfo['BusStopCode']}'),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-        child: Wrap(children: [
-          FutureBuilder(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: FutureBuilder(
             future: getUserLocation(),
             builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
               if (snapshot.hasData) {
-                return BusTimingRow(
-                  arrivalInfo: jsonDecode(mockTestingData.mockData),
-                  userLatLng: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
-                );
+                return ListView.separated(
+                    itemBuilder: (BuildContext context, int index) {
+                      return BusTimingRow(
+                        arrivalInfo: BusTimingInfo['Services'][index],
+                        userLatLng: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                    itemCount: BusTimingInfo['Services'].length);
               } else if (snapshot.hasError) {
                 return Text("${snapshot.error}");
               } else {
@@ -49,9 +55,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                 );
               }
             },
-          )
-        ]),
-      ),
+          )),
     );
   }
 }

@@ -74,14 +74,17 @@ class _BusTimingRowState extends State<BusTimingRow> {
   }
 
   String formatArrivalTime(arrivalTime) {
-    num minutesToArrival = Jiffy(arrivalTime).diff(Jiffy().format(), Units.MINUTE);
-
-    if (minutesToArrival < 0) {
-      return "left";
-    } else if (minutesToArrival <= 1) {
-      return "arr";
+    if (arrivalTime != '') {
+      num minutesToArrival = Jiffy(arrivalTime).diff(Jiffy().format(), Units.MINUTE);
+      if (minutesToArrival < 0) {
+        return "left";
+      } else if (minutesToArrival <= 1) {
+        return "arr";
+      } else {
+        return minutesToArrival.toString();
+      }
     } else {
-      return minutesToArrival.toString();
+      return '-';
     }
   }
 
