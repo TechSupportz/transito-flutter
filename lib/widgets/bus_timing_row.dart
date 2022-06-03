@@ -85,6 +85,23 @@ class _BusTimingRowState extends State<BusTimingRow> {
     }
   }
 
+  // computes and returns the distance between user and bus either in meters or kilometers
+  String calculateDistanceAway() {
+    double distanceAway = distance.as(
+        LengthUnit.Meter,
+        LatLng(
+          double.parse(widget.arrivalInfo['NextBus']['Latitude']),
+          double.parse(widget.arrivalInfo['NextBus']['Longitude']),
+        ),
+        widget.userLatLng);
+
+    if (distanceAway < 1000) {
+      return '${(distanceAway).toStringAsFixed(0)}m';
+    } else {
+      return '${(distanceAway / 1000).toStringAsFixed(1)}km';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -101,7 +118,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
               Text(
-                'about ${distance(new LatLng(double.parse(widget.arrivalInfo['NextBus']['Latitude']), double.parse(widget.arrivalInfo['NextBus']['Longitude'])), widget.userLatLng)}m away',
+                'about ${calculateDistanceAway()} away',
                 style: const TextStyle(
                     fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
               ),

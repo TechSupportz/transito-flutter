@@ -16,11 +16,11 @@ class BusTimingScreen extends StatefulWidget {
 }
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
-  final Distance distance = new Distance();
+  final Distance distance = const Distance();
 
   Future<Position> getUserLocation() async {
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-    print(position);
+    debugPrint('$position');
     return position;
   }
 
