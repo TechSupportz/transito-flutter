@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:transito/modals/app_colors.dart';
+import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 
 import 'screens/bus_timing_screen.dart';

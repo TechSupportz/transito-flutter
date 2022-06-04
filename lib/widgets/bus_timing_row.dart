@@ -1,27 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:transito/modals/app_colors.dart';
-
-enum CrowdLvl {
-  SEA, // for Seats Available
-  SDA, // for Standing Available
-  LSD, // for Limited Standing
-  NA // No value
-}
-
-enum BusType {
-  SD, // Single decker
-  DD, // Double decker
-  BD, // Bendy
-  NA // No value
-}
+import 'package:transito/models/app_colors.dart';
+import 'package:transito/models/enums/bus_type_enum.dart';
+import 'package:transito/models/enums/crowd_lvl_enum.dart';
+import '../models/arrival_info.dart';
+// import '../models/enums/crowd_lvl_enum.dart';
+// import '../models/enums/bus_type_enum.dart';
 
 class BusTimingRow extends StatefulWidget {
-  const BusTimingRow({Key? key, required this.arrivalInfo, required this.userLatLng})
+  const BusTimingRow({Key? key, required this.serviceInfo, required this.userLatLng})
       : super(key: key);
 
-  final arrivalInfo;
+  final ServiceInfo serviceInfo;
   final LatLng userLatLng; // user's current latitude and longitude
 
   @override
@@ -30,48 +21,6 @@ class BusTimingRow extends StatefulWidget {
 
 class _BusTimingRowState extends State<BusTimingRow> {
   final Distance distance = new Distance();
-
-  CrowdLvl decodeCrowdLvl(crowdLvlString) {
-    switch (crowdLvlString) {
-      case "SEA":
-        {
-          return CrowdLvl.SEA;
-        }
-      case "SDA":
-        {
-          return CrowdLvl.SDA;
-        }
-      case "LSD":
-        {
-          return CrowdLvl.LSD;
-        }
-      default:
-        {
-          return CrowdLvl.NA;
-        }
-    }
-  }
-
-  BusType decodeBusType(busTypeString) {
-    switch (busTypeString) {
-      case "SD":
-        {
-          return BusType.SD;
-        }
-      case "DD":
-        {
-          return BusType.DD;
-        }
-      case "BD":
-        {
-          return BusType.BD;
-        }
-      default:
-        {
-          return BusType.NA;
-        }
-    }
-  }
 
   String formatArrivalTime(arrivalTime) {
     if (arrivalTime != '') {
@@ -93,8 +42,8 @@ class _BusTimingRowState extends State<BusTimingRow> {
     double distanceAway = distance.as(
         LengthUnit.Meter,
         LatLng(
-          double.parse(widget.arrivalInfo['NextBus']['Latitude']),
-          double.parse(widget.arrivalInfo['NextBus']['Longitude']),
+          widget.serviceInfo.nextBus.latitude,
+          widget.serviceInfo.nextBus.longitude,
         ),
         widget.userLatLng);
 
@@ -117,7 +66,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.arrivalInfo['ServiceNo'],
+                widget.serviceInfo.serviceNum,
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
               Text(
@@ -133,23 +82,23 @@ class _BusTimingRowState extends State<BusTimingRow> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              ArrivalInfo(
-                eta: formatArrivalTime(widget.arrivalInfo['NextBus']['EstimatedArrival']),
-                accessible: widget.arrivalInfo['NextBus']['Feature'] == "WAB",
-                crowdLvl: decodeCrowdLvl(widget.arrivalInfo['NextBus']['Load']),
-                busType: decodeBusType(widget.arrivalInfo['NextBus']['Type']),
+              ArrivalCard(
+                eta: formatArrivalTime(widget.serviceInfo.nextBus.estimatedArrival),
+                accessible: widget.serviceInfo.nextBus.isAccessible,
+                crowdLvl: widget.serviceInfo.nextBus.crowdLvl,
+                busType: widget.serviceInfo.nextBus.busType,
               ),
-              ArrivalInfo(
-                eta: formatArrivalTime(widget.arrivalInfo['NextBus2']['EstimatedArrival']),
-                accessible: widget.arrivalInfo['NextBus2']['Feature'] == "WAB",
-                crowdLvl: decodeCrowdLvl(widget.arrivalInfo['NextBus2']['Load']),
-                busType: decodeBusType(widget.arrivalInfo['NextBus2']['Type']),
+              ArrivalCard(
+                eta: formatArrivalTime(widget.serviceInfo.nextBus2.estimatedArrival),
+                accessible: widget.serviceInfo.nextBus2.isAccessible,
+                crowdLvl: widget.serviceInfo.nextBus2.crowdLvl,
+                busType: widget.serviceInfo.nextBus2.busType,
               ),
-              ArrivalInfo(
-                eta: formatArrivalTime(widget.arrivalInfo['NextBus3']['EstimatedArrival']),
-                accessible: widget.arrivalInfo['NextBus3']['Feature'] == "WAB",
-                crowdLvl: decodeCrowdLvl(widget.arrivalInfo['NextBus3']['Load']),
-                busType: decodeBusType(widget.arrivalInfo['NextBus3']['Type']),
+              ArrivalCard(
+                eta: formatArrivalTime(widget.serviceInfo.nextBus3.estimatedArrival),
+                accessible: widget.serviceInfo.nextBus3.isAccessible,
+                crowdLvl: widget.serviceInfo.nextBus3.crowdLvl,
+                busType: widget.serviceInfo.nextBus3.busType,
               ),
             ],
           ),
@@ -159,8 +108,8 @@ class _BusTimingRowState extends State<BusTimingRow> {
   }
 }
 
-class ArrivalInfo extends StatefulWidget {
-  const ArrivalInfo(
+class ArrivalCard extends StatefulWidget {
+  const ArrivalCard(
       {Key? key,
       required this.eta,
       required this.accessible,
@@ -174,10 +123,10 @@ class ArrivalInfo extends StatefulWidget {
   final BusType busType;
 
   @override
-  State<ArrivalInfo> createState() => _ArrivalInfoState();
+  State<ArrivalCard> createState() => _ArrivalCardState();
 }
 
-class _ArrivalInfoState extends State<ArrivalInfo> {
+class _ArrivalCardState extends State<ArrivalCard> {
   @override
   Widget build(BuildContext context) {
     return widget.eta != '-'
