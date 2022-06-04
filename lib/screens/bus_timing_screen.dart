@@ -20,14 +20,24 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
   final Distance distance = const Distance();
-  Map<String, String> requestHeaders = {'Accept': 'application/json', 'AccountKey': Secret.secret};
+  final String busStopCode = '72069';
+  Map<String, String> requestHeaders = {
+    'Accept': 'application/json',
+    'AccountKey': Secret.LtaApiKey
+  };
 
   late Future<BusArrivalInfo> futureBusArrivalInfo;
 
   @override
   void initState() {
     super.initState();
-    futureBusArrivalInfo = fetchArrivalTimings();
+    futureBusArrivalInfo = fetchArrivalTimings()
+        //     .then((value) {
+        //   var _value = value;
+        //   _value.services.sort((a, b) => a.serviceNum.compareTo(b.serviceNum));
+        //   return _value;
+        // })
+        ;
   }
 
   Future<Position> getUserLocation() async {
@@ -40,11 +50,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
     final response = await http.get(
-        Uri.parse('http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=72069'),
+        Uri.parse(
+            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=$busStopCode'),
         headers: requestHeaders);
-
-    // var jsonData = json.decode(rawData.body);
-    // return jsonData;
 
     if (response.statusCode == 200) {
       debugPrint("${BusArrivalInfo.fromJson(jsonDecode(response.body))}");
@@ -54,8 +62,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       throw Exception('Failed to load data');
     }
   }
-
-  //final BusTimingInfo = jsonDecode(mockTestingData.mockData);
 
   @override
   Widget build(BuildContext context) {
@@ -90,6 +96,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
             }
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => setState(() {
+          futureBusArrivalInfo = fetchArrivalTimings();
+        }),
+        child: const Icon(Icons.refresh_rounded, size: 28),
       ),
     );
   }

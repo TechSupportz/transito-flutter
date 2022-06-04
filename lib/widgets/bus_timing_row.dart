@@ -200,7 +200,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                         }
                       })(),
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 11.5,
                         color: AppColors.kindaGrey,
                       ),
                     ),
@@ -209,10 +209,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
               ),
             ],
           )
-        : const Center(
-            child: Text(
-            '  -  ',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.white),
-          ));
+        : const Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            child: Center(
+                child: Text(
+              '-',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.white),
+            )),
+          );
   }
 }

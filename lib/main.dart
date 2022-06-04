@@ -22,6 +22,8 @@ class MyApp extends StatelessWidget {
           surface: Colors.black,
           primary: AppColors.veryPurple,
           secondary: AppColors.veryPurple,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
         ),
       ),
       initialRoute: MainScreen.routeName,
