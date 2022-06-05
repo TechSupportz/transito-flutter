@@ -4,18 +4,21 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:transito/models/arrival_info.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 import 'package:http/http.dart' as http;
-
-import '../models/mock_data.dart';
 import '../models/secret.dart';
 
 class BusTimingScreen extends StatefulWidget {
-  const BusTimingScreen({Key? key}) : super(key: key);
+  const BusTimingScreen({
+    Key? key,
+    required this.busStopCode,
+  }) : super(key: key);
   static String routeName = '/BusTiming';
+  final String busStopCode;
 
   @override
   State<BusTimingScreen> createState() => _BusTimingScreenState();
@@ -24,7 +27,6 @@ class BusTimingScreen extends StatefulWidget {
 class _BusTimingScreenState extends State<BusTimingScreen> {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
   final Distance distance = const Distance();
-  final String busStopCode = '72069';
   bool isFabVisible = true;
   late Timer timer;
 
@@ -44,7 +46,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     debugPrint("Fetching arrival timings");
     final response = await http.get(
         Uri.parse(
-            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=$busStopCode'),
+            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.busStopCode}'),
         headers: requestHeaders);
 
     if (response.statusCode == 200) {
@@ -68,7 +70,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     super.initState();
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
     timer = Timer.periodic(
-        Duration(seconds: 30),
+        const Duration(seconds: 30),
         (Timer t) => setState(() {
               futureBusArrivalInfo =
                   fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
@@ -87,7 +89,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Something'),
+        title: Text(widget.busStopCode),
         actions: [
           IconButton(
             icon: Icon(Icons.favorite_border_rounded),
@@ -137,9 +139,10 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       floatingActionButton: isFabVisible
           ? FloatingActionButton(
               onPressed: () => setState(() {
-                futureBusArrivalInfo =
-                    fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
-                ;
+                futureBusArrivalInfo = fetchArrivalTimings().then(
+                  (value) => sortBusArrivalInfo(value),
+                );
+                HapticFeedback.lightImpact();
               }),
               child: const Icon(Icons.refresh_rounded, size: 28),
               enableFeedback: true,

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/screens/navbar_screens/favourites_screen.dart';
 import 'package:transito/screens/navbar_screens/home_screen.dart';
@@ -12,7 +13,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int PageIndex = 0;
+  int _pageIndex = 0;
   final controller = PageController(
     initialPage: 0,
     keepPage: true,
@@ -26,12 +27,14 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widgetList[PageIndex].toString().split("Screen")[0])),
+      appBar: AppBar(title: Text(widgetList[_pageIndex].toString().split("Screen")[0])),
       body: PageView(
         controller: controller,
         children: widgetList,
+        pageSnapping: true,
+        dragStartBehavior: DragStartBehavior.start,
         onPageChanged: (index) {
-          updatePageIndex(index);
+          setState(() => _pageIndex = index);
         },
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -44,17 +47,22 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: Color(0xFFD8DBE2),
         showSelectedLabels: false,
         showUnselectedLabels: false,
-        currentIndex: PageIndex,
+        currentIndex: _pageIndex,
         onTap: (index) {
-          updatePageIndex(index);
+          setState(() {
+            _pageIndex = index;
+            controller.animateToPage(index,
+                duration: const Duration(milliseconds: 300), curve: Curves.ease);
+          });
         },
       ),
     );
   }
 
   void updatePageIndex(int index, {bool animate = true}) {
+    debugPrint('$index');
     setState(() {
-      PageIndex = index;
+      _pageIndex = index;
       animate
           ? controller.animateToPage(index,
               duration: const Duration(milliseconds: 250), curve: Curves.ease)

@@ -29,7 +29,6 @@ class MyApp extends StatelessWidget {
       initialRoute: MainScreen.routeName,
       routes: {
         MainScreen.routeName: (context) => MainScreen(),
-        BusTimingScreen.routeName: (context) => BusTimingScreen()
       },
       builder: (context, child) {
         return MediaQuery(

@@ -5,10 +5,24 @@ class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _homeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _homeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController textFieldController = TextEditingController();
+
+  void _goToBusTimingScreen(BuildContext context) {
+    String _busStopCode = textFieldController.text;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BusTimingScreen(
+          busStopCode: _busStopCode,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -16,14 +30,17 @@ class _homeScreenState extends State<HomeScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text("This is the home screen"),
+          TextField(
+            controller: textFieldController,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+          ),
+          SizedBox(
+            height: 10,
+          ),
           ElevatedButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const BusTimingScreen(),
-                ),
-              );
+              _goToBusTimingScreen(context);
             },
             child: Text('Go to Bus Timing Page'),
           )
