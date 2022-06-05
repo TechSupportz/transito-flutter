@@ -87,7 +87,13 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('BusStopName'),
+        title: Text('Something'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.favorite_border_rounded),
+            onPressed: () => debugPrint("hello"),
+          )
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
