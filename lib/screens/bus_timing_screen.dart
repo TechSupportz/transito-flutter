@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:transito/models/arrival_info.dart';
@@ -20,24 +22,11 @@ class BusTimingScreen extends StatefulWidget {
 }
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
-  final Distance distance = const Distance();
-  final String busStopCode = '75009';
-  Map<String, String> requestHeaders = {
-    'Accept': 'application/json',
-    'AccountKey': Secret.LtaApiKey
-  };
-
   late Future<BusArrivalInfo> futureBusArrivalInfo;
-
-  @override
-  void initState() {
-    super.initState();
-    futureBusArrivalInfo = fetchArrivalTimings().then((value) {
-      var _value = value;
-      _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
-      return _value;
-    });
-  }
+  final Distance distance = const Distance();
+  final String busStopCode = '72069';
+  bool isFabVisible = true;
+  late Timer timer;
 
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
@@ -45,6 +34,11 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     debugPrint('$position');
     return position;
   }
+
+  Map<String, String> requestHeaders = {
+    'Accept': 'application/json',
+    'AccountKey': Secret.LtaApiKey
+  };
 
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
@@ -54,12 +48,39 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
         headers: requestHeaders);
 
     if (response.statusCode == 200) {
-      debugPrint("${BusArrivalInfo.fromJson(jsonDecode(response.body))}");
+      debugPrint("Timing fetched");
       return BusArrivalInfo.fromJson(jsonDecode(response.body));
     } else {
       debugPrint("Error fetching arrival timings");
       throw Exception('Failed to load data');
     }
+  }
+
+  BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
+    var _value = value;
+    _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
+
+    return _value;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+    timer = Timer.periodic(
+        Duration(seconds: 30),
+        (Timer t) => setState(() {
+              futureBusArrivalInfo =
+                  fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+              ;
+            }));
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    debugPrint("Timer cancelled");
+    super.dispose();
   }
 
   @override
@@ -77,15 +98,26 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           ]),
           builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.hasData) {
-              return ListView.separated(
-                  itemBuilder: (BuildContext context, int index) {
-                    return BusTimingRow(
-                      serviceInfo: snapshot.data![1].services[index],
-                      userLatLng: LatLng(snapshot.data![0].latitude, snapshot.data![0].longitude),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) => const Divider(),
-                  itemCount: snapshot.data![1].services.length);
+              return NotificationListener<UserScrollNotification>(
+                onNotification: (notification) {
+                  if (notification.direction == ScrollDirection.forward) {
+                    !isFabVisible ? setState(() => isFabVisible = true) : null;
+                  } else if (notification.direction == ScrollDirection.reverse) {
+                    isFabVisible ? setState(() => isFabVisible = false) : null;
+                  }
+
+                  return true;
+                },
+                child: ListView.separated(
+                    itemBuilder: (BuildContext context, int index) {
+                      return BusTimingRow(
+                        serviceInfo: snapshot.data![1].services[index],
+                        userLatLng: LatLng(snapshot.data![0].latitude, snapshot.data![0].longitude),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) => const Divider(),
+                    itemCount: snapshot.data![1].services.length),
+              );
             } else if (snapshot.hasError) {
               return Text("${snapshot.error}");
             } else {
@@ -96,12 +128,17 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => setState(() {
-          futureBusArrivalInfo = fetchArrivalTimings();
-        }),
-        child: const Icon(Icons.refresh_rounded, size: 28),
-      ),
+      floatingActionButton: isFabVisible
+          ? FloatingActionButton(
+              onPressed: () => setState(() {
+                futureBusArrivalInfo =
+                    fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+                ;
+              }),
+              child: const Icon(Icons.refresh_rounded, size: 28),
+              enableFeedback: true,
+            )
+          : null,
     );
   }
 }
