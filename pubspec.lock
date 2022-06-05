@@ -8,6 +8,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "40.0.0"
+  alphanum_comparator:
+    dependency: "direct main"
+    description:
+      name: alphanum_comparator
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.1"
   analyzer:
     dependency: transitive
     description:

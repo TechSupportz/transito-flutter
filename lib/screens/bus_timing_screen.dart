@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
@@ -20,7 +21,7 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
   final Distance distance = const Distance();
-  final String busStopCode = '72069';
+  final String busStopCode = '75009';
   Map<String, String> requestHeaders = {
     'Accept': 'application/json',
     'AccountKey': Secret.LtaApiKey
@@ -31,13 +32,11 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   @override
   void initState() {
     super.initState();
-    futureBusArrivalInfo = fetchArrivalTimings()
-        //     .then((value) {
-        //   var _value = value;
-        //   _value.services.sort((a, b) => a.serviceNum.compareTo(b.serviceNum));
-        //   return _value;
-        // })
-        ;
+    futureBusArrivalInfo = fetchArrivalTimings().then((value) {
+      var _value = value;
+      _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
+      return _value;
+    });
   }
 
   Future<Position> getUserLocation() async {
