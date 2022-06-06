@@ -7,4 +7,6 @@ class AppColors {
   static const Color prettyGreen = Color(0xFF5BDB7A);
   static const Color notReallyYellow = Color(0xFFF7A74D);
   static const Color sortaRed = Color(0xFFF46A49);
+
+  static const Color cardBg = Color(0xFF1d1d1d);
 }
