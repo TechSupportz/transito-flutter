@@ -36,58 +36,62 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Nearby",
-          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-        ),
-        SizedBox(
-          height: 12,
-        ),
-        FutureBuilder(
-            future: busStops,
-            builder: (BuildContext context, AsyncSnapshot<List<BusStopInfo>> snapshot) {
-              if (snapshot.hasData) {
-                return Expanded(
-                  child: GridView.count(
-                    childAspectRatio: 2.5 / 1,
-                    crossAxisSpacing: 18,
-                    mainAxisSpacing: 21,
-                    shrinkWrap: true,
-                    crossAxisCount: 2,
-                    children: [
-                      BusStopCard(
-                        busStopInfo: snapshot.data![0],
-                      ),
-                      BusStopCard(
-                        busStopInfo: snapshot.data![1],
-                      ),
-                      BusStopCard(
-                        busStopInfo: snapshot.data![28],
-                      ),
-                      BusStopCard(
-                        busStopInfo: snapshot.data![173],
-                      ),
-                      BusStopCard(
-                        busStopInfo: snapshot.data![1933],
-                      ),
-                      BusStopCard(
-                        busStopInfo: snapshot.data![500],
-                      ),
-                    ],
-                  ),
-                );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            })
-      ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Nearby",
+            style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          FutureBuilder(
+              future: busStops,
+              builder: (BuildContext context, AsyncSnapshot<List<BusStopInfo>> snapshot) {
+                if (snapshot.hasData) {
+                  return Expanded(
+                    child: GridView.count(
+                      childAspectRatio: 2.5 / 1,
+                      crossAxisSpacing: 18,
+                      mainAxisSpacing: 21,
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        BusStopCard(
+                          busStopInfo: snapshot.data![0],
+                        ),
+                        BusStopCard(
+                          busStopInfo: snapshot.data![1],
+                        ),
+                        BusStopCard(
+                          busStopInfo: snapshot.data![28],
+                        ),
+                        BusStopCard(
+                          busStopInfo: snapshot.data![173],
+                        ),
+                        BusStopCard(
+                          busStopInfo: snapshot.data![1933],
+                        ),
+                        BusStopCard(
+                          busStopInfo: snapshot.data![500],
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              })
+        ],
+      ),
     );
   }
 }

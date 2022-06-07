@@ -26,6 +26,8 @@ class BusStopCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: Tooltip(
+        preferBelow: false,
+        showDuration: Duration(milliseconds: 350),
         message: busStopInfo.busStopName,
         child: InkWell(
           onTap: () =>
