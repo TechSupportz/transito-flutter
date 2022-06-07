@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 
-import 'screens/bus_timing_screen.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -24,6 +22,17 @@ class MyApp extends StatelessWidget {
           secondary: AppColors.veryPurple,
           onPrimary: Colors.white,
           onSecondary: Colors.white,
+        ),
+        splashFactory: InkSplash.splashFactory,
+        tooltipTheme: TooltipThemeData(
+          textStyle: TextStyle(
+            color: AppColors.kindaGrey,
+            fontWeight: FontWeight.w500,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.black54,
+            borderRadius: BorderRadius.circular(8),
+          ),
         ),
       ),
       initialRoute: MainScreen.routeName,

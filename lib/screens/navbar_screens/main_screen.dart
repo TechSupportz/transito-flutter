@@ -26,35 +26,37 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(widgetList[_pageIndex].toString().split("Screen")[0])),
-      body: PageView(
-        controller: controller,
-        children: widgetList,
-        pageSnapping: true,
-        dragStartBehavior: DragStartBehavior.start,
-        onPageChanged: (index) {
-          setState(() => _pageIndex = index);
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
-          BottomNavigationBarItem(icon: Icon(Icons.search_rounded), label: "Search"),
-        ],
-        backgroundColor: Colors.black,
-        unselectedItemColor: Color(0xFFD8DBE2),
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        currentIndex: _pageIndex,
-        onTap: (index) {
-          setState(() {
-            _pageIndex = index;
-            controller.animateToPage(index,
-                duration: const Duration(milliseconds: 300), curve: Curves.ease);
-          });
-        },
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppBar(title: Text(widgetList[_pageIndex].toString().split("Screen")[0])),
+        body: PageView(
+          controller: controller,
+          children: widgetList,
+          pageSnapping: true,
+          dragStartBehavior: DragStartBehavior.start,
+          onPageChanged: (index) {
+            setState(() => _pageIndex = index);
+          },
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: "Home"),
+            BottomNavigationBarItem(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
+            BottomNavigationBarItem(icon: Icon(Icons.search_rounded), label: "Search"),
+          ],
+          backgroundColor: Colors.black,
+          unselectedItemColor: Color(0xFFD8DBE2),
+          showSelectedLabels: false,
+          showUnselectedLabels: false,
+          currentIndex: _pageIndex,
+          onTap: (index) {
+            setState(() {
+              _pageIndex = index;
+              controller.animateToPage(index,
+                  duration: const Duration(milliseconds: 300), curve: Curves.ease);
+            });
+          },
+        ),
       ),
     );
   }
