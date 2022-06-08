@@ -96,24 +96,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        BusStopCard(
-                          busStopInfo: snapshot.data![0].busStopInfo,
-                        ),
-                        BusStopCard(
-                          busStopInfo: snapshot.data![1].busStopInfo,
-                        ),
-                        BusStopCard(
-                          busStopInfo: snapshot.data![2].busStopInfo,
-                        ),
-                        BusStopCard(
-                          busStopInfo: snapshot.data![3].busStopInfo,
-                        ),
-                        BusStopCard(
-                          busStopInfo: snapshot.data![4].busStopInfo,
-                        ),
-                        BusStopCard(
-                          busStopInfo: snapshot.data![5].busStopInfo,
-                        ),
+                        for (var busStop in snapshot.data!)
+                          BusStopCard(
+                            busStopInfo: busStop.busStopInfo,
+                          ),
                       ],
                     ),
                   );
