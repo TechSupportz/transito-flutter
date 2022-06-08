@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:transito/models/nearby_bus_stops.dart';
 
 import '../../models/bus_stops.dart';
 import '../../widgets/bus_stop_card.dart';
@@ -12,14 +15,45 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-late Future<List<BusStopInfo>> busStops;
+late Future<List<NearbyBusStops>> nearbyBusStops;
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Future<Position> getUserLocation() async {
-  //   debugPrint("Fetching user location");
-  //   Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-  //   debugPrint('$position');
-  //   return position;
+  final distance = const Distance();
+
+  Future<Position> getUserLocation() async {
+    debugPrint("Fetching user location");
+    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    debugPrint('$position');
+    return position;
+  }
+
+  Future<List<NearbyBusStops>> getNearbyBusStops({refresh = false}) async {
+    debugPrint("Fetching nearby bus stops");
+    // TODO: implement caching of nearby bus stops
+    // if (refresh == true) {
+    //   debugPrint("Nearby bus stops already fetched");
+    //   return nearbyBusStops;
+    // } else {
+    List<NearbyBusStops> _nearbyBusStops = [];
+    Position userLocation = await getUserLocation();
+    List<BusStopInfo> allBusStops = await fetchBusStops();
+
+    for (var busStop in allBusStops) {
+      LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
+      double distanceAway = distance.as(
+          LengthUnit.Meter, LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
+      if (distanceAway <= 500) {
+        _nearbyBusStops.add(NearbyBusStops(busStopInfo: busStop, distanceFromUser: distanceAway));
+      }
+    }
+    // setState(() {
+    //   nearbyBusStops = _nearbyBusStops;
+    // });
+
+    List<NearbyBusStops> _tempNearbyBusStops = _nearbyBusStops;
+    _tempNearbyBusStops.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
+    return _tempNearbyBusStops;
+  }
   // }
 
   Future<List<BusStopInfo>> fetchBusStops() async {
@@ -31,7 +65,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    busStops = fetchBusStops();
+    debugPrint("Initializing bus stops");
+    nearbyBusStops = getNearbyBusStops();
   }
 
   @override
@@ -49,8 +84,8 @@ class _HomeScreenState extends State<HomeScreen> {
             height: 12,
           ),
           FutureBuilder(
-              future: busStops,
-              builder: (BuildContext context, AsyncSnapshot<List<BusStopInfo>> snapshot) {
+              future: nearbyBusStops,
+              builder: (BuildContext context, AsyncSnapshot<List<NearbyBusStops>> snapshot) {
                 if (snapshot.hasData) {
                   return Expanded(
                     child: GridView.count(
@@ -62,22 +97,22 @@ class _HomeScreenState extends State<HomeScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         BusStopCard(
-                          busStopInfo: snapshot.data![0],
+                          busStopInfo: snapshot.data![0].busStopInfo,
                         ),
                         BusStopCard(
-                          busStopInfo: snapshot.data![1],
+                          busStopInfo: snapshot.data![1].busStopInfo,
                         ),
                         BusStopCard(
-                          busStopInfo: snapshot.data![28],
+                          busStopInfo: snapshot.data![2].busStopInfo,
                         ),
                         BusStopCard(
-                          busStopInfo: snapshot.data![173],
+                          busStopInfo: snapshot.data![3].busStopInfo,
                         ),
                         BusStopCard(
-                          busStopInfo: snapshot.data![1933],
+                          busStopInfo: snapshot.data![4].busStopInfo,
                         ),
                         BusStopCard(
-                          busStopInfo: snapshot.data![500],
+                          busStopInfo: snapshot.data![5].busStopInfo,
                         ),
                       ],
                     ),
