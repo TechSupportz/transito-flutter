@@ -18,17 +18,24 @@ class _MainScreenState extends State<MainScreen> {
     initialPage: 0,
     keepPage: true,
   );
+
   List<StatefulWidget> widgetList = [
     HomeScreen(),
     FavouritesScreen(),
     SearchScreen(),
   ];
 
+  List<String> pageTitles = [
+    'Home',
+    'Favourites',
+    'Search',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text(widgetList[_pageIndex].toString().split("Screen")[0])),
+        appBar: AppBar(title: Text(pageTitles[_pageIndex])),
         body: PageView(
           controller: controller,
           children: widgetList,
