@@ -25,26 +25,29 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("This is the search screen"),
-          TextField(
-            controller: textFieldController,
-            textAlign: TextAlign.center,
-            keyboardType: TextInputType.number,
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              _goToBusTimingScreen(context);
-            },
-            child: Text('Go to Bus Timing Page'),
-          )
-        ],
+    return Scaffold(
+      appBar: AppBar(title: const Text('Search')),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("This is the search screen"),
+            TextField(
+              controller: textFieldController,
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.number,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _goToBusTimingScreen(context);
+              },
+              child: Text('Go to Bus Timing Page'),
+            )
+          ],
+        ),
       ),
     );
   }

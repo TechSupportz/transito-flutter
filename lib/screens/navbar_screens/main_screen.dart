@@ -19,23 +19,27 @@ class _MainScreenState extends State<MainScreen> {
     keepPage: true,
   );
 
-  List<StatefulWidget> widgetList = [
+  List<StatefulWidget> widgetList = const [
     HomeScreen(),
     FavouritesScreen(),
     SearchScreen(),
   ];
 
-  List<String> pageTitles = [
-    'Home',
-    'Favourites',
-    'Search',
-  ];
+  void updatePageIndex(int index, {bool animate = true}) {
+    debugPrint('$index');
+    setState(() {
+      _pageIndex = index;
+      animate
+          ? controller.animateToPage(index,
+              duration: const Duration(milliseconds: 250), curve: Curves.ease)
+          : controller.jumpToPage(index);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(title: Text(pageTitles[_pageIndex])),
         body: PageView(
           controller: controller,
           children: widgetList,
@@ -66,16 +70,5 @@ class _MainScreenState extends State<MainScreen> {
         ),
       ),
     );
-  }
-
-  void updatePageIndex(int index, {bool animate = true}) {
-    debugPrint('$index');
-    setState(() {
-      _pageIndex = index;
-      animate
-          ? controller.animateToPage(index,
-              duration: const Duration(milliseconds: 250), curve: Curves.ease)
-          : controller.jumpToPage(index);
-    });
   }
 }
