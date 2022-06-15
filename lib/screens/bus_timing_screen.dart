@@ -13,14 +13,14 @@ import 'package:http/http.dart' as http;
 import '../models/secret.dart';
 
 class BusTimingScreen extends StatefulWidget {
-  const BusTimingScreen({
-    Key? key,
-    required this.busStopCode,
-    this.busStopName = 'Ayo?',
-  }) : super(key: key);
+  const BusTimingScreen(
+      {Key? key, required this.busStopCode, this.busStopName = 'Ayo?', this.busStopLocation})
+      : super(key: key);
   static String routeName = '/BusTiming';
   final String busStopCode;
   final String busStopName;
+  final LatLng?
+      busStopLocation; //TODO: replace optional with required once search fully is implemented
 
   @override
   State<BusTimingScreen> createState() => _BusTimingScreenState();
@@ -103,11 +103,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0),
           child: FutureBuilder(
-            future: Future.wait([
-              getUserLocation(),
-              futureBusArrivalInfo,
-            ]),
-            builder: (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+            future: futureBusArrivalInfo,
+            builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
               if (snapshot.hasData) {
                 return NotificationListener<UserScrollNotification>(
                   onNotification: (notification) {
@@ -122,13 +119,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                   child: ListView.separated(
                       itemBuilder: (BuildContext context, int index) {
                         return BusTimingRow(
-                          serviceInfo: snapshot.data![1].services[index],
-                          userLatLng:
-                              LatLng(snapshot.data![0].latitude, snapshot.data![0].longitude),
+                          serviceInfo: snapshot.data!.services[index],
+                          userLatLng: widget.busStopLocation!,
                         );
                       },
                       separatorBuilder: (BuildContext context, int index) => const Divider(),
-                      itemCount: snapshot.data![1].services.length),
+                      itemCount: snapshot.data!.services.length),
                 );
               } else if (snapshot.hasError) {
                 return Text("${snapshot.error}");

@@ -39,18 +39,21 @@ class _BusTimingRowState extends State<BusTimingRow> {
 
   // computes and returns the distance between user and bus either in meters or kilometers
   String calculateDistanceAway() {
-    double distanceAway = distance.as(
-        LengthUnit.Meter,
-        LatLng(
-          widget.serviceInfo.nextBus.latitude,
-          widget.serviceInfo.nextBus.longitude,
-        ),
-        widget.userLatLng);
-
-    if (distanceAway < 1000) {
-      return '${(distanceAway).toStringAsFixed(0)}m';
+    if (widget.serviceInfo.nextBus.latitude == 0 || widget.serviceInfo.nextBus.longitude == 0) {
+      return '???';
     } else {
-      return '${(distanceAway / 1000).toStringAsFixed(1)}km';
+      double distanceAway = distance.as(
+          LengthUnit.Meter,
+          LatLng(
+            widget.serviceInfo.nextBus.latitude,
+            widget.serviceInfo.nextBus.longitude,
+          ),
+          widget.userLatLng);
+      if (distanceAway < 1000) {
+        return '${(distanceAway).toStringAsFixed(0)}m';
+      } else {
+        return '${(distanceAway / 1000).toStringAsFixed(1)}km';
+      }
     }
   }
 

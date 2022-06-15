@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:transito/models/app_colors.dart';
 
 import '../models/bus_stops.dart';
@@ -9,13 +10,15 @@ class BusStopCard extends StatelessWidget {
 
   final BusStopInfo busStopInfo;
 
-  void goToBusTimingScreen(BuildContext context, String busStopCode, String busStopName) {
+  void goToBusTimingScreen(
+      BuildContext context, String busStopCode, String busStopName, LatLng busStopLocation) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BusTimingScreen(
           busStopCode: busStopCode,
           busStopName: busStopName,
+          busStopLocation: busStopLocation,
         ),
       ),
     );
@@ -30,8 +33,12 @@ class BusStopCard extends StatelessWidget {
         showDuration: Duration(milliseconds: 350),
         message: busStopInfo.busStopName,
         child: InkWell(
-          onTap: () =>
-              goToBusTimingScreen(context, busStopInfo.busStopCode, busStopInfo.busStopName),
+          onTap: () => goToBusTimingScreen(
+            context,
+            busStopInfo.busStopCode,
+            busStopInfo.busStopName,
+            LatLng(busStopInfo.latitude, busStopInfo.longitude),
+          ),
           customBorder: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
