@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 late Future<List<NearbyBusStops>> nearbyBusStops;
+List<NearbyBusStops> _nearbyBusStopsCache = [];
 
 class _HomeScreenState extends State<HomeScreen> {
   final distance = const Distance();
@@ -28,28 +29,29 @@ class _HomeScreenState extends State<HomeScreen> {
     return position;
   }
 
-  Future<List<NearbyBusStops>> getNearbyBusStops({refresh = false}) async {
-    debugPrint("Fetching nearby bus stops");
-    // TODO: implement caching of nearby bus stops
-    // if (nearbyBusStops.whenComplete(() => true && refresh)) {
-    //   debugPrint("Nearby bus stops already fetched");
-    //   return nearbyBusStops;
-    // } else {
-    List<NearbyBusStops> _nearbyBusStops = [];
-    Position userLocation = await getUserLocation();
-    List<BusStopInfo> allBusStops = await fetchBusStops();
+  Future<List<NearbyBusStops>> getNearbyBusStops({bool refresh = false}) async {
+    if (_nearbyBusStopsCache.isNotEmpty && !refresh) {
+      debugPrint("Nearby bus stops already fetched");
+      return _nearbyBusStopsCache;
+    } else {
+      debugPrint("Fetching nearby bus stops");
+      List<NearbyBusStops> _nearbyBusStops = [];
+      Position userLocation = await getUserLocation();
+      List<BusStopInfo> allBusStops = await fetchBusStops();
 
-    for (var busStop in allBusStops) {
-      LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
-      double distanceAway = distance.as(
-          LengthUnit.Meter, LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
-      if (distanceAway <= 500) {
-        _nearbyBusStops.add(NearbyBusStops(busStopInfo: busStop, distanceFromUser: distanceAway));
+      for (var busStop in allBusStops) {
+        LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
+        double distanceAway = distance.as(LengthUnit.Meter,
+            LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
+        if (distanceAway <= 500) {
+          _nearbyBusStops.add(NearbyBusStops(busStopInfo: busStop, distanceFromUser: distanceAway));
+        }
       }
+      List<NearbyBusStops> _tempNearbyBusStops = _nearbyBusStops;
+      _tempNearbyBusStops.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
+      _nearbyBusStopsCache = _tempNearbyBusStops;
+      return _tempNearbyBusStops;
     }
-    List<NearbyBusStops> _tempNearbyBusStops = _nearbyBusStops;
-    _tempNearbyBusStops.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
-    return _tempNearbyBusStops;
   }
 
   Future<List<BusStopInfo>> fetchBusStops() async {
