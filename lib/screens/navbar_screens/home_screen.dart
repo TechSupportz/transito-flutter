@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<List<BusStopInfo>> fetchBusStops() async {
     debugPrint("Fetching bus stops");
-    final String response = await rootBundle.loadString('assets/mock_data.json');
+    final String response = await rootBundle.loadString('assets/bus_stops.json');
     return AllBusStops.fromJson(jsonDecode(response)).busStops;
   }
 

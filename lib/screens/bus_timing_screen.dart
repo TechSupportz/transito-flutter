@@ -11,6 +11,7 @@ import 'package:transito/models/arrival_info.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 import 'package:http/http.dart' as http;
 import '../models/secret.dart';
+import 'add_favourite_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen(
@@ -67,6 +68,15 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return _value;
   }
 
+  void goToAddFavouritesScreen(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddFavouritesScreen(),
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -96,7 +106,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           actions: [
             IconButton(
               icon: Icon(Icons.favorite_border_rounded),
-              onPressed: () => debugPrint("hello"),
+              onPressed: () => goToAddFavouritesScreen(context),
             )
           ],
         ),

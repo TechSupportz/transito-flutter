@@ -25,13 +25,38 @@ class MyApp extends StatelessWidget {
         ),
         splashFactory: InkSplash.splashFactory,
         tooltipTheme: TooltipThemeData(
-          textStyle: TextStyle(
+          textStyle: const TextStyle(
             color: AppColors.kindaGrey,
             fontWeight: FontWeight.w500,
           ),
           decoration: BoxDecoration(
             color: Colors.black54,
             borderRadius: BorderRadius.circular(8),
+          ),
+        ),
+        checkboxTheme: CheckboxThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(5),
+          ),
+          visualDensity: VisualDensity.standard,
+          side: BorderSide(
+            color: AppColors.kindaGrey,
+            width: 1.75,
+          ),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(7.5),
+            ),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(7.5),
+            ),
+            side: BorderSide(color: AppColors.veryPurple),
           ),
         ),
       ),

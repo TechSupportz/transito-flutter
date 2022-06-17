@@ -401,6 +401,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  parent_child_checkbox:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: a7bc938de38ca021229ad7d5482ed5ba214e6bf8
+      url: "https://github.com/TechSupportz/parent-child-checkbox"
+    source: git
+    version: "0.0.3"
   path:
     dependency: transitive
     description:
