@@ -10,14 +10,15 @@ class BusStopCard extends StatelessWidget {
 
   final BusStopInfo busStopInfo;
 
-  void goToBusTimingScreen(
-      BuildContext context, String busStopCode, String busStopName, LatLng busStopLocation) {
+  void goToBusTimingScreen(BuildContext context, String busStopCode, String busStopName,
+      String busStopAddress, LatLng busStopLocation) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BusTimingScreen(
           busStopCode: busStopCode,
           busStopName: busStopName,
+          busStopAddress: busStopAddress,
           busStopLocation: busStopLocation,
         ),
       ),
@@ -37,6 +38,7 @@ class BusStopCard extends StatelessWidget {
             context,
             busStopInfo.busStopCode,
             busStopInfo.busStopName,
+            busStopInfo.roadName,
             LatLng(busStopInfo.latitude, busStopInfo.longitude),
           ),
           customBorder: RoundedRectangleBorder(

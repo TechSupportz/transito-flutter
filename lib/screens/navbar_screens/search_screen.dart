@@ -18,6 +18,7 @@ class _SearchScreenState extends State<SearchScreen> {
       MaterialPageRoute(
         builder: (context) => BusTimingScreen(
           busStopCode: _busStopCode,
+          busStopAddress: '',
         ),
       ),
     );

@@ -15,11 +15,16 @@ import 'add_favourite_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen(
-      {Key? key, required this.busStopCode, this.busStopName = 'Ayo?', this.busStopLocation})
+      {Key? key,
+      required this.busStopCode,
+      this.busStopName = 'Ayo?',
+      required this.busStopAddress,
+      this.busStopLocation})
       : super(key: key);
   static String routeName = '/BusTiming';
   final String busStopCode;
   final String busStopName;
+  final String busStopAddress;
   final LatLng?
       busStopLocation; //TODO: replace optional with required once search fully is implemented
 
@@ -68,11 +73,33 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return _value;
   }
 
-  void goToAddFavouritesScreen(BuildContext context) {
+  Future<List<String>> getBusServiceNumList() async {
+    List<String> busServicesList = await futureBusArrivalInfo.then(
+      (value) {
+        List<String> _busServicesList = [];
+        for (var service in value.services) {
+          _busServicesList.add(service.serviceNum);
+          // debugPrint('$_busServicesList');
+        }
+        return _busServicesList;
+      },
+    );
+    // debugPrint('$busServicesList');
+    return busServicesList;
+  }
+
+  Future<void> goToAddFavouritesScreen(BuildContext context) async {
+    List<String> busServicesList = await getBusServiceNumList();
+    // debugPrint('$busServicesList');
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const AddFavouritesScreen(),
+        builder: (context) => AddFavouritesScreen(
+          busStopCode: widget.busStopCode,
+          busStopName: widget.busStopName,
+          busStopAddress: widget.busStopAddress,
+          busServicesList: busServicesList,
+        ),
       ),
     );
   }
