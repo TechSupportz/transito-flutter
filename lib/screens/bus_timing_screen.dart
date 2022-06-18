@@ -132,6 +132,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           title: Text(widget.busStopName),
           actions: [
             IconButton(
+              //TODO: make icon and onPressed change based on if bus stop is in favourites
               icon: Icon(Icons.favorite_border_rounded),
               onPressed: () => goToAddFavouritesScreen(context),
             )

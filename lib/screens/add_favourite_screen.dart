@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
+import 'package:parent_child_checkbox/parent_child_checkbox.dart';
+import 'package:provider/provider.dart';
+import 'package:transito/models/favourite.dart';
+import 'package:transito/providers/favourites_provider.dart';
 
 import '../models/app_colors.dart';
 
@@ -27,6 +31,24 @@ const checkBoxFontStyle = TextStyle(
 class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
   @override
   Widget build(BuildContext context) {
+    var favourites = context.read<FavouritesProvider>();
+    var favouritesList = favourites.favouritesList;
+
+    void addToFavorites() {
+      // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
+      // debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
+
+      if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
+        var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services'];
+        favourites.addFavourite(
+          Favourite(busStopCode: widget.busStopCode, services: selectedServices),
+        );
+        print(favourites.favouritesList);
+      } else {
+        print('duplicate favourite');
+      }
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add to Favourites'),
@@ -101,14 +123,15 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
                       child: ElevatedButton(
-                          onPressed: () => print('bruh'), child: const Text("Add to favourites"))),
+                          onPressed: () => addToFavorites(),
+                          child: const Text("Add to favourites"))),
                   const SizedBox(
                     height: 8,
                   ),
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
                       child: OutlinedButton(
-                          onPressed: () => print('bruh'), child: const Text('Cancel')))
+                          onPressed: () => Navigator.pop(context), child: const Text('Cancel')))
                 ],
               ),
             ),
