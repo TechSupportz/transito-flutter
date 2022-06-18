@@ -5,8 +5,6 @@ import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/enums/bus_type_enum.dart';
 import 'package:transito/models/enums/crowd_lvl_enum.dart';
 import '../models/arrival_info.dart';
-// import '../models/enums/crowd_lvl_enum.dart';
-// import '../models/enums/bus_type_enum.dart';
 
 class BusTimingRow extends StatefulWidget {
   const BusTimingRow({Key? key, required this.serviceInfo, required this.userLatLng})

@@ -7,10 +7,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/models/arrival_info.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 import 'package:http/http.dart' as http;
 import '../models/secret.dart';
+import '../providers/favourites_provider.dart';
 import 'add_favourite_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
@@ -126,67 +128,74 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.busStopName),
-          actions: [
-            IconButton(
-              //TODO: make icon and onPressed change based on if bus stop is in favourites
-              icon: Icon(Icons.favorite_border_rounded),
-              onPressed: () => goToAddFavouritesScreen(context),
-            )
-          ],
-        ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-          child: FutureBuilder(
-            future: futureBusArrivalInfo,
-            builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
-              if (snapshot.hasData) {
-                return NotificationListener<UserScrollNotification>(
-                  onNotification: (notification) {
-                    if (notification.direction == ScrollDirection.forward) {
-                      !isFabVisible ? setState(() => isFabVisible = true) : null;
-                    } else if (notification.direction == ScrollDirection.reverse) {
-                      isFabVisible ? setState(() => isFabVisible = false) : null;
-                    }
-
-                    return true;
-                  },
-                  child: ListView.separated(
-                      itemBuilder: (BuildContext context, int index) {
-                        return BusTimingRow(
-                          serviceInfo: snapshot.data!.services[index],
-                          userLatLng: widget.busStopLocation!,
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const Divider(),
-                      itemCount: snapshot.data!.services.length),
-                );
-              } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
+    return Consumer<FavouritesProvider>(
+      builder: (context, value, child) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.busStopName),
+            actions: [
+              value.favouritesList.every((element) => element.busStopCode != widget.busStopCode)
+                  ? IconButton(
+                      icon: Icon(Icons.favorite_border_rounded),
+                      onPressed: () => goToAddFavouritesScreen(context),
+                    )
+                  : IconButton(
+                      icon: Icon(Icons.favorite_rounded),
+                      onPressed: () =>
+                          print('already added to favourites'), //TODO: replace with snackbar
+                    )
+            ],
           ),
-        ),
-        floatingActionButton: isFabVisible
-            ? FloatingActionButton(
-                onPressed: () => setState(() {
-                  futureBusArrivalInfo = fetchArrivalTimings().then(
-                    (value) => sortBusArrivalInfo(value),
+          body: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0),
+            child: FutureBuilder(
+              future: futureBusArrivalInfo,
+              builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
+                if (snapshot.hasData) {
+                  return NotificationListener<UserScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification.direction == ScrollDirection.forward) {
+                        !isFabVisible ? setState(() => isFabVisible = true) : null;
+                      } else if (notification.direction == ScrollDirection.reverse) {
+                        isFabVisible ? setState(() => isFabVisible = false) : null;
+                      }
+
+                      return true;
+                    },
+                    child: ListView.separated(
+                        itemBuilder: (BuildContext context, int index) {
+                          return BusTimingRow(
+                            serviceInfo: snapshot.data!.services[index],
+                            userLatLng: widget.busStopLocation!,
+                          );
+                        },
+                        separatorBuilder: (BuildContext context, int index) => const Divider(),
+                        itemCount: snapshot.data!.services.length),
                   );
-                  HapticFeedback.lightImpact();
-                }),
-                child: const Icon(Icons.refresh_rounded, size: 28),
-                enableFeedback: true,
-              )
-            : null,
-      ),
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
+            ),
+          ),
+          floatingActionButton: isFabVisible
+              ? FloatingActionButton(
+                  onPressed: () => setState(() {
+                    futureBusArrivalInfo = fetchArrivalTimings().then(
+                      (value) => sortBusArrivalInfo(value),
+                    );
+                    HapticFeedback.lightImpact();
+                  }),
+                  child: const Icon(Icons.refresh_rounded, size: 28),
+                  enableFeedback: true,
+                )
+              : null,
+        );
+      },
     );
   }
 }

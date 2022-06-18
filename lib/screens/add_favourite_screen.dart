@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
-import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
@@ -37,13 +36,14 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
     void addToFavorites() {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       // debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
-
+      //TODO: add snackbar to notify favourite add
       if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services'];
         favourites.addFavourite(
           Favourite(busStopCode: widget.busStopCode, services: selectedServices),
         );
         print(favourites.favouritesList);
+        Navigator.pop(context);
       } else {
         print('duplicate favourite');
       }
