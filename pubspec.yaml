@@ -24,6 +24,7 @@ dependencies:
   parent_child_checkbox:
     git:
       url: https://github.com/TechSupportz/parent-child-checkbox
+  flutter_svg: ^1.0.3
 
 dev_dependencies:
   flutter_test:
@@ -38,8 +39,7 @@ flutter:
 
   assets:
     - assets/
-    - assets/images/mrt_map.png
-    - assets/images/mrt_map.svg
+    - assets/images/
 
   fonts:
     - family: Poppins

@@ -86,49 +86,47 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            Text(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
+            child: Text(
               widget.busStopName,
               style: const TextStyle(
                   fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
             ),
-            SizedBox(
-              height: 8,
-            ),
-            FutureBuilder(
-              future: futureBusArrivalInfo,
-              builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
-                if (snapshot.hasData) {
-                  return ListView.separated(
-                      itemBuilder: (context, int index) {
-                        return Transform.scale(
-                          scale: 0.95,
-                          child: BusTimingRow(
-                            serviceInfo: snapshot.data![index],
-                            userLatLng: widget.busStopLocation,
-                          ),
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                            height: 8,
-                          ),
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length);
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
-            )
-          ],
-        ),
+          ),
+          FutureBuilder(
+            future: futureBusArrivalInfo,
+            builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
+              if (snapshot.hasData) {
+                return ListView.separated(
+                    itemBuilder: (context, int index) {
+                      return Transform.scale(
+                        scale: 0.9,
+                        child: BusTimingRow(
+                          serviceInfo: snapshot.data![index],
+                          userLatLng: widget.busStopLocation,
+                        ),
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                          height: 6,
+                        ),
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: EdgeInsets.only(bottom: 18),
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length);
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              } else {
+                return const Center(child: CircularProgressIndicator());
+              }
+            },
+          )
+        ],
       ),
     );
   }

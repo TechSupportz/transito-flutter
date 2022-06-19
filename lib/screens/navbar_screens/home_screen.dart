@@ -134,7 +134,10 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => refreshBusStops(),
+        onPressed: () {
+          refreshBusStops();
+          HapticFeedback.lightImpact();
+        },
         child: const Icon(Icons.my_location_rounded),
       ),
     );

@@ -81,7 +81,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
         Expanded(
           flex: 3,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               ArrivalCard(
                 eta: formatArrivalTime(widget.serviceInfo.nextBus.estimatedArrival),
@@ -210,13 +210,10 @@ class _ArrivalCardState extends State<ArrivalCard> {
               ),
             ],
           )
-        : const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
-            child: Center(
-                child: Text(
-              '-',
-              style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.white),
-            )),
-          );
+        : Center(
+            child: Text(
+            '    -  ',
+            style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.white),
+          ));
   }
 }

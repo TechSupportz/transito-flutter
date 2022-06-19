@@ -105,6 +105,16 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     );
   }
 
+  bool hideFabOnScroll(UserScrollNotification notification) {
+    if (notification.direction == ScrollDirection.forward) {
+      !isFabVisible ? setState(() => isFabVisible = true) : null;
+    } else if (notification.direction == ScrollDirection.reverse) {
+      isFabVisible ? setState(() => isFabVisible = false) : null;
+    }
+
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -150,15 +160,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
             builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
               if (snapshot.hasData) {
                 return NotificationListener<UserScrollNotification>(
-                  onNotification: (notification) {
-                    if (notification.direction == ScrollDirection.forward) {
-                      !isFabVisible ? setState(() => isFabVisible = true) : null;
-                    } else if (notification.direction == ScrollDirection.reverse) {
-                      isFabVisible ? setState(() => isFabVisible = false) : null;
-                    }
-
-                    return true;
-                  },
+                  onNotification: (notification) => hideFabOnScroll(notification),
                   child: ListView.separated(
                       itemBuilder: (context, int index) {
                         return BusTimingRow(
