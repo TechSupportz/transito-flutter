@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
@@ -12,11 +13,13 @@ class AddFavouritesScreen extends StatefulWidget {
       required this.busStopCode,
       required this.busStopName,
       required this.busStopAddress,
+      required this.busStopLocation,
       required this.busServicesList})
       : super(key: key);
   final String busStopCode;
   final String busStopName;
   final String busStopAddress;
+  final LatLng busStopLocation;
   final List<String> busServicesList;
 
   @override
@@ -40,7 +43,12 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
       if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services'];
         favourites.addFavourite(
-          Favourite(busStopCode: widget.busStopCode, services: selectedServices),
+          Favourite(
+              busStopCode: widget.busStopCode,
+              busStopName: widget.busStopName,
+              latitude: widget.busStopLocation.latitude,
+              longitude: widget.busStopLocation.longitude,
+              services: selectedServices),
         );
         print(favourites.favouritesList);
         Navigator.pop(context);

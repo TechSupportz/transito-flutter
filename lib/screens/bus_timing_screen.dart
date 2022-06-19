@@ -21,14 +21,13 @@ class BusTimingScreen extends StatefulWidget {
       required this.busStopCode,
       this.busStopName = 'Ayo?',
       required this.busStopAddress,
-      this.busStopLocation})
+      required this.busStopLocation})
       : super(key: key);
   static String routeName = '/BusTiming';
   final String busStopCode;
   final String busStopName;
   final String busStopAddress;
-  final LatLng?
-      busStopLocation; //TODO: replace optional with required once search fully is implemented
+  final LatLng busStopLocation;
 
   @override
   State<BusTimingScreen> createState() => _BusTimingScreenState();
@@ -36,7 +35,6 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
-  final Distance distance = const Distance();
   bool isFabVisible = true;
   late Timer timer;
 
@@ -100,6 +98,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           busStopCode: widget.busStopCode,
           busStopName: widget.busStopName,
           busStopAddress: widget.busStopAddress,
+          busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
       ),
@@ -136,51 +135,49 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
             actions: [
               value.favouritesList.every((element) => element.busStopCode != widget.busStopCode)
                   ? IconButton(
-                      icon: Icon(Icons.favorite_border_rounded),
+                      icon: const Icon(Icons.favorite_border_rounded),
                       onPressed: () => goToAddFavouritesScreen(context),
                     )
                   : IconButton(
-                      icon: Icon(Icons.favorite_rounded),
+                      icon: const Icon(Icons.favorite_rounded),
                       onPressed: () =>
                           print('already added to favourites'), //TODO: replace with snackbar
                     )
             ],
           ),
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0),
-            child: FutureBuilder(
-              future: futureBusArrivalInfo,
-              builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
-                if (snapshot.hasData) {
-                  return NotificationListener<UserScrollNotification>(
-                    onNotification: (notification) {
-                      if (notification.direction == ScrollDirection.forward) {
-                        !isFabVisible ? setState(() => isFabVisible = true) : null;
-                      } else if (notification.direction == ScrollDirection.reverse) {
-                        isFabVisible ? setState(() => isFabVisible = false) : null;
-                      }
+          body: FutureBuilder(
+            future: futureBusArrivalInfo,
+            builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
+              if (snapshot.hasData) {
+                return NotificationListener<UserScrollNotification>(
+                  onNotification: (notification) {
+                    if (notification.direction == ScrollDirection.forward) {
+                      !isFabVisible ? setState(() => isFabVisible = true) : null;
+                    } else if (notification.direction == ScrollDirection.reverse) {
+                      isFabVisible ? setState(() => isFabVisible = false) : null;
+                    }
 
-                      return true;
-                    },
-                    child: ListView.separated(
-                        itemBuilder: (BuildContext context, int index) {
-                          return BusTimingRow(
-                            serviceInfo: snapshot.data!.services[index],
-                            userLatLng: widget.busStopLocation!,
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) => const Divider(),
-                        itemCount: snapshot.data!.services.length),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-              },
-            ),
+                    return true;
+                  },
+                  child: ListView.separated(
+                      itemBuilder: (context, int index) {
+                        return BusTimingRow(
+                          serviceInfo: snapshot.data!.services[index],
+                          userLatLng: widget.busStopLocation,
+                        );
+                      },
+                      padding: const EdgeInsets.only(bottom: 32, left: 12, right: 12),
+                      separatorBuilder: (BuildContext context, int index) => const Divider(),
+                      itemCount: snapshot.data!.services.length),
+                );
+              } else if (snapshot.hasError) {
+                return Text("${snapshot.error}");
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+            },
           ),
           floatingActionButton: isFabVisible
               ? FloatingActionButton(
