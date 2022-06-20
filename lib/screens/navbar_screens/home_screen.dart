@@ -110,12 +110,11 @@ class _HomeScreenState extends State<HomeScreen> {
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) => hideFabOnScroll(notification),
         child: SingleChildScrollView(
-          padding: EdgeInsets.only(left: 12, right: 12, bottom: 32),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NearbyFavouritesGrid(userLocation: getUserLocation()),
-              const SizedBox(height: 18.0),
               nearbyBusStopsGrid(),
             ],
           ),
@@ -177,7 +176,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class NearbyFavouritesGrid extends StatefulWidget {
   const NearbyFavouritesGrid({Key? key, required this.userLocation}) : super(key: key);
-
   final Future<Position> userLocation;
 
   @override
@@ -243,6 +241,7 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
                               return FavouritesTimingCard(
                                 busStopCode: snapshot.data![index].busStopInfo.busStopCode,
                                 busStopName: snapshot.data![index].busStopInfo.busStopName,
+                                busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
                                 busStopLocation: LatLng(snapshot.data![index].busStopInfo.latitude,
                                     snapshot.data![index].busStopInfo.longitude),
                                 services: snapshot.data![index].busStopInfo.services,
@@ -251,21 +250,25 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
                             separatorBuilder: (BuildContext context, int index) => const SizedBox(
                               height: 18,
                             ),
+                            padding: const EdgeInsets.only(bottom: 18.0),
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
                             itemCount: snapshot.data!.length,
                           );
                         } else {
-                          return Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.cardBg,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Center(
-                              child: Text("No favourites nearby",
-                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 18.0),
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: AppColors.cardBg,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Center(
+                                child: Text("No favourites nearby",
+                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                              ),
                             ),
                           );
                         }

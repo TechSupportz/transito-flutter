@@ -6,6 +6,7 @@ part 'favourite.g.dart';
 class Favourite {
   String busStopCode;
   String busStopName;
+  String busStopAddress;
   double latitude;
   double longitude;
   List<String?> services;
@@ -13,6 +14,7 @@ class Favourite {
   Favourite({
     required this.busStopCode,
     required this.busStopName,
+    required this.busStopAddress,
     required this.latitude,
     required this.longitude,
     required this.services,

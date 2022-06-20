@@ -43,6 +43,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         return FavouritesTimingCard(
                           busStopCode: value.favouritesList[index].busStopCode,
                           busStopName: value.favouritesList[index].busStopName,
+                          busStopAddress: value.favouritesList[index].busStopAddress,
                           busStopLocation: LatLng(value.favouritesList[index].latitude,
                               value.favouritesList[index].longitude),
                           services: value.favouritesList[index].services,

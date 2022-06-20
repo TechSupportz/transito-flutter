@@ -47,12 +47,17 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
           Favourite(
               busStopCode: widget.busStopCode,
               busStopName: widget.busStopName,
+              busStopAddress: widget.busStopAddress,
               latitude: widget.busStopLocation.latitude,
               longitude: widget.busStopLocation.longitude,
               services: selectedServices),
         );
         print(favourites.favouritesList);
-        Navigator.push(context, MaterialPageRoute(builder: (context) => MainScreen()));
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+          (Route<dynamic> route) => false,
+        );
       } else {
         print('duplicate favourite');
       }

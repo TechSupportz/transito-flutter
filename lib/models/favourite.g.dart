@@ -9,6 +9,7 @@ part of 'favourite.dart';
 Favourite _$FavouriteFromJson(Map<String, dynamic> json) => Favourite(
       busStopCode: json['busStopCode'] as String,
       busStopName: json['busStopName'] as String,
+      busStopAddress: json['busStopAddress'] as String,
       latitude: (json['latitude'] as num).toDouble(),
       longitude: (json['longitude'] as num).toDouble(),
       services:
@@ -18,6 +19,7 @@ Favourite _$FavouriteFromJson(Map<String, dynamic> json) => Favourite(
 Map<String, dynamic> _$FavouriteToJson(Favourite instance) => <String, dynamic>{
       'busStopCode': instance.busStopCode,
       'busStopName': instance.busStopName,
+      'busStopAddress': instance.busStopAddress,
       'latitude': instance.latitude,
       'longitude': instance.longitude,
       'services': instance.services,
