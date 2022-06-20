@@ -4,6 +4,7 @@ import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
+import 'package:transito/screens/navbar_screens/main_screen.dart';
 
 import '../models/app_colors.dart';
 
@@ -51,7 +52,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               services: selectedServices),
         );
         print(favourites.favouritesList);
-        Navigator.pop(context);
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MainScreen()));
       } else {
         print('duplicate favourite');
       }
