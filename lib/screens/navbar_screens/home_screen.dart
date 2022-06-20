@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_provider.dart';
@@ -25,6 +27,17 @@ const distance = Distance();
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<NearbyBusStops>> nearbyBusStops;
+  bool isFabVisible = true;
+
+  bool hideFabOnScroll(UserScrollNotification notification) {
+    if (notification.direction == ScrollDirection.forward) {
+      !isFabVisible ? setState(() => isFabVisible = true) : null;
+    } else if (notification.direction == ScrollDirection.reverse) {
+      isFabVisible ? setState(() => isFabVisible = false) : null;
+    }
+
+    return true;
+  }
 
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
@@ -94,25 +107,29 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: (notification) => hideFabOnScroll(notification),
         child: SingleChildScrollView(
+          padding: EdgeInsets.only(left: 12, right: 12, bottom: 32),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               NearbyFavouritesGrid(userLocation: getUserLocation()),
+              const SizedBox(height: 18.0),
               nearbyBusStopsGrid(),
             ],
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          refreshBusStops();
-          HapticFeedback.lightImpact();
-        },
-        child: const Icon(Icons.my_location_rounded),
-      ),
+      floatingActionButton: isFabVisible
+          ? FloatingActionButton(
+              onPressed: () {
+                refreshBusStops();
+                HapticFeedback.lightImpact();
+              },
+              child: const Icon(Icons.my_location_rounded),
+            )
+          : null,
     );
   }
 
@@ -184,7 +201,7 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
       LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
       double distanceAway = distance.as(
           LengthUnit.Meter, LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
-      if (distanceAway <= 500) {
+      if (distanceAway <= 750) {
         _nearbyFavourites
             .add(NearbyFavourites(busStopInfo: busStop, distanceFromUser: distanceAway));
       }
@@ -220,24 +237,38 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
                     builder:
                         (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
                       if (snapshot.hasData) {
-                        return ListView.separated(
-                          itemBuilder: (context, int index) {
-                            return FavouritesTimingCard(
-                              busStopCode: snapshot.data![index].busStopInfo.busStopCode,
-                              busStopName: snapshot.data![index].busStopInfo.busStopName,
-                              busStopLocation: LatLng(snapshot.data![index].busStopInfo.latitude,
-                                  snapshot.data![index].busStopInfo.longitude),
-                              services: snapshot.data![index].busStopInfo.services,
-                            );
-                          },
-                          padding: const EdgeInsets.only(top: 12, bottom: 32),
-                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                            height: 18,
-                          ),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: snapshot.data!.length,
-                        );
+                        if (snapshot.data!.isNotEmpty) {
+                          return ListView.separated(
+                            itemBuilder: (context, int index) {
+                              return FavouritesTimingCard(
+                                busStopCode: snapshot.data![index].busStopInfo.busStopCode,
+                                busStopName: snapshot.data![index].busStopInfo.busStopName,
+                                busStopLocation: LatLng(snapshot.data![index].busStopInfo.latitude,
+                                    snapshot.data![index].busStopInfo.longitude),
+                                services: snapshot.data![index].busStopInfo.services,
+                              );
+                            },
+                            separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                              height: 18,
+                            ),
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: snapshot.data!.length,
+                          );
+                        } else {
+                          return Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardBg,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Text("No favourites nearby",
+                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                            ),
+                          );
+                        }
                       } else if (snapshot.hasError) {
                         return Text("${snapshot.error}");
                       } else {
