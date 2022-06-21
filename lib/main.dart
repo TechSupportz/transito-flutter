@@ -21,6 +21,8 @@ class MyApp extends StatelessWidget {
         title: "Transito",
         theme: ThemeData(
           fontFamily: 'Poppins',
+          canvasColor: Colors.transparent,
+          androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
           scaffoldBackgroundColor: Color(0xFF0C0C0C),
           colorScheme: const ColorScheme.dark().copyWith(
             surface: Colors.black,
@@ -45,7 +47,7 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.circular(5),
             ),
             visualDensity: VisualDensity.standard,
-            side: BorderSide(
+            side: const BorderSide(
               color: AppColors.kindaGrey,
               width: 1.75,
             ),

@@ -21,4 +21,12 @@ class FavouritesProvider extends ChangeNotifier {
         .indexWhere((element) => element.busStopCode == favourite.busStopCode)] = favourite;
     notifyListeners();
   }
+
+  void reorderFavourite(int oldIndex, int newIndex) {
+    if (oldIndex < newIndex) {
+      newIndex--;
+    }
+    _favouritesList.insert(newIndex, _favouritesList.removeAt(oldIndex));
+    notifyListeners();
+  }
 }

@@ -109,7 +109,14 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   height: 16,
                 ),
                 const Text(
-                  "Select all the bus services you would like to add to your favourites in this bus stop",
+                  "Select the bus services you would like to add to your favourites in this bus stop",
+                  style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                const Text(
+                  "Unselecting all the bus services will remove this bus stop from your favourites",
                   style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                 ),
                 const SizedBox(

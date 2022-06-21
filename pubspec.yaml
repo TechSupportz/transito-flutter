@@ -21,10 +21,10 @@ dependencies:
   http: ^0.13.4
   alphanum_comparator: ^2.0.1
   photo_view: ^0.14.0
+  flutter_svg: ^1.0.3
   parent_child_checkbox:
     git:
       url: https://github.com/TechSupportz/parent-child-checkbox
-  flutter_svg: ^1.0.3
 
 dev_dependencies:
   flutter_test:
