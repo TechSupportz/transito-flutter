@@ -413,7 +413,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: a7bc938de38ca021229ad7d5482ed5ba214e6bf8
+      resolved-ref: dd05e99295d5b9adadb9727f6d2e0946adfeeb47
       url: "https://github.com/TechSupportz/parent-child-checkbox"
     source: git
     version: "0.0.3"

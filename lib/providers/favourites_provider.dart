@@ -11,8 +11,14 @@ class FavouritesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void removeFavourite(Favourite favourite) {
-    _favouritesList.remove(favourite);
+  void removeFavourite(String busStopCode) {
+    _favouritesList.removeWhere((element) => element.busStopCode == busStopCode);
+    notifyListeners();
+  }
+
+  void updateFavourite(Favourite favourite) {
+    _favouritesList[_favouritesList
+        .indexWhere((element) => element.busStopCode == favourite.busStopCode)] = favourite;
     notifyListeners();
   }
 }

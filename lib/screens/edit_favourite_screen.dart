@@ -8,8 +8,8 @@ import 'package:transito/screens/navbar_screens/main_screen.dart';
 
 import '../models/app_colors.dart';
 
-class AddFavouritesScreen extends StatefulWidget {
-  const AddFavouritesScreen(
+class EditFavouritesScreen extends StatefulWidget {
+  const EditFavouritesScreen(
       {Key? key,
       required this.busStopCode,
       required this.busStopName,
@@ -24,26 +24,32 @@ class AddFavouritesScreen extends StatefulWidget {
   final List<String> busServicesList;
 
   @override
-  State<AddFavouritesScreen> createState() => _AddFavouritesScreenState();
+  State<EditFavouritesScreen> createState() => _EditFavouritesScreenState();
 }
 
 const checkBoxFontStyle = TextStyle(
   fontSize: 24,
 );
 
-class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
+class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     var favourites = context.read<FavouritesProvider>();
     var favouritesList = favourites.favouritesList;
 
-    void addToFavorites() {
+    Map<String?, List<String?>> initialSelectedChildren = {
+      'Bus Services': favouritesList
+          .firstWhere((element) => element.busStopCode == widget.busStopCode)
+          .services,
+    };
+
+    void updateFavorites() {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
-      //TODO: add snackbar to notify favourite added
-      if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
+      //TODO: add snackbar to notify favourite updated
+      if (ParentChildCheckbox.selectedChildrens['Bus Services'].length != 0) {
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
-        favourites.addFavourite(
+        favourites.updateFavourite(
           Favourite(
               busStopCode: widget.busStopCode,
               busStopName: widget.busStopName,
@@ -53,19 +59,21 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               services: selectedServices),
         );
         print(favourites.favouritesList);
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
-          (Route<dynamic> route) => false,
-        );
       } else {
-        print('duplicate favourite');
+        favourites.removeFavourite(widget.busStopCode);
       }
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MainScreen(),
+        ),
+        (Route<dynamic> route) => false,
+      );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add to Favourites'),
+        title: const Text('Edit Favourites'),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
@@ -119,6 +127,8 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                         for (var service in widget.busServicesList)
                           Text(service, style: checkBoxFontStyle),
                       ],
+                      // initialParentValue: {'Bus Services': true},
+                      initialChildrenValue: initialSelectedChildren,
                       parentCheckboxColor: AppColors.veryPurple,
                       childrenCheckboxColor: AppColors.veryPurple,
                       parentCheckboxScale: 1.35,
@@ -137,8 +147,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
                       child: ElevatedButton(
-                          onPressed: () => addToFavorites(),
-                          child: const Text("Add to favourites"))),
+                          onPressed: () => updateFavorites(), child: const Text("Save changes"))),
                   const SizedBox(
                     height: 8,
                   ),

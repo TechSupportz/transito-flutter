@@ -14,6 +14,7 @@ import 'package:http/http.dart' as http;
 import '../models/secret.dart';
 import '../providers/favourites_provider.dart';
 import 'add_favourite_screen.dart';
+import 'edit_favourite_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen(
@@ -105,6 +106,23 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     );
   }
 
+  Future<void> goToEditFavouritesScreen(BuildContext context) async {
+    List<String> busServicesList = await getBusServiceNumList();
+    // debugPrint('$busServicesList');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditFavouritesScreen(
+          busStopCode: widget.busStopCode,
+          busStopName: widget.busStopName,
+          busStopAddress: widget.busStopAddress,
+          busStopLocation: widget.busStopLocation,
+          busServicesList: busServicesList,
+        ),
+      ),
+    );
+  }
+
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
       !isFabVisible ? setState(() => isFabVisible = true) : null;
@@ -150,8 +168,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     )
                   : IconButton(
                       icon: const Icon(Icons.favorite_rounded),
-                      onPressed: () =>
-                          print('already added to favourites'), //TODO: replace with snackbar
+                      onPressed: () => goToEditFavouritesScreen(context),
                     )
             ],
           ),
