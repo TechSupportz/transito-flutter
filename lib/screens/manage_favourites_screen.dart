@@ -91,37 +91,53 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Manage Favourites'),
+            automaticallyImplyLeading: false,
           ),
-          body: ReorderableListView.builder(
-            header: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Drag and drop to reorder your favourites",
-                  style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+          body: Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "Drag and drop to reorder your favourites",
+                        style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Click the edit button to add/remove your favourited bus services",
+                        style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                      ),
+                      SizedBox(height: 18),
+                    ],
+                  ),
                 ),
-                SizedBox(height: 8),
-                Text(
-                  "Click the edit button to add/remove your favourited bus services",
-                  style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                ReorderableListView.builder(
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      key: Key(value.favouritesList[index].busStopCode),
+                      padding: const EdgeInsets.only(bottom: 18),
+                      child: FavouriteNameCard(
+                          busStopName: value.favouritesList[index].busStopName,
+                          onTap: () =>
+                              goToEditFavouritesScreen(context, value.favouritesList[index])),
+                    );
+                  },
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  shrinkWrap: true,
+                  buildDefaultDragHandles: true,
+                  itemCount: value.favouritesList.length,
+                  onReorder: (oldIndex, newIndex) => value.reorderFavourite(oldIndex, newIndex),
                 ),
-                SizedBox(height: 18),
               ],
             ),
-            itemBuilder: (context, index) {
-              return Padding(
-                key: Key(value.favouritesList[index].busStopCode),
-                padding: const EdgeInsets.only(bottom: 18),
-                child: FavouriteNameCard(
-                    busStopName: value.favouritesList[index].busStopName,
-                    onTap: () => goToEditFavouritesScreen(context, value.favouritesList[index])),
-              );
-            },
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            shrinkWrap: true,
-            buildDefaultDragHandles: true,
-            itemCount: value.favouritesList.length,
-            onReorder: (oldIndex, newIndex) => value.reorderFavourite(oldIndex, newIndex),
+          ),
+          floatingActionButton: FloatingActionButton(
+            child: const Icon(Icons.done_rounded),
+            onPressed: () => Navigator.pop(context),
           ),
         );
       },
