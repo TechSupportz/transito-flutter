@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
+import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -68,8 +69,9 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        initialRoute: MainScreen.routeName,
+        initialRoute: LocationAccessScreen.routeName,
         routes: {
+          LocationAccessScreen.routeName: (context) => LocationAccessScreen(),
           MainScreen.routeName: (context) => MainScreen(),
         },
         builder: (context, child) {
