@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 
 import '../models/app_colors.dart';
@@ -79,13 +79,6 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   }
 
   @override
-  void dispose() {
-    timer.cancel();
-    debugPrint("Timer cancelled");
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return FutureBuilder(
         future: futureBusArrivalInfo,
@@ -149,5 +142,12 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             );
           }
         });
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    debugPrint("Timer cancelled");
+    super.dispose();
   }
 }

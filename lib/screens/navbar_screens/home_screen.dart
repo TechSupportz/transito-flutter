@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -10,6 +11,7 @@ import 'package:transito/models/favourite.dart';
 import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
+import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
 
 import '../../models/bus_stops.dart';
 import '../../widgets/bus_stop_card.dart';
@@ -27,6 +29,7 @@ const distance = Distance();
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<NearbyBusStops>> nearbyBusStops;
+  late Future<bool> _isLocationPermissionGranted;
   bool isFabVisible = true;
 
   bool hideFabOnScroll(UserScrollNotification notification) {
@@ -37,6 +40,17 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return true;
+  }
+
+  Future<bool> checkLocationPermissions() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever ||
+        permission == LocationPermission.unableToDetermine) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   Future<Position> getUserLocation() async {
@@ -87,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     debugPrint("Initializing bus stops");
+    _isLocationPermissionGranted = checkLocationPermissions();
     nearbyBusStops = getNearbyBusStops();
   }
 
@@ -111,13 +126,57 @@ class _HomeScreenState extends State<HomeScreen> {
         onNotification: (notification) => hideFabOnScroll(notification),
         child: SingleChildScrollView(
           padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              NearbyFavouritesGrid(userLocation: getUserLocation()),
-              nearbyBusStopsGrid(),
-            ],
-          ),
+          child: FutureBuilder(
+              future: _isLocationPermissionGranted,
+              builder: (context, AsyncSnapshot<bool> snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data!) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        NearbyFavouritesGrid(userLocation: getUserLocation()),
+                        nearbyBusStopsGrid(),
+                      ],
+                    );
+                  } else {
+                    return Material(
+                      color: AppColors.cardBg,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Column(
+                          children: [
+                            const Text(
+                              "Please grant location permission to use this feature",
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            TextButton(
+                                onPressed: () => Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const LocationAccessScreen(),
+                                    ),
+                                    (route) => false),
+                                child: const Text("Grant permission")),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              }),
         ),
       ),
       floatingActionButton: isFabVisible
@@ -209,11 +268,6 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
     _nearbyFavouritesCache = _tempNearbyFavourites;
     return _tempNearbyFavourites;
     // }
-  }
-
-  void initState() {
-    super.initState();
-    debugPrint("Initializing favourites");
   }
 
   @override

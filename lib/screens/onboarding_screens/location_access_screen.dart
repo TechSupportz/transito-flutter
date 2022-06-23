@@ -3,27 +3,90 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:is_first_run/is_first_run.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
+import 'package:transito/screens/onboarding_screens/quick_start_screen.dart';
+
+import '../../models/app_colors.dart';
 
 class LocationAccessScreen extends StatefulWidget {
   const LocationAccessScreen({Key? key}) : super(key: key);
-  static String routeName = '/locationPermission';
 
   @override
   State<LocationAccessScreen> createState() => _LocationAccessScreenState();
 }
 
 class _LocationAccessScreenState extends State<LocationAccessScreen> {
-  Future<void> requestLocationPermission() async {
+  late bool _isFirstRun;
+
+  void checkIfFirstRun() async {
+    bool isFirstRun = await IsFirstRun.isFirstRun();
+    setState(() {
+      _isFirstRun = isFirstRun;
+    });
+  }
+
+  void goToMainScreen() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => MainScreen(),
+      ),
+    );
+  }
+
+  void goToQuickStart() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => QuickStartScreen(),
+      ),
+    );
+  }
+
+  Future<void> requestLocationPermission(BuildContext context) async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        requestLocationPermission();
-      } else {
-        Navigator.pushNamedAndRemoveUntil(context, MainScreen.routeName, (route) => false);
+        permission = await Geolocator.requestPermission();
       }
+      if (permission == LocationPermission.deniedForever) {
+        showDialog<void>(
+          context: context,
+          barrierDismissible: false, // user must tap button!
+          builder: (context) => AlertDialog(
+            backgroundColor: AppColors.cardBg,
+            title: Text('Location Permission Denied'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Location permission is required to use key features of this app.'),
+                SizedBox(height: 8),
+                Text('Please enable location permission via your settings.'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                child: Text('Open Settings'),
+                onPressed: () {
+                  Geolocator.openAppSettings();
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        );
+      } else {
+        _isFirstRun ? goToQuickStart() : goToMainScreen();
+      }
+    } else {
+      _isFirstRun ? goToQuickStart() : goToMainScreen();
     }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    checkIfFirstRun();
   }
 
   @override
@@ -52,6 +115,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
               children: [
                 SvgPicture.asset(
                   'assets/images/location.svg',
+                  placeholderBuilder: (context) => CircularProgressIndicator(),
                 ),
                 const SizedBox(
                   height: 10,
@@ -66,7 +130,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 42),
                 child: ElevatedButton(
-                  onPressed: () => requestLocationPermission(),
+                  onPressed: () => requestLocationPermission(context),
                   child: Text("Grant Permission"),
                 ),
               ),

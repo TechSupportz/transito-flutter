@@ -5,12 +5,13 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/arrival_info.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
-import 'package:http/http.dart' as http;
+
 import '../models/secret.dart';
 import '../providers/favourites_provider.dart';
 import 'add_favourite_screen.dart';
@@ -24,7 +25,6 @@ class BusTimingScreen extends StatefulWidget {
       required this.busStopAddress,
       required this.busStopLocation})
       : super(key: key);
-  static String routeName = '/BusTiming';
   final String busStopCode;
   final String busStopName;
   final String busStopAddress;
@@ -147,13 +147,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   }
 
   @override
-  void dispose() {
-    timer.cancel();
-    debugPrint("Timer cancelled");
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Consumer<FavouritesProvider>(
       builder: (context, value, child) {
@@ -213,5 +206,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    debugPrint("Timer cancelled");
+    super.dispose();
   }
 }

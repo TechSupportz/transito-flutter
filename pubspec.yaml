@@ -25,6 +25,7 @@ dependencies:
   parent_child_checkbox:
     git:
       url: https://github.com/TechSupportz/parent-child-checkbox
+  is_first_run: ^1.0.0
 
 dev_dependencies:
   flutter_test:
@@ -56,4 +57,9 @@ flutter:
           weight: 600
         - asset: assets/fonts/Poppins-Bold.ttf
           weight: 700
+
+    - family: Itim
+      fonts:
+        - asset: assets/fonts/Itim-Regular.ttf
+
 
