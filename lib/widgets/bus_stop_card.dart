@@ -32,7 +32,6 @@ class BusStopCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchProvider = Provider.of<SearchProvider>(context, listen: false);
-
     return Material(
       color: Colors.transparent,
       child: Tooltip(

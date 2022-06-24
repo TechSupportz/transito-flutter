@@ -8,5 +8,10 @@ class AppColors {
   static const Color notReallyYellow = Color(0xFFF7A74D);
   static const Color sortaRed = Color(0xFFF46A49);
 
+  static const Color SBST = Color(0xFF8A2890);
+  static const Color SMRT = Color(0xFFDC1C27);
+  static const Color TTS = Color(0xFF389643);
+  static const Color GAS = Color(0xFFF4BD00);
+
   static const Color cardBg = Color(0xFF1d1d1d);
 }
