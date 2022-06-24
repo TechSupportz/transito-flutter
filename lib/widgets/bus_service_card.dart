@@ -5,6 +5,7 @@ import 'package:transito/models/enums/bus_operator_enum.dart';
 
 import '../models/app_colors.dart';
 import '../providers/search_provider.dart';
+import '../screens/bus_service_info_screen.dart';
 
 class BusServiceCard extends StatelessWidget {
   const BusServiceCard({Key? key, required this.busServiceInfo}) : super(key: key);
@@ -35,6 +36,10 @@ class BusServiceCard extends StatelessWidget {
         onTap: () {
           searchProvider.addRecentSearch(busServiceInfo);
           debugPrint('Added recent search: ${busServiceInfo.serviceNo}');
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => BusServiceInfoScreen(busServiceInfo: busServiceInfo)));
         },
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
