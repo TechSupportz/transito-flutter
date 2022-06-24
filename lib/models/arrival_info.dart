@@ -1,8 +1,7 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:transito/models/enums/bus_operator_enum.dart';
 import 'package:transito/models/enums/bus_type_enum.dart';
 import 'package:transito/models/enums/crowd_lvl_enum.dart';
-
-import 'enums/bus_operator_enum.dart';
 
 part 'arrival_info.g.dart';
 

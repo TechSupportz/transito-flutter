@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 
 import '../models/bus_stops.dart';
+import '../providers/search_provider.dart';
 import '../screens/bus_timing_screen.dart';
 
 class BusStopCard extends StatelessWidget {
-  const BusStopCard({Key? key, required this.busStopInfo}) : super(key: key);
+  const BusStopCard({Key? key, required this.busStopInfo, this.searchMode = false})
+      : super(key: key);
 
   final BusStopInfo busStopInfo;
+  final bool searchMode;
 
   void goToBusTimingScreen(BuildContext context, String busStopCode, String busStopName,
       String busStopAddress, LatLng busStopLocation) {
@@ -27,6 +31,8 @@ class BusStopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final searchProvider = Provider.of<SearchProvider>(context, listen: false);
+
     return Material(
       color: Colors.transparent,
       child: Tooltip(
@@ -34,34 +40,38 @@ class BusStopCard extends StatelessWidget {
         showDuration: Duration(milliseconds: 350),
         message: busStopInfo.busStopName,
         child: InkWell(
-          onTap: () => goToBusTimingScreen(
-            context,
-            busStopInfo.busStopCode,
-            busStopInfo.busStopName,
-            busStopInfo.roadName,
-            LatLng(busStopInfo.latitude, busStopInfo.longitude),
-          ),
+          onTap: () {
+            if (searchMode) {
+              searchProvider.addRecentSearch(busStopInfo);
+              debugPrint('Added recent search: ${busStopInfo.busStopName}');
+            }
+            goToBusTimingScreen(
+              context,
+              busStopInfo.busStopCode,
+              busStopInfo.busStopName,
+              busStopInfo.roadName,
+              LatLng(busStopInfo.latitude, busStopInfo.longitude),
+            );
+          },
           customBorder: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Ink(
+          child: Container(
             decoration:
                 BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Text(
-                    busStopInfo.busStopName,
-                    overflow: TextOverflow.fade,
-                    maxLines: 1,
-                    softWrap: false,
-                    style: TextStyle(
-                      fontSize: 21,
-                      fontWeight: FontWeight.w500,
-                    ),
+                Text(
+                  busStopInfo.busStopName,
+                  overflow: TextOverflow.fade,
+                  maxLines: 1,
+                  softWrap: false,
+                  style: TextStyle(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 Row(

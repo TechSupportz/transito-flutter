@@ -50,7 +50,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever) {
-        showDialog<void>(
+        showDialog(
           context: context,
           barrierDismissible: false, // user must tap button!
           builder: (context) => AlertDialog(
@@ -131,7 +131,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
                 constraints: const BoxConstraints(minHeight: 42),
                 child: ElevatedButton(
                   onPressed: () => requestLocationPermission(context),
-                  child: Text("Grant Permission"),
+                  child: Text("Check Permission"),
                 ),
               ),
             ),

@@ -2,7 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/screens/navbar_screens/favourites_screen.dart';
 import 'package:transito/screens/navbar_screens/home_screen.dart';
-import 'package:transito/screens/navbar_screens/search_screen.dart';
+import 'package:transito/screens/navbar_screens/recent_search_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   List<StatefulWidget> widgetList = const [
     HomeScreen(),
     FavouritesScreen(),
-    SearchScreen(),
+    RecentSearchScreen(),
   ];
 
   void updatePageIndex(int index, {bool animate = true}) {
