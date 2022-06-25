@@ -42,7 +42,6 @@ class BusStopCard extends StatelessWidget {
           onTap: () {
             if (searchMode) {
               searchProvider.addRecentSearch(busStopInfo);
-              debugPrint('Added recent search: ${busStopInfo.busStopName}');
             }
             goToBusTimingScreen(
               context,
@@ -55,7 +54,7 @@ class BusStopCard extends StatelessWidget {
           customBorder: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Container(
+          child: Ink(
             decoration:
                 BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -69,10 +68,11 @@ class BusStopCard extends StatelessWidget {
                   maxLines: 1,
                   softWrap: false,
                   style: TextStyle(
-                    fontSize: 21,
+                    fontSize: searchMode ? 24 : 21,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
+                SizedBox(height: searchMode ? 4 : 0),
                 Row(
                   children: [
                     Container(

@@ -99,9 +99,8 @@ class MyApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10),
             ),
-            contentTextStyle: TextStyle(
+            contentTextStyle: const TextStyle(
               fontFamily: 'Poppins',
-              // fontSize: 16,
               color: Colors.white,
             ),
             actionTextColor: AppColors.veryPurple,

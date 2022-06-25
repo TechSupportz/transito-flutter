@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/widgets/recent_search_list.dart';
 
+import '../../providers/search_provider.dart';
 import '../search_screen.dart';
 
 class RecentSearchScreen extends StatefulWidget {
@@ -30,6 +32,12 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
         ),
       ]),
       body: RecentSearchList(),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();
+        },
+        child: const Icon(Icons.delete_rounded),
+      ),
     );
   }
 }

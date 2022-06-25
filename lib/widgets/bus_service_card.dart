@@ -35,11 +35,12 @@ class BusServiceCard extends StatelessWidget {
       child: InkWell(
         onTap: () {
           searchProvider.addRecentSearch(busServiceInfo);
-          debugPrint('Added recent search: ${busServiceInfo.serviceNo}');
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => BusServiceInfoScreen(busServiceInfo: busServiceInfo)));
+            context,
+            MaterialPageRoute(
+              builder: (context) => BusServiceInfoScreen(busServiceInfo: busServiceInfo),
+            ),
+          );
         },
         customBorder: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
@@ -49,29 +50,30 @@ class BusServiceCard extends StatelessWidget {
               BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  busServiceInfo.serviceNo,
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  softWrap: false,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w600,
-                  ),
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                busServiceInfo.serviceNo,
+                overflow: TextOverflow.fade,
+                maxLines: 1,
+                softWrap: false,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w600,
                 ),
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1),
-                  margin: EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                      color: getOperatorColor(busServiceInfo.operator),
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Text(busServiceInfo.operator.name,
-                      style: TextStyle(fontWeight: FontWeight.w500)),
-                ),
-              ]),
+              ),
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1),
+                margin: EdgeInsets.only(right: 8),
+                decoration: BoxDecoration(
+                    color: getOperatorColor(busServiceInfo.operator),
+                    borderRadius: BorderRadius.circular(5)),
+                child: Text(busServiceInfo.operator.name,
+                    style: TextStyle(fontWeight: FontWeight.w500)),
+              ),
+            ],
+          ),
         ),
       ),
     );
