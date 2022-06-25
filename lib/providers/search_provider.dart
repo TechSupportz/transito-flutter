@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/bus_stops.dart';
 
 class SearchProvider extends ChangeNotifier {
-  List<dynamic> _recentSearches = [];
+  final List<dynamic> _recentSearches = [];
 
   List<dynamic> get recentSearches => _recentSearches;
 

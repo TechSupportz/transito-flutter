@@ -32,6 +32,15 @@ const checkBoxFontStyle = TextStyle(
 );
 
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var favourites = context.read<FavouritesProvider>();
@@ -58,9 +67,11 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               longitude: widget.busStopLocation.longitude,
               services: selectedServices),
         );
+        _showSnackBar('Updated favourites');
         print(favourites.favouritesList);
       } else {
         favourites.removeFavourite(widget.busStopCode);
+        _showSnackBar('Removed favourites');
       }
       Navigator.pushAndRemoveUntil(
         context,

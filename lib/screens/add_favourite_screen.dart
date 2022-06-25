@@ -32,6 +32,15 @@ const checkBoxFontStyle = TextStyle(
 );
 
 class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var favourites = context.read<FavouritesProvider>();
@@ -40,7 +49,6 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
     void addToFavorites() {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
-      //TODO: add snackbar to notify favourite added
       if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
         favourites.addFavourite(
@@ -52,14 +60,20 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               longitude: widget.busStopLocation.longitude,
               services: selectedServices),
         );
-        print(favourites.favouritesList);
+        _showSnackBar('Added to favourites');
+        debugPrint('${favourites.favouritesList}');
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MainScreen()),
           (Route<dynamic> route) => false,
         );
       } else {
-        print('duplicate favourite');
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => MainScreen()),
+          (Route<dynamic> route) => false,
+        );
+        _showSnackBar('Something went wrong...');
       }
     }
 

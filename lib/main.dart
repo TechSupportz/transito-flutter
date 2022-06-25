@@ -93,6 +93,19 @@ class MyApp extends StatelessWidget {
             labelColor: AppColors.veryPurple,
             unselectedLabelColor: AppColors.kindaGrey,
           ),
+          snackBarTheme: SnackBarThemeData(
+            backgroundColor: Color(0xFF2E2E2E),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            contentTextStyle: TextStyle(
+              fontFamily: 'Poppins',
+              // fontSize: 16,
+              color: Colors.white,
+            ),
+            actionTextColor: AppColors.veryPurple,
+          ),
         ),
         home: defaultHome,
         builder: (context, child) {
