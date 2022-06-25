@@ -19,6 +19,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Recent Searches'), actions: [
+        // button to open the search interface
         IconButton(
           icon: const Hero(tag: 'SearchIcon', child: Icon(Icons.search)),
           onPressed: () {
@@ -31,7 +32,9 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
           },
         ),
       ]),
+      // displays the recent search list widget
       body: RecentSearchList(),
+      // floating action button to clear the recent searches list by calling a function in the search provider
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();

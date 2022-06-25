@@ -18,22 +18,12 @@ class _MainScreenState extends State<MainScreen> {
     keepPage: true,
   );
 
+  // Screens to be displayed by the bottom navigation bar
   List<StatefulWidget> widgetList = const [
     HomeScreen(),
     FavouritesScreen(),
     RecentSearchScreen(),
   ];
-
-  void updatePageIndex(int index, {bool animate = true}) {
-    debugPrint('$index');
-    setState(() {
-      _pageIndex = index;
-      animate
-          ? controller.animateToPage(index,
-              duration: const Duration(milliseconds: 250), curve: Curves.ease)
-          : controller.jumpToPage(index);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +49,7 @@ class _MainScreenState extends State<MainScreen> {
         showUnselectedLabels: false,
         currentIndex: _pageIndex,
         onTap: (index) {
+          // updates _pageIndex and animates the page transition
           setState(() {
             _pageIndex = index;
             controller.animateToPage(index,

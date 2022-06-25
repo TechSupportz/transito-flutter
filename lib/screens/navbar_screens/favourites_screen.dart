@@ -16,16 +16,17 @@ class FavouritesScreen extends StatefulWidget {
 class _FavouritesScreenState extends State<FavouritesScreen> {
   bool isFabVisible = true;
 
+  // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
       !isFabVisible ? setState(() => isFabVisible = true) : null;
     } else if (notification.direction == ScrollDirection.reverse) {
       isFabVisible ? setState(() => isFabVisible = false) : null;
     }
-
     return true;
   }
 
+  // function to open the manage favourites screen
   void goToManageFavouritesScreen(BuildContext context) {
     Navigator.push(
       context,
@@ -43,7 +44,9 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
           appBar: AppBar(
             title: const Text('Favourites'),
           ),
+          // if the user has favourites display them via the favourites_timing_card widget, otherwise display a message
           body: value.favouritesList.isNotEmpty
+              // notification listener to hide or show the FAB depending if the user is scrolling or not
               ? NotificationListener<UserScrollNotification>(
                   onNotification: (notification) => hideFabOnScroll(notification),
                   child: ListView.separated(
@@ -64,6 +67,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     itemCount: value.favouritesList.length,
                   ),
                 )
+              // if the user has no favourites display a message
               : Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -85,6 +89,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     ],
                   ),
                 ),
+          // floating action button to open the manage favourites screen
           floatingActionButton: isFabVisible
               ? FloatingActionButton(
                   onPressed: () => goToManageFavouritesScreen(context),

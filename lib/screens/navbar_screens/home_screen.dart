@@ -32,6 +32,7 @@ class _HomeScreenState extends State<HomeScreen> {
   late Future<bool> _isLocationPermissionGranted;
   bool isFabVisible = true;
 
+  // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
       !isFabVisible ? setState(() => isFabVisible = true) : null;
@@ -42,6 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return true;
   }
 
+  // checks if the user has granted access to their location
   Future<bool> checkLocationPermissions() async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied ||
@@ -53,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // gets the user's current location
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -60,6 +63,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return position;
   }
 
+  // fetches the bus stop json file from the assets folder and decodes it into a list of BusStops objects
   Future<List<BusStopInfo>> fetchBusStops() async {
     debugPrint("Fetching bus stops");
     final String response = await rootBundle.loadString('assets/bus_stops.json');
@@ -67,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<List<NearbyBusStops>> getNearbyBusStops({bool refresh = false}) async {
+    // if the list of nearby bus stops is already populated and the user has not requested a refresh, return the list of nearby bus stops
     if (_nearbyBusStopsCache.isNotEmpty && !refresh) {
       debugPrint("Nearby bus stops already fetched");
       return _nearbyBusStopsCache;
@@ -76,6 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       Position userLocation = await getUserLocation();
       List<BusStopInfo> allBusStops = await fetchBusStops();
 
+      // searches through the list of bus stops and returns those within 500m to the user's current location sorted by nearest to farthest
       for (var busStop in allBusStops) {
         LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
         double distanceAway = distance.as(LengthUnit.Meter,
@@ -91,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  // function to force refresh the list of nearby bus stops
   void refreshBusStops() {
     setState(() {
       nearbyBusStops = getNearbyBusStops(refresh: true);
@@ -111,6 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: Text('Home'),
         actions: [
+          // button to open the MRT map screen
           IconButton(
             onPressed: () => Navigator.push(
               context,
@@ -122,14 +130,17 @@ class _HomeScreenState extends State<HomeScreen> {
           )
         ],
       ),
+      // notification listener to call the hideFabOnScroll function when the user scrolls
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) => hideFabOnScroll(notification),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 16),
           child: FutureBuilder(
               future: _isLocationPermissionGranted,
               builder: (context, AsyncSnapshot<bool> snapshot) {
+                // display a loading indicator while the user's location is being fetched
                 if (snapshot.hasData) {
+                  // if the user has granted access to their location, display the list of nearby bus stops
                   if (snapshot.data!) {
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,6 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     );
                   } else {
+                    // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
                     return Material(
                       color: AppColors.cardBg,
                       shape: RoundedRectangleBorder(
@@ -146,25 +158,27 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: Column(
-                          children: [
-                            const Text(
-                              "Please grant location permission to use this feature",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Please grant location permission to use this feature",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 16),
-                            TextButton(
-                                onPressed: () => Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const LocationAccessScreen(),
-                                    ),
-                                    (route) => false),
-                                child: const Text("Grant permission")),
-                          ],
+                              SizedBox(height: 16),
+                              TextButton(
+                                  onPressed: () => Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const LocationAccessScreen(),
+                                      ),
+                                      (route) => false),
+                                  child: const Text("Grant permission")),
+                            ],
+                          ),
                         ),
                       ),
                     );
@@ -179,6 +193,7 @@ class _HomeScreenState extends State<HomeScreen> {
               }),
         ),
       ),
+      // floating action button to refresh user's location and nearbyBusStops
       floatingActionButton: isFabVisible
           ? FloatingActionButton(
               onPressed: () {
@@ -205,6 +220,7 @@ class _HomeScreenState extends State<HomeScreen> {
         FutureBuilder(
             future: nearbyBusStops,
             builder: (BuildContext context, AsyncSnapshot<List<NearbyBusStops>> snapshot) {
+              // display a loading indicator while the list of nearby bus stops is being fetched
               if (snapshot.hasData) {
                 return GridView.count(
                   childAspectRatio: 2.5 / 1,
@@ -214,6 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
+                    // loop through nearby bus stops and send their data to the BusStopCard widget to display them
                     for (var busStop in snapshot.data!)
                       BusStopCard(
                         busStopInfo: busStop.busStopInfo,
@@ -242,8 +259,9 @@ class NearbyFavouritesGrid extends StatefulWidget {
 }
 
 class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
-  List<NearbyFavourites> _nearbyFavouritesCache = [];
+  // List<NearbyFavourites> _nearbyFavouritesCache = [];
 
+  // function to get the user's nearby favourites
   Future<List<NearbyFavourites>> getNearbyFavourites(
       {bool refresh = false, required List<Favourite> favouritesList}) async {
     // if (_nearbyFavouritesCache.isNotEmpty && !refresh) {
@@ -254,6 +272,7 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
     List<NearbyFavourites> _nearbyFavourites = [];
     Position userLocation = await widget.userLocation;
 
+    // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
     for (var busStop in favouritesList) {
       LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
       double distanceAway = distance.as(
@@ -265,7 +284,7 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
     }
     List<NearbyFavourites> _tempNearbyFavourites = _nearbyFavourites;
     _tempNearbyFavourites.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
-    _nearbyFavouritesCache = _tempNearbyFavourites;
+    // _nearbyFavouritesCache = _tempNearbyFavourites;
     return _tempNearbyFavourites;
     // }
   }
@@ -273,70 +292,88 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
   @override
   Widget build(BuildContext context) {
     return Consumer<FavouritesProvider>(builder: (context, value, child) {
-      return value.favouritesList.isNotEmpty
-          ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Nearby Favourites",
-                  style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(
-                  height: 12,
-                ),
-                FutureBuilder(
-                    future: getNearbyFavourites(favouritesList: value.favouritesList),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-                      if (snapshot.hasData) {
-                        if (snapshot.data!.isNotEmpty) {
-                          return ListView.separated(
-                            itemBuilder: (context, int index) {
-                              return FavouritesTimingCard(
-                                busStopCode: snapshot.data![index].busStopInfo.busStopCode,
-                                busStopName: snapshot.data![index].busStopInfo.busStopName,
-                                busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
-                                busStopLocation: LatLng(snapshot.data![index].busStopInfo.latitude,
-                                    snapshot.data![index].busStopInfo.longitude),
-                                services: snapshot.data![index].busStopInfo.services,
-                              );
-                            },
-                            separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                              height: 18,
-                            ),
-                            padding: const EdgeInsets.only(bottom: 18.0),
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: snapshot.data!.length,
-                          );
-                        } else {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 18.0),
-                            child: Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: AppColors.cardBg,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Center(
-                                child: Text("No favourites nearby",
-                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                              ),
-                            ),
-                          );
-                        }
-                      } else if (snapshot.hasError) {
-                        return Text("${snapshot.error}");
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Nearby Favourites",
+            style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          value.favouritesList.isNotEmpty
+              ? FutureBuilder(
+                  future: getNearbyFavourites(favouritesList: value.favouritesList),
+                  builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
+                    // display a loading indicator while the list of nearby favourites is being fetched
+                    if (snapshot.hasData) {
+                      // checks if user has any favourites within 750m of their current location and displays them if they do
+                      if (snapshot.data!.isNotEmpty) {
+                        return ListView.separated(
+                          itemBuilder: (context, int index) {
+                            return FavouritesTimingCard(
+                              busStopCode: snapshot.data![index].busStopInfo.busStopCode,
+                              busStopName: snapshot.data![index].busStopInfo.busStopName,
+                              busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
+                              busStopLocation: LatLng(snapshot.data![index].busStopInfo.latitude,
+                                  snapshot.data![index].busStopInfo.longitude),
+                              services: snapshot.data![index].busStopInfo.services,
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                            height: 18,
+                          ),
+                          padding: const EdgeInsets.only(bottom: 18.0),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: snapshot.data!.length,
+                        );
                       } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
+                        // if user has no favourites within 750m of their current location, display a message to tell them
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 18.0),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardBg,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Center(
+                              child: Text("No favourites nearby",
+                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                            ),
+                          ),
                         );
                       }
-                    })
-              ],
-            )
-          : const SizedBox();
+                    } else if (snapshot.hasError) {
+                      return Text("${snapshot.error}");
+                    } else {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                  },
+                )
+              // if user has no favourites, display a message to tell them
+              : Padding(
+                  padding: const EdgeInsets.only(bottom: 18.0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Center(
+                      child: Text("You have no favourites",
+                          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                    ),
+                  ),
+                ),
+        ],
+      );
     });
   }
 }
