@@ -213,7 +213,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     futureBusArrivalInfo = fetchArrivalTimings().then(
                       (value) => sortBusArrivalInfo(value),
                     );
-                    HapticFeedback.lightImpact();
+                    HapticFeedback.selectionClick();
                   }),
                   child: const Icon(Icons.refresh_rounded, size: 28),
                   enableFeedback: true,
