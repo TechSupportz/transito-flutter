@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../models/favourite.dart';
 
 class FavouritesProvider extends ChangeNotifier {
@@ -24,6 +25,7 @@ class FavouritesProvider extends ChangeNotifier {
 
   void reorderFavourite(int oldIndex, int newIndex) {
     if (oldIndex < newIndex) {
+      // removing the item at oldIndex will shorten the list by 1
       newIndex--;
     }
     _favouritesList.insert(newIndex, _favouritesList.removeAt(oldIndex));
