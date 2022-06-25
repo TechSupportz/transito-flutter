@@ -36,18 +36,22 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   late Future<List<ServiceInfo>> futureBusArrivalInfo;
   late Timer timer;
 
+  // api request headers
   Map<String, String> requestHeaders = {
     'Accept': 'application/json',
     'AccountKey': Secret.LtaApiKey
   };
 
+  // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
+    // gets response from api
     final response = await http.get(
         Uri.parse(
             'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.busStopCode}'),
         headers: requestHeaders);
 
+    // if response is successful, parse the response and return it as a BusArrivalInfo object
     if (response.statusCode == 200) {
       debugPrint("Timing fetched");
       return BusArrivalInfo.fromJson(jsonDecode(response.body));
@@ -57,6 +61,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     }
   }
 
+  // function to properly sort the bus arrival info according to the Bus Service number and to filter it based on users favourite services
   List<ServiceInfo> filterBusArrivalInfo(BusArrivalInfo value) {
     var _value = value;
     var _filteredList =
@@ -66,6 +71,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     return _filteredList;
   }
 
+  // function to fetch bus arrival info and update the state of the widget, and to set a timer to fetch bus arrival info again after 30 seconds
   @override
   void initState() {
     super.initState();
@@ -144,6 +150,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
         });
   }
 
+  // function to dispose the timer when the widget is disposed
   @override
   void dispose() {
     timer.cancel();

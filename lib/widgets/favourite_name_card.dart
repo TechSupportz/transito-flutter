@@ -10,6 +10,8 @@ class FavouriteNameCard extends StatelessWidget {
   }) : super(key: key);
 
   final String busStopName;
+
+  // onTap function passed in from parent
   final Function onTap;
 
   @override

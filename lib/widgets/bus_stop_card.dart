@@ -14,6 +14,7 @@ class BusStopCard extends StatelessWidget {
   final BusStopInfo busStopInfo;
   final bool searchMode;
 
+  // function that navigates user to bus timing screen
   void goToBusTimingScreen(BuildContext context, String busStopCode, String busStopName,
       String busStopAddress, LatLng busStopLocation) {
     Navigator.push(

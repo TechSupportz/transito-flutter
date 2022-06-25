@@ -12,6 +12,7 @@ class BusServiceCard extends StatelessWidget {
 
   final BusServiceInfo busServiceInfo;
 
+  // function that returns the correct colours for each bus operator
   Color getOperatorColor(BusOperator operator) {
     switch (operator) {
       case BusOperator.SBST:
