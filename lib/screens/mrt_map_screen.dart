@@ -10,6 +10,7 @@ class MrtMapScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('MRT Map'),
       ),
+      // displays a zoomable mrt map (yes that's literally the only thing this whole screen does)
       body: PhotoView(
         imageProvider: AssetImage('assets/images/mrt_map.png'),
       ),

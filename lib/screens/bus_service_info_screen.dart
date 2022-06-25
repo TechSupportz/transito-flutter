@@ -12,6 +12,7 @@ class BusServiceInfoScreen extends StatelessWidget {
 
   final BusServiceInfo busServiceInfo;
 
+  // function that returns the correct colours for each bus operator
   Color getOperatorColor(BusOperator operator) {
     switch (operator) {
       case BusOperator.SBST:
@@ -91,29 +92,25 @@ class BusServiceInfoScreen extends StatelessWidget {
                       TableRow(
                         children: [
                           const Text('6:30am - 8:30am', style: TextStyle(fontSize: 21)),
-                          Text('${busServiceInfo.AMPeakFreq}',
-                              style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.AMPeakFreq, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Text('8:31am - 4:59pm', style: const TextStyle(fontSize: 21)),
-                          Text('${busServiceInfo.AMOffPeakFreq}',
-                              style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.AMOffPeakFreq, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Text('5:00pm - 7:00pm', style: const TextStyle(fontSize: 21)),
-                          Text('${busServiceInfo.PMPeakFreq}',
-                              style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.PMPeakFreq, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Text('After 7:00pm', style: TextStyle(fontSize: 21)),
-                          Text('${busServiceInfo.PMOffPeakFreq}',
-                              style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.PMOffPeakFreq, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                     ],

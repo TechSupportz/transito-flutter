@@ -21,7 +21,7 @@ class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen(
       {Key? key,
       required this.busStopCode,
-      this.busStopName = 'Ayo?',
+      required this.busStopName,
       required this.busStopAddress,
       required this.busStopLocation})
       : super(key: key);
@@ -39,6 +39,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   bool isFabVisible = true;
   late Timer timer;
 
+  // function to get the user's location
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -46,18 +47,22 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return position;
   }
 
+  // api request headers
   Map<String, String> requestHeaders = {
     'Accept': 'application/json',
     'AccountKey': Secret.LtaApiKey
   };
 
+  // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
+    // gets response from api
     final response = await http.get(
         Uri.parse(
             'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.busStopCode}'),
         headers: requestHeaders);
 
+    // if response is successful, parse the response and return it as a BusArrivalInfo object
     if (response.statusCode == 200) {
       debugPrint("Timing fetched");
       return BusArrivalInfo.fromJson(jsonDecode(response.body));
@@ -67,6 +72,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     }
   }
 
+  // function to properly sort the bus arrival info according to the Bus Service number
   BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
     var _value = value;
     _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
@@ -74,6 +80,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return _value;
   }
 
+  // function to get the list of bus services that are currently operating at that bus stop
+  // this is used to display the bus stops in the add favourites screen
   Future<List<String>> getBusServiceNumList() async {
     List<String> busServicesList = await futureBusArrivalInfo.then(
       (value) {
@@ -89,6 +97,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return busServicesList;
   }
 
+  // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
   Future<void> goToAddFavouritesScreen(BuildContext context) async {
     List<String> busServicesList = await getBusServiceNumList();
     // debugPrint('$busServicesList');
@@ -106,6 +115,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     );
   }
 
+  // function to get the list of bus services that are currently operating at that bus stop and route to the edit favourites screen
   Future<void> goToEditFavouritesScreen(BuildContext context) async {
     List<String> busServicesList = await getBusServiceNumList();
     // debugPrint('$busServicesList');
@@ -123,6 +133,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     );
   }
 
+  // function to hide the fab when the user is scrolling down the list to avoid blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
       !isFabVisible ? setState(() => isFabVisible = true) : null;
@@ -133,6 +144,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return true;
   }
 
+  // initialise bus arrival info and start the timer to automatically re-fetch the bus arrival info every 30 seconds
   @override
   void initState() {
     super.initState();
@@ -154,6 +166,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           appBar: AppBar(
             title: Text(widget.busStopName),
             actions: [
+              // display different IconButtons depending on whether the bus stop is a favourite or not
               value.favouritesList.every((element) => element.busStopCode != widget.busStopCode)
                   ? IconButton(
                       icon: const Icon(Icons.favorite_border_rounded),
@@ -168,7 +181,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           body: FutureBuilder(
             future: futureBusArrivalInfo,
             builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
+              // check if the snapshot has data, if not then display a loading indicator
               if (snapshot.hasData) {
+                // notification listener to hide the fab when the user is scrolling down the list
                 return NotificationListener<UserScrollNotification>(
                   onNotification: (notification) => hideFabOnScroll(notification),
                   child: ListView.separated(
@@ -192,6 +207,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
             },
           ),
           floatingActionButton: isFabVisible
+              // re-fetch data when user taps the refresh button
               ? FloatingActionButton(
                   onPressed: () => setState(() {
                     futureBusArrivalInfo = fetchArrivalTimings().then(
@@ -208,6 +224,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     );
   }
 
+  // dispose of the timer when user leaves the screen
   @override
   void dispose() {
     timer.cancel();

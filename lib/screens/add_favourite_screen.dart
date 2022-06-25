@@ -32,6 +32,7 @@ const checkBoxFontStyle = TextStyle(
 );
 
 class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
+  // function to display snackbar
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -43,13 +44,17 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // access favourites provider
     var favourites = context.read<FavouritesProvider>();
     var favouritesList = favourites.favouritesList;
 
     void addToFavorites() {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
+
+      // check if bus stop already exists in favourites list
       if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
+        // retrieve the selected services and add it to the favourites list
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
         favourites.addFavourite(
           Favourite(
@@ -60,14 +65,17 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               longitude: widget.busStopLocation.longitude,
               services: selectedServices),
         );
+        // display snackbar to notify user that favourite has been added
         _showSnackBar('Added to favourites');
         debugPrint('${favourites.favouritesList}');
+        // navigate back to main screen
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MainScreen()),
           (Route<dynamic> route) => false,
         );
       } else {
+        // if user somehow accesses this screen with a bus stop that already exists in favourites list, display snackbar to notify user
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => MainScreen()),
@@ -150,6 +158,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                 children: [
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
+                      // button to add bus stop to favourites list
                       child: ElevatedButton(
                           onPressed: () => addToFavorites(),
                           child: const Text("Add to favourites"))),
@@ -158,6 +167,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                   ),
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
+                      // button to cancel and navigate back to previous screen
                       child: OutlinedButton(
                           onPressed: () => Navigator.pop(context), child: const Text('Cancel')))
                 ],

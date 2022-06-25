@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 import 'package:transito/models/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/widgets/favourite_name_card.dart';
@@ -24,18 +24,22 @@ class ManageFavouritesScreen extends StatefulWidget {
 class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   bool isFabVisible = true;
 
+  // api headers
   Map<String, String> requestHeaders = {
     'Accept': 'application/json',
     'AccountKey': Secret.LtaApiKey
   };
 
+  // fetch arrival into to retrieve what buses are available if user wants to edit a favourite
   Future<BusArrivalInfo> fetchArrivalTimings(String busStopCode) async {
     debugPrint("Fetching arrival timings");
+    // gets response from api
     final response = await http.get(
         Uri.parse(
             'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=$busStopCode'),
         headers: requestHeaders);
 
+    // if response is successful, parse the response and return it as a BusArrivalInfo object
     if (response.statusCode == 200) {
       debugPrint("Timing fetched");
       return BusArrivalInfo.fromJson(jsonDecode(response.body));
@@ -45,6 +49,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     }
   }
 
+  // function to properly sort the bus arrival info according to the Bus Service number
   BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
     var _value = value;
     _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
@@ -52,6 +57,8 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     return _value;
   }
 
+  // function to get the list of bus services that are currently operating at that bus stop
+  // this is used to display the bus stops in the edit favourites screen
   Future<List<String>> getBusServiceNumList(String busStopCode) async {
     List<String> busServicesList = await fetchArrivalTimings(busStopCode).then(
       (value) {
@@ -67,6 +74,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     return busServicesList;
   }
 
+  // function to get the list of bus stops that are currently operating at that bus service and route to edit favourites screen
   Future<void> goToEditFavouritesScreen(BuildContext context, Favourite favourite) async {
     List<String> busServicesList = await getBusServiceNumList(favourite.busStopCode);
     // debugPrint('$busServicesList');
@@ -130,6 +138,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                   shrinkWrap: true,
                   buildDefaultDragHandles: true,
                   itemCount: value.favouritesList.length,
+                  // calls reorder function in FavouritesProvider to reorder the favourites list
                   onReorder: (oldIndex, newIndex) => value.reorderFavourite(oldIndex, newIndex),
                 ),
               ],

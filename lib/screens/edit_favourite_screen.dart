@@ -32,6 +32,8 @@ const checkBoxFontStyle = TextStyle(
 );
 
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
+  // function to display snackbar
+
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -43,9 +45,11 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // access favourites provider
     var favourites = context.read<FavouritesProvider>();
     var favouritesList = favourites.favouritesList;
 
+    // set the selected services to the bus stop
     Map<String?, List<String?>> initialSelectedChildren = {
       'Bus Services': favouritesList
           .firstWhere((element) => element.busStopCode == widget.busStopCode)
@@ -55,8 +59,9 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     void updateFavorites() {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
-      //TODO: add snackbar to notify favourite updated
+      // check if user wants to edit or remove favourites
       if (ParentChildCheckbox.selectedChildrens['Bus Services'].length != 0) {
+        // if services were selected then update the favourites list
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
         favourites.updateFavourite(
           Favourite(
@@ -70,9 +75,11 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         _showSnackBar('Updated favourites');
         print(favourites.favouritesList);
       } else {
+        // if no services were selected then remove the bus stop from favourites list
         favourites.removeFavourite(widget.busStopCode);
         _showSnackBar('Removed favourites');
       }
+      // navigate back to main screen
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
@@ -164,6 +171,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 children: [
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
+                      // button to add bus stop to favourites list
                       child: ElevatedButton(
                           onPressed: () => updateFavorites(), child: const Text("Save changes"))),
                   const SizedBox(
@@ -171,6 +179,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   ),
                   ConstrainedBox(
                       constraints: const BoxConstraints(minHeight: 42),
+                      // button to cancel and navigate back to previous screen
                       child: OutlinedButton(
                           onPressed: () => Navigator.pop(context), child: const Text('Cancel')))
                 ],

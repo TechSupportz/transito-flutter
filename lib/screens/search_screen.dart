@@ -29,11 +29,13 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   late TabController _tabController;
   final _textFieldController = TextEditingController();
 
+  // tabs to switch between bus stops and bus services
   static const List<Tab> searchTabs = <Tab>[
     Tab(text: 'Bus Stops'),
     Tab(text: 'Bus Services'),
   ];
 
+  // fetches bus stop data from the assets/data/bus_stops.json file and assigns it to respective variables
   Future<List<BusStopInfo>> fetchBusStops() async {
     debugPrint("Fetching bus stops");
     final String response = await rootBundle.loadString('assets/bus_stops.json');
@@ -44,11 +46,14 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     return AllBusStops.fromJson(jsonDecode(response)).busStops;
   }
 
+  // fetches bus service data from the assets/data/bus_services.json file and assigns it to respective variables
   Future<List<BusServiceInfo>> fetchBusServices() async {
     debugPrint("Fetching bus stops");
-    final String response = await rootBundle.loadString('assets/busServices.json');
+    final String response = await rootBundle.loadString('assets/bus_services.json');
     var busServices = AllBusServices.fromJson(jsonDecode(response)).busServices;
+    // removes duplicate bus services due to api returning one for each direction
     busServices = busServices.where((element) => element.direction != 2).toList();
+    // sorts bus services by service number
     busServices.sort((a, b) => compareNatural(a.serviceNo, b.serviceNo));
     setState(() {
       _busServiceList = busServices;
@@ -58,11 +63,12 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   }
 
   void filterBusStops() {
+    // the toLowerCase() methods makes search case-insensitive
     final String searchText = _textFieldController.text.toLowerCase();
     List<BusStopInfo> _results = [];
 
-    if (searchText.isEmpty && _busStopList.isNotEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
+    if (searchText.trim().isEmpty && _busStopList.isNotEmpty) {
+      // if the search field is empty or only contains white-space, show all bus stops
       _results = _busStopList;
     } else {
       _results = _busStopList
@@ -71,20 +77,21 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
               busStopInfo.busStopCode.toLowerCase().contains(searchText) ||
               busStopInfo.roadName.toLowerCase().contains(searchText))
           .toList();
-      // we use the toLowerCase() method to make it case-insensitive
     }
+    // updates the filtered bus stop list
     setState(() {
       _filteredBusStopList = _results;
     });
   }
 
   void filterBusServices() {
+    // the toLowerCase() methods makes search case-insensitive
     final String searchText = _textFieldController.text.toLowerCase();
     List<BusServiceInfo> _results = [];
     List<BusServiceInfo> _sortedResults = [];
 
-    if (searchText.isEmpty && _busServiceList.isNotEmpty) {
-      // if the search field is empty or only contains white-space, we'll display all users
+    if (searchText.trim().isEmpty && _busServiceList.isNotEmpty) {
+      // if the search field is empty or only contains white-space, show all bus services
       _results = _busServiceList;
     } else {
       _results = _busServiceList
@@ -92,13 +99,16 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
               busServiceInfo.serviceNo.toLowerCase().contains(searchText))
           .toList();
     }
+    // sorts bus services by service number
     _sortedResults = _results;
     _sortedResults.sort((a, b) => compareNatural(a.serviceNo, b.serviceNo));
+    // updates the filtered bus service list
     setState(() {
       _filteredBusServiceList = _sortedResults;
     });
   }
 
+  // initializes the screen
   @override
   void initState() {
     super.initState();
@@ -107,6 +117,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     _futureBusServiceList = fetchBusServices();
   }
 
+  // disposes of tab controller when the screen exited
   @override
   void dispose() {
     _tabController.dispose();
@@ -125,6 +136,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
               suffixIcon: IconButton(
                 icon: Hero(tag: 'SearchIcon', child: Icon(Icons.clear)),
                 onPressed: () {
+                  // clears the search field and updates the filtered bus stop/bus services list depending on tab
                   _textFieldController.clear();
                   if (_tabController.index == 0) {
                     setState(() {
@@ -156,10 +168,12 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     );
   }
 
+  // listview for the bus stops tab
   Widget busStopView() {
     return FutureBuilder(
         future: _futureBusStopList,
         builder: (BuildContext context, AsyncSnapshot<List<BusStopInfo>> snapshot) {
+          // if the bus stop list is not yet loaded, show a loading indicator
           if (snapshot.hasData) {
             return ListView.separated(
               itemCount: _filteredBusStopList.length,
@@ -175,10 +189,12 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
         });
   }
 
+  // listview for the bus services tab
   Widget busServiceView() {
     return FutureBuilder(
       future: _futureBusServiceList,
       builder: (BuildContext context, AsyncSnapshot<List<BusServiceInfo>> snapshot) {
+        // if the bus service list is not yet loaded, show a loading indicator
         if (snapshot.hasData) {
           return ListView.separated(
             itemCount: _filteredBusServiceList.length,

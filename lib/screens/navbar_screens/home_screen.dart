@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) => hideFabOnScroll(notification),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 16),
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
           child: FutureBuilder(
               future: _isLocationPermissionGranted,
               builder: (context, AsyncSnapshot<bool> snapshot) {
