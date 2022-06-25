@@ -1,5 +1,3 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
@@ -19,6 +17,7 @@ class LocationAccessScreen extends StatefulWidget {
 class _LocationAccessScreenState extends State<LocationAccessScreen> {
   late bool _isFirstRun;
 
+  // function to check if the app is being run for the first time
   void checkIfFirstRun() async {
     bool isFirstRun = await IsFirstRun.isFirstRun();
     setState(() {
@@ -26,22 +25,25 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
     });
   }
 
+  // function to send the user to the main screen
   void goToMainScreen() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => MainScreen(),
+        builder: (context) => const MainScreen(),
       ),
     );
   }
 
+  // function to send the user to the quick start screen
   void goToQuickStart() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => QuickStartScreen(),
+        builder: (context) => const QuickStartScreen(),
       ),
     );
   }
 
+  // function to check and request for the user's location permission in order to access their location
   Future<void> requestLocationPermission(BuildContext context) async {
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
@@ -50,15 +52,16 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
         permission = await Geolocator.requestPermission();
       }
       if (permission == LocationPermission.deniedForever) {
+        // if the user has denied location permission forever, show a dialog (which is not dismissible) to the user to open the settings app
         showDialog(
           context: context,
           barrierDismissible: false, // user must tap button!
           builder: (context) => AlertDialog(
             backgroundColor: AppColors.cardBg,
-            title: Text('Location Permission Denied'),
+            title: const Text('Location Permission Denied'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
+              children: const [
                 Text('Location permission is required to use key features of this app.'),
                 SizedBox(height: 8),
                 Text('Please enable location permission via your settings.'),
@@ -66,7 +69,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
             ),
             actions: [
               TextButton(
-                child: Text('Open Settings'),
+                child: const Text('Open Settings'),
                 onPressed: () {
                   Geolocator.openAppSettings();
                   Navigator.pop(context);
@@ -75,6 +78,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
             ],
           ),
         );
+        // if the user has granted location permission and it is the first run, go to the quick start screen if it isn't the first run, go to the main screen
       } else {
         _isFirstRun ? goToQuickStart() : goToMainScreen();
       }
@@ -83,6 +87,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
     }
   }
 
+  // check if it is the first run on the screen's initialization
   @override
   void initState() {
     super.initState();
@@ -92,16 +97,13 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Almost there...'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
+            const Text(
               'We need to access your location',
               style: TextStyle(
                 fontSize: 32,
@@ -115,12 +117,13 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
               children: [
                 SvgPicture.asset(
                   'assets/images/location.svg',
-                  placeholderBuilder: (context) => CircularProgressIndicator(),
+                  placeholderBuilder: (context) => const CircularProgressIndicator(),
                 ),
                 const SizedBox(
                   height: 10,
                 ),
-                Text('We need your location to determine where you are to display nearby bus stops',
+                const Text(
+                    'We need your location to determine where you are to display nearby bus stops',
                     textAlign: TextAlign.center,
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
               ],
@@ -129,9 +132,10 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
               padding: const EdgeInsets.only(bottom: 16),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 42),
+                // button to trigger the request for the user's location permission
                 child: ElevatedButton(
                   onPressed: () => requestLocationPermission(context),
-                  child: Text("Check Permission"),
+                  child: const Text("Check Permission"),
                 ),
               ),
             ),

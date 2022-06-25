@@ -52,6 +52,7 @@ class QuickStartScreen extends StatelessWidget {
               padding: const EdgeInsets.only(bottom: 16),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 42),
+                // button to bring user to the main screen
                 child: ElevatedButton(
                   onPressed: () => Navigator.pushReplacement(
                     context,
