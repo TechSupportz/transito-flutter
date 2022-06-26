@@ -97,6 +97,9 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Permission Required'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Column(
