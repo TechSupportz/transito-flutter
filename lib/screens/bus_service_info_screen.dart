@@ -35,7 +35,7 @@ class BusServiceInfoScreen extends StatelessWidget {
         title: const Text('Bus Service Info'),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 16.0),
+        padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

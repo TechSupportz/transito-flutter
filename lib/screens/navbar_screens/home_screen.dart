@@ -27,7 +27,7 @@ class HomeScreen extends StatefulWidget {
 List<NearbyBusStops> _nearbyBusStopsCache = [];
 const distance = Distance();
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin<HomeScreen> {
   late Future<List<NearbyBusStops>> nearbyBusStops;
   late Future<bool> _isLocationPermissionGranted;
   bool isFabVisible = true;
@@ -103,6 +103,9 @@ class _HomeScreenState extends State<HomeScreen> {
       nearbyBusStops = getNearbyBusStops(refresh: true);
     });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {

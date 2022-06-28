@@ -5,6 +5,7 @@ import 'package:transito/models/app_colors.dart';
 
 import '../models/bus_stops.dart';
 import '../providers/search_provider.dart';
+import '../screens/bus_stop_info_screen.dart';
 import '../screens/bus_timing_screen.dart';
 
 class BusStopCard extends StatelessWidget {
@@ -30,6 +31,21 @@ class BusStopCard extends StatelessWidget {
     );
   }
 
+  void goToBusStopInfoScreen(BuildContext context, String busStopCode, String busStopName,
+      String busStopAddress, LatLng busStopLocation) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BusStopInfoScreen(
+          busStopCode: busStopCode,
+          busStopName: busStopName,
+          busStopAddress: busStopAddress,
+          busStopLocation: busStopLocation,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final searchProvider = Provider.of<SearchProvider>(context, listen: false);
@@ -43,14 +59,22 @@ class BusStopCard extends StatelessWidget {
           onTap: () {
             if (searchMode) {
               searchProvider.addRecentSearch(busStopInfo);
+              goToBusStopInfoScreen(
+                context,
+                busStopInfo.busStopCode,
+                busStopInfo.busStopName,
+                busStopInfo.roadName,
+                LatLng(busStopInfo.latitude, busStopInfo.longitude),
+              );
+            } else {
+              goToBusTimingScreen(
+                context,
+                busStopInfo.busStopCode,
+                busStopInfo.busStopName,
+                busStopInfo.roadName,
+                LatLng(busStopInfo.latitude, busStopInfo.longitude),
+              );
             }
-            goToBusTimingScreen(
-              context,
-              busStopInfo.busStopCode,
-              busStopInfo.busStopName,
-              busStopInfo.roadName,
-              LatLng(busStopInfo.latitude, busStopInfo.longitude),
-            );
           },
           customBorder: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
