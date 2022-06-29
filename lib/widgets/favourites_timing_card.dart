@@ -115,6 +115,9 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                       padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
                       child: Text(
                         widget.busStopName,
+                        overflow: TextOverflow.fade,
+                        maxLines: 1,
+                        softWrap: false,
                         style: const TextStyle(
                             fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
                       ),

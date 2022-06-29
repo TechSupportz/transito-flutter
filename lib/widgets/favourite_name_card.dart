@@ -27,10 +27,15 @@ class FavouriteNameCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              busStopName,
-              style: const TextStyle(
-                  fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
+            Expanded(
+              child: Text(
+                busStopName,
+                overflow: TextOverflow.fade,
+                maxLines: 1,
+                softWrap: false,
+                style: const TextStyle(
+                    fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
+              ),
             ),
             IconButton(
               icon: const Icon(Icons.edit),
