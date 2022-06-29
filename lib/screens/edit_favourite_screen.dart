@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
@@ -7,6 +8,7 @@ import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 
 import '../models/app_colors.dart';
+import '../models/arrival_info.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
   const EditFavouritesScreen(
@@ -41,6 +43,20 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         duration: Duration(seconds: 2),
       ),
     );
+  }
+
+  // function to properly sort the bus arrival info according to the Bus Service number
+  BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
+    var _value = value;
+    _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
+
+    return _value;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    widget.busServicesList.sort((a, b) => compareNatural(a, b));
   }
 
   @override

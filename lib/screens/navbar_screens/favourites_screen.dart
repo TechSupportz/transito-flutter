@@ -92,6 +92,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
           // floating action button to open the manage favourites screen
           floatingActionButton: isFabVisible
               ? FloatingActionButton(
+                  heroTag: 'favouritesFAB',
                   onPressed: () => goToManageFavouritesScreen(context),
                   child: const Icon(Icons.edit_rounded),
                 )

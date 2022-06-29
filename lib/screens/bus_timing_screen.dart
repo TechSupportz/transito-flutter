@@ -233,6 +233,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     );
                     HapticFeedback.selectionClick();
                   }),
+                  heroTag: "busTimingFAB",
                   child: const Icon(Icons.refresh_rounded, size: 28),
                   enableFeedback: true,
                 )

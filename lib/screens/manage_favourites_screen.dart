@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -47,14 +46,6 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
       debugPrint("Error fetching arrival timings");
       throw Exception('Failed to load data');
     }
-  }
-
-  // function to properly sort the bus arrival info according to the Bus Service number
-  BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
-    var _value = value;
-    _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
-
-    return _value;
   }
 
   // function to get the list of bus services that are currently operating at that bus stop
@@ -145,6 +136,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
             ),
           ),
           floatingActionButton: FloatingActionButton(
+            heroTag: "manageFavFAB",
             child: const Icon(Icons.done_rounded),
             onPressed: () => Navigator.pop(context),
           ),

@@ -199,6 +199,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       // floating action button to refresh user's location and nearbyBusStops
       floatingActionButton: isFabVisible
           ? FloatingActionButton(
+              heroTag: "homeFAB",
               onPressed: () {
                 refreshBusStops();
                 HapticFeedback.selectionClick();

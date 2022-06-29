@@ -90,56 +90,69 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
         future: futureBusArrivalInfo,
         builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
           if (snapshot.hasData) {
-            return InkWell(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BusTimingScreen(
-                    busStopCode: widget.busStopCode,
-                    busStopName: widget.busStopName,
-                    busStopAddress: widget.busStopAddress,
-                    busStopLocation: widget.busStopLocation,
+            return Tooltip(
+              decoration: BoxDecoration(
+                color: AppColors.cardBg,
+              ),
+              textStyle: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+              showDuration: const Duration(milliseconds: 350),
+              message: widget.busStopName,
+              child: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BusTimingScreen(
+                      busStopCode: widget.busStopCode,
+                      busStopName: widget.busStopName,
+                      busStopAddress: widget.busStopAddress,
+                      busStopLocation: widget.busStopLocation,
+                    ),
                   ),
                 ),
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.cardBg,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
-                      child: Text(
-                        widget.busStopName,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        softWrap: false,
-                        style: const TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
+                        child: Text(
+                          widget.busStopName,
+                          overflow: TextOverflow.fade,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.kindaGrey),
+                        ),
                       ),
-                    ),
-                    ListView.separated(
-                        itemBuilder: (context, int index) {
-                          return Transform.scale(
-                            scale: 0.9,
-                            child: BusTimingRow(
-                              serviceInfo: snapshot.data![index],
-                              userLatLng: widget.busStopLocation,
-                            ),
-                          );
-                        },
-                        separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                              height: 6,
-                            ),
-                        physics: const NeverScrollableScrollPhysics(),
-                        padding: EdgeInsets.only(bottom: 18),
-                        shrinkWrap: true,
-                        itemCount: snapshot.data!.length),
-                  ],
+                      ListView.separated(
+                          itemBuilder: (context, int index) {
+                            return Transform.scale(
+                              scale: 0.9,
+                              child: BusTimingRow(
+                                serviceInfo: snapshot.data![index],
+                                userLatLng: widget.busStopLocation,
+                              ),
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                                height: 6,
+                              ),
+                          physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.only(bottom: 18),
+                          shrinkWrap: true,
+                          itemCount: snapshot.data!.length),
+                    ],
+                  ),
                 ),
               ),
             );
