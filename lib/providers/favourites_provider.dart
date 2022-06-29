@@ -12,11 +12,13 @@ class FavouritesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // removes the favourite from the list based on bus stop code
   void removeFavourite(String busStopCode) {
     _favouritesList.removeWhere((element) => element.busStopCode == busStopCode);
     notifyListeners();
   }
 
+  // finds index where the old favourite is located based on bus stop code and replaces the old favourite with the new favourite
   void updateFavourite(Favourite favourite) {
     _favouritesList[_favouritesList
         .indexWhere((element) => element.busStopCode == favourite.busStopCode)] = favourite;
