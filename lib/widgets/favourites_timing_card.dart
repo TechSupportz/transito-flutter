@@ -91,7 +91,8 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
         builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
           if (snapshot.hasData) {
             return Tooltip(
-              decoration: BoxDecoration(
+              preferBelow: false,
+              decoration: const BoxDecoration(
                 color: AppColors.cardBg,
               ),
               textStyle: const TextStyle(
