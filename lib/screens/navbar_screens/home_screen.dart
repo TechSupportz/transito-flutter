@@ -12,6 +12,7 @@ import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
+import 'package:transito/widgets/error_text.dart';
 
 import '../../models/bus_stops.dart';
 import '../../widgets/bus_stop_card.dart';
@@ -242,7 +243,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                   ],
                 );
               } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
+                // return Text("${snapshot.error}");
+                debugPrint("<=== ERROR ${snapshot.error} ===>");
+                return const ErrorText();
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),
@@ -352,7 +355,9 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
                         );
                       }
                     } else if (snapshot.hasError) {
-                      return Text("${snapshot.error}");
+                      // return Text("${snapshot.error}");
+                      debugPrint("<=== ERROR ${snapshot.error} ===>");
+                      return const ErrorText();
                     } else {
                       return const Center(
                         child: CircularProgressIndicator(),

@@ -8,6 +8,7 @@ import 'package:transito/models/app_colors.dart';
 import '../models/arrival_info.dart';
 import '../models/secret.dart';
 import '../widgets/bus_service_box.dart';
+import '../widgets/error_text.dart';
 import 'bus_timing_screen.dart';
 
 class BusStopInfoScreen extends StatefulWidget {
@@ -181,7 +182,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                   .toList(),
                             );
                           } else if (snapshot.hasError) {
-                            return Text("${snapshot.error}");
+                            // return Text("${snapshot.error}");
+                            debugPrint("<=== ERROR ${snapshot.error} ===>");
+                            return const ErrorText();
                           }
                           return const Center(child: CircularProgressIndicator());
                         }),

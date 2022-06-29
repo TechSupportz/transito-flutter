@@ -83,7 +83,6 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         "Try adding some favourites!",
                         style: TextStyle(
                           fontSize: 16,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],

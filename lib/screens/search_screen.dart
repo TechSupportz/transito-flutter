@@ -9,6 +9,7 @@ import '../models/bus_services.dart';
 import '../models/bus_stops.dart';
 import '../widgets/bus_service_card.dart';
 import '../widgets/bus_stop_card.dart';
+import '../widgets/error_text.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);
@@ -183,6 +184,10 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
               },
               separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
             );
+          } else if (snapshot.hasError) {
+            // return Text("${snapshot.error}");
+            debugPrint("<=== ERROR ${snapshot.error} ===>");
+            return const ErrorText();
           } else {
             return const Center(child: CircularProgressIndicator());
           }

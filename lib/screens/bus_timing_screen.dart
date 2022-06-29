@@ -14,6 +14,7 @@ import 'package:transito/widgets/bus_timing_row.dart';
 
 import '../models/secret.dart';
 import '../providers/favourites_provider.dart';
+import '../widgets/error_text.dart';
 import 'add_favourite_screen.dart';
 import 'bus_stop_info_screen.dart';
 import 'edit_favourite_screen.dart';
@@ -216,7 +217,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                       itemCount: snapshot.data!.services.length),
                 );
               } else if (snapshot.hasError) {
-                return Text("${snapshot.error}");
+                // return Text("${snapshot.error}");
+                debugPrint("<=== ERROR ${snapshot.error} ===>");
+                return const ErrorText();
               } else {
                 return const Center(
                   child: CircularProgressIndicator(),

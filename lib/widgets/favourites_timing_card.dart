@@ -11,6 +11,7 @@ import '../models/app_colors.dart';
 import '../models/arrival_info.dart';
 import '../models/secret.dart';
 import '../screens/bus_timing_screen.dart';
+import 'error_text.dart';
 
 class FavouritesTimingCard extends StatefulWidget {
   const FavouritesTimingCard({
@@ -158,7 +159,16 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
               ),
             );
           } else if (snapshot.hasError) {
-            return Text("${snapshot.error}");
+            // return Text("${snapshot.error}");
+            debugPrint("<=== ERROR ${snapshot.error} ===>");
+            return Container(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              decoration: BoxDecoration(
+                color: AppColors.cardBg,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const ErrorText(),
+            );
           } else {
             return const SizedBox(
               height: 0,
