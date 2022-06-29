@@ -56,6 +56,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   @override
   void initState() {
     super.initState();
+    // sorts bus services list according to the Bus Service number correctly
     widget.busServicesList.sort((a, b) => compareNatural(a, b));
   }
 
