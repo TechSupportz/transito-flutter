@@ -15,6 +15,7 @@ import 'package:transito/widgets/bus_timing_row.dart';
 import '../models/secret.dart';
 import '../providers/favourites_provider.dart';
 import 'add_favourite_screen.dart';
+import 'bus_stop_info_screen.dart';
 import 'edit_favourite_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
@@ -144,6 +145,20 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return true;
   }
 
+  void goToBusStopInfoScreen(context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BusStopInfoScreen(
+          busStopCode: widget.busStopCode,
+          busStopName: widget.busStopName,
+          busStopAddress: widget.busStopAddress,
+          busStopLocation: widget.busStopLocation,
+        ),
+      ),
+    );
+  }
+
   // initialise bus arrival info and start the timer to automatically re-fetch the bus arrival info every 30 seconds
   @override
   void initState() {
@@ -164,7 +179,10 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       builder: (context, value, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(widget.busStopName),
+            title: GestureDetector(
+              onTap: () => goToBusStopInfoScreen(context),
+              child: Text(widget.busStopName),
+            ),
             actions: [
               // display different IconButtons depending on whether the bus stop is a favourite or not
               value.favouritesList.every((element) => element.busStopCode != widget.busStopCode)

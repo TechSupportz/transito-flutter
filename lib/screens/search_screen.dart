@@ -134,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           // enabled: _busStopList.isNotEmpty,
           decoration: InputDecoration(
               suffixIcon: IconButton(
-                icon: Icon(Icons.clear),
+                icon: const Icon(Icons.clear),
                 onPressed: () {
                   // clears the search field and updates the filtered bus stop/bus services list depending on tab
                   _textFieldController.clear();

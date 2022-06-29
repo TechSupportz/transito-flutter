@@ -88,6 +88,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
     );
   }
 
+  // initialise futureBusArrivalInfo and futureBusServices onInit
   @override
   void initState() {
     super.initState();
