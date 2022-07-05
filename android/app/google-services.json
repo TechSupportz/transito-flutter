@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "341566460699",
+    "project_id": "transito-8f50c",
+    "storage_bucket": "transito-8f50c.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341566460699:android:c3f3ddf8179b6cd46379be",
+        "android_client_info": {
+          "package_name": "tnitish.com.transito"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh5R9feCSl5TQ9gB2YFmcUQoO3l5bAqKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

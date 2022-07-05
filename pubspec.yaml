@@ -26,6 +26,8 @@ dependencies:
     git:
       url: https://github.com/TechSupportz/parent-child-checkbox
   is_first_run: ^1.0.0
+  firebase_core: ^1.19.1
+  firebase_auth: ^3.4.1
 
 dev_dependencies:
   flutter_test:
