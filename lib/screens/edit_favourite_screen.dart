@@ -186,19 +186,13 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 42),
-                      // button to add bus stop to favourites list
-                      child: ElevatedButton(
-                          onPressed: () => updateFavorites(), child: const Text("Save changes"))),
+                  ElevatedButton(
+                      onPressed: () => updateFavorites(), child: const Text("Save changes")),
                   const SizedBox(
                     height: 8,
                   ),
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 42),
-                      // button to cancel and navigate back to previous screen
-                      child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context), child: const Text('Cancel')))
+                  OutlinedButton(
+                      onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
                 ],
               ),
             ),

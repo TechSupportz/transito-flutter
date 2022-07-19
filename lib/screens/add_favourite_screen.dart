@@ -156,20 +156,13 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 42),
-                      // button to add bus stop to favourites list
-                      child: ElevatedButton(
-                          onPressed: () => addToFavorites(),
-                          child: const Text("Add to favourites"))),
+                  ElevatedButton(
+                      onPressed: () => addToFavorites(), child: const Text("Add to favourites")),
                   const SizedBox(
                     height: 8,
                   ),
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 42),
-                      // button to cancel and navigate back to previous screen
-                      child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context), child: const Text('Cancel')))
+                  OutlinedButton(
+                      onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
                 ],
               ),
             ),

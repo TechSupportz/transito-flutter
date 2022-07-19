@@ -28,6 +28,8 @@ dependencies:
   is_first_run: ^1.0.0
   firebase_core: ^1.19.1
   firebase_auth: ^3.4.1
+  flutter_form_builder: 7.1.1
+  form_builder_validators: ^8.1.1
 
 dev_dependencies:
   flutter_test:

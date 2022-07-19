@@ -133,13 +133,9 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 42),
-                // button to trigger the request for the user's location permission
-                child: ElevatedButton(
-                  onPressed: () => requestLocationPermission(context),
-                  child: const Text("Check Permission"),
-                ),
+              child: ElevatedButton(
+                onPressed: () => requestLocationPermission(context),
+                child: const Text("Check Permission"),
               ),
             ),
           ],
