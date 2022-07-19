@@ -29,6 +29,13 @@
             {
               "client_id": "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "341566460699-sbmc4e7nb44hug4fnqi44uhd878ko65s.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "tnitish.com.transito"
+              }
             }
           ]
         }

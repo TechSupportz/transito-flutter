@@ -10,8 +10,10 @@ import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_provider.dart';
+import 'package:transito/screens/auth/login-screen.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
+import 'package:transito/services/auth_service.dart';
 import 'package:transito/widgets/error_text.dart';
 
 import '../../models/bus_stops.dart';
@@ -131,6 +133,14 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               ),
             ),
             icon: Icon(Icons.map_rounded),
+          ),
+          IconButton(
+            onPressed: () => AuthService().logout().then((value) => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  (Route<dynamic> route) => false,
+                )),
+            icon: Icon(Icons.logout_rounded),
           )
         ],
       ),
