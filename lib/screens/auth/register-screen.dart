@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../models/app_colors.dart';
+import '../../services/auth_service.dart';
+import '../navbar_screens/main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -21,7 +22,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isPasswordVisible = true;
 
   void onRegisterBtnPress() {
-    print('Registering...');
+    _registerFormKey.currentState!.save();
+    if (_registerFormKey.currentState!.validate()) {
+      AuthService()
+          .registerUserWithEmail(
+        _usernameFieldKey.currentState!.value,
+        _emailFieldKey.currentState!.value,
+        _passwordFieldKey.currentState!.value,
+      )
+          .then((value) {
+        print(AuthService().user);
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const MainScreen()),
+          (Route<dynamic> route) => false,
+        );
+      });
+    }
   }
 
   @override

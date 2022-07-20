@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -120,9 +121,11 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
+    var user = Provider.of<User?>(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: Text('Welcome ${user?.displayName ?? ''}'),
         actions: [
           // button to open the MRT map screen
           IconButton(
