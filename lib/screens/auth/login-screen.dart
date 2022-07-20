@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -7,7 +9,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/auth/register-screen.dart';
 
-import '../../services/auth_service.dart';
+import '../../providers/authentication_service.dart';
 import '../navbar_screens/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,25 +20,61 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool isPasswordVisible = false;
+  bool _isPasswordVisible = false;
+  bool _isLoading = false;
   final _loginFormKey = GlobalKey<FormBuilderState>();
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
   final _passwordFieldKey = GlobalKey<FormBuilderFieldState>();
 
-  void onLoginBtnPress() {
-    _loginFormKey.currentState!.save();
-    if (_loginFormKey.currentState!.validate()) {
-      AuthService()
-          .login(
+  void onLoginBtnPress() async {
+    setState(() {
+      _isLoading = true;
+    });
+    _loginFormKey.currentState!.saveAndValidate();
+    if (_loginFormKey.currentState!.isValid) {
+      AuthenticationService()
+          .loginUserWithEmail(
         _emailFieldKey.currentState!.value,
         _passwordFieldKey.currentState!.value,
       )
-          .then((value) {
-        print(AuthService().user);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => MainScreen()),
-          (Route<dynamic> route) => false,
-        );
+          .then(
+        (err) {
+          print(err);
+          if (err == null) {
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => MainScreen(),
+              ),
+              (Route<dynamic> route) => false,
+            );
+          } else {
+            setState(() {
+              _isLoading = false;
+            });
+            switch (err) {
+              case 'user-not-found':
+                _emailFieldKey.currentState!.invalidate("An account with this email doesn't exist");
+                break;
+              case 'wrong-password':
+                _passwordFieldKey.currentState!.invalidate("Incorrect password");
+                break;
+              case 'user-disabled':
+                _emailFieldKey.currentState!.invalidate("This account has been disabled");
+                break;
+              default:
+                _emailFieldKey.currentState!.invalidate("Oops, something went wrong on our end");
+                _passwordFieldKey.currentState!.invalidate("Oops, something went wrong on our end");
+                break;
+            }
+          }
+        },
+      );
+    } else {
+      Timer(const Duration(milliseconds: 500), () {
+        setState(() {
+          _isLoading = false;
+        });
+        _loginFormKey.currentState!.validate();
       });
     }
   }
@@ -82,8 +120,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             OutlinedButton.icon(
-                              onPressed: () => debugPrint(
-                                  "${AuthService().user.listen((value) => print(value))}"),
+                              onPressed: () => debugPrint("Google!"),
                               icon: SvgPicture.asset('assets/images/google_logo.svg'),
                               label: const Text('Sign in with Google',
                                   style: TextStyle(color: Colors.white)),
@@ -128,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     key: _passwordFieldKey,
                                     name: 'password',
                                     scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                                    obscureText: !isPasswordVisible,
+                                    obscureText: !_isPasswordVisible,
                                     keyboardType: TextInputType.visiblePassword,
                                     autovalidateMode: AutovalidateMode.onUserInteraction,
                                     validator: FormBuilderValidators.compose(
@@ -136,14 +173,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                     decoration: InputDecoration(
                                       labelText: 'Password',
                                       suffixIcon: IconButton(
-                                        icon: Icon(isPasswordVisible
+                                        icon: Icon(_isPasswordVisible
                                             ? Icons.visibility_off_rounded
                                             : Icons.visibility_rounded),
                                         iconSize: 24,
                                         splashRadius: 1,
+                                        color: Colors.white70,
                                         onPressed: () {
                                           setState(() {
-                                            isPasswordVisible = !isPasswordVisible;
+                                            _isPasswordVisible = !_isPasswordVisible;
                                           });
                                         },
                                       ),
@@ -154,9 +192,24 @@ class _LoginScreenState extends State<LoginScreen> {
                                     padding: const EdgeInsets.symmetric(horizontal: 21.0),
                                     child: OutlinedButton(
                                       onPressed: () => onLoginBtnPress(),
-                                      child: Text('Login'),
+                                      child: AnimatedSwitcher(
+                                        transitionBuilder: (child, animation) => ScaleTransition(
+                                          scale: animation,
+                                          child: child,
+                                        ),
+                                        duration: const Duration(milliseconds: 175),
+                                        child: _isLoading
+                                            ? const SizedBox(
+                                                height: 18,
+                                                width: 18,
+                                                child: Center(
+                                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                                ),
+                                              )
+                                            : const Text('Login'),
+                                      ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             ),

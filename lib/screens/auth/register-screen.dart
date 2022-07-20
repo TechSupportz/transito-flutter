@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../models/app_colors.dart';
-import '../../services/auth_service.dart';
+import '../../providers/authentication_service.dart';
 import '../navbar_screens/main_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -24,14 +24,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void onRegisterBtnPress() {
     _registerFormKey.currentState!.save();
     if (_registerFormKey.currentState!.validate()) {
-      AuthService()
+      AuthenticationService()
           .registerUserWithEmail(
         _usernameFieldKey.currentState!.value,
         _emailFieldKey.currentState!.value,
         _passwordFieldKey.currentState!.value,
       )
           .then((value) {
-        print(AuthService().user);
+        print(value);
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) => const MainScreen()),
           (Route<dynamic> route) => false,
