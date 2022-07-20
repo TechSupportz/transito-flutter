@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
@@ -29,6 +30,25 @@ void main() async {
       _permission == LocationPermission.whileInUse) {
     _defaultHome = MainScreen();
   }
+
+  Future.wait([
+    precachePicture(
+      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/logo.svg'),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/google_logo.svg'),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/location.svg'),
+      null,
+    ),
+    precachePicture(
+      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/diagram.svg'),
+      null,
+    ),
+  ]);
 
   runApp(
     MultiProvider(
