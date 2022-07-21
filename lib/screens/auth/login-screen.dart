@@ -25,6 +25,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _loginFormKey = GlobalKey<FormBuilderState>();
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
   final _passwordFieldKey = GlobalKey<FormBuilderFieldState>();
+  final _forgotPasswordEmailFieldKey = GlobalKey<FormBuilderFieldState>();
 
   void onLoginBtnPress() async {
     setState(() {
@@ -53,7 +54,8 @@ class _LoginScreenState extends State<LoginScreen> {
             });
             switch (err) {
               case 'user-not-found':
-                _emailFieldKey.currentState!.invalidate("An account with this email doesn't exist");
+                _emailFieldKey.currentState!.invalidate("No user found with this email");
+
                 break;
               case 'wrong-password':
                 _passwordFieldKey.currentState!.invalidate("Incorrect password");
@@ -76,6 +78,47 @@ class _LoginScreenState extends State<LoginScreen> {
         });
         _loginFormKey.currentState!.validate();
       });
+    }
+  }
+
+  void showForgetPasswordDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => forgetPasswordDialog(context),
+    );
+  }
+
+  void onSendPasswordResetBtnPress() async {
+    _forgotPasswordEmailFieldKey.currentState!.save();
+    _forgotPasswordEmailFieldKey.currentState!.validate();
+    if (_forgotPasswordEmailFieldKey.currentState!.isValid) {
+      await AuthenticationService()
+          .sendPasswordResetEmail(_forgotPasswordEmailFieldKey.currentState!.value)
+          .then(
+        (err) {
+          print(err);
+          if (err == null) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Check your email for a password reset link'),
+                duration: Duration(seconds: 2),
+              ),
+            );
+            Navigator.of(context).pop();
+          } else {
+            switch (err) {
+              case 'user-not-found':
+                _forgotPasswordEmailFieldKey.currentState!
+                    .invalidate("No user found with this email");
+                break;
+              default:
+                _forgotPasswordEmailFieldKey.currentState!
+                    .invalidate("Oops, something went wrong on our end");
+                break;
+            }
+          }
+        },
+      );
     }
   }
 
@@ -160,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       labelText: 'Email',
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 12),
                                   FormBuilderTextField(
                                     key: _passwordFieldKey,
                                     name: 'password',
@@ -187,7 +230,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: 12),
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 21.0),
                                     child: OutlinedButton(
@@ -210,6 +253,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                       ),
                                     ),
                                   ),
+                                  const SizedBox(height: 6),
+                                  GestureDetector(
+                                    onTap: () => showForgetPasswordDialog(),
+                                    child: const Text(
+                                      'Forgot password?',
+                                      style: TextStyle(fontSize: 14, color: AppColors.veryPurple),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -219,13 +271,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
+                      padding: const EdgeInsets.only(bottom: 12.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           const Text(
                             'New Here?',
-                            style: TextStyle(color: AppColors.kindaGrey),
+                            style: TextStyle(fontSize: 13, color: AppColors.kindaGrey),
                           ),
                           const SizedBox(width: 3),
                           GestureDetector(
@@ -236,7 +288,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: const Text(
                               'Register!',
-                              style: TextStyle(color: AppColors.veryPurple),
+                              style: TextStyle(fontSize: 13, color: AppColors.veryPurple),
                             ),
                           ),
                         ],
@@ -249,6 +301,49 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  AlertDialog forgetPasswordDialog(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Forgot Password'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+              'Please enter your email address and we will send you a link to reset your password.',
+              style: TextStyle(
+                fontSize: 16,
+                color: AppColors.kindaGrey,
+              )),
+          const SizedBox(height: 18),
+          FormBuilderTextField(
+            key: _forgotPasswordEmailFieldKey,
+            name: 'email',
+            decoration: const InputDecoration(
+              labelText: 'Email',
+              fillColor: Colors.white10,
+            ),
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            validator: FormBuilderValidators.compose(
+              [
+                FormBuilderValidators.email(),
+                FormBuilderValidators.required(),
+              ],
+            ),
+          )
+        ],
+      ),
+      actions: [
+        TextButton(
+          child: const Text('Cancel'),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        TextButton(
+          child: const Text('Send'),
+          onPressed: () => onSendPasswordResetBtnPress(),
+        ),
+      ],
     );
   }
 }

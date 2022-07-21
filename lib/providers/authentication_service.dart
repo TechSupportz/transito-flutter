@@ -27,15 +27,22 @@ class AuthenticationService {
         password: password,
       );
     } on FirebaseAuthException catch (e) {
-      debugPrint("Login failed with code: ${e.code}");
-      debugPrint("Login failed with message: ${e.message}");
+      debugPrint("🛑 Login failed with code: ${e.code}");
+      debugPrint("🛑 Login failed with message: ${e.message}");
       return e.code;
     }
     return null;
   }
 
-  Future<void> forgetPassword(email) {
-    return _auth.sendPasswordResetEmail(email: email);
+  Future<String?> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      debugPrint("🛑 Forget password failed with code: ${e.code}");
+      debugPrint("🛑 Forget password failed with message: ${e.message}");
+      return e.code;
+    }
+    return null;
   }
 
   Future<void> logout() {

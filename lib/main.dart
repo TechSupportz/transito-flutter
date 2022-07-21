@@ -131,17 +131,25 @@ class MyApp extends StatelessWidget {
             minimumSize: const Size(15, 42),
           ),
         ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(7.5),
+            ),
+          ),
+        ),
         dialogTheme: DialogTheme(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
+          backgroundColor: AppColors.cardBg,
         ),
         tabBarTheme: const TabBarTheme(
           labelColor: AppColors.veryPurple,
           unselectedLabelColor: AppColors.kindaGrey,
         ),
         snackBarTheme: SnackBarThemeData(
-          backgroundColor: Color(0xFF2E2E2E),
+          backgroundColor: AppColors.cardBg,
           behavior: SnackBarBehavior.floating,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
@@ -167,6 +175,7 @@ class MyApp extends StatelessWidget {
                 color: AppColors.cardBg,
               )),
           isDense: true,
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           fillColor: AppColors.inputFieldBg,
           filled: true,
         ),

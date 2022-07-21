@@ -5,8 +5,6 @@ import 'package:is_first_run/is_first_run.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 import 'package:transito/screens/onboarding_screens/quick_start_screen.dart';
 
-import '../../models/app_colors.dart';
-
 class LocationAccessScreen extends StatefulWidget {
   const LocationAccessScreen({Key? key}) : super(key: key);
 
@@ -57,7 +55,6 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
           context: context,
           barrierDismissible: false, // user must tap button!
           builder: (context) => AlertDialog(
-            backgroundColor: AppColors.cardBg,
             title: const Text('Location Permission Denied'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
