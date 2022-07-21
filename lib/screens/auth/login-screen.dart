@@ -98,13 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
         (err) {
           print(err);
           if (err == null) {
+            Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Check your email for a password reset link'),
                 duration: Duration(seconds: 2),
               ),
             );
-            Navigator.of(context).pop();
           } else {
             switch (err) {
               case 'user-not-found':

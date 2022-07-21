@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
@@ -5,7 +7,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../models/app_colors.dart';
 import '../../providers/authentication_service.dart';
-import '../navbar_screens/main_screen.dart';
+import 'login-screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);
@@ -16,26 +18,56 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _registerFormKey = GlobalKey<FormBuilderState>();
-  final _usernameFieldKey = GlobalKey<FormBuilderFieldState>();
+  final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
   final _passwordFieldKey = GlobalKey<FormBuilderFieldState>();
   bool isPasswordVisible = true;
+  bool _isLoading = false;
 
   void onRegisterBtnPress() {
-    _registerFormKey.currentState!.save();
+    setState(() {
+      _isLoading = true;
+    });
+    _registerFormKey.currentState!.saveAndValidate();
     if (_registerFormKey.currentState!.validate()) {
       AuthenticationService()
           .registerUserWithEmail(
-        _usernameFieldKey.currentState!.value,
+        _nameFieldKey.currentState!.value,
         _emailFieldKey.currentState!.value,
         _passwordFieldKey.currentState!.value,
       )
-          .then((value) {
-        print(value);
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-          (Route<dynamic> route) => false,
-        );
+          .then((err) {
+        if (err == null) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const LoginScreen(),
+            ),
+            (Route<dynamic> route) => false,
+          );
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Registration successful, please login'),
+            ),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+          });
+          switch (err) {
+            case 'email-already-in-use':
+              _emailFieldKey.currentState!.invalidate('Email already in use');
+              break;
+            case 'weak-password':
+              _passwordFieldKey.currentState!.invalidate('Password is too weak');
+              break;
+          }
+        }
+      });
+    } else {
+      Timer(const Duration(milliseconds: 500), () {
+        setState(() {
+          _isLoading = false;
+        });
       });
     }
   }
@@ -82,15 +114,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
                               FormBuilderTextField(
-                                key: _usernameFieldKey,
-                                name: 'username',
+                                key: _nameFieldKey,
+                                name: 'name',
                                 scrollPadding: const EdgeInsets.symmetric(vertical: 50),
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
                                 validator: FormBuilderValidators.compose([
                                   FormBuilderValidators.required(),
                                 ]),
                                 decoration: const InputDecoration(
-                                  labelText: 'Username',
+                                  labelText: 'Name',
                                 ),
                               ),
                               const SizedBox(height: 16),
@@ -116,8 +148,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 obscureText: !isPasswordVisible,
                                 keyboardType: TextInputType.visiblePassword,
                                 autovalidateMode: AutovalidateMode.onUserInteraction,
+                                valueTransformer: (value) => value?.trim(),
                                 validator: FormBuilderValidators.compose([
                                   FormBuilderValidators.required(),
+                                  FormBuilderValidators.minLength(8),
                                 ]),
                                 decoration: InputDecoration(
                                   labelText: 'Password',
@@ -139,7 +173,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 16),
                                 child: OutlinedButton(
                                   onPressed: () => onRegisterBtnPress(),
-                                  child: Text('Register'),
+                                  child: AnimatedSwitcher(
+                                    transitionBuilder: (child, animation) => ScaleTransition(
+                                      scale: animation,
+                                      child: child,
+                                    ),
+                                    duration: const Duration(milliseconds: 175),
+                                    child: _isLoading
+                                        ? const SizedBox(
+                                            height: 18,
+                                            width: 18,
+                                            child: Center(
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            ),
+                                          )
+                                        : const Text('Register'),
+                                  ),
                                 ),
                               )
                             ],

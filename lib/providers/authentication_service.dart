@@ -6,15 +6,15 @@ class AuthenticationService {
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  Future<String?> registerUserWithEmail(String username, String email, String password) async {
+  Future<String?> registerUserWithEmail(String name, String email, String password) async {
     try {
       UserCredential result =
           await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
-      await user?.updateDisplayName(username);
+      await user?.updateDisplayName(name);
     } on FirebaseAuthException catch (e) {
-      debugPrint("Registration failed with code: ${e.code}");
-      debugPrint("Registration failed with message: ${e.message}");
+      debugPrint("🛑 Registration failed with code: ${e.code}");
+      debugPrint("🛑 Registration failed with message: ${e.message}");
       return e.code;
     }
     return null;
