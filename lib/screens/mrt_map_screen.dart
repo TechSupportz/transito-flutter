@@ -12,7 +12,7 @@ class MrtMapScreen extends StatelessWidget {
       ),
       // displays a zoomable mrt map (yes that's literally the only thing this whole screen does)
       body: PhotoView(
-        imageProvider: AssetImage('assets/images/mrt_map.png'),
+        imageProvider: const AssetImage('assets/images/mrt_map.png'),
       ),
     );
   }

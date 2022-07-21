@@ -54,7 +54,7 @@ class QuickStartScreen extends StatelessWidget {
                 onPressed: () => Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => MainScreen(),
+                    builder: (context) => const MainScreen(),
                   ),
                 ),
                 child: const Text("Take me to the home screen!"),

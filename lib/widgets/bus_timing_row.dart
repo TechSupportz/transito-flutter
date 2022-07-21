@@ -19,7 +19,7 @@ class BusTimingRow extends StatefulWidget {
 }
 
 class _BusTimingRowState extends State<BusTimingRow> {
-  final Distance distance = new Distance();
+  final Distance distance = const Distance();
 
   // formats the arrival time into minutes
   String formatArrivalTime(arrivalTime) {

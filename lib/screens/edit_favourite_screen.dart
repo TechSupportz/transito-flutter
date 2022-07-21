@@ -40,7 +40,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -90,7 +90,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               services: selectedServices),
         );
         _showSnackBar('Updated favourites');
-        print(favourites.favouritesList);
+        debugPrint("${favourites.favouritesList}");
       } else {
         // if no services were selected then remove the bus stop from favourites list
         favourites.removeFavourite(widget.busStopCode);
@@ -100,7 +100,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => MainScreen(),
+          builder: (context) => const MainScreen(),
         ),
         (Route<dynamic> route) => false,
       );
