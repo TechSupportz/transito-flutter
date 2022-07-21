@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  Stream<User?> get authStateChanges => _auth.authStateChanges();
-
   Future<String?> registerUserWithEmail(String name, String email, String password) async {
     try {
       UserCredential result =
           await _auth.createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
       await user?.updateDisplayName(name);
+      await user?.sendEmailVerification();
+      // user?.reload();
     } on FirebaseAuthException catch (e) {
       debugPrint("🛑 Registration failed with code: ${e.code}");
       debugPrint("🛑 Registration failed with message: ${e.message}");
@@ -46,6 +46,7 @@ class AuthenticationService {
   }
 
   Future<void> logout() {
+    // debugPrint("Logout");
     return _auth.signOut();
   }
 }

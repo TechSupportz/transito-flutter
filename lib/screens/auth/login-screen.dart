@@ -10,6 +10,7 @@ import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/auth/register-screen.dart';
 
 import '../../providers/authentication_service.dart';
+import '../../widgets/email_verification_dialog.dart';
 import '../navbar_screens/main_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -22,6 +23,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+
   final _loginFormKey = GlobalKey<FormBuilderState>();
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
   final _passwordFieldKey = GlobalKey<FormBuilderFieldState>();
@@ -39,15 +41,24 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordFieldKey.currentState!.value,
       )
           .then(
-        (err) {
-          print(err);
+        (err) async {
           if (err == null) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(
-                builder: (context) => MainScreen(),
-              ),
-              (Route<dynamic> route) => false,
-            );
+            setState(() {
+              _isLoading = false;
+            });
+            if (context.read<User>().emailVerified) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const MainScreen(),
+                ),
+                (Route<dynamic> route) => false,
+              );
+            } else {
+              showDialog(
+                context: context,
+                builder: (context) => const EmailVerificationDialog(),
+              );
+            }
           } else {
             setState(() {
               _isLoading = false;
@@ -96,7 +107,6 @@ class _LoginScreenState extends State<LoginScreen> {
           .sendPasswordResetEmail(_forgotPasswordEmailFieldKey.currentState!.value)
           .then(
         (err) {
-          print(err);
           if (err == null) {
             Navigator.of(context).pop();
             ScaffoldMessenger.of(context).showSnackBar(
@@ -124,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<User?>(context);
+    var user = context.watch<User?>();
     bool isLoggedIn = user != null;
 
     return Scaffold(
@@ -271,27 +281,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const Spacer(),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text(
-                            'New Here?',
-                            style: TextStyle(fontSize: 13, color: AppColors.kindaGrey),
+                      padding: const EdgeInsets.only(bottom: 16.0),
+                      child: GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => const RegisterScreen(),
                           ),
-                          const SizedBox(width: 3),
-                          GestureDetector(
-                            onTap: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) => const RegisterScreen(),
-                              ),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Text(
+                              'New Here?',
+                              style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
                             ),
-                            child: const Text(
+                            SizedBox(width: 3),
+                            Text(
                               'Register!',
-                              style: TextStyle(fontSize: 13, color: AppColors.veryPurple),
+                              style: TextStyle(fontSize: 14, color: AppColors.veryPurple),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],

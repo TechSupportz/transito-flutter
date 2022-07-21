@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
-    var user = Provider.of<User?>(context);
+    var user = context.watch<User?>();
 
     return Scaffold(
       appBar: AppBar(
@@ -132,19 +132,19 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => MrtMapScreen(),
+                builder: (context) => const MrtMapScreen(),
               ),
             ),
-            icon: Icon(Icons.map_rounded),
+            icon: const Icon(Icons.map_rounded),
           ),
           IconButton(
             onPressed: () =>
                 AuthenticationService().logout().then((value) => Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
+                      MaterialPageRoute(builder: (context) => const LoginScreen()),
                       (Route<dynamic> route) => false,
                     )),
-            icon: Icon(Icons.logout_rounded),
+            icon: const Icon(Icons.logout_rounded),
           )
         ],
       ),
@@ -186,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 16),
+                              const SizedBox(height: 16),
                               TextButton(
                                   onPressed: () => Navigator.pushAndRemoveUntil(
                                       context,

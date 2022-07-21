@@ -30,6 +30,8 @@ dependencies:
   firebase_auth: ^3.4.1
   flutter_form_builder: 7.1.1
   form_builder_validators: ^8.1.1
+  android_intent_plus: ^3.1.1
+  url_launcher: ^6.1.5
 
 dev_dependencies:
   flutter_test:

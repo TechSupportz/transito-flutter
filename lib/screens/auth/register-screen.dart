@@ -7,6 +7,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 
 import '../../models/app_colors.dart';
 import '../../providers/authentication_service.dart';
+import '../../widgets/email_verification_dialog.dart';
 import 'login-screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -44,10 +45,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
             (Route<dynamic> route) => false,
           );
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Registration successful, please login'),
-            ),
+          showDialog(
+            context: context,
+            builder: (context) => const EmailVerificationDialog(),
           );
         } else {
           setState(() {

@@ -8,7 +8,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
-import 'package:transito/providers/authentication_service.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/search_provider.dart';
 import 'package:transito/screens/auth/login-screen.dart';
@@ -18,7 +17,7 @@ import 'package:transito/screens/onboarding_screens/location_access_screen.dart'
 import 'firebase_options.dart';
 
 void main() async {
-  Widget _defaultHome = LocationAccessScreen();
+  Widget _defaultHome = const LocationAccessScreen();
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -28,7 +27,7 @@ void main() async {
   LocationPermission _permission = await Geolocator.checkPermission();
   if (!_isFirstRun && _permission == LocationPermission.always ||
       _permission == LocationPermission.whileInUse) {
-    _defaultHome = MainScreen();
+    _defaultHome = const MainScreen();
   }
 
   Future.wait([
@@ -53,8 +52,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        StreamProvider(
-          create: (context) => AuthenticationService().authStateChanges,
+        StreamProvider<User?>.value(
+          value: FirebaseAuth.instance.userChanges(),
           initialData: null,
         ),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
@@ -72,7 +71,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
-    bool isLoggedIn = user != null;
+    bool isLoggedIn = user != null && user.emailVerified == true;
 
     return MaterialApp(
       title: "Transito",
@@ -86,7 +85,7 @@ class MyApp extends StatelessWidget {
         fontFamily: 'Poppins',
         canvasColor: Colors.transparent,
         androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-        scaffoldBackgroundColor: Color(0xFF0C0C0C),
+        scaffoldBackgroundColor: const Color(0xFF0C0C0C),
         colorScheme: const ColorScheme.dark().copyWith(
           surface: Colors.black,
           primary: AppColors.veryPurple,
@@ -175,7 +174,7 @@ class MyApp extends StatelessWidget {
                 color: AppColors.cardBg,
               )),
           isDense: true,
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           fillColor: AppColors.inputFieldBg,
           filled: true,
         ),
