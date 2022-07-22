@@ -29,6 +29,28 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordFieldKey = GlobalKey<FormBuilderFieldState>();
   final _forgotPasswordEmailFieldKey = GlobalKey<FormBuilderFieldState>();
 
+  void onGoogleBtnPress() async {
+    AuthenticationService().signInWithGoogle().then(
+      (err) async {
+        print(err);
+        if (err == null) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => const MainScreen(),
+            ),
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Sonething went wrong... Please try again'),
+            ),
+          );
+        }
+      },
+    );
+  }
+
   void onLoginBtnPress() async {
     setState(() {
       _isLoading = true;
@@ -66,7 +88,6 @@ class _LoginScreenState extends State<LoginScreen> {
             switch (err) {
               case 'user-not-found':
                 _emailFieldKey.currentState!.invalidate("No user found with this email");
-
                 break;
               case 'wrong-password':
                 _passwordFieldKey.currentState!.invalidate("Incorrect password");
@@ -173,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             OutlinedButton.icon(
-                              onPressed: () => debugPrint("Google!"),
+                              onPressed: () => onGoogleBtnPress(),
                               icon: SvgPicture.asset('assets/images/google_logo.svg'),
                               label: const Text('Sign in with Google',
                                   style: TextStyle(color: Colors.white)),
