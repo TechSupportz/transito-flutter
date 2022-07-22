@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/auth/register-screen.dart';
@@ -12,6 +14,7 @@ import 'package:transito/screens/auth/register-screen.dart';
 import '../../providers/authentication_service.dart';
 import '../../widgets/email_verification_dialog.dart';
 import '../navbar_screens/main_screen.dart';
+import '../onboarding_screens/location_access_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -21,6 +24,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  Widget _defaultHome = const LocationAccessScreen();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
@@ -31,12 +35,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void onGoogleBtnPress() async {
     AuthenticationService().signInWithGoogle().then(
-      (err) async {
-        print(err);
+      (err) {
         if (err == null) {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-              builder: (context) => const MainScreen(),
+              builder: (context) => _defaultHome,
             ),
             (Route<dynamic> route) => false,
           );
@@ -49,6 +52,18 @@ class _LoginScreenState extends State<LoginScreen> {
         }
       },
     );
+  }
+
+  void setIsGoogleLoading(bool value) {
+    if (value) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => const Center(child: CircularProgressIndicator()),
+      );
+    } else {
+      Navigator.of(context).pop();
+    }
   }
 
   void onLoginBtnPress() async {
@@ -71,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
             if (context.read<User>().emailVerified) {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(
-                  builder: (context) => const MainScreen(),
+                  builder: (context) => _defaultHome,
                 ),
                 (Route<dynamic> route) => false,
               );
@@ -151,6 +166,21 @@ class _LoginScreenState extends State<LoginScreen> {
         },
       );
     }
+  }
+
+  initialiseDefaultHome() async {
+    bool _isFirstRun = await IsFirstRun.isFirstRun();
+    LocationPermission _permission = await Geolocator.checkPermission();
+    if (!_isFirstRun && _permission == LocationPermission.always ||
+        _permission == LocationPermission.whileInUse) {
+      _defaultHome = const MainScreen();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialiseDefaultHome();
   }
 
   @override
