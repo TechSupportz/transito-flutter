@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var user = context.watch<User?>();
+    var user = context.read<User?>();
     bool isLoggedIn = user != null && user.emailVerified == true;
 
     return MaterialApp(
