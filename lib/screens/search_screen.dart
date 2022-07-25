@@ -134,24 +134,28 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           onChanged: (_) => _tabController.index == 0 ? filterBusStops() : filterBusServices(),
           // enabled: _busStopList.isNotEmpty,
           decoration: InputDecoration(
-              suffixIcon: IconButton(
-                icon: const Icon(Icons.clear),
-                onPressed: () {
-                  // clears the search field and updates the filtered bus stop/bus services list depending on tab
-                  _textFieldController.clear();
-                  if (_tabController.index == 0) {
-                    setState(() {
-                      _filteredBusStopList = _busStopList;
-                    });
-                  } else {
-                    setState(() {
-                      _filteredBusServiceList = _busServiceList;
-                    });
-                  }
-                },
-              ),
-              hintText: 'Search...',
-              border: InputBorder.none),
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                // clears the search field and updates the filtered bus stop/bus services list depending on tab
+                _textFieldController.clear();
+                if (_tabController.index == 0) {
+                  setState(() {
+                    _filteredBusStopList = _busStopList;
+                  });
+                } else {
+                  setState(() {
+                    _filteredBusServiceList = _busServiceList;
+                  });
+                }
+              },
+            ),
+            hintText: 'Search...',
+            isDense: false,
+            filled: false,
+            border: InputBorder.none,
+            enabledBorder: InputBorder.none,
+          ),
         ),
         bottom: TabBar(
           controller: _tabController,

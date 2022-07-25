@@ -37,7 +37,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 2),
+        duration: const Duration(seconds: 2),
       ),
     );
   }
@@ -71,14 +71,14 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
         // navigate back to main screen
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (Route<dynamic> route) => false,
         );
       } else {
         // if user somehow accesses this screen with a bus stop that already exists in favourites list, display snackbar to notify user
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => MainScreen()),
+          MaterialPageRoute(builder: (context) => const MainScreen()),
           (Route<dynamic> route) => false,
         );
         _showSnackBar('Something went wrong...');
@@ -156,20 +156,13 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 42),
-                      // button to add bus stop to favourites list
-                      child: ElevatedButton(
-                          onPressed: () => addToFavorites(),
-                          child: const Text("Add to favourites"))),
+                  ElevatedButton(
+                      onPressed: () => addToFavorites(), child: const Text("Add to favourites")),
                   const SizedBox(
                     height: 8,
                   ),
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(minHeight: 42),
-                      // button to cancel and navigate back to previous screen
-                      child: OutlinedButton(
-                          onPressed: () => Navigator.pop(context), child: const Text('Cancel')))
+                  OutlinedButton(
+                      onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
                 ],
               ),
             ),

@@ -24,12 +24,12 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
         Hero(
           tag: 'searchPostfix',
           child: IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => SearchScreen(),
+                  builder: (context) => const SearchScreen(),
                 ),
               );
             },
@@ -37,7 +37,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
         ),
       ]),
       // displays the recent search list widget
-      body: RecentSearchList(),
+      body: const RecentSearchList(),
       // floating action button to clear the recent searches list by calling a function in the search provider
       floatingActionButton: FloatingActionButton(
         onPressed: () {

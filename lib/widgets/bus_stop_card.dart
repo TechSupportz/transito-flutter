@@ -53,7 +53,7 @@ class BusStopCard extends StatelessWidget {
       color: Colors.transparent,
       child: Tooltip(
         preferBelow: false,
-        showDuration: Duration(milliseconds: 350),
+        showDuration: const Duration(milliseconds: 350),
         message: busStopInfo.busStopName,
         child: InkWell(
           onTap: () {
@@ -101,8 +101,8 @@ class BusStopCard extends StatelessWidget {
                 Row(
                   children: [
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                      margin: EdgeInsets.only(right: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                      margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
                           color: AppColors.veryPurple, borderRadius: BorderRadius.circular(5)),
                       child: Text(
@@ -115,7 +115,8 @@ class BusStopCard extends StatelessWidget {
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         softWrap: false,
-                        style: TextStyle(color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                        style: const TextStyle(
+                            color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
                       ),
                     )
                   ],

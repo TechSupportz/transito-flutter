@@ -150,7 +150,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                 height: 6,
                               ),
                           physics: const NeverScrollableScrollPhysics(),
-                          padding: EdgeInsets.only(bottom: 18),
+                          padding: const EdgeInsets.only(bottom: 18),
                           shrinkWrap: true,
                           itemCount: snapshot.data!.length),
                     ],

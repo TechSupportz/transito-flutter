@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:ui';
 
 class AppColors {
@@ -14,4 +16,5 @@ class AppColors {
   static const Color GAS = Color(0xFFF4BD00);
 
   static const Color cardBg = Color(0xFF1d1d1d);
+  static const Color inputFieldBg = Color(0xff202020);
 }

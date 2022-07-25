@@ -44,7 +44,7 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.search_rounded), label: "Search"),
         ],
         backgroundColor: Colors.black,
-        unselectedItemColor: Color(0xFFD8DBE2),
+        unselectedItemColor: const Color(0xFFD8DBE2),
         showSelectedLabels: false,
         showUnselectedLabels: false,
         currentIndex: _pageIndex,

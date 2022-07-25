@@ -50,18 +50,14 @@ class QuickStartScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(minHeight: 42),
-                // button to bring user to the main screen
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MainScreen(),
-                    ),
+              child: ElevatedButton(
+                onPressed: () => Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const MainScreen(),
                   ),
-                  child: const Text("Take me to the home screen!"),
                 ),
+                child: const Text("Take me to the home screen!"),
               ),
             ),
           ],

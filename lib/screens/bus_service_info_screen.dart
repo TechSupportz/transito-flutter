@@ -97,13 +97,13 @@ class BusServiceInfoScreen extends StatelessWidget {
                       ),
                       TableRow(
                         children: [
-                          const Text('8:31am - 4:59pm', style: const TextStyle(fontSize: 21)),
+                          const Text('8:31am - 4:59pm', style: TextStyle(fontSize: 21)),
                           Text(busServiceInfo.AMOffPeakFreq, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
-                          const Text('5:00pm - 7:00pm', style: const TextStyle(fontSize: 21)),
+                          const Text('5:00pm - 7:00pm', style: TextStyle(fontSize: 21)),
                           Text(busServiceInfo.PMPeakFreq, style: const TextStyle(fontSize: 21)),
                         ],
                       ),

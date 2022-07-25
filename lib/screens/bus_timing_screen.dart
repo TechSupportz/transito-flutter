@@ -167,11 +167,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
     timer = Timer.periodic(
         const Duration(seconds: 30),
-        (Timer t) => setState(() {
-              futureBusArrivalInfo =
-                  fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
-              ;
-            }));
+        (Timer t) => setState(
+              () {
+                futureBusArrivalInfo =
+                    fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+              },
+            ));
   }
 
   @override

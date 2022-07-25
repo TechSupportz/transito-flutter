@@ -216,13 +216,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(bottom: 16, top: 21),
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(minHeight: 42),
-                    // button to trigger the request for the user's location permission
-                    child: ElevatedButton(
-                      onPressed: () => goToBusTimingScreen(),
-                      child: const Text('View Bus Timings'),
-                    ),
+                  child: ElevatedButton(
+                    onPressed: () => goToBusTimingScreen(),
+                    child: const Text('View Bus Timings'),
                   ),
                 ),
               ],
