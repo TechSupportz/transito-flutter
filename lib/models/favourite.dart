@@ -1,4 +1,6 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:latlong2/latlong.dart';
 
 part 'favourite.g.dart';
 
@@ -7,16 +9,21 @@ class Favourite {
   String busStopCode;
   String busStopName;
   String busStopAddress;
-  double latitude;
-  double longitude;
+
+  @JsonKey(fromJson: decodeBusStopLocation)
+  LatLng busStopLocation;
+
   List<String?> services;
+
+  static LatLng decodeBusStopLocation(GeoPoint busStopGeoPoint) {
+    return LatLng(busStopGeoPoint.latitude, busStopGeoPoint.longitude);
+  }
 
   Favourite({
     required this.busStopCode,
     required this.busStopName,
     required this.busStopAddress,
-    required this.latitude,
-    required this.longitude,
+    required this.busStopLocation,
     required this.services,
   });
 

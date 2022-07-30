@@ -294,13 +294,12 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
     Position userLocation = await widget.userLocation;
 
     // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
-    for (var busStop in favouritesList) {
-      LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
-      double distanceAway = distance.as(
-          LengthUnit.Meter, LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
+    for (var favourite in favouritesList) {
+      double distanceAway = distance.as(LengthUnit.Meter,
+          LatLng(userLocation.latitude, userLocation.longitude), favourite.busStopLocation);
       if (distanceAway <= 750) {
         _nearbyFavourites
-            .add(NearbyFavourites(busStopInfo: busStop, distanceFromUser: distanceAway));
+            .add(NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway));
       }
     }
     List<NearbyFavourites> _tempNearbyFavourites = _nearbyFavourites;
@@ -337,8 +336,7 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
                               busStopCode: snapshot.data![index].busStopInfo.busStopCode,
                               busStopName: snapshot.data![index].busStopInfo.busStopName,
                               busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
-                              busStopLocation: LatLng(snapshot.data![index].busStopInfo.latitude,
-                                  snapshot.data![index].busStopInfo.longitude),
+                              busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
                               services: snapshot.data![index].busStopInfo.services,
                             );
                           },

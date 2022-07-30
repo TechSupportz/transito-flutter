@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
@@ -76,7 +75,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
           busStopCode: favourite.busStopCode,
           busStopName: favourite.busStopName,
           busStopAddress: favourite.busStopAddress,
-          busStopLocation: LatLng(favourite.latitude, favourite.longitude),
+          busStopLocation: favourite.busStopLocation,
           busServicesList: busServicesList,
         ),
       ),

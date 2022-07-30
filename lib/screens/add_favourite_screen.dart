@@ -61,8 +61,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               busStopCode: widget.busStopCode,
               busStopName: widget.busStopName,
               busStopAddress: widget.busStopAddress,
-              latitude: widget.busStopLocation.latitude,
-              longitude: widget.busStopLocation.longitude,
+              busStopLocation: widget.busStopLocation,
               services: selectedServices),
         );
         // display snackbar to notify user that favourite has been added

@@ -1,10 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/screens/manage_favourites_screen.dart';
 import 'package:transito/widgets/favourites_timing_card.dart';
+
+import '../../providers/favourites_service.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({Key? key}) : super(key: key);
@@ -37,6 +39,15 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+
+    FavouritesService().streamFavourites(context.read<User?>()!.uid).listen((value) {
+      print(value['favourites']?.toString());
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<FavouritesProvider>(
       builder: (context, value, child) {
@@ -55,8 +66,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         busStopCode: value.favouritesList[index].busStopCode,
                         busStopName: value.favouritesList[index].busStopName,
                         busStopAddress: value.favouritesList[index].busStopAddress,
-                        busStopLocation: LatLng(value.favouritesList[index].latitude,
-                            value.favouritesList[index].longitude),
+                        busStopLocation: value.favouritesList[index].busStopLocation,
                         services: value.favouritesList[index].services,
                       );
                     },
