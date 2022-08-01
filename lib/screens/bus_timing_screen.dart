@@ -164,6 +164,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   @override
   void initState() {
     super.initState();
+    print(widget.busStopLocation);
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
     timer = Timer.periodic(
         const Duration(seconds: 30),

@@ -242,10 +242,10 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               // display a loading indicator while the list of nearby bus stops is being fetched
               if (snapshot.hasData) {
                 return GridView.count(
-                  childAspectRatio: 2.5 / 1,
+                  childAspectRatio: 2.5 / 1, // 4.5 / 1 for column view
                   crossAxisSpacing: 18,
                   mainAxisSpacing: 21,
-                  crossAxisCount: 2,
+                  crossAxisCount: 2, // 1 for column view
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [

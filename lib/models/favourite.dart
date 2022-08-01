@@ -5,6 +5,21 @@ import 'package:latlong2/latlong.dart';
 part 'favourite.g.dart';
 
 @JsonSerializable(explicitToJson: true)
+class FavouritesList {
+  List<Favourite> favouritesList;
+
+  FavouritesList({
+    required this.favouritesList,
+  });
+
+  factory FavouritesList.fromFirestore(DocumentSnapshot doc) =>
+      FavouritesList.fromJson(doc.data()! as Map<String, dynamic>);
+
+  factory FavouritesList.fromJson(Map<String, dynamic> json) => _$FavouritesListFromJson(json);
+  Map<String, dynamic> toJson() => _$FavouritesListToJson(this);
+}
+
+@JsonSerializable(explicitToJson: true)
 class Favourite {
   String busStopCode;
   String busStopName;

@@ -11,7 +11,6 @@ class AuthenticationService {
     return _users
         .doc(userId)
         .set({
-          'id': userId,
           'favourites': [],
         })
         .then(

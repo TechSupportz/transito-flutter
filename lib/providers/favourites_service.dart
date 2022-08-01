@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:transito/models/favourite.dart';
 
 class FavouritesService {
-  final CollectionReference _usersCollection = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _usersCollection = FirebaseFirestore.instance.collection('favourites');
 
-  Stream<dynamic> streamFavourites(String userId) {
-    return _usersCollection.doc(userId).snapshots();
+  Stream<List<Favourite>> streamFavourites(String userId) {
+    return _usersCollection
+        .doc(userId)
+        .snapshots()
+        .map((snapshot) => FavouritesList.fromFirestore(snapshot).favouritesList);
   }
 
   Future<void> addFavourite(Favourite favourite, String userId) {
     return _usersCollection
         .doc(userId)
         .update({
-          'favourites': FieldValue.arrayUnion([favourite.toJson()])
+          'favouritesList': FieldValue.arrayUnion([favourite.toJson()])
         })
         .then(
           (_) => debugPrint('✔️ Added ${favourite.busStopCode} to favourites'),
@@ -28,7 +31,7 @@ class FavouritesService {
     return _usersCollection
         .doc(userId)
         .update({
-          'favourites': FieldValue.arrayRemove([busStopCode])
+          'favouritesList': FieldValue.arrayRemove([busStopCode])
         })
         .then(
           (_) => debugPrint('✔️ Removed ${busStopCode} from favourites'),
