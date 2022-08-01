@@ -40,4 +40,13 @@ class FavouritesService {
           (error) => debugPrint('❌ Error removing favourite from Firestore: $error'),
         );
   }
+
+  Future<bool> isAddedToFavourites(String busStopCode, String userId) async {
+    final favouritesList = await _usersCollection
+        .doc(userId)
+        .get()
+        .then((snapshot) => FavouritesList.fromFirestore(snapshot).favouritesList);
+
+    return favouritesList.any((favourite) => favourite.busStopCode == busStopCode);
+  }
 }
