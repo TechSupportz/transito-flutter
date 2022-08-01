@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
+import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 
 import '../models/app_colors.dart';
@@ -44,6 +46,8 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    var userId = context.read<User?>()?.uid;
+
     // access favourites provider
     var favourites = context.read<FavouritesProvider>();
     var favouritesList = favourites.favouritesList;
@@ -56,13 +60,15 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
       if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
         // retrieve the selected services and add it to the favourites list
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
-        favourites.addFavourite(
+        FavouritesService().addFavourite(
           Favourite(
-              busStopCode: widget.busStopCode,
-              busStopName: widget.busStopName,
-              busStopAddress: widget.busStopAddress,
-              busStopLocation: widget.busStopLocation,
-              services: selectedServices),
+            busStopCode: widget.busStopCode,
+            busStopName: widget.busStopName,
+            busStopAddress: widget.busStopAddress,
+            busStopLocation: widget.busStopLocation,
+            services: selectedServices,
+          ),
+          userId!,
         );
         // display snackbar to notify user that favourite has been added
         _showSnackBar('Added to favourites');

@@ -25,13 +25,17 @@ class Favourite {
   String busStopName;
   String busStopAddress;
 
-  @JsonKey(fromJson: decodeBusStopLocation)
+  @JsonKey(fromJson: decodeBusStopLocation, toJson: encodeBusStopLocation)
   LatLng busStopLocation;
 
   List<String?> services;
 
   static LatLng decodeBusStopLocation(GeoPoint busStopGeoPoint) {
     return LatLng(busStopGeoPoint.latitude, busStopGeoPoint.longitude);
+  }
+
+  static GeoPoint encodeBusStopLocation(LatLng busStopLocation) {
+    return GeoPoint(busStopLocation.latitude, busStopLocation.longitude);
   }
 
   Favourite({

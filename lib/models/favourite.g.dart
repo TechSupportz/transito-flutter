@@ -32,6 +32,7 @@ Map<String, dynamic> _$FavouriteToJson(Favourite instance) => <String, dynamic>{
       'busStopCode': instance.busStopCode,
       'busStopName': instance.busStopName,
       'busStopAddress': instance.busStopAddress,
-      'busStopLocation': instance.busStopLocation.toJson(),
+      'busStopLocation':
+          Favourite.encodeBusStopLocation(instance.busStopLocation),
       'services': instance.services,
     };

@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/models/nearby_bus_stops.dart';
-import 'package:transito/providers/favourites_provider.dart';
+import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/screens/auth/login-screen.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
@@ -311,90 +311,109 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FavouritesProvider>(builder: (context, value, child) {
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Nearby Favourites",
-            style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(
-            height: 12,
-          ),
-          value.favouritesList.isNotEmpty
-              ? FutureBuilder(
-                  future: getNearbyFavourites(favouritesList: value.favouritesList),
-                  builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-                    // display a loading indicator while the list of nearby favourites is being fetched
-                    if (snapshot.hasData) {
-                      // checks if user has any favourites within 750m of their current location and displays them if they do
-                      if (snapshot.data!.isNotEmpty) {
-                        return ListView.separated(
-                          itemBuilder: (context, int index) {
-                            return FavouritesTimingCard(
-                              busStopCode: snapshot.data![index].busStopInfo.busStopCode,
-                              busStopName: snapshot.data![index].busStopInfo.busStopName,
-                              busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
-                              busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
-                              services: snapshot.data![index].busStopInfo.services,
+    String userId = context.watch<User?>()!.uid;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Nearby Favourites",
+          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        StreamBuilder<List<Favourite>>(
+          stream: FavouritesService().streamFavourites(userId),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Favourite> favouritesList = snapshot.data!;
+
+              return favouritesList.isNotEmpty
+                  ? FutureBuilder(
+                      future: getNearbyFavourites(favouritesList: favouritesList),
+                      builder:
+                          (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
+                        // display a loading indicator while the list of nearby favourites is being fetched
+                        if (snapshot.hasData) {
+                          // checks if user has any favourites within 750m of their current location and displays them if they do
+                          if (snapshot.data!.isNotEmpty) {
+                            return ListView.separated(
+                              itemBuilder: (context, int index) {
+                                return FavouritesTimingCard(
+                                  busStopCode: snapshot.data![index].busStopInfo.busStopCode,
+                                  busStopName: snapshot.data![index].busStopInfo.busStopName,
+                                  busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
+                                  busStopLocation:
+                                      snapshot.data![index].busStopInfo.busStopLocation,
+                                  services: snapshot.data![index].busStopInfo.services,
+                                );
+                              },
+                              separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                                height: 18,
+                              ),
+                              padding: const EdgeInsets.only(bottom: 18.0),
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: snapshot.data!.length,
                             );
-                          },
-                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                            height: 18,
-                          ),
-                          padding: const EdgeInsets.only(bottom: 18.0),
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: snapshot.data!.length,
-                        );
-                      } else {
-                        // if user has no favourites within 750m of their current location, display a message to tell them
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 18.0),
-                          child: Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: AppColors.cardBg,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Center(
-                              child: Text("No favourites nearby",
-                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                            ),
-                          ),
-                        );
-                      }
-                    } else if (snapshot.hasError) {
-                      // return Text("${snapshot.error}");
-                      debugPrint("<=== ERROR ${snapshot.error} ===>");
-                      return const ErrorText();
-                    } else {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  },
-                )
-              // if user has no favourites, display a message to tell them
-              : Padding(
-                  padding: const EdgeInsets.only(bottom: 18.0),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBg,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Text("You have no favourites",
-                          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                    ),
-                  ),
-                ),
-        ],
-      );
-    });
+                          } else {
+                            // if user has no favourites within 750m of their current location, display a message to tell them
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 18.0),
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Center(
+                                  child: Text("No favourites nearby",
+                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                                ),
+                              ),
+                            );
+                          }
+                        } else if (snapshot.hasError) {
+                          // return Text("${snapshot.error}");
+                          debugPrint("<=== ERROR ${snapshot.error} ===>");
+                          return const ErrorText();
+                        } else {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                      },
+                    )
+                  // if user has no favourites, display a message to tell them
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: 18.0),
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Center(
+                          child: Text("You have no favourites",
+                              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                        ),
+                      ),
+                    );
+            } else if (snapshot.hasError) {
+              // return Text("${snapshot.error}");
+              debugPrint("<=== ERROR ${snapshot.error} ===>");
+              return const ErrorText();
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          },
+        ),
+      ],
+    );
   }
 }
