@@ -13,6 +13,7 @@ import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/screens/auth/login-screen.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
+import 'package:transito/screens/navbar_screens/main_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
 import 'package:transito/widgets/error_text.dart';
 
@@ -312,6 +313,12 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
   @override
   Widget build(BuildContext context) {
     String userId = context.watch<User?>()!.uid;
+
+    StreamProvider<List<Favourite>>.value(
+      value: FavouritesService().streamFavourites(userId),
+      initialData: [],
+      child: MainScreen(),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
