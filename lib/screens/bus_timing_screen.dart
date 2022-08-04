@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -10,10 +11,10 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/arrival_info.dart';
+import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 
 import '../models/secret.dart';
-import '../providers/favourites_provider.dart';
 import '../widgets/error_text.dart';
 import 'add_favourite_screen.dart';
 import 'bus_stop_info_screen.dart';
@@ -39,6 +40,7 @@ class BusTimingScreen extends StatefulWidget {
 class _BusTimingScreenState extends State<BusTimingScreen> {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
   bool isFabVisible = true;
+  bool isAddedToFavourites = false;
   late Timer timer;
 
   // function to get the user's location
@@ -164,6 +166,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   @override
   void initState() {
     super.initState();
+    // print(widget.busStopLocation);
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
     timer = Timer.periodic(
         const Duration(seconds: 30),
@@ -173,77 +176,82 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
               },
             ));
+
+    var userId = context.read<User?>()?.uid;
+    FavouritesService().isAddedToFavourites(widget.busStopCode, userId!).then((value) {
+      print(value);
+      setState(() {
+        isAddedToFavourites = value;
+        print(isAddedToFavourites);
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FavouritesProvider>(
-      builder: (context, value, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: GestureDetector(
-              onTap: () => goToBusStopInfoScreen(context),
-              child: Text(widget.busStopName),
-            ),
-            actions: [
-              // display different IconButtons depending on whether the bus stop is a favourite or not
-              value.favouritesList.every((element) => element.busStopCode != widget.busStopCode)
-                  ? IconButton(
-                      icon: const Icon(Icons.favorite_border_rounded),
-                      onPressed: () => goToAddFavouritesScreen(context),
-                    )
-                  : IconButton(
-                      icon: const Icon(Icons.favorite_rounded),
-                      onPressed: () => goToEditFavouritesScreen(context),
-                    )
-            ],
-          ),
-          body: FutureBuilder(
-            future: futureBusArrivalInfo,
-            builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
-              // check if the snapshot has data, if not then display a loading indicator
-              if (snapshot.hasData) {
-                // notification listener to hide the fab when the user is scrolling down the list
-                return NotificationListener<UserScrollNotification>(
-                  onNotification: (notification) => hideFabOnScroll(notification),
-                  child: ListView.separated(
-                      itemBuilder: (context, int index) {
-                        return BusTimingRow(
-                          serviceInfo: snapshot.data!.services[index],
-                          userLatLng: widget.busStopLocation,
-                        );
-                      },
-                      padding: const EdgeInsets.only(bottom: 32, left: 12, right: 12),
-                      separatorBuilder: (BuildContext context, int index) => const Divider(),
-                      itemCount: snapshot.data!.services.length),
-                );
-              } else if (snapshot.hasError) {
-                // return Text("${snapshot.error}");
-                debugPrint("<=== ERROR ${snapshot.error} ===>");
-                return const ErrorText();
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              }
-            },
-          ),
-          floatingActionButton: isFabVisible
-              // re-fetch data when user taps the refresh button
-              ? FloatingActionButton(
-                  onPressed: () => setState(() {
-                    futureBusArrivalInfo = fetchArrivalTimings().then(
-                      (value) => sortBusArrivalInfo(value),
-                    );
-                    HapticFeedback.selectionClick();
-                  }),
-                  heroTag: "busTimingFAB",
-                  child: const Icon(Icons.refresh_rounded, size: 28),
-                  enableFeedback: true,
+    return Scaffold(
+      appBar: AppBar(
+        title: GestureDetector(
+          onTap: () => goToBusStopInfoScreen(context),
+          child: Text(widget.busStopName),
+        ),
+        actions: [
+          // display different IconButtons depending on whether the bus stop is a favourite or not
+          isAddedToFavourites
+              ? IconButton(
+                  icon: const Icon(Icons.favorite_rounded),
+                  onPressed: () => goToEditFavouritesScreen(context),
                 )
-              : null,
-        );
-      },
+              : IconButton(
+                  icon: const Icon(Icons.favorite_border_rounded),
+                  onPressed: () => goToAddFavouritesScreen(context),
+                )
+        ],
+      ),
+      body: FutureBuilder(
+        future: futureBusArrivalInfo,
+        builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
+          // check if the snapshot has data, if not then display a loading indicator
+          if (snapshot.hasData) {
+            // notification listener to hide the fab when the user is scrolling down the list
+            return NotificationListener<UserScrollNotification>(
+              onNotification: (notification) => hideFabOnScroll(notification),
+              child: ListView.separated(
+                  itemBuilder: (context, int index) {
+                    return BusTimingRow(
+                      serviceInfo: snapshot.data!.services[index],
+                      userLatLng: widget.busStopLocation,
+                    );
+                  },
+                  padding: const EdgeInsets.only(bottom: 32, left: 12, right: 12),
+                  separatorBuilder: (BuildContext context, int index) => const Divider(),
+                  itemCount: snapshot.data!.services.length),
+            );
+          } else if (snapshot.hasError) {
+            // return Text("${snapshot.error}");
+            debugPrint("<=== ERROR ${snapshot.error} ===>");
+            return const ErrorText();
+          } else {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
+      floatingActionButton: isFabVisible
+          // re-fetch data when user taps the refresh button
+          ? FloatingActionButton(
+              onPressed: () => setState(() {
+                futureBusArrivalInfo = fetchArrivalTimings().then(
+                  (value) => sortBusArrivalInfo(value),
+                );
+                HapticFeedback.selectionClick();
+              }),
+              heroTag: "busTimingFAB",
+              child: const Icon(Icons.refresh_rounded, size: 28),
+              enableFeedback: true,
+            )
+          : null,
     );
   }
 

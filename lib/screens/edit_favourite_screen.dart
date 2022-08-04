@@ -1,10 +1,11 @@
 import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
-import 'package:transito/providers/favourites_provider.dart';
+import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 
 import '../models/app_colors.dart';
@@ -34,8 +35,9 @@ const checkBoxFontStyle = TextStyle(
 );
 
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
-  // function to display snackbar
+  late Future<Map<String?, List<String?>>> favouriteServicesList;
 
+  // function to display snackbar
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -58,42 +60,46 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     super.initState();
     // sorts bus services list according to the Bus Service number correctly
     widget.busServicesList.sort((a, b) => compareNatural(a, b));
+    favouriteServicesList = FavouritesService()
+        .getFavouriteServicesByBusStopCode(context.read<User?>()!.uid, widget.busStopCode);
   }
 
   @override
   Widget build(BuildContext context) {
-    // access favourites provider
-    var favourites = context.read<FavouritesProvider>();
-    var favouritesList = favourites.favouritesList;
+    String? userId = context.read<User?>()?.uid;
 
-    // set the selected services to the bus stop
-    Map<String?, List<String?>> initialSelectedChildren = {
-      'Bus Services': favouritesList
-          .firstWhere((element) => element.busStopCode == widget.busStopCode)
-          .services,
-    };
-
-    void updateFavorites() {
+    Future<void> updateFavorites() async {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
       // check if user wants to edit or remove favourites
       if (ParentChildCheckbox.selectedChildrens['Bus Services'].length != 0) {
         // if services were selected then update the favourites list
         var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
-        favourites.updateFavourite(
+        FavouritesService().updateFavourite(
           Favourite(
               busStopCode: widget.busStopCode,
               busStopName: widget.busStopName,
               busStopAddress: widget.busStopAddress,
-              latitude: widget.busStopLocation.latitude,
-              longitude: widget.busStopLocation.longitude,
+              busStopLocation: widget.busStopLocation,
               services: selectedServices),
+          userId!,
         );
         _showSnackBar('Updated favourites');
-        debugPrint("${favourites.favouritesList}");
+        // debugPrint("$favouriteServicesList");
       } else {
+        List<String?> initialServices = await favouriteServicesList.then((value) {
+          return value['Bus Services']!;
+        });
+
         // if no services were selected then remove the bus stop from favourites list
-        favourites.removeFavourite(widget.busStopCode);
+        FavouritesService().removeFavourite(
+            Favourite(
+                busStopCode: widget.busStopCode,
+                busStopName: widget.busStopName,
+                busStopAddress: widget.busStopAddress,
+                busStopLocation: widget.busStopLocation,
+                services: initialServices),
+            userId!);
         _showSnackBar('Removed favourites');
       }
       // navigate back to main screen
@@ -159,27 +165,38 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 ),
               ],
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    ParentChildCheckbox(
-                      parent: const Text("Bus Services", style: checkBoxFontStyle),
-                      children: [
-                        for (var service in widget.busServicesList)
-                          Text(service, style: checkBoxFontStyle),
-                      ],
-                      // initialParentValue: {'Bus Services': true},
-                      initialChildrenValue: initialSelectedChildren,
-                      parentCheckboxColor: AppColors.veryPurple,
-                      childrenCheckboxColor: AppColors.veryPurple,
-                      parentCheckboxScale: 1.35,
-                      childrenCheckboxScale: 1.35,
-                      gap: 2,
+            FutureBuilder(
+              future: favouriteServicesList,
+              builder: (context, AsyncSnapshot<Map<String?, List<String?>>> snapshot) {
+                if (snapshot.hasData) {
+                  return Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          ParentChildCheckbox(
+                            parent: const Text("Bus Services", style: checkBoxFontStyle),
+                            children: [
+                              for (var service in widget.busServicesList)
+                                Text(service, style: checkBoxFontStyle),
+                            ],
+                            // initialParentValue: {'Bus Services': true},
+                            initialChildrenValue: snapshot.data,
+                            parentCheckboxColor: AppColors.veryPurple,
+                            childrenCheckboxColor: AppColors.veryPurple,
+                            parentCheckboxScale: 1.35,
+                            childrenCheckboxScale: 1.35,
+                            gap: 2,
+                          ),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-              ),
+                  );
+                } else {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 28),

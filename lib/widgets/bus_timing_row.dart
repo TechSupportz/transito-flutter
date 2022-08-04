@@ -37,6 +37,17 @@ class _BusTimingRowState extends State<BusTimingRow> {
     }
   }
 
+  // String formatExactTime(arrivalTime) {
+  //   if (arrivalTime != '') {
+  //     print(arrivalTime);
+  //     String formattedArrivalTime = Jiffy(arrivalTime).add(hours: 8).format("HH:mm");
+  //     print(formattedArrivalTime);
+  //     return formattedArrivalTime;
+  //   } else {
+  //     return '-';
+  //   }
+  // }
+
   // computes and returns the distance between user and bus either in meters or kilometers
   String calculateDistanceAway() {
     if (widget.serviceInfo.nextBus.latitude == 0 || widget.serviceInfo.nextBus.longitude == 0) {
