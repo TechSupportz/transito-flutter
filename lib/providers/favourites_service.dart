@@ -13,6 +13,16 @@ class FavouritesService {
         .map((snapshot) => FavouritesList.fromFirestore(snapshot).favouritesList);
   }
 
+  Future<List<Favourite>> getFavourites(String userId) async {
+    return _favouritesCollection.doc(userId).get().then((snapshot) {
+      if (snapshot.exists) {
+        return FavouritesList.fromFirestore(snapshot).favouritesList;
+      } else {
+        return [];
+      }
+    });
+  }
+
   Future<Map<String?, List<String?>>> getFavouriteServicesByBusStopCode(
       String userId, String busStopCode) async {
     var _favouritesList =
@@ -43,7 +53,6 @@ class FavouritesService {
         );
   }
 
-  // I have no idea if this works, have fun future me!
   Future<void> removeFavourite(Favourite favourite, String userId) {
     return _favouritesCollection
         .doc(userId)
@@ -56,6 +65,23 @@ class FavouritesService {
         .catchError(
           (error) => debugPrint('❌ Error removing favourite from Firestore: $error'),
         );
+  }
+
+  Future<void> reorderFavourites(List<Favourite> favourites, String userId) async {
+    if (favourites.isNotEmpty) {
+      _favouritesCollection
+          .doc(userId)
+          .update({'favouritesList': favourites.map((favourite) => favourite.toJson()).toList()})
+          .then(
+            (_) => debugPrint(
+                '✔️ Reordered favourites list to ${favourites.map((favourite) => favourite.busStopCode).toList()}'),
+          )
+          .catchError(
+            (error) => debugPrint('❌ Error reordering favourite from Firestore: $error'),
+          );
+    } else {
+      debugPrint('✔️ No changes were made to favourites order');
+    }
   }
 
   Future<void> updateFavourite(Favourite favourite, String userId) async {

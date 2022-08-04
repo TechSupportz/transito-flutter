@@ -1,10 +1,11 @@
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
-import 'package:transito/providers/favourites_provider.dart';
+import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/widgets/favourite_name_card.dart';
 
 import '../models/app_colors.dart';
@@ -21,6 +22,8 @@ class ManageFavouritesScreen extends StatefulWidget {
 
 class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   bool isFabVisible = true;
+  late Future<List<Favourite>> _futureFavouritesList;
+  List<Favourite> reorderedFavouritesList = [];
 
   // api headers
   Map<String, String> requestHeaders = {
@@ -83,64 +86,89 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _futureFavouritesList = FavouritesService().getFavourites(context.read<User?>()!.uid);
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Consumer<FavouritesProvider>(
-      builder: (context, value, child) {
-        return Scaffold(
-          appBar: AppBar(
-            title: const Text('Manage Favourites'),
-            automaticallyImplyLeading: false,
-          ),
-          body: Padding(
-            padding: const EdgeInsets.only(top: 12.0),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: const [
-                      Text(
-                        "Drag and drop to reorder your favourites",
-                        style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
-                      ),
-                      SizedBox(height: 8),
-                      Text(
-                        "Click the edit button to add/remove your favourited bus services",
-                        style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
-                      ),
-                      SizedBox(height: 18),
-                    ],
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Manage Favourites'),
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 12.0),
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text(
+                    "Drag and drop to reorder your favourites",
+                    style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                   ),
-                ),
-                ReorderableListView.builder(
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      key: Key(value.favouritesList[index].busStopCode),
-                      padding: const EdgeInsets.only(bottom: 18),
-                      child: FavouriteNameCard(
-                          busStopName: value.favouritesList[index].busStopName,
-                          onTap: () =>
-                              goToEditFavouritesScreen(context, value.favouritesList[index])),
-                    );
-                  },
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  shrinkWrap: true,
-                  buildDefaultDragHandles: true,
-                  itemCount: value.favouritesList.length,
-                  // calls reorder function in FavouritesProvider to reorder the favourites list
-                  onReorder: (oldIndex, newIndex) => value.reorderFavourite(oldIndex, newIndex),
-                ),
-              ],
+                  SizedBox(height: 8),
+                  Text(
+                    "Click the edit button to add/remove your favourited bus services",
+                    style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                  ),
+                  SizedBox(height: 18),
+                ],
+              ),
             ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            heroTag: "manageFavFAB",
-            child: const Icon(Icons.done_rounded),
-            onPressed: () => Navigator.pop(context),
-          ),
-        );
-      },
+            FutureBuilder<List<Favourite>>(
+              future: _futureFavouritesList,
+              builder: (context, AsyncSnapshot<List<Favourite>> snapshot) {
+                if (snapshot.hasData) {
+                  List<Favourite> _favouritesList = snapshot.data!;
+                  return ReorderableListView.builder(
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          key: Key(_favouritesList[index].busStopCode),
+                          padding: const EdgeInsets.only(bottom: 18),
+                          child: FavouriteNameCard(
+                              busStopName: _favouritesList[index].busStopName,
+                              onTap: () =>
+                                  goToEditFavouritesScreen(context, _favouritesList[index])),
+                        );
+                      },
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      shrinkWrap: true,
+                      buildDefaultDragHandles: true,
+                      itemCount: _favouritesList.length,
+                      // calls reorder function in FavouritesProvider to reorder the favourites list
+                      onReorder: (oldIndex, newIndex) {
+                        if (oldIndex < newIndex) {
+                          // removing the item at oldIndex will shorten the list by 1
+                          newIndex--;
+                        }
+                        _favouritesList.insert(newIndex, _favouritesList.removeAt(oldIndex));
+
+                        setState(() {
+                          reorderedFavouritesList = _favouritesList;
+                        });
+                      });
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                } else {
+                  return const Center(child: CircularProgressIndicator());
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        heroTag: "manageFavFAB",
+        child: const Icon(Icons.done_rounded),
+        onPressed: () => FavouritesService()
+            .reorderFavourites(reorderedFavouritesList, context.read<User?>()!.uid)
+            .then((value) => Navigator.pop(context)),
+      ),
     );
   }
 }
