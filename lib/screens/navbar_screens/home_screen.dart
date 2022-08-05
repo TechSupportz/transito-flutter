@@ -11,14 +11,13 @@ import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_service.dart';
-import 'package:transito/screens/auth/login-screen.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
+import 'package:transito/screens/settings_screen.dart';
 import 'package:transito/widgets/error_text.dart';
 
 import '../../models/bus_stops.dart';
-import '../../providers/authentication_service.dart';
 import '../../widgets/bus_stop_card.dart';
 import '../../widgets/favourites_timing_card.dart';
 
@@ -139,13 +138,13 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
             icon: const Icon(Icons.map_rounded),
           ),
           IconButton(
-            onPressed: () =>
-                AuthenticationService().logout().then((value) => Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(builder: (context) => const LoginScreen()),
-                      (Route<dynamic> route) => false,
-                    )),
-            icon: const Icon(Icons.logout_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const SettingsScreen(),
+              ),
+            ),
+            icon: const Icon(Icons.settings_rounded),
           )
         ],
       ),
