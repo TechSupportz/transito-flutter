@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:transito/models/app_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/arrival_info.dart';
 import '../models/secret.dart';
@@ -76,8 +77,15 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
     return busServicesList;
   }
 
-  void openMaps() {
-    print('Opening maps');
+  Future<void> openMaps(LatLng navigationLocation) async {
+    var uri = Uri.parse(
+        'https://www.google.com/maps/search/?api=1&query=${navigationLocation.latitude},${navigationLocation.longitude}');
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      throw 'Could not launch Google Maps';
+    }
   }
 
   // a function that send the user to the bus timing screen
@@ -219,38 +227,38 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           SizedBox(
                             width: double.infinity,
                             height: 400,
-                            child: FlutterMap(
-                              options: MapOptions(
-                                center: widget.busStopLocation,
-                                zoom: 17,
-                                maxZoom: 18,
-                                interactiveFlags: InteractiveFlag.all,
-                              ),
-                              layers: [
-                                TileLayerOptions(
-                                  urlTemplate: "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
-                                  userAgentPackageName: 'tnitish.com.transito',
-                                  errorImage: const AssetImage('assets/images/mapError.png'),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: FlutterMap(
+                                options: MapOptions(
+                                  center: widget.busStopLocation,
+                                  zoom: 17,
+                                  maxZoom: 18,
+                                  interactiveFlags: InteractiveFlag.all &
+                                      ~InteractiveFlag.pinchMove &
+                                      ~InteractiveFlag.rotate,
                                 ),
-                                MarkerLayerOptions(
-                                  markers: [
-                                    Marker(
-                                      point: widget.busStopLocation,
-                                      builder: (context) => Container(
-                                        // decoration: BoxDecoration(
-                                        //   color: AppColors.veryPurple,
-                                        //   borderRadius: BorderRadius.circular(5),
-                                        // ),
-                                        child: const Icon(
+                                layers: [
+                                  TileLayerOptions(
+                                    urlTemplate:
+                                        "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
+                                    userAgentPackageName: 'tnitish.com.transito',
+                                    errorImage: const AssetImage('assets/images/mapError.png'),
+                                  ),
+                                  MarkerLayerOptions(
+                                    markers: [
+                                      Marker(
+                                        point: widget.busStopLocation,
+                                        builder: (context) => const Icon(
                                           Icons.place_rounded,
                                           size: 35,
-                                          color: AppColors.kindaGrey,
+                                          color: AppColors.veryPurple,
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
                           )
                         ],
@@ -280,7 +288,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     OutlinedButton(
-                      onPressed: () => openMaps(),
+                      onPressed: () => openMaps(widget.busStopLocation),
                       child: const Text("Take me there!"),
                     ),
                     ElevatedButton(
