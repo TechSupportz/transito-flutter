@@ -21,19 +21,11 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Recent Searches'), actions: [
         // button to open the search interface
-        Hero(
-          tag: 'searchPostfix',
-          child: IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SearchScreen(),
-                ),
-              );
-            },
-          ),
+        IconButton(
+          icon: const Icon(Icons.delete_rounded),
+          onPressed: () {
+            Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();
+          },
         ),
       ]),
       // displays the recent search list widget
@@ -41,11 +33,16 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
       // floating action button to clear the recent searches list by calling a function in the search provider
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SearchScreen(),
+            ),
+          );
           HapticFeedback.selectionClick();
         },
-        heroTag: 'recentSearchFAB',
-        child: const Icon(Icons.delete_rounded),
+        heroTag: 'searchIcon',
+        child: const Icon(Icons.search_rounded),
       ),
     );
   }
