@@ -34,7 +34,7 @@ dependencies:
   url_launcher: ^6.1.5
   google_sign_in: ^5.4.0
   cloud_firestore: ^3.4.1
-  google_maps_flutter: ^2.1.10
+  flutter_map: ^2.2.0
 
 dev_dependencies:
   flutter_test:

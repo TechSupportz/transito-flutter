@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:transito/models/app_colors.dart';
@@ -214,7 +216,42 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           const SizedBox(
                             height: 8,
                           ),
-                          Image.asset('assets/images/placeholder-map.jpg'),
+                          SizedBox(
+                            width: double.infinity,
+                            height: 300,
+                            child: FlutterMap(
+                              options: MapOptions(
+                                center: widget.busStopLocation,
+                                zoom: 17,
+                                maxZoom: 18,
+                                interactiveFlags: InteractiveFlag.all,
+                              ),
+                              layers: [
+                                TileLayerOptions(
+                                  urlTemplate: "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
+                                  userAgentPackageName: 'com.example.app',
+                                ),
+                                MarkerLayerOptions(
+                                  markers: [
+                                    Marker(
+                                      point: widget.busStopLocation,
+                                      builder: (context) => Container(
+                                        // decoration: BoxDecoration(
+                                        //   color: AppColors.veryPurple,
+                                        //   borderRadius: BorderRadius.circular(5),
+                                        // ),
+                                        child: const Icon(
+                                          Icons.place_rounded,
+                                          size: 35,
+                                          color: AppColors.kindaGrey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
                         ],
                       ),
                     ],
