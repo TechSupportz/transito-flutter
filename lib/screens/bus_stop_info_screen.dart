@@ -218,7 +218,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           ),
                           SizedBox(
                             width: double.infinity,
-                            height: 300,
+                            height: 400,
                             child: FlutterMap(
                               options: MapOptions(
                                 center: widget.busStopLocation,
@@ -229,7 +229,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               layers: [
                                 TileLayerOptions(
                                   urlTemplate: "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
-                                  userAgentPackageName: 'com.example.app',
+                                  userAgentPackageName: 'tnitish.com.transito',
+                                  errorImage: const AssetImage('assets/images/mapError.png'),
                                 ),
                                 MarkerLayerOptions(
                                   markers: [
