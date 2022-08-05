@@ -7,10 +7,13 @@ class FavouritesService {
       FirebaseFirestore.instance.collection('favourites');
 
   Stream<List<Favourite>> streamFavourites(String userId) {
-    return _favouritesCollection
-        .doc(userId)
-        .snapshots()
-        .map((snapshot) => FavouritesList.fromFirestore(snapshot).favouritesList);
+    return _favouritesCollection.doc(userId).snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        return FavouritesList.fromFirestore(snapshot).favouritesList;
+      } else {
+        return [];
+      }
+    });
   }
 
   Future<List<Favourite>> getFavourites(String userId) async {
@@ -27,9 +30,6 @@ class FavouritesService {
       String userId, String busStopCode) async {
     var _favouritesList =
         FavouritesList.fromFirestore(await _favouritesCollection.doc(userId).get()).favouritesList;
-
-    List<String?> favouriteServices =
-        _favouritesList.firstWhere((element) => element.busStopCode == busStopCode).services;
 
     Map<String?, List<String?>> initialSelectedChildren = {
       'Bus Services':

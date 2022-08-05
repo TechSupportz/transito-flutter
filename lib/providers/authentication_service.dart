@@ -5,13 +5,13 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final CollectionReference _users = FirebaseFirestore.instance.collection('users');
+  final CollectionReference _users = FirebaseFirestore.instance.collection('favourites');
 
   Future<void> addNewUser({required String userId}) {
     return _users
         .doc(userId)
         .set({
-          'favourites': [],
+          'favouritesList': [],
         })
         .then(
           (_) => debugPrint('✔️ Added new user to Firestore'),
