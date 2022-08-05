@@ -74,6 +74,10 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
     return busServicesList;
   }
 
+  void openMaps() {
+    print('Opening maps');
+  }
+
   // a function that send the user to the bus timing screen
   void goToBusTimingScreen() {
     Navigator.push(
@@ -103,125 +107,151 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
       appBar: AppBar(
         title: const Text('Bus Stop Information'),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(left: 12.0, right: 12.0, top: 12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: Padding(
+        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+        child: Stack(
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      widget.busStopName,
-                      overflow: TextOverflow.fade,
-                      maxLines: 1,
-                      softWrap: false,
-                      style: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w600,
+            SingleChildScrollView(
+              padding: const EdgeInsets.only(bottom: 128),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.busStopName,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: const TextStyle(
+                              fontSize: 30,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                                margin: const EdgeInsets.only(right: 8),
+                                decoration: BoxDecoration(
+                                    color: AppColors.veryPurple,
+                                    borderRadius: BorderRadius.circular(5)),
+                                child: Text(widget.busStopCode,
+                                    style: const TextStyle(fontWeight: FontWeight.w500)),
+                              ),
+                              Text(
+                                widget.busStopAddress,
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                                softWrap: false,
+                                style: const TextStyle(
+                                    color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                              )
+                            ],
+                          )
+                        ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                          margin: const EdgeInsets.only(right: 8),
-                          decoration: BoxDecoration(
-                              color: AppColors.veryPurple, borderRadius: BorderRadius.circular(5)),
-                          child: Text(widget.busStopCode,
-                              style: const TextStyle(fontWeight: FontWeight.w500)),
-                        ),
-                        Text(
-                          widget.busStopAddress,
-                          overflow: TextOverflow.fade,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: const TextStyle(
-                              color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
-                        )
-                      ],
-                    )
-                  ],
-                ),
-                const SizedBox(
-                  height: 21,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Operating Bus Services',
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(
+                        height: 21,
                       ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    FutureBuilder(
-                        future: futureBusServices,
-                        builder: (context, AsyncSnapshot<List<String>> snapshot) {
-                          if (snapshot.hasData) {
-                            return Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: snapshot.data!
-                                  .map(
-                                    (serviceNum) => BusServiceBox(
-                                      busServiceNumber: serviceNum,
-                                    ),
-                                  )
-                                  .toList(),
-                            );
-                          } else if (snapshot.hasError) {
-                            // return Text("${snapshot.error}");
-                            debugPrint("<=== ERROR ${snapshot.error} ===>");
-                            return const ErrorText();
-                          }
-                          return const Center(child: CircularProgressIndicator());
-                        }),
-                  ],
-                ),
-                const SizedBox(
-                  height: 21,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Location',
-                      style: TextStyle(
-                        fontSize: 21,
-                        fontWeight: FontWeight.w600,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Operating Bus Services',
+                            style: TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          FutureBuilder(
+                              future: futureBusServices,
+                              builder: (context, AsyncSnapshot<List<String>> snapshot) {
+                                if (snapshot.hasData) {
+                                  return Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: snapshot.data!
+                                        .map(
+                                          (serviceNum) => BusServiceBox(
+                                            busServiceNumber: serviceNum,
+                                          ),
+                                        )
+                                        .toList(),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  // return Text("${snapshot.error}");
+                                  debugPrint("<=== ERROR ${snapshot.error} ===>");
+                                  return const ErrorText();
+                                }
+                                return const Center(child: CircularProgressIndicator());
+                              }),
+                        ],
                       ),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    Image.asset('assets/images/placeholder-map.jpg'),
-                  ],
-                ),
-              ],
+                      const SizedBox(
+                        height: 21,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Location',
+                            style: TextStyle(
+                              fontSize: 21,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Image.asset('assets/images/placeholder-map.jpg'),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 16, top: 21),
-                  child: ElevatedButton(
-                    onPressed: () => goToBusTimingScreen(),
-                    child: const Text('View Bus Timings'),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                padding: const EdgeInsets.only(bottom: 16, top: 8),
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Color(0xFF0c0c0c),
+                      Colors.transparent,
+                    ],
+                    stops: [0.9, 1.0],
                   ),
                 ),
-              ],
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    OutlinedButton(
+                      onPressed: () => openMaps(),
+                      child: const Text("Take me there!"),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => goToBusTimingScreen(),
+                      child: const Text('View Bus Timings'),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
