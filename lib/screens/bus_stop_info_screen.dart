@@ -232,6 +232,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               child: FlutterMap(
                                 options: MapOptions(
                                   center: widget.busStopLocation,
+                                  minZoom: 11,
                                   zoom: 17,
                                   maxZoom: 18,
                                   interactiveFlags: InteractiveFlag.all &
@@ -290,6 +291,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                     OutlinedButton(
                       onPressed: () => openMaps(widget.busStopLocation),
                       child: const Text("Take me there!"),
+                    ),
+                    SizedBox(
+                      height: 8,
                     ),
                     ElevatedButton(
                       onPressed: () => goToBusTimingScreen(),
