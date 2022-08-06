@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:transito/models/app_colors.dart';
-import 'package:transito/models/settings_options.dart';
+import 'package:transito/models/settings_card_options.dart';
 
 class SettingsRadioCard extends StatelessWidget {
   const SettingsRadioCard(
@@ -10,7 +10,7 @@ class SettingsRadioCard extends StatelessWidget {
 
   final String title;
   final bool initialValue;
-  final List<SettingsOption> options;
+  final List<SettingsCardOption> options;
 
   final TextStyle titleStyle = const TextStyle(
     fontSize: 21,

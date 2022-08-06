@@ -1,8 +1,8 @@
-class SettingsOption {
+class SettingsCardOption {
   bool value;
   String text;
 
-  SettingsOption({
+  SettingsCardOption({
     required this.value,
     required this.text,
   });

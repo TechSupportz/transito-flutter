@@ -6,11 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/settings_options.dart';
+import 'package:transito/models/settings_card_options.dart';
+import 'package:transito/models/user_settings.dart';
 import 'package:transito/providers/authentication_service.dart';
 import 'package:transito/widgets/settings_radio_card.dart';
 
 import '../models/app_colors.dart';
+import '../providers/settings_service.dart';
+import '../widgets/error_text.dart';
 import 'auth/login-screen.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -105,7 +108,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -206,29 +208,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                const SizedBox(height: 24),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 const Text(
                   "Aesthetics ✨",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 24),
-                SettingsRadioCard(
-                  title: "ETA Format",
-                  initialValue: true,
-                  options: [
-                    SettingsOption(value: true, text: "Minutes to arrival (2 mins)"),
-                    SettingsOption(value: false, text: "Time of arrival (18:21)")
-                  ],
-                ),
-                const SizedBox(height: 18),
-                SettingsRadioCard(
-                  title: "Nearby Layout",
-                  initialValue: false,
-                  options: [
-                    SettingsOption(value: true, text: "Grid layout"),
-                    SettingsOption(value: false, text: "Column layout")
-                  ],
-                ),
+                StreamBuilder(
+                  stream: SettingsService().streamSettings(user?.uid),
+                  builder: (context, AsyncSnapshot<UserSettings> snapshot) {
+                    if (snapshot.hasData) {
+                      return Column(
+                        children: [
+                          SettingsRadioCard(
+                            title: "ETA Format",
+                            initialValue: snapshot.data!.isETAminutes,
+                            options: [
+                              SettingsCardOption(value: true, text: "Minutes to arrival (2 mins)"),
+                              SettingsCardOption(value: false, text: "Time of arrival (18:21)")
+                            ],
+                          ),
+                          const SizedBox(height: 18),
+                          SettingsRadioCard(
+                            title: "Nearby Layout",
+                            initialValue: snapshot.data!.isNearbyGrid,
+                            options: [
+                              SettingsCardOption(value: true, text: "Grid layout"),
+                              SettingsCardOption(value: false, text: "Column layout")
+                            ],
+                          ),
+                        ],
+                      );
+                    } else if (snapshot.hasError) {
+                      return Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBg,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: ErrorText(),
+                          ));
+                    } else {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                  },
+                )
               ],
             ),
           ],
