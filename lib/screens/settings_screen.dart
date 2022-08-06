@@ -7,9 +7,11 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/settings_options.dart';
+import 'package:transito/providers/authentication_service.dart';
 import 'package:transito/widgets/settings_radio_card.dart';
 
 import '../models/app_colors.dart';
+import 'auth/login-screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -22,7 +24,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
 
-  void updateDisplayName(User user) async {
+  void updateDisplayName(User? user) async {
     setState(() {
       _isNameFieldLoading = true;
     });
@@ -30,7 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _nameFieldKey.currentState?.save();
     _nameFieldKey.currentState?.validate();
 
-    if (_nameFieldKey.currentState!.isValid) {
+    if (_nameFieldKey.currentState!.isValid && user != null) {
       if (user.displayName != _nameFieldKey.currentState!.value) {
         try {
           await user.updateDisplayName(_nameFieldKey.currentState!.value).then((value) {
@@ -55,15 +57,49 @@ class _SettingsScreenState extends State<SettingsScreen> {
           _nameFieldKey.currentState!.invalidate("New name cannot be the same as previous");
         });
       }
+    } else {
+      _nameFieldKey.currentState!.invalidate("Oops, something went wrong on our end");
     }
   }
 
-  void showResetPasswordDialog() {
+  void showResetPasswordDialog(String? email) {
     debugPrint('showResetPasswordDialog');
-    // showDialog(
-    //   context: context,
-    //   builder: (context) => resetPasswordDialog(context),
-    // );
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Reset Password'),
+        content: const Text('Are you sure you want to reset your password?'),
+        actions: [
+          TextButton(
+            child: const Text('Cancel'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+          ElevatedButton(
+            child: const Text('Yes'),
+            onPressed: () {
+              if (email != null) {
+                AuthenticationService().sendPasswordResetEmail(email).then((_) {
+                  Navigator.of(context).pop();
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    (Route<dynamic> route) => false,
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Password reset email sent to $email'),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                });
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -122,7 +158,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   splashRadius: 1,
                                   onPressed: () {
                                     HapticFeedback.mediumImpact();
-                                    updateDisplayName(user!);
+                                    updateDisplayName(user);
                                   },
                                   icon: const Icon(
                                     Icons.check_rounded,
@@ -139,11 +175,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      !user!.providerData.isEmpty
+                      (user != null &&
+                              user.providerData.map((e) => e.providerId).contains('password'))
                           ? Padding(
                               padding: const EdgeInsets.only(bottom: 6.0),
                               child: OutlinedButton(
-                                onPressed: () => showResetPasswordDialog(),
+                                onPressed: () => showResetPasswordDialog(user.email),
                                 child: const Text(
                                   'Reset password',
                                   style: TextStyle(fontSize: 14, color: AppColors.veryPurple),
@@ -151,9 +188,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ),
                               ),
                             )
-                          : SizedBox(height: 0),
+                          : const SizedBox(height: 0),
                       ElevatedButton(
-                        onPressed: () => showResetPasswordDialog(),
+                        onPressed: () => AuthenticationService()
+                            .logout()
+                            .then((value) => Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                  (Route<dynamic> route) => false,
+                                )),
                         child: const Text(
                           'Logout',
                           style: TextStyle(fontSize: 14),

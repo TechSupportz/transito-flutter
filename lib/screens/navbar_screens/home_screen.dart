@@ -311,7 +311,7 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
 
   @override
   Widget build(BuildContext context) {
-    String userId = context.watch<User?>()!.uid;
+    String? userId = context.watch<User?>()?.uid;
 
     StreamProvider<List<Favourite>>.value(
       value: FavouritesService().streamFavourites(userId),

@@ -96,8 +96,8 @@ class AuthenticationService {
     try {
       await _auth.sendPasswordResetEmail(email: email);
     } on FirebaseAuthException catch (e) {
-      debugPrint("❌ Forget password failed with code: ${e.code}");
-      debugPrint("❌ Forget password failed with message: ${e.message}");
+      debugPrint("❌ Reset password failed with code: ${e.code}");
+      debugPrint("❌ Reset password failed with message: ${e.message}");
       return e.code;
     }
     return null;

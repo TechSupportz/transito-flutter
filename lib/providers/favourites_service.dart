@@ -6,14 +6,18 @@ class FavouritesService {
   final CollectionReference _favouritesCollection =
       FirebaseFirestore.instance.collection('favourites');
 
-  Stream<List<Favourite>> streamFavourites(String userId) {
-    return _favouritesCollection.doc(userId).snapshots().map((snapshot) {
-      if (snapshot.exists) {
-        return FavouritesList.fromFirestore(snapshot).favouritesList;
-      } else {
-        return [];
-      }
-    });
+  Stream<List<Favourite>> streamFavourites(String? userId) {
+    if (userId != null) {
+      return _favouritesCollection.doc(userId).snapshots().map((snapshot) {
+        if (snapshot.exists) {
+          return FavouritesList.fromFirestore(snapshot).favouritesList;
+        } else {
+          return [];
+        }
+      });
+    } else {
+      return Stream.value([]);
+    }
   }
 
   Future<List<Favourite>> getFavourites(String userId) async {
