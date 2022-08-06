@@ -266,12 +266,21 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                           );
                         } else {
                           return Center(
-                            child: Container(
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 18.0),
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: AppColors.cardBg,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Text("No nearby bus stops")),
+                                child: const Center(
+                                  child: Text("No bus stops nearby",
+                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                                ),
+                              ),
+                            ),
                           );
                         }
                       } else if (snapshot.hasError) {
