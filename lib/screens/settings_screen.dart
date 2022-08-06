@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/settings_options.dart';
+import 'package:transito/widgets/settings_radio_card.dart';
 
 import '../models/app_colors.dart';
 
@@ -50,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   "About you",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
                 ),
-                SizedBox(height: 24),
+                const SizedBox(height: 18),
                 FormBuilderTextField(
                   key: _nameFieldKey,
                   name: 'name',
@@ -105,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     children: [
                       !user!.providerData.isEmpty
                           ? Padding(
-                              padding: const EdgeInsets.only(bottom: 8.0),
+                              padding: const EdgeInsets.only(bottom: 6.0),
                               child: OutlinedButton(
                                 onPressed: () => showResetPasswordDialog(),
                                 child: const Text(
@@ -131,6 +133,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const Text(
                   "Aesthetics ✨",
                   style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 24),
+                SettingsRadioCard(
+                  title: "ETA Format",
+                  initialValue: true,
+                  options: [
+                    SettingsOption(value: true, text: "Minutes to arrival (2 mins)"),
+                    SettingsOption(value: false, text: "Time of arrival (18:21)")
+                  ],
+                ),
+                const SizedBox(height: 18),
+                SettingsRadioCard(
+                  title: "Nearby Layout",
+                  initialValue: false,
+                  options: [
+                    SettingsOption(value: true, text: "Grid layout"),
+                    SettingsOption(value: false, text: "Column layout")
+                  ],
                 ),
               ],
             ),
