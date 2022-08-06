@@ -1,15 +1,24 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/settings_card_options.dart';
 
+import '../providers/settings_service.dart';
+
 class SettingsRadioCard extends StatelessWidget {
   const SettingsRadioCard(
-      {Key? key, required this.title, required this.initialValue, required this.options})
+      {Key? key,
+      required this.title,
+      required this.initialValue,
+      required this.firebaseFieldName,
+      required this.options})
       : super(key: key);
 
   final String title;
   final bool initialValue;
+  final String firebaseFieldName;
   final List<SettingsCardOption> options;
 
   final TextStyle titleStyle = const TextStyle(
@@ -23,6 +32,25 @@ class SettingsRadioCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    User? user = context.watch<User?>();
+
+    void updateSettings(bool newValue) {
+      switch (firebaseFieldName) {
+        case 'isETAminutes':
+          SettingsService().updateIsETAminutes(
+            userId: user?.uid,
+            newValue: newValue,
+          );
+          break;
+        case 'isNearbyGrid':
+          SettingsService().updateIsNearbyGrid(
+            userId: user?.uid,
+            newValue: newValue,
+          );
+          break;
+      }
+    }
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -44,6 +72,7 @@ class SettingsRadioCard extends StatelessWidget {
             orientation: OptionsOrientation.vertical,
             activeColor: AppColors.veryPurple,
             initialValue: initialValue,
+            onChanged: (value) => updateSettings(value as bool),
             options: options
                 .map((option) => FormBuilderFieldOption(
                       value: option.value,

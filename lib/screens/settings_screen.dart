@@ -228,6 +228,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           SettingsRadioCard(
                             title: "ETA Format",
                             initialValue: snapshot.data!.isETAminutes,
+                            firebaseFieldName: 'isETAminutes',
                             options: [
                               SettingsCardOption(value: true, text: "Minutes to arrival (2 mins)"),
                               SettingsCardOption(value: false, text: "Time of arrival (18:21)")
@@ -237,6 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           SettingsRadioCard(
                             title: "Nearby Layout",
                             initialValue: snapshot.data!.isNearbyGrid,
+                            firebaseFieldName: 'isNearbyGrid',
                             options: [
                               SettingsCardOption(value: true, text: "Grid layout"),
                               SettingsCardOption(value: false, text: "Column layout")

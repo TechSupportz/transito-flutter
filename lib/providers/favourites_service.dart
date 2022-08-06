@@ -106,7 +106,6 @@ class FavouritesService {
               .catchError(
                 (error) => debugPrint('❌ Error updating favourite in Firestore: $error'),
               );
-          ;
         }
       },
     );
