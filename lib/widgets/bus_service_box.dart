@@ -12,7 +12,7 @@ class BusServiceBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
       decoration: BoxDecoration(
-        border: Border.all(color: AppColors.veryPurple, width: 1.5),
+        border: Border.all(color: AppColors.accentColour, width: 1.5),
         borderRadius: BorderRadius.circular(7.5),
       ),
       child: Text(

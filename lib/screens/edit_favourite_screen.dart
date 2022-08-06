@@ -137,7 +137,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                         margin: const EdgeInsets.only(right: 12),
                         decoration: BoxDecoration(
-                            color: AppColors.veryPurple, borderRadius: BorderRadius.circular(5)),
+                            color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
                         child: Text(widget.busStopCode, style: const TextStyle(fontSize: 16))),
                     Text(
                       widget.busStopAddress,
@@ -181,8 +181,8 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                             ],
                             // initialParentValue: {'Bus Services': true},
                             initialChildrenValue: snapshot.data,
-                            parentCheckboxColor: AppColors.veryPurple,
-                            childrenCheckboxColor: AppColors.veryPurple,
+                            parentCheckboxColor: AppColors.accentColour,
+                            childrenCheckboxColor: AppColors.accentColour,
                             parentCheckboxScale: 1.35,
                             childrenCheckboxScale: 1.35,
                             gap: 2,

@@ -35,6 +35,8 @@ dependencies:
   google_sign_in: ^5.4.0
   cloud_firestore: ^3.4.1
   flutter_map: ^2.2.0
+  form_builder_extra_fields: ^7.1.0
+  restart_app: ^1.1.0
 
 dev_dependencies:
   flutter_test:

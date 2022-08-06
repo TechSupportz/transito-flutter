@@ -24,7 +24,7 @@ class BusServiceInfoScreen extends StatelessWidget {
       case BusOperator.GAS:
         return AppColors.GAS;
       default:
-        return AppColors.veryPurple;
+        return AppColors.accentColour;
     }
   }
 

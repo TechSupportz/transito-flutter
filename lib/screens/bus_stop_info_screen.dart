@@ -151,7 +151,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                                 margin: const EdgeInsets.only(right: 8),
                                 decoration: BoxDecoration(
-                                    color: AppColors.veryPurple,
+                                    color: AppColors.accentColour,
                                     borderRadius: BorderRadius.circular(5)),
                                 child: Text(widget.busStopCode,
                                     style: const TextStyle(fontWeight: FontWeight.w500)),
@@ -250,10 +250,10 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                     markers: [
                                       Marker(
                                         point: widget.busStopLocation,
-                                        builder: (context) => const Icon(
+                                        builder: (context) => Icon(
                                           Icons.place_rounded,
                                           size: 35,
-                                          color: AppColors.veryPurple,
+                                          color: AppColors.accentColour,
                                         ),
                                       ),
                                     ],

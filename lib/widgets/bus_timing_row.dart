@@ -8,11 +8,16 @@ import 'package:transito/models/enums/crowd_lvl_enum.dart';
 import '../models/arrival_info.dart';
 
 class BusTimingRow extends StatefulWidget {
-  const BusTimingRow({Key? key, required this.serviceInfo, required this.userLatLng})
-      : super(key: key);
+  const BusTimingRow({
+    Key? key,
+    required this.serviceInfo,
+    required this.userLatLng,
+    required this.isETAminutes,
+  }) : super(key: key);
 
   final ServiceInfo serviceInfo;
   final LatLng userLatLng; // user's current latitude and longitude
+  final bool isETAminutes; // whether to display ETA in minutes or exact time
 
   @override
   State<BusTimingRow> createState() => _BusTimingRowState();
@@ -21,32 +26,30 @@ class BusTimingRow extends StatefulWidget {
 class _BusTimingRowState extends State<BusTimingRow> {
   final Distance distance = const Distance();
 
-  // formats the arrival time into minutes
+  // formats the arrival time into minutes or exact time depending on user's settings
   String formatArrivalTime(arrivalTime) {
-    if (arrivalTime != '') {
-      num minutesToArrival = Jiffy(arrivalTime).diff(Jiffy().format(), Units.MINUTE);
-      if (minutesToArrival < -1) {
-        return "left";
-      } else if (minutesToArrival <= 1) {
-        return "arr";
+    if (!widget.isETAminutes) {
+      if (arrivalTime != '') {
+        String formattedArrivalTime = Jiffy(arrivalTime).add(hours: 8).format("HH:mm");
+        return formattedArrivalTime;
       } else {
-        return minutesToArrival.toString();
+        return '-';
       }
     } else {
-      return '-';
+      if (arrivalTime != '') {
+        num minutesToArrival = Jiffy(arrivalTime).diff(Jiffy().format(), Units.MINUTE);
+        if (minutesToArrival < -1) {
+          return "left";
+        } else if (minutesToArrival <= 1) {
+          return "arr";
+        } else {
+          return minutesToArrival.toString();
+        }
+      } else {
+        return '-';
+      }
     }
   }
-
-  // String formatExactTime(arrivalTime) {
-  //   if (arrivalTime != '') {
-  //     print(arrivalTime);
-  //     String formattedArrivalTime = Jiffy(arrivalTime).add(hours: 8).format("HH:mm");
-  //     print(formattedArrivalTime);
-  //     return formattedArrivalTime;
-  //   } else {
-  //     return '-';
-  //   }
-  // }
 
   // computes and returns the distance between user and bus either in meters or kilometers
   String calculateDistanceAway() {
@@ -101,18 +104,21 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 accessible: widget.serviceInfo.nextBus.isAccessible,
                 crowdLvl: widget.serviceInfo.nextBus.crowdLvl,
                 busType: widget.serviceInfo.nextBus.busType,
+                isETAminutes: widget.isETAminutes,
               ),
               ArrivalCard(
                 eta: formatArrivalTime(widget.serviceInfo.nextBus2.estimatedArrival),
                 accessible: widget.serviceInfo.nextBus2.isAccessible,
                 crowdLvl: widget.serviceInfo.nextBus2.crowdLvl,
                 busType: widget.serviceInfo.nextBus2.busType,
+                isETAminutes: widget.isETAminutes,
               ),
               ArrivalCard(
                 eta: formatArrivalTime(widget.serviceInfo.nextBus3.estimatedArrival),
                 accessible: widget.serviceInfo.nextBus3.isAccessible,
                 crowdLvl: widget.serviceInfo.nextBus3.crowdLvl,
                 busType: widget.serviceInfo.nextBus3.busType,
+                isETAminutes: widget.isETAminutes,
               ),
             ],
           ),
@@ -123,18 +129,20 @@ class _BusTimingRowState extends State<BusTimingRow> {
 }
 
 class ArrivalCard extends StatefulWidget {
-  const ArrivalCard(
-      {Key? key,
-      required this.eta,
-      required this.accessible,
-      required this.crowdLvl,
-      required this.busType})
-      : super(key: key);
+  const ArrivalCard({
+    Key? key,
+    required this.eta,
+    required this.accessible,
+    required this.crowdLvl,
+    required this.busType,
+    required this.isETAminutes,
+  }) : super(key: key);
 
   final String eta;
   final bool accessible;
   final CrowdLvl crowdLvl;
   final BusType busType;
+  final bool isETAminutes;
 
   @override
   State<ArrivalCard> createState() => _ArrivalCardState();
@@ -161,7 +169,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                   Text(
                     widget.eta,
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: widget.isETAminutes ? 30 : 18,
                       fontWeight: FontWeight.w500,
                       color: (() {
                         switch (widget.crowdLvl) {
@@ -216,8 +224,8 @@ class _ArrivalCardState extends State<ArrivalCard> {
                             }
                         }
                       })(),
-                      style: const TextStyle(
-                        fontSize: 11.5,
+                      style: TextStyle(
+                        fontSize: widget.isETAminutes ? 11.5 : 10,
                         color: AppColors.kindaGrey,
                       ),
                     ),

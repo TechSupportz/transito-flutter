@@ -11,7 +11,9 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/arrival_info.dart';
+import 'package:transito/models/user_settings.dart';
 import 'package:transito/providers/favourites_service.dart';
+import 'package:transito/providers/settings_service.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 
 import '../models/secret.dart';
@@ -189,6 +191,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    User? user = context.watch<User?>();
+
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -208,36 +212,52 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                 )
         ],
       ),
-      body: FutureBuilder(
-        future: futureBusArrivalInfo,
-        builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
-          // check if the snapshot has data, if not then display a loading indicator
-          if (snapshot.hasData) {
-            // notification listener to hide the fab when the user is scrolling down the list
-            return NotificationListener<UserScrollNotification>(
-              onNotification: (notification) => hideFabOnScroll(notification),
-              child: ListView.separated(
-                  itemBuilder: (context, int index) {
-                    return BusTimingRow(
-                      serviceInfo: snapshot.data!.services[index],
-                      userLatLng: widget.busStopLocation,
+      body: StreamBuilder(
+          stream: SettingsService().streamSettings(user?.uid),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              UserSettings userSettings = snapshot.data as UserSettings;
+              return FutureBuilder(
+                future: futureBusArrivalInfo,
+                builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
+                  // check if the snapshot has data, if not then display a loading indicator
+                  if (snapshot.hasData) {
+                    // notification listener to hide the fab when the user is scrolling down the list
+                    return NotificationListener<UserScrollNotification>(
+                      onNotification: (notification) => hideFabOnScroll(notification),
+                      child: ListView.separated(
+                          itemBuilder: (context, int index) {
+                            return BusTimingRow(
+                              serviceInfo: snapshot.data!.services[index],
+                              userLatLng: widget.busStopLocation,
+                              isETAminutes: userSettings.isETAminutes,
+                            );
+                          },
+                          padding: const EdgeInsets.only(bottom: 32, left: 12, right: 12),
+                          separatorBuilder: (BuildContext context, int index) => const Divider(),
+                          itemCount: snapshot.data!.services.length),
                     );
-                  },
-                  padding: const EdgeInsets.only(bottom: 32, left: 12, right: 12),
-                  separatorBuilder: (BuildContext context, int index) => const Divider(),
-                  itemCount: snapshot.data!.services.length),
-            );
-          } else if (snapshot.hasError) {
-            // return Text("${snapshot.error}");
-            debugPrint("<=== ERROR ${snapshot.error} ===>");
-            return const ErrorText();
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+                  } else if (snapshot.hasError) {
+                    // return Text("${snapshot.error}");
+                    debugPrint("<=== ERROR ${snapshot.error} ===>");
+                    return const ErrorText();
+                  } else {
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              );
+            } else if (snapshot.hasError) {
+              // return Text("${snapshot.error}");
+              debugPrint("<=== ERROR ${snapshot.error} ===>");
+              return const ErrorText();
+            } else {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+          }),
       floatingActionButton: isFabVisible
           // re-fetch data when user taps the refresh button
           ? FloatingActionButton(
