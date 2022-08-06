@@ -2,14 +2,18 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:collection/collection.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 
 import '../models/app_colors.dart';
 import '../models/arrival_info.dart';
 import '../models/secret.dart';
+import '../models/user_settings.dart';
+import '../providers/settings_service.dart';
 import '../screens/bus_timing_screen.dart';
 import 'error_text.dart';
 
@@ -87,77 +91,103 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: futureBusArrivalInfo,
-        builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
+    User? user = context.watch<User?>();
+
+    return StreamBuilder(
+        stream: SettingsService().streamSettings(user?.uid),
+        builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return Tooltip(
-              preferBelow: false,
-              decoration: const BoxDecoration(
-                color: AppColors.cardBg,
-              ),
-              textStyle: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-              showDuration: const Duration(milliseconds: 350),
-              message: widget.busStopName,
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => BusTimingScreen(
-                      busStopCode: widget.busStopCode,
-                      busStopName: widget.busStopName,
-                      busStopAddress: widget.busStopAddress,
-                      busStopLocation: widget.busStopLocation,
-                    ),
-                  ),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBg,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
-                        child: Text(
-                          widget.busStopName,
-                          overflow: TextOverflow.fade,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.kindaGrey),
+            UserSettings userSettings = snapshot.data as UserSettings;
+            return FutureBuilder(
+                future: futureBusArrivalInfo,
+                builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
+                  if (snapshot.hasData) {
+                    return Tooltip(
+                      preferBelow: false,
+                      decoration: const BoxDecoration(
+                        color: AppColors.cardBg,
+                      ),
+                      textStyle: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      showDuration: const Duration(milliseconds: 350),
+                      message: widget.busStopName,
+                      child: GestureDetector(
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BusTimingScreen(
+                              busStopCode: widget.busStopCode,
+                              busStopName: widget.busStopName,
+                              busStopAddress: widget.busStopAddress,
+                              busStopLocation: widget.busStopLocation,
+                            ),
+                          ),
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: AppColors.cardBg,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
+                                child: Text(
+                                  widget.busStopName,
+                                  overflow: TextOverflow.fade,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: const TextStyle(
+                                      fontSize: 28,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.kindaGrey),
+                                ),
+                              ),
+                              ListView.separated(
+                                  itemBuilder: (context, int index) {
+                                    return Transform.scale(
+                                      scale: 0.9,
+                                      child: BusTimingRow(
+                                        serviceInfo: snapshot.data![index],
+                                        userLatLng: widget.busStopLocation,
+                                        isETAminutes: userSettings.isETAminutes,
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (BuildContext context, int index) =>
+                                      const SizedBox(
+                                        height: 6,
+                                      ),
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.only(bottom: 18),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data!.length),
+                            ],
+                          ),
                         ),
                       ),
-                      ListView.separated(
-                          itemBuilder: (context, int index) {
-                            return Transform.scale(
-                              scale: 0.9,
-                              child: BusTimingRow(
-                                serviceInfo: snapshot.data![index],
-                                userLatLng: widget.busStopLocation,
-                              ),
-                            );
-                          },
-                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                                height: 6,
-                              ),
-                          physics: const NeverScrollableScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 18),
-                          shrinkWrap: true,
-                          itemCount: snapshot.data!.length),
-                    ],
-                  ),
-                ),
-              ),
-            );
+                    );
+                  } else if (snapshot.hasError) {
+                    // return Text("${snapshot.error}");
+                    debugPrint("<=== ERROR ${snapshot.error} ===>");
+                    return Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardBg,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const ErrorText(),
+                    );
+                  } else {
+                    return const SizedBox(
+                      height: 0,
+                    );
+                  }
+                });
           } else if (snapshot.hasError) {
             // return Text("${snapshot.error}");
             debugPrint("<=== ERROR ${snapshot.error} ===>");
