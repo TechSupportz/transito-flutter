@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,8 +22,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
 
-  void updateDisplayName() {
-    debugPrint('updateDisplayName');
+  void updateDisplayName(User user) async {
+    setState(() {
+      _isNameFieldLoading = true;
+    });
+
+    _nameFieldKey.currentState?.save();
+    _nameFieldKey.currentState?.validate();
+
+    if (_nameFieldKey.currentState!.isValid) {
+      if (user.displayName != _nameFieldKey.currentState!.value) {
+        try {
+          await user.updateDisplayName(_nameFieldKey.currentState!.value).then((value) {
+            setState(() {
+              _isNameFieldLoading = false;
+            });
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Name updated successfully'),
+              ),
+            );
+          });
+        } catch (e) {
+          debugPrint('❌ Unable to update name: $e');
+          _nameFieldKey.currentState!.invalidate("Oops, something went wrong on our end");
+        }
+      } else {
+        Timer(const Duration(milliseconds: 500), () {
+          setState(() {
+            _isNameFieldLoading = false;
+          });
+          _nameFieldKey.currentState!.invalidate("New name cannot be the same as previous");
+        });
+      }
+    }
   }
 
   void showResetPasswordDialog() {
@@ -88,7 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   splashRadius: 1,
                                   onPressed: () {
                                     HapticFeedback.mediumImpact();
-                                    updateDisplayName();
+                                    updateDisplayName(user!);
                                   },
                                   icon: const Icon(
                                     Icons.check_rounded,

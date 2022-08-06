@@ -5,19 +5,34 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final CollectionReference _users = FirebaseFirestore.instance.collection('favourites');
+  final CollectionReference _favourites = FirebaseFirestore.instance.collection('favourites');
+  final CollectionReference _settings = FirebaseFirestore.instance.collection('settings');
 
-  Future<void> addNewUser({required String userId}) {
-    return _users
+  Future<void> addNewUser({required String userId}) async {
+    _favourites
         .doc(userId)
         .set({
           'favouritesList': [],
         })
         .then(
-          (_) => debugPrint('✔️ Added new user to Firestore'),
+          (_) => debugPrint('✔️ Created favourites for new user'),
         )
         .catchError(
-          (error) => debugPrint('❌ Error adding new user to Firestore: $error'),
+          (error) => debugPrint('❌ Error creating favourites document in Firestore: $error'),
+        );
+
+    _settings
+        .doc(userId)
+        .set({
+          'accentColour': '0xFF7E6BFF',
+          'isETAminutes': true,
+          'isNearbyGrid': true,
+        })
+        .then(
+          (_) => debugPrint('✔️ Created settings for new user'),
+        )
+        .catchError(
+          (error) => debugPrint('❌ Error creating settings document in Firestore: $error'),
         );
   }
 

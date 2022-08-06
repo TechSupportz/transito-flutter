@@ -121,7 +121,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
-    var user = context.read<User?>();
+    var user = context.watch<User?>();
 
     return Scaffold(
       appBar: AppBar(
