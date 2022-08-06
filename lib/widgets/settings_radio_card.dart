@@ -70,7 +70,7 @@ class SettingsRadioCard extends StatelessWidget {
             name: 'radioGroup',
             controlAffinity: ControlAffinity.trailing,
             orientation: OptionsOrientation.vertical,
-            activeColor: AppColors.veryPurple,
+            activeColor: AppColors.accentColour,
             initialValue: initialValue,
             onChanged: (value) => updateSettings(value as bool),
             options: options

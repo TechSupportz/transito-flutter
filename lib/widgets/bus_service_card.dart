@@ -24,7 +24,7 @@ class BusServiceCard extends StatelessWidget {
       case BusOperator.GAS:
         return AppColors.GAS;
       default:
-        return AppColors.veryPurple;
+        return AppColors.accentColour;
     }
   }
 

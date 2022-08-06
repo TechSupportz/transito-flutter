@@ -104,7 +104,7 @@ class BusStopCard extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
-                          color: AppColors.veryPurple, borderRadius: BorderRadius.circular(5)),
+                          color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
                       child: Text(
                         busStopInfo.busStopCode,
                       ),

@@ -317,9 +317,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                   const SizedBox(height: 6),
                                   GestureDetector(
                                     onTap: () => showForgetPasswordDialog(),
-                                    child: const Text(
+                                    child: Text(
                                       'Forgot password?',
-                                      style: TextStyle(fontSize: 14, color: AppColors.veryPurple),
+                                      style: TextStyle(fontSize: 14, color: AppColors.accentColour),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -341,15 +341,15 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: const [
-                            Text(
+                          children: [
+                            const Text(
                               'New Here?',
                               style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
                             ),
-                            SizedBox(width: 3),
+                            const SizedBox(width: 3),
                             Text(
                               'Register!',
-                              style: TextStyle(fontSize: 14, color: AppColors.veryPurple),
+                              style: TextStyle(fontSize: 14, color: AppColors.accentColour),
                             ),
                           ],
                         ),

@@ -151,7 +151,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 valueTransformer: (value) => value?.trim(),
                                 validator: FormBuilderValidators.compose([
                                   FormBuilderValidators.required(),
-                                  FormBuilderValidators.minLength(8),
+                                  FormBuilderValidators.minLength(8,
+                                      errorText: 'Enter at least 8 characters'),
                                 ]),
                                 decoration: InputDecoration(
                                   labelText: 'Password',

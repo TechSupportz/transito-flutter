@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/settings_card_options.dart';
@@ -15,6 +16,7 @@ import '../models/app_colors.dart';
 import '../providers/settings_service.dart';
 import '../widgets/error_text.dart';
 import 'auth/login-screen.dart';
+import 'navbar_screens/main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -25,6 +27,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
+  final _accentColourFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
 
   void updateDisplayName(User? user) async {
@@ -105,6 +108,67 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
+  void updateAccentColour(User? user) async {
+    _accentColourFieldKey.currentState?.save();
+    _accentColourFieldKey.currentState?.validate();
+
+    if (_accentColourFieldKey.currentState!.isValid && user != null) {
+      SettingsService()
+          .updateAccentColour(
+            userId: user.uid,
+            newValue:
+                '0x${_accentColourFieldKey.currentState!.value.toString().substring(8, 16).toUpperCase()}',
+          )
+          .then((_) => showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Accent colour updated'),
+                  content: const Text('A restart may be required for the change to take effect.'),
+                  actions: [
+                    TextButton(
+                      child: const Text('Ok'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => MainScreen(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ));
+    }
+  }
+
+  void resetAccentColour(User? user) async {
+    SettingsService().updateAccentColour(userId: user?.uid, newValue: '0xFF7E6BFF').then(
+          (_) => showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Accent colour reset'),
+              content: const Text('A restart may be required for the change to take effect.'),
+              actions: [
+                TextButton(
+                  child: const Text('Ok'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => MainScreen(),
+                      ),
+                      (Route<dynamic> route) => false,
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+  }
+
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
@@ -139,7 +203,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     suffixIcon: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
-                        color: AppColors.veryPurple,
+                        color: AppColors.accentColour,
                       ),
                       child: AnimatedSwitcher(
                           transitionBuilder: (child, animation) => ScaleTransition(
@@ -183,9 +247,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               padding: const EdgeInsets.only(bottom: 6.0),
                               child: OutlinedButton(
                                 onPressed: () => showResetPasswordDialog(user.email),
-                                child: const Text(
+                                child: Text(
                                   'Reset password',
-                                  style: TextStyle(fontSize: 14, color: AppColors.veryPurple),
+                                  style: TextStyle(fontSize: 14, color: AppColors.accentColour),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -225,6 +289,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     if (snapshot.hasData) {
                       return Column(
                         children: [
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.cardBg,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Accent Colour",
+                                  style: TextStyle(fontSize: 18),
+                                ),
+                                const SizedBox(height: 6),
+                                FormBuilderColorPickerField(
+                                  key: _accentColourFieldKey,
+                                  name: "Accent Colour",
+                                  initialValue: Color(int.parse(snapshot.data!.accentColour)),
+                                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                                  validator: FormBuilderValidators.compose([
+                                    FormBuilderValidators.required(),
+                                    (val) {
+                                      if (val?.alpha != 255) {
+                                        return "Please select a fully opaque colour";
+                                      }
+                                      if ('0x${val.toString().substring(8, 16).toUpperCase()}' ==
+                                          snapshot.data!.accentColour) {
+                                        return "This is already your accent colour";
+                                      }
+                                      return null;
+                                    }
+                                  ]),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    OutlinedButton(
+                                        onPressed: () => resetAccentColour(user),
+                                        child: const Text("Reset to default")),
+                                    const SizedBox(width: 8),
+                                    ElevatedButton(
+                                        onPressed: () => updateAccentColour(user),
+                                        child: const Text("Apply"))
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 18),
                           SettingsRadioCard(
                             title: "ETA Format",
                             initialValue: snapshot.data!.isETAminutes,

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../models/app_colors.dart';
 import '../models/user_settings.dart';
 
 class SettingsService {
@@ -10,7 +11,9 @@ class SettingsService {
     if (userId != null) {
       return _settingsCollection.doc(userId).snapshots().map((snapshot) {
         if (snapshot.exists) {
-          return UserSettings.fromFirestore(snapshot);
+          UserSettings userSettings = UserSettings.fromFirestore(snapshot);
+          AppColors.accentColour = Color(int.parse(userSettings.accentColour));
+          return userSettings;
         } else {
           return UserSettings(
             accentColour: '0xFF7E6BFF',
@@ -32,17 +35,16 @@ class SettingsService {
 
   Future<void> updateAccentColour({String? userId, required String newValue}) async {
     if (userId != null) {
-      _settingsCollection
-          .doc(userId)
-          .update({
-            'accentColour': newValue,
-          })
-          .then(
-            (_) => debugPrint('✔️ Updated accentColour to $newValue'),
-          )
-          .catchError(
-            (error) => debugPrint('❌ Error updating accentColour in Firestore: $error'),
-          );
+      _settingsCollection.doc(userId).update({
+        'accentColour': newValue,
+      }).then(
+        (_) {
+          debugPrint('✔️ Updated accentColour to $newValue');
+          AppColors.accentColour = Color(int.parse(newValue));
+        },
+      ).catchError(
+        (error) => debugPrint('❌ Error updating accentColour in Firestore: $error'),
+      );
     }
   }
 
