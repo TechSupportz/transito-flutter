@@ -233,7 +233,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                               isETAminutes: userSettings.isETAminutes,
                             );
                           },
-                          padding: const EdgeInsets.only(bottom: 32, left: 12, right: 12),
+                          padding: const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
                           separatorBuilder: (BuildContext context, int index) => const Divider(),
                           itemCount: snapshot.data!.services.length),
                     );

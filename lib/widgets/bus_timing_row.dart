@@ -30,7 +30,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
   String formatArrivalTime(arrivalTime) {
     if (!widget.isETAminutes) {
       if (arrivalTime != '') {
-        String formattedArrivalTime = Jiffy(arrivalTime).add(hours: 8).format("HH:mm");
+        String formattedArrivalTime = Jiffy(arrivalTime).format("HH:mm");
         return formattedArrivalTime;
       } else {
         return '-';

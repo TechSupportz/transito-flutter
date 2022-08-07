@@ -49,17 +49,22 @@ dev_dependencies:
 
 
 flutter_native_splash:
+  color: "#000000"
   android: true
   ios: true
   image: "assets/images/logo.png"
-  color: "#000000"
+  android_12:
+    image: "assets/icons/a12-splash-1152x1152.png"
+    icon_background_color: "#0c0c0c"
+    color: "#000000"
+
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/transitoIcon.png"
+  image_path: "assets/icons/Icon-1024x1024.png"
   adaptive_icon_background: "#000000"
-  adaptive_icon_foreground: "assets/images/transitoIcon.png"
+  adaptive_icon_foreground: "assets/icons/icon-foreground-1024x1024.png"
   adaptive_icon_padding: true
 
 
@@ -69,6 +74,7 @@ flutter:
   assets:
     - assets/
     - assets/images/
+    - assets/icons/
 
   fonts:
     - family: Poppins
