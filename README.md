@@ -8,7 +8,7 @@ One such feature is the "At a glance" screen. It allows users to instantly see t
 
 ## Built using
 
-This app is built using the Flutter Framework made by Google. It also uses Firebase and Firestore for authentication and as a database respectively
+This app is built using the [Flutter Framework](https://flutter.dev/) made by Google. It also uses [Firebase](https://firebase.google.com/) for authentication and a NoSQL database
 
 Bus arrival data is provided via [Singapore's Land Transport Authority's DataMall Datasets](https://datamall.lta.gov.sg/content/datamall/en.html)
 
@@ -28,11 +28,21 @@ Map Tiles used are from [OneMap's Night Layout](https://www.onemap.gov.sg/docs/m
 	* [geolocator](https://pub.dev/packages/geolocator)
 	* [latlong2](https://pub.dev/packages/latlong2)
 	* [flutter_map](https://pub.dev/packages/flutter_map)
+* ### Time Formatter
+	* [jiffy](https://pub.dev/packages/jiffy)
 * ### Froms
 	* [flutter_form_builder](https://pub.dev/packages/flutter_form_builder)
 	* [form_builder_validators](https://pub.dev/packages/form_builder_validators)
 	* [form_builder_extra_fields](https://pub.dev/packages/form_builder_extra_fields)
 	* [parent_child_checkbox](https://pub.dev/packages/parent_child_checkbox)
 		* [forked version](https://github.com/TechSupportz/parent-child-checkbox)
+* ### Image Utilities
+	* [photo_view](https://pub.dev/packages/photo_view)
+	* [flutter_svg](https://pub.dev/packages/flutter_svg)
+* ### Splash Screen and Icons
+	* [flutter_native_splash](https://pub.dev/packages/flutter_native_splash)
+	* [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons)
 * ### Other Useful Stuff
-	* WIP
+	* [is_first_run](https://pub.dev/packages/is_first_run)
+	* [url_launcher](https://pub.dev/packages/url_launcher)
+	* [android_intent_plus](https://pub.dev/packages/android_intent_plus)
