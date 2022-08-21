@@ -10,6 +10,10 @@ One such feature is the "At a glance" screen. It allows users to instantly see t
 
 This app is built using the Flutter Framework made by Google. It also uses Firebase and Firestore for authentication and as a database respectively
 
+Bus arrival data is provided via [Singapore's Land Transport Authority's DataMall Datasets](https://datamall.lta.gov.sg/content/datamall/en.html)
+
+Map Tiles used are from [OneMap's Night Layout](https://www.onemap.gov.sg/docs/maps/night.html)
+
 ### Packages used
 * ### Flutter SDK
 	* [provider](https://pub.dev/packages/provider)
