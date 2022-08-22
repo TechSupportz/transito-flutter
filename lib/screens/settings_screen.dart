@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/settings_card_options.dart';
 import 'package:transito/models/user_settings.dart';
 import 'package:transito/providers/authentication_service.dart';
+import 'package:transito/screens/onboarding_screens/quick_start_screen.dart';
 import 'package:transito/widgets/settings_radio_card.dart';
 
 import '../models/app_colors.dart';
@@ -29,6 +30,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
   final _accentColourFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
+  final TextStyle titleStyle = const TextStyle(fontSize: 30, fontWeight: FontWeight.w700);
 
   void updateDisplayName(User? user) async {
     setState(() {
@@ -169,6 +171,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
   }
 
+  void goToQuickStart() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => QuickStartScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
@@ -177,16 +187,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Settings'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+        padding: const EdgeInsets.only(top: 12, bottom: 18, left: 12, right: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "About you",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                  style: titleStyle,
                 ),
                 const SizedBox(height: 18),
                 FormBuilderTextField(
@@ -294,11 +304,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   "Aesthetics ✨",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700),
+                  style: titleStyle,
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 18),
                 StreamBuilder(
                   stream: SettingsService().streamSettings(user?.uid),
                   builder: (context, AsyncSnapshot<UserSettings> snapshot) {
@@ -394,6 +404,86 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 )
               ],
             ),
+            const SizedBox(height: 24),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  "Others",
+                  style: titleStyle,
+                ),
+                const SizedBox(height: 18),
+                Material(
+                  child: InkWell(
+                    onTap: () => goToQuickStart(),
+                    customBorder: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Ink(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.cardBg,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: const [
+                          Text(
+                            "View Quick Start",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                          Icon(
+                            Icons.description_rounded,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Material(
+                  child: InkWell(
+                    onTap: () => showAboutDialog(
+                      context: context,
+                      applicationIcon: ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          "assets/icons/Icon-1024x1024.png",
+                          width: 56,
+                          height: 56,
+                        ),
+                      ),
+                      applicationName: "Transito",
+                      applicationVersion: "1.0.0",
+                      applicationLegalese: "© 2022 Transito",
+                    ),
+                    customBorder: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Ink(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.cardBg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: const [
+                            Text(
+                              "About",
+                              style: TextStyle(fontSize: 18),
+                            ),
+                            Icon(
+                              Icons.info_outline_rounded,
+                            ),
+                          ],
+                        )),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),

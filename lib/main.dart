@@ -100,6 +100,7 @@ class _MyAppState extends State<MyApp> {
               canvasColor: Colors.transparent,
               androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
               scaffoldBackgroundColor: const Color(0xFF0C0C0C),
+              cardColor: const Color(0xFF0C0C0C),
               colorScheme: const ColorScheme.dark().copyWith(
                 surface: Colors.black,
                 primary: AppColors.accentColour,

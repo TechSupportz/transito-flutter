@@ -51,11 +51,12 @@ class QuickStartScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
-                onPressed: () => Navigator.pushReplacement(
+                onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
                     builder: (context) => const MainScreen(),
                   ),
+                  (Route<dynamic> route) => false,
                 ),
                 child: const Text("Take me to the home screen!"),
               ),
