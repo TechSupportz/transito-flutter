@@ -5,6 +5,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
   final CollectionReference _favourites = FirebaseFirestore.instance.collection('favourites');
   final CollectionReference _settings = FirebaseFirestore.instance.collection('settings');
 
@@ -38,7 +39,7 @@ class AuthenticationService {
 
   Future<String?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
@@ -106,5 +107,10 @@ class AuthenticationService {
   Future<void> logout() async {
     // debugPrint("Logout");
     await _auth.signOut();
+  }
+
+  Future<void> googleLogout() async {
+    await _auth.signOut();
+    await _googleSignIn.signOut();
   }
 }

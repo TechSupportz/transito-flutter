@@ -238,39 +238,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 12),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      (user != null &&
-                              user.providerData.map((e) => e.providerId).contains('password'))
-                          ? Padding(
-                              padding: const EdgeInsets.only(bottom: 6.0),
-                              child: OutlinedButton(
-                                onPressed: () => showResetPasswordDialog(user.email),
-                                child: Text(
-                                  'Reset password',
-                                  style: TextStyle(fontSize: 14, color: AppColors.accentColour),
-                                  textAlign: TextAlign.center,
-                                ),
+                  child: (user != null &&
+                          user.providerData.map((e) => e.providerId).contains('password'))
+                      ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: OutlinedButton(
+                              onPressed: () => showResetPasswordDialog(user.email),
+                              child: Text(
+                                'Reset password',
+                                style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                textAlign: TextAlign.center,
                               ),
-                            )
-                          : const SizedBox(height: 0),
-                      ElevatedButton(
-                        onPressed: () => AuthenticationService()
-                            .logout()
-                            .then((value) => Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                  (Route<dynamic> route) => false,
-                                )),
-                        child: const Text(
-                          'Logout',
-                          style: TextStyle(fontSize: 14),
-                          textAlign: TextAlign.center,
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () => AuthenticationService()
+                                .logout()
+                                .then((value) => Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const LoginScreen()),
+                                      (Route<dynamic> route) => false,
+                                    )),
+                            child: const Text(
+                              'Logout',
+                              style: TextStyle(fontSize: 14),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ])
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            ElevatedButton(
+                              onPressed: () => AuthenticationService()
+                                  .googleLogout()
+                                  .then((value) => Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => const LoginScreen()),
+                                        (Route<dynamic> route) => false,
+                                      )),
+                              child: const Text(
+                                'Logout',
+                                style: TextStyle(fontSize: 14),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ],
             ),

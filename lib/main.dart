@@ -66,6 +66,7 @@ void main() async {
       child: MyApp(defaultHome: _defaultHome),
     ),
   );
+  FlutterNativeSplash.remove();
 }
 
 class MyApp extends StatefulWidget {
@@ -83,11 +84,9 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
     bool isLoggedIn = user != null && user.emailVerified == true;
-
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
-          FlutterNativeSplash.remove();
           return MaterialApp(
             title: "Transito",
             supportedLocales: const [Locale('en', 'US')],
