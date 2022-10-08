@@ -1,7 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="tnitish.com.transito">
+    package="com.tnitish.transito">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <queries>
@@ -12,7 +11,7 @@
     </queries>
 
    <application
-        android:label="transito"
+        android:label="Transito"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

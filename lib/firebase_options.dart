@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyCh5R9feCSl5TQ9gB2YFmcUQoO3l5bAqKo',
-    appId: '1:341566460699:android:c3f3ddf8179b6cd46379be',
+    appId: '1:341566460699:android:9eeaef11f72af65a6379be',
     messagingSenderId: '341566460699',
     projectId: 'transito-8f50c',
     storageBucket: 'transito-8f50c.appspot.com',
@@ -59,11 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDDxXYJ33YMI241T9axi37KOt-WbqRX0_k',
-    appId: '1:341566460699:ios:5361a9765de2a74a6379be',
+    appId: '1:341566460699:ios:9ceb370c8d2cdb6e6379be',
     messagingSenderId: '341566460699',
     projectId: 'transito-8f50c',
     storageBucket: 'transito-8f50c.appspot.com',
-    iosClientId: '341566460699-sbmc4e7nb44hug4fnqi44uhd878ko65s.apps.googleusercontent.com',
-    iosBundleId: 'tnitish.com.transito',
+    androidClientId: '341566460699-a3glvvmvtfr62g0ndehnmsvjehbkb66o.apps.googleusercontent.com',
+    iosClientId: '341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com',
+    iosBundleId: 'com.tnitish.transito',
   );
 }

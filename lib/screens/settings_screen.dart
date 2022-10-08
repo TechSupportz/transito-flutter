@@ -455,7 +455,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         ),
                       ),
                       applicationName: "Transito",
-                      applicationVersion: "1.0.0",
+                      applicationVersion: "0.1.2",
                       applicationLegalese: "© 2022 Transito",
                     ),
                     customBorder: RoundedRectangleBorder(

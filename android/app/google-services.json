@@ -7,12 +7,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:341566460699:android:c3f3ddf8179b6cd46379be",
+        "mobilesdk_app_id": "1:341566460699:android:9eeaef11f72af65a6379be",
         "android_client_info": {
-          "package_name": "tnitish.com.transito"
+          "package_name": "com.tnitish.transito"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "341566460699-3bm3fv80co5oum2anvndhs0nogi4mrjq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tnitish.transito",
+            "certificate_hash": "0f0f036b8bb2efbbc89426c0116418ec2ef075f6"
+          }
+        },
+        {
+          "client_id": "341566460699-h3am1p9mt28nfvfi6q9rc1kkptegrkqm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tnitish.transito",
+            "certificate_hash": "2dbf7887db2d9370e6d4c81e192937dd9f0b890a"
+          }
+        },
         {
           "client_id": "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com",
           "client_type": 3
@@ -31,10 +47,62 @@
               "client_type": 3
             },
             {
-              "client_id": "341566460699-sbmc4e7nb44hug4fnqi44uhd878ko65s.apps.googleusercontent.com",
+              "client_id": "341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "tnitish.com.transito"
+                "bundle_id": "com.tnitish.transito"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:341566460699:android:c3f3ddf8179b6cd46379be",
+        "android_client_info": {
+          "package_name": "tnitish.com.transito"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "341566460699-a3glvvmvtfr62g0ndehnmsvjehbkb66o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tnitish.com.transito",
+            "certificate_hash": "0f0f036b8bb2efbbc89426c0116418ec2ef075f6"
+          }
+        },
+        {
+          "client_id": "341566460699-c3rsic7fqihsv4cso08rbr24a50ebgsq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "tnitish.com.transito",
+            "certificate_hash": "2dbf7887db2d9370e6d4c81e192937dd9f0b890a"
+          }
+        },
+        {
+          "client_id": "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCh5R9feCSl5TQ9gB2YFmcUQoO3l5bAqKo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tnitish.transito"
               }
             }
           ]
