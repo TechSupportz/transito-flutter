@@ -174,7 +174,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void goToQuickStart() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => QuickStartScreen(),
+        builder: (context) => const QuickStartScreen(),
       ),
     );
   }

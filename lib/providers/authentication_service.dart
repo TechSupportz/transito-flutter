@@ -62,6 +62,23 @@ class AuthenticationService {
     return null;
   }
 
+  Future<String?> signInAnonymously() async {
+    try {
+      UserCredential result = await _auth.signInAnonymously();
+      User? user = result.user;
+      await user?.updateDisplayName("Guest");
+      await addNewUser(userId: user!.uid).then(
+        (_) => debugPrint('✔️ Initialised user in Firestore'),
+      );
+      debugPrint("✔️ Signed in anonymously");
+    } on FirebaseAuthException catch (e) {
+      debugPrint("❌ Anonymous Login failed with code: ${e.code}");
+      debugPrint("❌ Anonymous Login failed with message: ${e.message}");
+      return e.code;
+    }
+    return null;
+  }
+
   Future<String?> registerUserWithEmail(String name, String email, String password) async {
     try {
       UserCredential result =

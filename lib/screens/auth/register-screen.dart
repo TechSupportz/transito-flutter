@@ -8,6 +8,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import '../../models/app_colors.dart';
 import '../../providers/authentication_service.dart';
 import '../../widgets/email_verification_dialog.dart';
+import '../onboarding_screens/location_access_screen.dart';
 import 'login-screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -18,12 +19,39 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
+  final Widget _defaultHome = const LocationAccessScreen();
   final _registerFormKey = GlobalKey<FormBuilderState>();
   final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
   final _emailFieldKey = GlobalKey<FormBuilderFieldState>();
   final _passwordFieldKey = GlobalKey<FormBuilderFieldState>();
   bool isPasswordVisible = true;
   bool _isLoading = false;
+
+  void showGuestLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => guestLoginDialog(context),
+    );
+  }
+
+  void onGuestLoginBtnPress() {
+    AuthenticationService().signInAnonymously().then((err) {
+      if (err == null) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => _defaultHome,
+          ),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Something went wrong... Please try again'),
+          ),
+        );
+      }
+    });
+  }
 
   void onRegisterBtnPress() {
     setState(() {
@@ -108,92 +136,123 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: FormBuilder(
-                          key: _registerFormKey,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              FormBuilderTextField(
-                                key: _nameFieldKey,
-                                name: 'name',
-                                scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                                autovalidateMode: AutovalidateMode.onUserInteraction,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                ]),
-                                decoration: const InputDecoration(
-                                  labelText: 'Name',
-                                ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            OutlinedButton.icon(
+                              onPressed: () => showGuestLoginDialog(),
+                              icon: const Icon(
+                                Icons.perm_identity_rounded,
+                                color: AppColors.kindaGrey,
                               ),
-                              const SizedBox(height: 16),
-                              FormBuilderTextField(
-                                key: _emailFieldKey,
-                                name: 'email',
-                                scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                                keyboardType: TextInputType.emailAddress,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                  FormBuilderValidators.email(),
-                                ]),
-                                decoration: const InputDecoration(
-                                  labelText: 'Email',
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              FormBuilderTextField(
-                                key: _passwordFieldKey,
-                                name: 'password',
-                                scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                                obscureText: !isPasswordVisible,
-                                keyboardType: TextInputType.visiblePassword,
-                                autovalidateMode: AutovalidateMode.onUserInteraction,
-                                valueTransformer: (value) => value?.trim(),
-                                validator: FormBuilderValidators.compose([
-                                  FormBuilderValidators.required(),
-                                  FormBuilderValidators.minLength(8,
-                                      errorText: 'Enter at least 8 characters'),
-                                ]),
-                                decoration: InputDecoration(
-                                  labelText: 'Password',
-                                  suffixIcon: IconButton(
-                                    icon: Icon(isPasswordVisible
-                                        ? Icons.visibility_off_rounded
-                                        : Icons.visibility_rounded),
-                                    iconSize: 24,
-                                    splashRadius: 1,
-                                    onPressed: () {
-                                      setState(() {
-                                        isPasswordVisible = !isPasswordVisible;
-                                      });
-                                    },
-                                  ),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 16),
-                                child: OutlinedButton(
-                                  onPressed: () => onRegisterBtnPress(),
-                                  child: AnimatedSwitcher(
-                                    transitionBuilder: (child, animation) => ScaleTransition(
-                                      scale: animation,
-                                      child: child,
+                              label: const Text('Continue as a Guest',
+                                  style: TextStyle(color: Colors.white)),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Row(
+                                children: const [
+                                  Expanded(child: Divider(thickness: 1)),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text(
+                                      'or',
+                                      style: TextStyle(color: AppColors.kindaGrey),
                                     ),
-                                    duration: const Duration(milliseconds: 175),
-                                    child: _isLoading
-                                        ? const SizedBox(
-                                            height: 18,
-                                            width: 18,
-                                            child: Center(
-                                              child: CircularProgressIndicator(strokeWidth: 2),
-                                            ),
-                                          )
-                                        : const Text('Register'),
                                   ),
-                                ),
-                              )
-                            ],
-                          ),
+                                  Expanded(child: Divider(thickness: 1)),
+                                ],
+                              ),
+                            ),
+                            FormBuilder(
+                              key: _registerFormKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  FormBuilderTextField(
+                                    key: _nameFieldKey,
+                                    name: 'name',
+                                    scrollPadding: const EdgeInsets.symmetric(vertical: 50),
+                                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                                    validator: FormBuilderValidators.compose([
+                                      FormBuilderValidators.required(),
+                                    ]),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Name',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  FormBuilderTextField(
+                                    key: _emailFieldKey,
+                                    name: 'email',
+                                    scrollPadding: const EdgeInsets.symmetric(vertical: 50),
+                                    keyboardType: TextInputType.emailAddress,
+                                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                                    validator: FormBuilderValidators.compose([
+                                      FormBuilderValidators.required(),
+                                      FormBuilderValidators.email(),
+                                    ]),
+                                    decoration: const InputDecoration(
+                                      labelText: 'Email',
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  FormBuilderTextField(
+                                    key: _passwordFieldKey,
+                                    name: 'password',
+                                    scrollPadding: const EdgeInsets.symmetric(vertical: 50),
+                                    obscureText: !isPasswordVisible,
+                                    keyboardType: TextInputType.visiblePassword,
+                                    autovalidateMode: AutovalidateMode.onUserInteraction,
+                                    valueTransformer: (value) => value?.trim(),
+                                    validator: FormBuilderValidators.compose([
+                                      FormBuilderValidators.required(),
+                                      FormBuilderValidators.minLength(8,
+                                          errorText: 'Enter at least 8 characters'),
+                                    ]),
+                                    decoration: InputDecoration(
+                                      labelText: 'Password',
+                                      suffixIcon: IconButton(
+                                        icon: Icon(isPasswordVisible
+                                            ? Icons.visibility_off_rounded
+                                            : Icons.visibility_rounded),
+                                        iconSize: 24,
+                                        splashRadius: 1,
+                                        onPressed: () {
+                                          setState(() {
+                                            isPasswordVisible = !isPasswordVisible;
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(horizontal: 21.0, vertical: 16),
+                                    child: OutlinedButton(
+                                      onPressed: () => onRegisterBtnPress(),
+                                      child: AnimatedSwitcher(
+                                        transitionBuilder: (child, animation) => ScaleTransition(
+                                          scale: animation,
+                                          child: child,
+                                        ),
+                                        duration: const Duration(milliseconds: 175),
+                                        child: _isLoading
+                                            ? const SizedBox(
+                                                height: 18,
+                                                width: 18,
+                                                child: Center(
+                                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                                ),
+                                              )
+                                            : const Text('Register'),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -204,6 +263,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  AlertDialog guestLoginDialog(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Continue as a Guest'),
+      content: const Text(
+          'Using a guest account will prevent your favourites and setting from being synced. Are you sure you want to continue?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => onGuestLoginBtnPress(),
+          child: const Text('Continue'),
+        ),
+      ],
     );
   }
 }
