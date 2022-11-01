@@ -122,12 +122,19 @@ class AuthenticationService {
   }
 
   Future<void> logout() async {
-    // debugPrint("Logout");
-    await _auth.signOut();
+    if (_auth.currentUser!.providerData.map((e) => e.providerId).contains('password')) {
+      await _auth.signOut();
+    } else {
+      await _auth.signOut();
+      await _googleSignIn.signOut();
+    }
   }
 
-  Future<void> googleLogout() async {
-    await _auth.signOut();
-    await _googleSignIn.signOut();
+  Future<void> deleteAccount() async {
+    String userID = _auth.currentUser!.uid;
+
+    await _favourites.doc(userID).delete();
+    await _settings.doc(userID).delete();
+    await _auth.currentUser!.delete();
   }
 }

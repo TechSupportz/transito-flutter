@@ -247,57 +247,109 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 12),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                  child: (user != null &&
-                          user.providerData.map((e) => e.providerId).contains('password'))
-                      ? Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 6.0),
-                            child: OutlinedButton(
-                              onPressed: () => showResetPasswordDialog(user.email),
-                              child: Text(
-                                'Reset password',
-                                style: TextStyle(fontSize: 14, color: AppColors.accentColour),
-                                textAlign: TextAlign.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                      (user != null &&
+                              user.providerData.map((e) => e.providerId).contains('password'))
+                          ? Padding(
+                              padding: const EdgeInsets.only(bottom: 6.0),
+                              child: OutlinedButton(
+                                onPressed: () => showResetPasswordDialog(user.email),
+                                child: Text(
+                                  'Reset password',
+                                  style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                          ),
-                          ElevatedButton(
-                            onPressed: () => AuthenticationService()
-                                .logout()
-                                .then((value) => Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const LoginScreen()),
-                                      (Route<dynamic> route) => false,
-                                    )),
-                            child: const Text(
-                              'Logout',
-                              style: TextStyle(fontSize: 14),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ])
-                      : Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            ElevatedButton(
-                              onPressed: () => AuthenticationService()
-                                  .googleLogout()
-                                  .then((value) => Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) => const LoginScreen()),
-                                        (Route<dynamic> route) => false,
-                                      )),
-                              child: const Text(
-                                'Logout',
-                                style: TextStyle(fontSize: 14),
-                                textAlign: TextAlign.center,
+                            )
+                          : const SizedBox(),
+                      (user != null && !user.isAnonymous)
+                          ? Padding(
+                              padding: const EdgeInsets.only(bottom: 6.0),
+                              child: ElevatedButton(
+                                onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: const Text('Logout'),
+                                    content: const Text('Are you sure you want to logout?'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text('No'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          AuthenticationService().logout().then(
+                                                (value) => Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => const LoginScreen(),
+                                                  ),
+                                                  (Route<dynamic> route) => false,
+                                                ),
+                                              );
+                                        },
+                                        child: const Text('Yes'),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                child: const Text(
+                                  'Logout',
+                                  style: TextStyle(fontSize: 14),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                ),
+                            )
+                          : const SizedBox(),
+                      ElevatedButton(
+                        onPressed: () => showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                                  title: Text('Delete account'),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Text(
+                                          'Are you sure you want to delete your account and all the data related to it?'),
+                                      SizedBox(height: 12),
+                                      Text.rich(TextSpan(text: 'This action is ', children: [
+                                        TextSpan(
+                                          text: 'PERMANENT',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              color: AppColors.sortaRed),
+                                        ),
+                                        TextSpan(text: ' and cannot be undone.')
+                                      ])),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: Text('No'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        AuthenticationService().deleteAccount().then(
+                                              (value) => Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => const LoginScreen(),
+                                                ),
+                                                (Route<dynamic> route) => false,
+                                              ),
+                                            );
+                                      },
+                                      child: Text('Yes'),
+                                    ),
+                                  ],
+                                )),
+                        child: const Text("Delete account"),
+                        style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(AppColors.sortaRed)),
+                      )
+                    ])),
               ],
             ),
             const SizedBox(height: 24),
