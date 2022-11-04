@@ -1,3 +1,5 @@
+[<img width="1024" height="50%" alt="Feature graphic-Google-Play" src="https://user-images.githubusercontent.com/79391172/199914846-fa2832b8-87ec-4cbe-b637-291261cfd977.png">](https://play.google.com/store/apps/details?id=com.tnitish.transito)
+
 # Transito
 
 Transito is a bus timing app that users can use to view the bus arrival timings while interacting with an aesthetically pleasing and minimal user interface
