@@ -62,6 +62,23 @@ class AuthenticationService {
     return null;
   }
 
+  Future<String?> signInAnonymously() async {
+    try {
+      UserCredential result = await _auth.signInAnonymously();
+      User? user = result.user;
+      await user?.updateDisplayName("Guest");
+      await addNewUser(userId: user!.uid).then(
+        (_) => debugPrint('✔️ Initialised user in Firestore'),
+      );
+      debugPrint("✔️ Signed in anonymously");
+    } on FirebaseAuthException catch (e) {
+      debugPrint("❌ Anonymous Login failed with code: ${e.code}");
+      debugPrint("❌ Anonymous Login failed with message: ${e.message}");
+      return e.code;
+    }
+    return null;
+  }
+
   Future<String?> registerUserWithEmail(String name, String email, String password) async {
     try {
       UserCredential result =
@@ -105,12 +122,19 @@ class AuthenticationService {
   }
 
   Future<void> logout() async {
-    // debugPrint("Logout");
-    await _auth.signOut();
+    if (_auth.currentUser!.providerData.map((e) => e.providerId).contains('password')) {
+      await _auth.signOut();
+    } else {
+      await _auth.signOut();
+      await _googleSignIn.signOut();
+    }
   }
 
-  Future<void> googleLogout() async {
-    await _auth.signOut();
-    await _googleSignIn.signOut();
+  Future<void> deleteAccount() async {
+    String userID = _auth.currentUser!.uid;
+
+    await _favourites.doc(userID).delete();
+    await _settings.doc(userID).delete();
+    await _auth.currentUser!.delete();
   }
 }
