@@ -497,19 +497,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Material(
                   child: InkWell(
                     onTap: () => showAboutDialog(
-                      context: context,
-                      applicationIcon: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          "assets/icons/Icon-1024x1024.png",
-                          width: 56,
-                          height: 56,
+                        context: context,
+                        applicationIcon: ClipRRect(
+                          borderRadius: BorderRadius.circular(10),
+                          child: Image.asset(
+                            "assets/icons/Icon-1024x1024.png",
+                            width: 56,
+                            height: 56,
+                          ),
                         ),
-                      ),
-                      applicationName: "Transito",
-                      applicationVersion: "0.1.2",
-                      applicationLegalese: "© 2022 Transito",
-                    ),
+                        applicationName: "Transito",
+                        applicationVersion: "1.1.1",
+                        applicationLegalese: "© 2022 Transito",
+                        children: const [
+                          SizedBox(height: 18),
+                          Text(
+                            "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Transito is not responsible for any inaccuracies in the data.",
+                            style: TextStyle(fontSize: 14),
+                          ),
+                        ]),
                     customBorder: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
