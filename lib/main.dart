@@ -83,7 +83,8 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
-    bool isLoggedIn = user != null && user.emailVerified == true;
+    bool isLoggedIn =
+        (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
