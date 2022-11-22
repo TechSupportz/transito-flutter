@@ -67,9 +67,11 @@ class AuthenticationService {
       UserCredential result = await _auth.signInAnonymously();
       User? user = result.user;
       await user?.updateDisplayName("Guest");
-      await addNewUser(userId: user!.uid).then(
-        (_) => debugPrint('✔️ Initialised user in Firestore'),
-      );
+      if (result.additionalUserInfo?.isNewUser ?? false) {
+        await addNewUser(userId: user!.uid).then(
+          (_) => debugPrint('✔️ Initialised user in Firestore'),
+        );
+      }
       debugPrint("✔️ Signed in anonymously");
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Anonymous Login failed with code: ${e.code}");
