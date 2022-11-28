@@ -1,12 +1,14 @@
 [<img width="1024" height="50%" alt="Feature graphic-Google-Play" src="https://user-images.githubusercontent.com/79391172/199914846-fa2832b8-87ec-4cbe-b637-291261cfd977.png">](https://play.google.com/store/apps/details?id=com.tnitish.transito)
 
-# Transito
+# [Transito](https://play.google.com/store/apps/details?id=com.tnitish.transito)
 
 Transito is a bus timing app that users can use to view the bus arrival timings while interacting with an aesthetically pleasing and minimal user interface
 
 The app was built with ease of access in mind to enable users to get information swiftly. Features included in this app were also carefully curated to improve the user's quality of life without making the app feel bloated and confusing to use.
 
 One such feature is the "At a glance" screen. It allows users to instantly see the timings of certain buses at favourited bus stops instead of searching and sifting through the list of nearby bus stops.
+
+[Get it on Google Play today!](https://play.google.com/store/apps/details?id=com.tnitish.transito)
 
 ## Built using
 
