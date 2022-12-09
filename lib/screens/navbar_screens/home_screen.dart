@@ -244,54 +244,63 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               if (snapshot.hasData) {
                 UserSettings userSettings = snapshot.data as UserSettings;
                 return FutureBuilder(
-                    future: nearbyBusStops,
-                    builder: (BuildContext context, AsyncSnapshot<List<NearbyBusStops>> snapshot) {
-                      // display a loading indicator while the list of nearby bus stops is being fetched
-                      if (snapshot.hasData && snapshot.data != null) {
-                        if (snapshot.data!.isNotEmpty) {
-                          return GridView.count(
-                            childAspectRatio: userSettings.isNearbyGrid ? 2.5 / 1 : 5 / 1,
-                            crossAxisSpacing: 18,
-                            mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
-                            crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
-                              // loop through nearby bus stops and send their data to the BusStopCard widget to display them
-                              for (var busStop in snapshot.data!)
-                                BusStopCard(
-                                  busStopInfo: busStop.busStopInfo,
-                                ),
-                            ],
-                          );
-                        } else {
-                          return Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 18.0),
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppColors.cardBg,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Center(
-                                  child: Text("No bus stops nearby",
-                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                      } else if (snapshot.hasError) {
-                        // return Text("${snapshot.error}");
-                        debugPrint("<=== ERROR ${snapshot.error} ===>");
-                        return const ErrorText();
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      }
+                    future: getUserLocation(),
+                    builder: (BuildContext context, AsyncSnapshot<Position> snapshot) {
+                      // ! Change this once you rework the location retrieval
+                      final userLocation = snapshot.data!;
+                      return FutureBuilder(
+                          future: nearbyBusStops,
+                          builder:
+                              (BuildContext context, AsyncSnapshot<List<NearbyBusStops>> snapshot) {
+                            // display a loading indicator while the list of nearby bus stops is being fetched
+                            if (snapshot.hasData && snapshot.data != null) {
+                              if (snapshot.data!.isNotEmpty) {
+                                return GridView.count(
+                                  childAspectRatio: userSettings.isNearbyGrid ? 2.5 / 1 : 5 / 1,
+                                  crossAxisSpacing: 18,
+                                  mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
+                                  crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  children: [
+                                    // loop through nearby bus stops and send their data to the BusStopCard widget to display them
+                                    for (var busStop in snapshot.data!)
+                                      BusStopCard(
+                                        busStopInfo: busStop.busStopInfo,
+                                        userLocation: userLocation,
+                                      ),
+                                  ],
+                                );
+                              } else {
+                                return Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(bottom: 18.0),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.cardBg,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      child: const Center(
+                                        child: Text("No bus stops nearby",
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.w500, fontSize: 18)),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else if (snapshot.hasError) {
+                              // return Text("${snapshot.error}");
+                              debugPrint("<=== ERROR ${snapshot.error} ===>");
+                              return const ErrorText();
+                            } else {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                          });
                     });
               } else if (snapshot.hasError) {
                 // return Text("${snapshot.error}");
