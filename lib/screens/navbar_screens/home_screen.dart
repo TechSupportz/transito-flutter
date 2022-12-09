@@ -255,6 +255,28 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                             // display a loading indicator while the list of nearby bus stops is being fetched
                             if (snapshot.hasData && snapshot.data != null) {
                               if (snapshot.data!.isNotEmpty) {
+                                final busStops = snapshot.data!;
+                                final userLatLng = LatLng(
+                                  userLocation.latitude,
+                                  userLocation.longitude,
+                                );
+                                // sort the bus stops by distance from the user
+                                busStops.sort((a, b) => (distance.as(
+                                      LengthUnit.Meter,
+                                      LatLng(
+                                        a.busStopInfo.latitude,
+                                        a.busStopInfo.longitude,
+                                      ),
+                                      userLatLng,
+                                    ) -
+                                    distance.as(
+                                      LengthUnit.Meter,
+                                      LatLng(
+                                        b.busStopInfo.latitude,
+                                        b.busStopInfo.longitude,
+                                      ),
+                                      userLatLng,
+                                    )) as int);
                                 return GridView.count(
                                   childAspectRatio: userSettings.isNearbyGrid ? 2.5 / 1 : 5 / 1,
                                   crossAxisSpacing: 18,
@@ -264,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                   physics: const NeverScrollableScrollPhysics(),
                                   children: [
                                     // loop through nearby bus stops and send their data to the BusStopCard widget to display them
-                                    for (var busStop in snapshot.data!)
+                                    for (var busStop in busStops)
                                       BusStopCard(
                                         busStopInfo: busStop.busStopInfo,
                                         userLocation: userLocation,
