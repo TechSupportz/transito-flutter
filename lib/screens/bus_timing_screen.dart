@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/arrival_info.dart';
@@ -192,7 +193,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
-
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -225,17 +225,35 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     // notification listener to hide the fab when the user is scrolling down the list
                     return NotificationListener<UserScrollNotification>(
                       onNotification: (notification) => hideFabOnScroll(notification),
-                      child: ListView.separated(
-                          itemBuilder: (context, int index) {
-                            return BusTimingRow(
-                              serviceInfo: snapshot.data!.services[index],
-                              userLatLng: widget.busStopLocation,
-                              isETAminutes: userSettings.isETAminutes,
-                            );
-                          },
-                          padding: const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
-                          separatorBuilder: (BuildContext context, int index) => const Divider(),
-                          itemCount: snapshot.data!.services.length),
+                      child: snapshot.data!.services.isEmpty
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Text(
+                                  Jiffy().hour > 5
+                                      ? '🦥 All the buses are lepaking 🦥'
+                                      : "💤 Buses are sleeping 💤",
+                                  style: const TextStyle(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            )
+                          : ListView.separated(
+                              itemBuilder: (context, int index) {
+                                return BusTimingRow(
+                                  serviceInfo: snapshot.data!.services[index],
+                                  userLatLng: widget.busStopLocation,
+                                  isETAminutes: userSettings.isETAminutes,
+                                );
+                              },
+                              padding:
+                                  const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
+                              separatorBuilder: (BuildContext context, int index) =>
+                                  const Divider(),
+                              itemCount: snapshot.data!.services.length),
                     );
                   } else if (snapshot.hasError) {
                     // return Text("${snapshot.error}");

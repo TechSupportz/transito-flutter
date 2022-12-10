@@ -5,6 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
@@ -147,25 +148,41 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                       color: AppColors.kindaGrey),
                                 ),
                               ),
-                              ListView.separated(
-                                  itemBuilder: (context, int index) {
-                                    return Transform.scale(
-                                      scale: 0.9,
-                                      child: BusTimingRow(
-                                        serviceInfo: snapshot.data![index],
-                                        userLatLng: widget.busStopLocation,
-                                        isETAminutes: userSettings.isETAminutes,
+                              snapshot.data!.isEmpty
+                                  ? Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          Jiffy().hour > 5
+                                              ? '🦥 Your favourites are lepaking 🦥'
+                                              : "💤 Buses are sleeping 💤",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
                                       ),
-                                    );
-                                  },
-                                  separatorBuilder: (BuildContext context, int index) =>
-                                      const SizedBox(
-                                        height: 6,
-                                      ),
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.only(bottom: 18),
-                                  shrinkWrap: true,
-                                  itemCount: snapshot.data!.length),
+                                    )
+                                  : ListView.separated(
+                                      itemBuilder: (context, int index) {
+                                        return Transform.scale(
+                                          scale: 0.9,
+                                          child: BusTimingRow(
+                                            serviceInfo: snapshot.data![index],
+                                            userLatLng: widget.busStopLocation,
+                                            isETAminutes: userSettings.isETAminutes,
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (BuildContext context, int index) =>
+                                          const SizedBox(
+                                            height: 6,
+                                          ),
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      padding: const EdgeInsets.only(bottom: 18),
+                                      shrinkWrap: true,
+                                      itemCount: snapshot.data!.length),
                             ],
                           ),
                         ),
