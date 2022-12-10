@@ -193,7 +193,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
-
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -232,10 +231,10 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                 padding: const EdgeInsets.all(16.0),
                                 child: Text(
                                   Jiffy().hour > 5
-                                      ? 'No Bus Services are operating currently'
+                                      ? '🦥 All the buses are lepaking 🦥'
                                       : "💤 Buses are sleeping 💤",
                                   style: const TextStyle(
-                                    fontSize: 24,
+                                    fontSize: 21,
                                     fontWeight: FontWeight.w500,
                                   ),
                                   textAlign: TextAlign.center,
