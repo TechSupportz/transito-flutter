@@ -56,10 +56,17 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
 
+      List<String?> selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
+
+      // check if any bus services are selected
+      if (selectedServices.isEmpty) {
+        _showSnackBar("Please select at least one bus service");
+        return;
+      }
+
       // check if bus stop already exists in favourites list
       if (favouritesList.every((element) => element.busStopCode != widget.busStopCode)) {
         // retrieve the selected services and add it to the favourites list
-        var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
         FavouritesService().addFavourite(
           Favourite(
             busStopCode: widget.busStopCode,
