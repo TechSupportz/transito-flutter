@@ -71,10 +71,12 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     Future<void> updateFavorites() async {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
       debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
+
+      List<String?> selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
+
       // check if user wants to edit or remove favourites
-      if (ParentChildCheckbox.selectedChildrens['Bus Services'].length != 0) {
+      if (selectedServices.isNotEmpty) {
         // if services were selected then update the favourites list
-        var selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
         FavouritesService().updateFavourite(
           Favourite(
               busStopCode: widget.busStopCode,
@@ -84,32 +86,55 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               services: selectedServices),
           userId!,
         );
-        _showSnackBar('Updated favourites');
+        _showSnackBar('Updated favourites for ${widget.busStopName}');
         // debugPrint("$favouriteServicesList");
       } else {
+        // retrieve the list of services that the user initially had in their favourites
         List<String?> initialServices = await favouriteServicesList.then((value) {
           return value['Bus Services']!;
         });
 
         // if no services were selected then remove the bus stop from favourites list
-        FavouritesService().removeFavourite(
-            Favourite(
-                busStopCode: widget.busStopCode,
-                busStopName: widget.busStopName,
-                busStopAddress: widget.busStopAddress,
-                busStopLocation: widget.busStopLocation,
-                services: initialServices),
-            userId!);
-        _showSnackBar('Removed favourites');
+        showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+                  title: const Text("Delete Favourite"),
+                  content: const Text(
+                      "Are you sure you want to remove this bus stop from your favourites?"),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("No"),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // delete favourite
+                        FavouritesService().removeFavourite(
+                            Favourite(
+                                busStopCode: widget.busStopCode,
+                                busStopName: widget.busStopName,
+                                busStopAddress: widget.busStopAddress,
+                                busStopLocation: widget.busStopLocation,
+                                services: initialServices),
+                            userId!);
+                        _showSnackBar('Removed ${widget.busStopName} from favourites');
+                        // navigate to main screen
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MainScreen(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                      child: const Text("Yes"),
+                    ),
+                  ],
+                ));
       }
       // navigate back to main screen
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainScreen(),
-        ),
-        (Route<dynamic> route) => false,
-      );
     }
 
     return Scaffold(

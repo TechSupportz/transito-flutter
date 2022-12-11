@@ -78,7 +78,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
           userId!,
         );
         // display snackbar to notify user that favourite has been added
-        _showSnackBar('Added to favourites');
+        _showSnackBar('Added ${widget.busStopName} to favourites');
         debugPrint('${favourites.favouritesList}');
         // navigate back to main screen
         Navigator.pushAndRemoveUntil(
