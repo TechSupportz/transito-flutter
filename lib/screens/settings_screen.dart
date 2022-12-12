@@ -437,6 +437,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: false, text: "Column layout")
                             ],
                           ),
+                          const SizedBox(height: 18),
+                          SettingsRadioCard(
+                              title: "Nearby Detail",
+                              initialValue: snapshot.data!.showNearbyDistance ?? true,
+                              firebaseFieldName: 'showNearbyDistance',
+                              options: [
+                                SettingsCardOption(value: true, text: "Distance to bus stops"),
+                                SettingsCardOption(value: false, text: "Road name of bus stops")
+                              ]),
                         ],
                       );
                     } else if (snapshot.hasError) {
@@ -507,7 +516,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         applicationName: "Transito",
-                        applicationVersion: "1.1.1",
+                        applicationVersion: "1.2.0",
                         applicationLegalese: "© 2022 Transito",
                         children: const [
                           SizedBox(height: 18),

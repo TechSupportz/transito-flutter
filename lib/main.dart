@@ -34,6 +34,7 @@ void main() async {
     _defaultHome = const MainScreen();
   }
 
+  // load all svg assets
   Future.wait([
     precachePicture(
       ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/logo.svg'),
@@ -164,14 +165,15 @@ class _MyAppState extends State<MyApp> {
                 unselectedLabelColor: AppColors.kindaGrey,
               ),
               snackBarTheme: SnackBarThemeData(
-                backgroundColor: AppColors.cardBg,
+                backgroundColor: const Color(0xFF262626),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
                 contentTextStyle: const TextStyle(
                   fontFamily: 'Poppins',
-                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.kindaGrey,
                 ),
                 actionTextColor: AppColors.accentColour,
               ),
