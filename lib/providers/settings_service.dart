@@ -13,12 +13,18 @@ class SettingsService {
         if (snapshot.exists) {
           UserSettings userSettings = UserSettings.fromFirestore(snapshot);
           AppColors.accentColour = Color(int.parse(userSettings.accentColour));
+
+          if (userSettings.showNearbyDistance == null) {
+            updateShowNearbyDistance(newValue: true, userId: userId);
+          }
+
           return userSettings;
         } else {
           return UserSettings(
             accentColour: '0xFF7E6BFF',
             isETAminutes: true,
             isNearbyGrid: true,
+            showNearbyDistance: true,
           );
         }
       });
@@ -28,6 +34,7 @@ class SettingsService {
           accentColour: '0xFF7E6BFF',
           isETAminutes: true,
           isNearbyGrid: true,
+          showNearbyDistance: true,
         ),
       );
     }
@@ -76,6 +83,22 @@ class SettingsService {
           )
           .catchError(
             (error) => debugPrint('❌ Error updating isNearbyGrid in Firestore: $error'),
+          );
+    }
+  }
+
+  Future<void> updateShowNearbyDistance({String? userId, required bool newValue}) async {
+    if (userId != null) {
+      _settingsCollection
+          .doc(userId)
+          .update({
+            'showNearbyDistance': newValue,
+          })
+          .then(
+            (_) => debugPrint('✔️ Updated showNearbyDistance to $newValue'),
+          )
+          .catchError(
+            (error) => debugPrint('❌ Error updating showNearbyDistance in Firestore: $error'),
           );
     }
   }

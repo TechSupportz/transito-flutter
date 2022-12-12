@@ -10,6 +10,7 @@ UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
       accentColour: json['accentColour'] as String,
       isETAminutes: json['isETAminutes'] as bool,
       isNearbyGrid: json['isNearbyGrid'] as bool,
+      showNearbyDistance: json['showNearbyDistance'] as bool?,
     );
 
 Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
@@ -17,4 +18,5 @@ Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
       'accentColour': instance.accentColour,
       'isETAminutes': instance.isETAminutes,
       'isNearbyGrid': instance.isNearbyGrid,
+      'showNearbyDistance': instance.showNearbyDistance,
     };

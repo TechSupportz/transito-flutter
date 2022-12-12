@@ -8,11 +8,13 @@ class UserSettings {
   final String accentColour;
   final bool isETAminutes;
   final bool isNearbyGrid;
+  final bool? showNearbyDistance;
 
   UserSettings({
     required this.accentColour,
     required this.isETAminutes,
     required this.isNearbyGrid,
+    required this.showNearbyDistance,
   });
 
   factory UserSettings.fromFirestore(DocumentSnapshot doc) =>

@@ -10,11 +10,16 @@ import '../screens/bus_timing_screen.dart';
 
 class BusStopCard extends StatelessWidget {
   const BusStopCard(
-      {Key? key, required this.busStopInfo, this.distanceFromUser, this.searchMode = false})
+      {Key? key,
+      required this.busStopInfo,
+      this.distanceFromUser,
+      this.searchMode = false,
+      this.showDistanceFromUser = false})
       : super(key: key);
 
   final BusStopInfo busStopInfo;
   final double? distanceFromUser;
+  final bool showDistanceFromUser;
   final bool searchMode;
 
   // function that navigates user to bus timing screen
@@ -123,7 +128,9 @@ class BusStopCard extends StatelessWidget {
                       child: Text(
                         searchMode
                             ? busStopInfo.busStopName
-                            : '${transformDistanceFromUser(distanceFromUser!)} away',
+                            : showDistanceFromUser
+                                ? '${transformDistanceFromUser(distanceFromUser!)} away'
+                                : busStopInfo.roadName,
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         softWrap: false,

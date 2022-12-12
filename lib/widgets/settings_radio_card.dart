@@ -48,6 +48,11 @@ class SettingsRadioCard extends StatelessWidget {
             newValue: newValue,
           );
           break;
+        case 'showNearbyDistance':
+          SettingsService().updateShowNearbyDistance(
+            userId: user?.uid,
+            newValue: newValue,
+          );
       }
     }
 

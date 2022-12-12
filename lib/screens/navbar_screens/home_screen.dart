@@ -262,6 +262,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                 BusStopCard(
                                   busStopInfo: busStop.busStopInfo,
                                   distanceFromUser: busStop.distanceFromUser,
+                                  showDistanceFromUser: userSettings.showNearbyDistance ?? true,
                                 ),
                             ],
                           );
