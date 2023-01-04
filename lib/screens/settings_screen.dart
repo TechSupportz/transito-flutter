@@ -516,7 +516,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         applicationName: "Transito",
-                        applicationVersion: "1.2.0",
+                        applicationVersion: "1.2.2",
                         applicationLegalese: "© 2022 Transito",
                         children: const [
                           SizedBox(height: 18),
