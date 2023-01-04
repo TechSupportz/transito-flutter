@@ -88,6 +88,14 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         );
         _showSnackBar('Updated favourites for ${widget.busStopName}');
         // debugPrint("$favouriteServicesList");
+        // navigate to main screen
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MainScreen(),
+          ),
+          (Route<dynamic> route) => false,
+        );
       } else {
         // retrieve the list of services that the user initially had in their favourites
         List<String?> initialServices = await favouriteServicesList.then((value) {

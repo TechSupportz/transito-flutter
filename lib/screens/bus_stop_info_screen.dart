@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:http/http.dart' as http;
+import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -74,6 +75,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
       },
     );
     // debugPrint('$busServicesList');
+    // debugPrint('${busServicesList.isEmpty}');
     return busServicesList;
   }
 
@@ -186,25 +188,36 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           ),
                           FutureBuilder(
                               future: futureBusServices,
-                              builder: (context, AsyncSnapshot<List<String>> snapshot) {
+                              builder:
+                                  (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
                                 if (snapshot.hasData) {
-                                  return Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children: snapshot.data!
-                                        .map(
-                                          (serviceNum) => BusServiceBox(
-                                            busServiceNumber: serviceNum,
+                                  return snapshot.data!.isEmpty
+                                      ? Text(
+                                          Jiffy().hour > 5
+                                              ? 'All the buses are lepaking 🦥'
+                                              : "Buses are sleeping 💤",
+                                          style: const TextStyle(
+                                            fontSize: 18,
                                           ),
                                         )
-                                        .toList(),
-                                  );
+                                      : Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children: snapshot.data!
+                                              .map(
+                                                (serviceNum) => BusServiceBox(
+                                                  busServiceNumber: serviceNum,
+                                                ),
+                                              )
+                                              .toList(),
+                                        );
                                 } else if (snapshot.hasError) {
                                   // return Text("${snapshot.error}");
                                   debugPrint("<=== ERROR ${snapshot.error} ===>");
                                   return const ErrorText();
+                                } else {
+                                  return const Center(child: CircularProgressIndicator());
                                 }
-                                return const Center(child: CircularProgressIndicator());
                               }),
                         ],
                       ),
