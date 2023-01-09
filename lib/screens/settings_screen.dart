@@ -159,7 +159,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Navigator.of(context).pop();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (context) => MainScreen(),
+                        builder: (context) => const MainScreen(),
                       ),
                       (Route<dynamic> route) => false,
                     );
