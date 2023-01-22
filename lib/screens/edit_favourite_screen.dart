@@ -194,7 +194,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                 ),
                 const SizedBox(
-                  height: 16,
+                  height: 8,
                 ),
               ],
             ),
@@ -203,24 +203,41 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               builder: (context, AsyncSnapshot<Map<String?, List<String?>>> snapshot) {
                 if (snapshot.hasData) {
                   return Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          ParentChildCheckbox(
-                            parent: const Text("Bus Services", style: checkBoxFontStyle),
-                            children: [
-                              for (var service in widget.busServicesList)
-                                Text(service, style: checkBoxFontStyle),
-                            ],
-                            // initialParentValue: {'Bus Services': true},
-                            initialChildrenValue: snapshot.data,
-                            parentCheckboxColor: AppColors.accentColour,
-                            childrenCheckboxColor: AppColors.accentColour,
-                            parentCheckboxScale: 1.35,
-                            childrenCheckboxScale: 1.35,
-                            gap: 2,
-                          ),
-                        ],
+                    child: ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return const LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Color(0xFF0c0c0c),
+                            Colors.transparent,
+                            Colors.transparent,
+                            Color(0xFF0c0c0c)
+                          ],
+                          stops: [0.0, 0.05, 0.95, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstOut,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.only(top: 8, bottom: 16),
+                        child: Column(
+                          children: [
+                            ParentChildCheckbox(
+                              parent: const Text("Bus Services", style: checkBoxFontStyle),
+                              children: [
+                                for (var service in widget.busServicesList)
+                                  Text(service, style: checkBoxFontStyle),
+                              ],
+                              // initialParentValue: {'Bus Services': true},
+                              initialChildrenValue: snapshot.data,
+                              parentCheckboxColor: AppColors.accentColour,
+                              childrenCheckboxColor: AppColors.accentColour,
+                              parentCheckboxScale: 1.35,
+                              childrenCheckboxScale: 1.35,
+                              gap: 2,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

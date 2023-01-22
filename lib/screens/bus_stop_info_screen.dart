@@ -317,7 +317,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                   TileLayer(
                                     urlTemplate:
                                         "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
-                                    userAgentPackageName: 'tnitish.com.transito',
+                                    userAgentPackageName: 'com.tnitish.transito',
                                     errorImage: const AssetImage('assets/images/mapError.png'),
                                   ),
                                   MarkerLayer(
