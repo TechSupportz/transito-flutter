@@ -252,14 +252,14 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                       ~InteractiveFlag.pinchMove &
                                       ~InteractiveFlag.rotate,
                                 ),
-                                layers: [
-                                  TileLayerOptions(
+                                children: [
+                                  TileLayer(
                                     urlTemplate:
                                         "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
                                     userAgentPackageName: 'tnitish.com.transito',
                                     errorImage: const AssetImage('assets/images/mapError.png'),
                                   ),
-                                  MarkerLayerOptions(
+                                  MarkerLayer(
                                     markers: [
                                       Marker(
                                         point: widget.busStopLocation,
@@ -305,7 +305,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                       onPressed: () => openMaps(widget.busStopLocation),
                       child: const Text("Take me there!"),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 8,
                     ),
                     ElevatedButton(

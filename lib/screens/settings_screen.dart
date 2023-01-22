@@ -133,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Navigator.of(context).pop();
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => MainScreen(),
+                            builder: (context) => const MainScreen(),
                           ),
                           (Route<dynamic> route) => false,
                         );
@@ -306,7 +306,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onPressed: () => showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
-                                  title: Text('Delete account'),
+                                  title: const Text('Delete account'),
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: const [
@@ -327,7 +327,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   actions: [
                                     TextButton(
                                       onPressed: () => Navigator.of(context).pop(),
-                                      child: Text('No'),
+                                      child: const Text('No'),
                                     ),
                                     TextButton(
                                       onPressed: () {
@@ -341,7 +341,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               ),
                                             );
                                       },
-                                      child: Text('Yes'),
+                                      child: const Text('Yes'),
                                     ),
                                   ],
                                 )),

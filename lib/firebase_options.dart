@@ -63,7 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '341566460699',
     projectId: 'transito-8f50c',
     storageBucket: 'transito-8f50c.appspot.com',
-    androidClientId: '341566460699-a3glvvmvtfr62g0ndehnmsvjehbkb66o.apps.googleusercontent.com',
+    androidClientId: '341566460699-3bm3fv80co5oum2anvndhs0nogi4mrjq.apps.googleusercontent.com',
     iosClientId: '341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com',
     iosBundleId: 'com.tnitish.transito',
   );

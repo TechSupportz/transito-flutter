@@ -354,8 +354,8 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
 
     StreamProvider<List<Favourite>>.value(
       value: FavouritesService().streamFavourites(userId),
-      initialData: [],
-      child: MainScreen(),
+      initialData: const [],
+      child: const MainScreen(),
     );
 
     return Column(
