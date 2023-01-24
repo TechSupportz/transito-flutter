@@ -13,7 +13,6 @@ import 'package:transito/models/nearby_bus_stops.dart';
 import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/providers/settings_service.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
-import 'package:transito/screens/navbar_screens/main_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
 import 'package:transito/screens/settings_screen.dart';
 import 'package:transito/widgets/error_text.dart';
@@ -30,11 +29,11 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-List<NearbyBusStops> _nearbyBusStopsCache = [];
 const distance = Distance();
 
 class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin<HomeScreen> {
   late Future<List<NearbyBusStops>> nearbyBusStops;
+  late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
   bool isFabVisible = true;
 
@@ -76,37 +75,60 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     return AllBusStops.fromJson(jsonDecode(response)).busStops;
   }
 
-  Future<List<NearbyBusStops>> getNearbyBusStops({bool refresh = false}) async {
-    // if the list of nearby bus stops is already populated and the user has not requested a refresh, return the list of nearby bus stops
-    if (_nearbyBusStopsCache.isNotEmpty && !refresh) {
-      debugPrint("Nearby bus stops already fetched");
-      return _nearbyBusStopsCache;
-    } else {
-      debugPrint("Fetching nearby bus stops");
-      List<NearbyBusStops> _nearbyBusStops = [];
-      Position userLocation = await getUserLocation();
-      List<BusStopInfo> allBusStops = await fetchBusStops();
+  Future<List<NearbyBusStops>> getNearbyBusStops() async {
+    debugPrint("Fetching nearby bus stops");
+    List<NearbyBusStops> _nearbyBusStops = [];
+    Position userLocation = await getUserLocation();
+    List<BusStopInfo> allBusStops = await fetchBusStops();
 
-      // searches through the list of bus stops and returns those within 500m to the user's current location sorted by nearest to farthest
-      for (var busStop in allBusStops) {
-        LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
-        double distanceAway = distance.as(LengthUnit.Meter,
-            LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
-        if (distanceAway <= 500) {
-          _nearbyBusStops.add(NearbyBusStops(busStopInfo: busStop, distanceFromUser: distanceAway));
-        }
+    // searches through the list of bus stops and returns those within 500m to the user's current location sorted by nearest to farthest
+    for (var busStop in allBusStops) {
+      LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
+      double distanceAway = distance.as(
+          LengthUnit.Meter, LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
+      if (distanceAway <= 500) {
+        _nearbyBusStops.add(NearbyBusStops(busStopInfo: busStop, distanceFromUser: distanceAway));
       }
-      List<NearbyBusStops> _tempNearbyBusStops = _nearbyBusStops;
-      _tempNearbyBusStops.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
-      _nearbyBusStopsCache = _tempNearbyBusStops;
-      return _tempNearbyBusStops;
     }
+    List<NearbyBusStops> _tempNearbyBusStops = _nearbyBusStops;
+    _tempNearbyBusStops.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
+    return _tempNearbyBusStops;
   }
 
-  // function to force refresh the list of nearby bus stops
-  void refreshBusStops() {
+  // function to get the user's nearby favourites
+  Future<List<NearbyFavourites>> getNearbyFavourites({
+    bool refresh = false,
+  }) async {
+    debugPrint("Fetching nearby favourites");
+    List<NearbyFavourites> _nearbyFavourites = [];
+    List<Favourite> favouritesList =
+        await FavouritesService().getFavourites(context.read<User>().uid);
+    Position userLocation = await getUserLocation();
+
+    // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
+    for (var favourite in favouritesList) {
+      double distanceAway = distance.as(LengthUnit.Meter,
+          LatLng(userLocation.latitude, userLocation.longitude), favourite.busStopLocation);
+      if (distanceAway <= 750) {
+        _nearbyFavourites
+            .add(NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway));
+      }
+    }
+    List<NearbyFavourites> _tempNearbyFavourites = _nearbyFavourites;
+    _tempNearbyFavourites.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
+    // _nearbyFavouritesCache = _tempNearbyFavourites;
+    return _tempNearbyFavourites;
+    // }
+  }
+
+  // function to get the list of all nearby bus stops
+  void getAllNearby() async {
+    print("Getting all nearby");
+    // Position userLocation = await getUserLocation();
+
     setState(() {
-      nearbyBusStops = getNearbyBusStops(refresh: true);
+      nearbyBusStops = getNearbyBusStops();
+      nearbyFavourites = getNearbyFavourites();
     });
   }
 
@@ -119,6 +141,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     debugPrint("Initializing bus stops");
     _isLocationPermissionGranted = checkLocationPermissions();
     nearbyBusStops = getNearbyBusStops();
+    nearbyFavourites = getNearbyFavourites();
   }
 
   @override
@@ -165,7 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        NearbyFavouritesGrid(userLocation: getUserLocation()),
+                        nearbyFavouritesList(),
                         nearbyBusStopsGrid(),
                       ],
                     );
@@ -205,10 +228,12 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                   }
                 } else if (snapshot.hasError) {
                   return Text("${snapshot.error}");
-                } else {
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(strokeWidth: 3),
                   );
+                } else {
+                  return const SizedBox(height: 0);
                 }
               }),
         ),
@@ -218,7 +243,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
           ? FloatingActionButton(
               heroTag: "homeFAB",
               onPressed: () {
-                refreshBusStops();
+                getAllNearby();
                 HapticFeedback.selectionClick();
               },
               child: const Icon(Icons.my_location_rounded),
@@ -291,7 +316,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                         return const ErrorText();
                       } else {
                         return const Center(
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(strokeWidth: 3),
                         );
                       }
                     });
@@ -301,63 +326,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                 return const ErrorText();
               } else {
                 return const Center(
-                  child: CircularProgressIndicator(),
+                  child: CircularProgressIndicator(strokeWidth: 3),
                 );
               }
             })
       ],
     );
   }
-}
 
-class NearbyFavouritesGrid extends StatefulWidget {
-  const NearbyFavouritesGrid({Key? key, required this.userLocation}) : super(key: key);
-  final Future<Position> userLocation;
-
-  @override
-  State<NearbyFavouritesGrid> createState() => _NearbyFavouritesGridState();
-}
-
-class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
-  // List<NearbyFavourites> _nearbyFavouritesCache = [];
-
-  // function to get the user's nearby favourites
-  Future<List<NearbyFavourites>> getNearbyFavourites(
-      {bool refresh = false, required List<Favourite> favouritesList}) async {
-    // if (_nearbyFavouritesCache.isNotEmpty && !refresh) {
-    //   debugPrint("Nearby Favourites already fetched");
-    //   return _nearbyFavouritesCache;
-    // } else {
-    debugPrint("Fetching nearby favourites");
-    List<NearbyFavourites> _nearbyFavourites = [];
-    Position userLocation = await widget.userLocation;
-
-    // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
-    for (var favourite in favouritesList) {
-      double distanceAway = distance.as(LengthUnit.Meter,
-          LatLng(userLocation.latitude, userLocation.longitude), favourite.busStopLocation);
-      if (distanceAway <= 750) {
-        _nearbyFavourites
-            .add(NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway));
-      }
-    }
-    List<NearbyFavourites> _tempNearbyFavourites = _nearbyFavourites;
-    _tempNearbyFavourites.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
-    // _nearbyFavouritesCache = _tempNearbyFavourites;
-    return _tempNearbyFavourites;
-    // }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    String? userId = context.watch<User?>()?.uid;
-
-    StreamProvider<List<Favourite>>.value(
-      value: FavouritesService().streamFavourites(userId),
-      initialData: [],
-      child: MainScreen(),
-    );
-
+  Column nearbyFavouritesList() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -368,96 +345,60 @@ class _NearbyFavouritesGridState extends State<NearbyFavouritesGrid> {
         const SizedBox(
           height: 12,
         ),
-        StreamBuilder<List<Favourite>>(
-          stream: FavouritesService().streamFavourites(userId),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              List<Favourite> favouritesList = snapshot.data!;
-
-              return favouritesList.isNotEmpty
-                  ? FutureBuilder(
-                      future: getNearbyFavourites(favouritesList: favouritesList),
-                      builder:
-                          (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-                        // display a loading indicator while the list of nearby favourites is being fetched
-                        if (snapshot.hasData) {
-                          // checks if user has any favourites within 750m of their current location and displays them if they do
-                          if (snapshot.data!.isNotEmpty) {
-                            return ListView.separated(
-                              itemBuilder: (context, int index) {
-                                return FavouritesTimingCard(
-                                  busStopCode: snapshot.data![index].busStopInfo.busStopCode,
-                                  busStopName: snapshot.data![index].busStopInfo.busStopName,
-                                  busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
-                                  busStopLocation:
-                                      snapshot.data![index].busStopInfo.busStopLocation,
-                                  services: snapshot.data![index].busStopInfo.services,
-                                );
-                              },
-                              separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                                height: 18,
-                              ),
-                              padding: const EdgeInsets.only(bottom: 18.0),
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: snapshot.data!.length,
-                            );
-                          } else {
-                            // if user has no favourites within 750m of their current location, display a message to tell them
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 18.0),
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: AppColors.cardBg,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: const Center(
-                                  child: Text("No favourites nearby",
-                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                                ),
-                              ),
-                            );
-                          }
-                        } else if (snapshot.hasError) {
-                          // return Text("${snapshot.error}");
-                          debugPrint("<=== ERROR ${snapshot.error} ===>");
-                          return const ErrorText();
-                        } else {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                      },
-                    )
-                  // if user has no favourites, display a message to tell them
-                  : Padding(
-                      padding: const EdgeInsets.only(bottom: 18.0),
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.cardBg,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Center(
-                          child: Text("You have no favourites",
-                              style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                        ),
-                      ),
+        FutureBuilder(
+          future: nearbyFavourites,
+          builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
+            // display a loading indicator while the list of nearby favourites is being fetched
+            if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+              // checks if user has any favourites within 750m of their current location and displays them if they do
+              if (snapshot.data!.isNotEmpty) {
+                return ListView.separated(
+                  itemBuilder: (context, int index) {
+                    return FavouritesTimingCard(
+                      busStopCode: snapshot.data![index].busStopInfo.busStopCode,
+                      busStopName: snapshot.data![index].busStopInfo.busStopName,
+                      busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
+                      busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
+                      services: snapshot.data![index].busStopInfo.services,
                     );
+                  },
+                  separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                    height: 18,
+                  ),
+                  padding: const EdgeInsets.only(bottom: 18.0),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: snapshot.data!.length,
+                );
+              } else {
+                // if user has no favourites within 750m of their current location, display a message to tell them
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 18.0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBg,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Center(
+                      child: Text("No favourites nearby",
+                          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                    ),
+                  ),
+                );
+              }
             } else if (snapshot.hasError) {
               // return Text("${snapshot.error}");
               debugPrint("<=== ERROR ${snapshot.error} ===>");
               return const ErrorText();
             } else {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(strokeWidth: 3),
               );
             }
           },
-        ),
+        )
       ],
     );
   }

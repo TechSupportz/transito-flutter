@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
@@ -85,6 +86,17 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     );
   }
 
+  // function to hide the fab when the user is scrolling down the list to avoid blocking content
+  bool hideFabOnScroll(UserScrollNotification notification) {
+    if (notification.direction == ScrollDirection.forward) {
+      !isFabVisible ? setState(() => isFabVisible = true) : null;
+    } else if (notification.direction == ScrollDirection.reverse) {
+      isFabVisible ? setState(() => isFabVisible = false) : null;
+    }
+
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -125,50 +137,57 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
               builder: (context, AsyncSnapshot<List<Favourite>> snapshot) {
                 if (snapshot.hasData) {
                   List<Favourite> _favouritesList = snapshot.data!;
-                  return ReorderableListView.builder(
-                      itemBuilder: (context, index) {
-                        return Padding(
-                          key: Key(_favouritesList[index].busStopCode),
-                          padding: const EdgeInsets.only(bottom: 18),
-                          child: FavouriteNameCard(
-                              busStopName: _favouritesList[index].busStopName,
-                              onTap: () =>
-                                  goToEditFavouritesScreen(context, _favouritesList[index])),
-                        );
-                      },
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      shrinkWrap: true,
-                      buildDefaultDragHandles: true,
-                      itemCount: _favouritesList.length,
-                      // calls reorder function in FavouritesProvider to reorder the favourites list
-                      onReorder: (oldIndex, newIndex) {
-                        if (oldIndex < newIndex) {
-                          // removing the item at oldIndex will shorten the list by 1
-                          newIndex--;
-                        }
-                        _favouritesList.insert(newIndex, _favouritesList.removeAt(oldIndex));
+                  return Expanded(
+                    child: NotificationListener<UserScrollNotification>(
+                      onNotification: (notification) => hideFabOnScroll(notification),
+                      child: ReorderableListView.builder(
+                          itemBuilder: (context, index) {
+                            return Padding(
+                              key: Key(_favouritesList[index].busStopCode),
+                              padding: const EdgeInsets.only(bottom: 18),
+                              child: FavouriteNameCard(
+                                  busStopName: _favouritesList[index].busStopName,
+                                  onTap: () =>
+                                      goToEditFavouritesScreen(context, _favouritesList[index])),
+                            );
+                          },
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          shrinkWrap: true,
+                          buildDefaultDragHandles: true,
+                          itemCount: _favouritesList.length,
+                          // calls reorder function in FavouritesProvider to reorder the favourites list
+                          onReorder: (oldIndex, newIndex) {
+                            if (oldIndex < newIndex) {
+                              // removing the item at oldIndex will shorten the list by 1
+                              newIndex--;
+                            }
+                            _favouritesList.insert(newIndex, _favouritesList.removeAt(oldIndex));
 
-                        setState(() {
-                          reorderedFavouritesList = _favouritesList;
-                        });
-                      });
+                            setState(() {
+                              reorderedFavouritesList = _favouritesList;
+                            });
+                          }),
+                    ),
+                  );
                 } else if (snapshot.hasError) {
                   return Text("${snapshot.error}");
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(strokeWidth: 3));
                 }
               },
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "manageFavFAB",
-        child: const Icon(Icons.done_rounded),
-        onPressed: () => FavouritesService()
-            .reorderFavourites(reorderedFavouritesList, context.read<User?>()!.uid)
-            .then((value) => Navigator.pop(context)),
-      ),
+      floatingActionButton: isFabVisible
+          ? FloatingActionButton(
+              heroTag: "manageFavFAB",
+              child: const Icon(Icons.done_rounded),
+              onPressed: () => FavouritesService()
+                  .reorderFavourites(reorderedFavouritesList, context.read<User?>()!.uid)
+                  .then((value) => Navigator.pop(context)),
+            )
+          : null,
     );
   }
 }

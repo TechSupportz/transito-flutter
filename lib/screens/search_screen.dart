@@ -193,7 +193,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             debugPrint("<=== ERROR ${snapshot.error} ===>");
             return const ErrorText();
           } else {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator(strokeWidth: 3));
           }
         });
   }
@@ -214,7 +214,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
           );
         } else {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(strokeWidth: 3));
         }
       },
     );

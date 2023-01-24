@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -58,7 +59,10 @@ class _LoginScreenState extends State<LoginScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (BuildContext context) => const Center(child: CircularProgressIndicator()),
+        builder: (BuildContext context) => const Center(
+            child: CircularProgressIndicator(
+          strokeWidth: 3,
+        )),
       );
     } else {
       Navigator.of(context).pop();
@@ -184,9 +188,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var user = context.watch<User?>();
-    bool isLoggedIn = user != null;
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(title: const Text('Welcome!')),

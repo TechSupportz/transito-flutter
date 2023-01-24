@@ -261,7 +261,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     return const ErrorText();
                   } else {
                     return const Center(
-                      child: CircularProgressIndicator(),
+                      child: CircularProgressIndicator(strokeWidth: 3),
                     );
                   }
                 },
@@ -272,7 +272,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
               return const ErrorText();
             } else {
               return const Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(strokeWidth: 3),
               );
             }
           }),

@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletons/skeletons.dart';
 import 'package:transito/widgets/bus_timing_row.dart';
 
 import '../models/app_colors.dart';
@@ -50,7 +51,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
 
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
-    debugPrint("Fetching arrival timings");
+    debugPrint("Fetching favourite arrival timings");
     // gets response from api
     final response = await http.get(
         Uri.parse(
@@ -59,7 +60,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
 
     // if response is successful, parse the response and return it as a BusArrivalInfo object
     if (response.statusCode == 200) {
-      debugPrint("Timing fetched");
+      debugPrint("Favourites Timing fetched");
       return BusArrivalInfo.fromJson(jsonDecode(response.body));
     } else {
       debugPrint("Error fetching arrival timings");
@@ -99,72 +100,57 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             UserSettings userSettings = snapshot.data as UserSettings;
-            return FutureBuilder(
-                future: futureBusArrivalInfo,
-                builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
-                  if (snapshot.hasData) {
-                    return Tooltip(
-                      preferBelow: false,
-                      decoration: const BoxDecoration(
-                        color: AppColors.cardBg,
-                      ),
-                      textStyle: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      showDuration: const Duration(milliseconds: 350),
-                      message: widget.busStopName,
-                      child: GestureDetector(
-                        onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => BusTimingScreen(
-                              busStopCode: widget.busStopCode,
-                              busStopName: widget.busStopName,
-                              busStopAddress: widget.busStopAddress,
-                              busStopLocation: widget.busStopLocation,
-                            ),
-                          ),
+            return Tooltip(
+              preferBelow: false,
+              decoration: const BoxDecoration(
+                color: AppColors.cardBg,
+              ),
+              textStyle: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+              ),
+              showDuration: const Duration(milliseconds: 350),
+              message: widget.busStopName,
+              child: GestureDetector(
+                onTap: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BusTimingScreen(
+                      busStopCode: widget.busStopCode,
+                      busStopName: widget.busStopName,
+                      busStopAddress: widget.busStopAddress,
+                      busStopLocation: widget.busStopLocation,
+                    ),
+                  ),
+                ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.cardBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
+                        child: Text(
+                          widget.busStopName,
+                          overflow: TextOverflow.fade,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.kindaGrey),
                         ),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.cardBg,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
-                                child: Text(
-                                  widget.busStopName,
-                                  overflow: TextOverflow.fade,
-                                  maxLines: 1,
-                                  softWrap: false,
-                                  style: const TextStyle(
-                                      fontSize: 28,
-                                      fontWeight: FontWeight.w600,
-                                      color: AppColors.kindaGrey),
-                                ),
-                              ),
-                              snapshot.data!.isEmpty
-                                  ? Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Text(
-                                          Jiffy().hour > 5
-                                              ? '🦥 Your favourites are lepaking 🦥'
-                                              : "💤 Buses are sleeping 💤",
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
-                                      ),
-                                    )
-                                  : ListView.separated(
+                      ),
+                      FutureBuilder(
+                          future: futureBusArrivalInfo,
+                          builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
+                            if (snapshot.hasData) {
+                              return snapshot.data!.isNotEmpty
+                                  ? ListView.separated(
                                       itemBuilder: (context, int index) {
                                         return Transform.scale(
                                           scale: 0.9,
@@ -182,29 +168,61 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                       physics: const NeverScrollableScrollPhysics(),
                                       padding: const EdgeInsets.only(bottom: 18),
                                       shrinkWrap: true,
-                                      itemCount: snapshot.data!.length),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    // return Text("${snapshot.error}");
-                    debugPrint("<=== ERROR ${snapshot.error} ===>");
-                    return Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardBg,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const ErrorText(),
-                    );
-                  } else {
-                    return const SizedBox(
-                      height: 0,
-                    );
-                  }
-                });
+                                      itemCount: snapshot.data!.length)
+                                  : Center(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(16.0),
+                                        child: Text(
+                                          Jiffy().hour > 5
+                                              ? '🦥 Your favourites are lepaking 🦥'
+                                              : "💤 Buses are sleeping 💤",
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ),
+                                    );
+                            } else if (snapshot.hasError) {
+                              // return Text("${snapshot.error}");
+                              debugPrint("<=== ERROR ${snapshot.error} ===>");
+                              return Container(
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: AppColors.cardBg,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const ErrorText(),
+                              );
+                            } else if (snapshot.connectionState == ConnectionState.waiting) {
+                              return ListView.separated(
+                                  itemBuilder: (context, index) => const SkeletonItem(
+                                        child: SkeletonLine(
+                                          style: SkeletonLineStyle(
+                                              height: 55,
+                                              borderRadius: BorderRadius.all(Radius.circular(10)),
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 12, vertical: 1.5)),
+                                        ),
+                                      ),
+                                  separatorBuilder: (BuildContext context, int index) =>
+                                      const SizedBox(
+                                        height: 12,
+                                      ),
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  padding: const EdgeInsets.only(bottom: 18),
+                                  shrinkWrap: true,
+                                  itemCount: widget.services.length);
+                            } else {
+                              return const SizedBox(height: 10);
+                            }
+                          }),
+                    ],
+                  ),
+                ),
+              ),
+            );
           } else if (snapshot.hasError) {
             // return Text("${snapshot.error}");
             debugPrint("<=== ERROR ${snapshot.error} ===>");
@@ -217,8 +235,10 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
               child: const ErrorText(),
             );
           } else {
-            return const SizedBox(
-              height: 0,
+            return const Center(
+              child: CircularProgressIndicator(
+                strokeWidth: 3,
+              ),
             );
           }
         });

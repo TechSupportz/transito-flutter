@@ -3,9 +3,9 @@
 import 'package:flutter/material.dart';
 
 class AppColors with ChangeNotifier {
-  Color primaryColor = Color(0xFF7E6BFF);
+  Color primaryColor = const Color(0xFF7E6BFF);
 
-  static Color accentColour = Color(0xFF7E6BFF);
+  static Color accentColour = const Color(0xFF7E6BFF);
 
   static const Color veryPurple = Color(0xFF7E6BFF);
   static const Color kindaGrey = Color(0xFFD8DBE2);

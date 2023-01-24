@@ -127,7 +127,7 @@ class BusStopCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         searchMode
-                            ? busStopInfo.busStopName
+                            ? busStopInfo.roadName
                             : showDistanceFromUser
                                 ? '${transformDistanceFromUser(distanceFromUser!)} away'
                                 : busStopInfo.roadName,

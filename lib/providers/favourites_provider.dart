@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/favourite.dart';
 
 class FavouritesProvider extends ChangeNotifier {
-  List<Favourite> _favouritesList = [];
+  final List<Favourite> _favouritesList = [];
 
   List<Favourite> get favouritesList => _favouritesList;
 
