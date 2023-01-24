@@ -37,6 +37,7 @@ dependencies:
   flutter_map: ^3.1.0
   form_builder_extra_fields: ^8.3.0
   flutter_native_splash: ^2.1.2+1
+  skeletons: ^0.0.3
 
 dev_dependencies:
   flutter_test:

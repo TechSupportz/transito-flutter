@@ -165,15 +165,15 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                     children: [
                       ParentChildCheckbox(
                         parent: const Text("Bus Services", style: checkBoxFontStyle),
-                        children: [
-                          for (var service in widget.busServicesList)
-                            Text(service, style: checkBoxFontStyle),
-                        ],
                         parentCheckboxColor: AppColors.accentColour,
                         childrenCheckboxColor: AppColors.accentColour,
                         parentCheckboxScale: 1.35,
                         childrenCheckboxScale: 1.35,
                         gap: 2,
+                        children: [
+                          for (var service in widget.busServicesList)
+                            Text(service, style: checkBoxFontStyle),
+                        ],
                       ),
                     ],
                   ),
