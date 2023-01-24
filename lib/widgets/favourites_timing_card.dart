@@ -202,7 +202,8 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                           style: SkeletonLineStyle(
                                               height: 55,
                                               borderRadius: BorderRadius.all(Radius.circular(10)),
-                                              padding: EdgeInsets.symmetric(horizontal: 12)),
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 12, vertical: 1.5)),
                                         ),
                                       ),
                                   separatorBuilder: (BuildContext context, int index) =>
