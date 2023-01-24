@@ -243,7 +243,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   );
                 } else {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(strokeWidth: 3),
                   );
                 }
               },

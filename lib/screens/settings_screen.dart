@@ -459,7 +459,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             child: ErrorText(),
                           ));
                     } else {
-                      return const Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
                     }
                   },
                 )

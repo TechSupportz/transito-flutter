@@ -117,7 +117,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
               children: [
                 SvgPicture.asset(
                   'assets/images/location.svg',
-                  placeholderBuilder: (context) => const CircularProgressIndicator(),
+                  placeholderBuilder: (context) => const CircularProgressIndicator(strokeWidth: 3),
                 ),
                 const SizedBox(
                   height: 10,

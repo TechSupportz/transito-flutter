@@ -32,7 +32,7 @@ class QuickStartScreen extends StatelessWidget {
               children: [
                 SvgPicture.asset(
                   "assets/images/diagram.svg",
-                  placeholderBuilder: (context) => const CircularProgressIndicator(),
+                  placeholderBuilder: (context) => const CircularProgressIndicator(strokeWidth: 3),
                 ),
                 const SizedBox(
                   height: 16,

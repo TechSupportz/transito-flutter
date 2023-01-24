@@ -172,7 +172,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                 } else if (snapshot.hasError) {
                   return Text("${snapshot.error}");
                 } else {
-                  return const Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator(strokeWidth: 3));
                 }
               },
             ),

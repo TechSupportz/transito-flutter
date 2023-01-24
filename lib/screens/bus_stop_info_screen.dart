@@ -277,7 +277,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                   debugPrint("<=== ERROR ${snapshot.error} ===>");
                                   return const ErrorText();
                                 } else {
-                                  return const Center(child: CircularProgressIndicator());
+                                  return const Center(
+                                      child: CircularProgressIndicator(strokeWidth: 3));
                                 }
                               }),
                         ],
