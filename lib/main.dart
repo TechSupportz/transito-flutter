@@ -20,18 +20,18 @@ import 'package:transito/screens/onboarding_screens/location_access_screen.dart'
 import 'firebase_options.dart';
 
 void main() async {
-  Widget _defaultHome = const LocationAccessScreen();
+  Widget defaultHome = const LocationAccessScreen();
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  bool _isFirstRun = await IsFirstRun.isFirstRun();
-  LocationPermission _permission = await Geolocator.checkPermission();
-  if (!_isFirstRun && _permission == LocationPermission.always ||
-      _permission == LocationPermission.whileInUse) {
-    _defaultHome = const MainScreen();
+  bool isFirstRun = await IsFirstRun.isFirstRun();
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (!isFirstRun && permission == LocationPermission.always ||
+      permission == LocationPermission.whileInUse) {
+    defaultHome = const MainScreen();
   }
 
   // load all svg assets
@@ -64,7 +64,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
       ],
-      child: MyApp(defaultHome: _defaultHome),
+      child: MyApp(defaultHome: defaultHome),
     ),
   );
   FlutterNativeSplash.remove();
@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,
               androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-              scaffoldBackgroundColor: const Color(0xFF0C0C0C),
+              scaffoldBackgroundColor: Color(0xFF0C0C0C),
               cardColor: const Color(0xFF0C0C0C),
               colorScheme: const ColorScheme.dark().copyWith(
                 surface: Colors.black,
@@ -200,8 +200,8 @@ class _MyAppState extends State<MyApp> {
             home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
             builder: (context, child) {
               return MediaQuery(
-                child: child!,
                 data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                child: child!,
               );
             },
           );

@@ -30,7 +30,7 @@ dependencies:
   firebase_auth: ^4.2.5
   flutter_form_builder: ^7.7.0
   form_builder_validators: ^8.1.1
-  android_intent_plus: ^3.1.1
+  android_intent_plus: ^3.1.5
   url_launcher: ^6.1.5
   google_sign_in: ^5.4.0
   cloud_firestore: ^4.3.1
