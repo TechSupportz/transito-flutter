@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -9,7 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
-import 'package:transito/screens/auth/register-screen.dart';
+import 'package:transito/screens/auth/register_screen.dart';
 
 import '../../providers/authentication_service.dart';
 import '../../widgets/email_verification_dialog.dart';

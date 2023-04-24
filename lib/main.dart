@@ -16,7 +16,7 @@ import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/search_provider.dart';
 import 'package:transito/providers/settings_service.dart';
-import 'package:transito/screens/auth/login-screen.dart';
+import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navbar_screens/main_screen.dart';
 import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
 

@@ -9,7 +9,7 @@ import '../../models/app_colors.dart';
 import '../../providers/authentication_service.dart';
 import '../../widgets/email_verification_dialog.dart';
 import '../onboarding_screens/location_access_screen.dart';
-import 'login-screen.dart';
+import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({Key? key}) : super(key: key);

@@ -16,7 +16,7 @@ import 'package:transito/widgets/settings_radio_card.dart';
 import '../models/app_colors.dart';
 import '../providers/settings_service.dart';
 import '../widgets/error_text.dart';
-import 'auth/login-screen.dart';
+import 'auth/login_screen.dart';
 import 'navbar_screens/main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
