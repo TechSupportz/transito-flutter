@@ -27,32 +27,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool isPasswordVisible = true;
   bool _isLoading = false;
 
-  void showGuestLoginDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => guestLoginDialog(context),
-    );
-  }
-
-  void onGuestLoginBtnPress() {
-    AuthenticationService().signInAnonymously().then((err) {
-      if (err == null) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => _defaultHome,
-          ),
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong... Please try again'),
-          ),
-        );
-      }
-    });
-  }
-
   void onRegisterBtnPress() {
     setState(() {
       _isLoading = true;
@@ -139,15 +113,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            OutlinedButton.icon(
-                              onPressed: () => showGuestLoginDialog(),
-                              icon: const Icon(
-                                Icons.perm_identity_rounded,
-                                color: AppColors.kindaGrey,
-                              ),
-                              label: const Text('Continue as a Guest',
-                                  style: TextStyle(color: Colors.white)),
-                            ),
                             Padding(
                               padding: const EdgeInsets.symmetric(vertical: 8.0),
                               child: Row(
@@ -263,24 +228,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
-  }
-
-  AlertDialog guestLoginDialog(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Continue as a Guest'),
-      content: const Text(
-          'Using a guest account will prevent your favourites and setting from being synced. Are you sure you want to continue?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
-        TextButton(
-          onPressed: () => onGuestLoginBtnPress(),
-          child: const Text('Continue'),
-        ),
-      ],
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -68,6 +69,33 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void onGuestLoginBtnPress() {
+    AuthenticationService().signInAnonymously().then((err) {
+      if (err == null) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => _defaultHome,
+          ),
+          (Route<dynamic> route) => false,
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Something went wrong... Please try again'),
+          ),
+        );
+      }
+    });
+  }
+
+  void showGuestLoginDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => guestLoginDialog(context),
+    );
+  }
+
+  // TODO: Move this function
   void onLoginBtnPress() async {
     setState(() {
       _isLoading = true;
@@ -104,17 +132,22 @@ class _LoginScreenState extends State<LoginScreen> {
             });
             switch (err) {
               case 'user-not-found':
-                _emailFieldKey.currentState!.invalidate("No user found with this email");
+                _emailFieldKey.currentState!
+                    .invalidate("No user found with this email");
                 break;
               case 'wrong-password':
-                _passwordFieldKey.currentState!.invalidate("Incorrect password");
+                _passwordFieldKey.currentState!
+                    .invalidate("Incorrect password");
                 break;
               case 'user-disabled':
-                _emailFieldKey.currentState!.invalidate("This account has been disabled");
+                _emailFieldKey.currentState!
+                    .invalidate("This account has been disabled");
                 break;
               default:
-                _emailFieldKey.currentState!.invalidate("Oops, something went wrong on our end");
-                _passwordFieldKey.currentState!.invalidate("Oops, something went wrong on our end");
+                _emailFieldKey.currentState!
+                    .invalidate("Oops, something went wrong on our end");
+                _passwordFieldKey.currentState!
+                    .invalidate("Oops, something went wrong on our end");
                 break;
             }
           }
@@ -130,6 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  // TODO: Move this function
   void showForgetPasswordDialog() {
     showDialog(
       context: context,
@@ -137,12 +171,14 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // TODO: Move this function
   void onSendPasswordResetBtnPress() async {
     _forgotPasswordEmailFieldKey.currentState!.save();
     _forgotPasswordEmailFieldKey.currentState!.validate();
     if (_forgotPasswordEmailFieldKey.currentState!.isValid) {
       await AuthenticationService()
-          .sendPasswordResetEmail(_forgotPasswordEmailFieldKey.currentState!.value)
+          .sendPasswordResetEmail(
+              _forgotPasswordEmailFieldKey.currentState!.value)
           .then(
         (err) {
           if (err == null) {
@@ -189,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(title: const Text('Welcome!')),
+      // appBar: AppBar(title: const Text('Welcome!')),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: ScrollConfiguration(
@@ -200,6 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 hasScrollBody: false,
                 child: Column(
                   children: [
+                    const Spacer(),
                     Column(
                       children: [
                         Padding(
@@ -210,148 +247,204 @@ class _LoginScreenState extends State<LoginScreen> {
                         const Text(
                           'Simply login and never miss a bus again!',
                           textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
+                          style: TextStyle(
+                              fontSize: 18, color: AppColors.kindaGrey),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    Expanded(
-                      flex: 55,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            OutlinedButton.icon(
-                              onPressed: () => onGoogleBtnPress(),
-                              icon: SvgPicture.asset('assets/images/google_logo.svg'),
-                              label: const Text('Sign in with Google',
-                                  style: TextStyle(color: Colors.white)),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8.0),
-                              child: Row(
-                                children: const [
-                                  Expanded(child: Divider(thickness: 1)),
-                                  Padding(
-                                    padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                    child: Text(
-                                      'or',
-                                      style: TextStyle(color: AppColors.kindaGrey),
-                                    ),
-                                  ),
-                                  Expanded(child: Divider(thickness: 1)),
-                                ],
-                              ),
-                            ),
-                            FormBuilder(
-                              key: _loginFormKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  FormBuilderTextField(
-                                    key: _emailFieldKey,
-                                    name: 'email',
-                                    scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                                    keyboardType: TextInputType.emailAddress,
-                                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                                    validator: FormBuilderValidators.compose([
-                                      FormBuilderValidators.required(),
-                                      FormBuilderValidators.email(),
-                                    ]),
-                                    decoration: const InputDecoration(
-                                      labelText: 'Email',
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  FormBuilderTextField(
-                                    key: _passwordFieldKey,
-                                    name: 'password',
-                                    scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                                    obscureText: !_isPasswordVisible,
-                                    keyboardType: TextInputType.visiblePassword,
-                                    autovalidateMode: AutovalidateMode.onUserInteraction,
-                                    validator: FormBuilderValidators.compose(
-                                        [FormBuilderValidators.required()]),
-                                    decoration: InputDecoration(
-                                      labelText: 'Password',
-                                      suffixIcon: IconButton(
-                                        icon: Icon(_isPasswordVisible
-                                            ? Icons.visibility_off_rounded
-                                            : Icons.visibility_rounded),
-                                        iconSize: 24,
-                                        splashRadius: 1,
-                                        color: Colors.white70,
-                                        onPressed: () {
-                                          setState(() {
-                                            _isPasswordVisible = !_isPasswordVisible;
-                                          });
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 21.0),
-                                    child: OutlinedButton(
-                                      onPressed: () => onLoginBtnPress(),
-                                      child: AnimatedSwitcher(
-                                        transitionBuilder: (child, animation) => ScaleTransition(
-                                          scale: animation,
-                                          child: child,
-                                        ),
-                                        duration: const Duration(milliseconds: 175),
-                                        child: _isLoading
-                                            ? const SizedBox(
-                                                height: 18,
-                                                width: 18,
-                                                child: Center(
-                                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                                ),
-                                              )
-                                            : const Text('Login'),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 6),
-                                  GestureDetector(
-                                    onTap: () => showForgetPasswordDialog(),
-                                    child: Text(
-                                      'Forgot password?',
-                                      style: TextStyle(fontSize: 14, color: AppColors.accentColour),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
                     const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 16.0),
-                      child: GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterScreen(),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                OutlinedButton.icon(
+                                  onPressed: () => onGoogleBtnPress(),
+                                  icon: SvgPicture.asset(
+                                      'assets/images/google_logo.svg'),
+                                  label: const Text(
+                                    'Continue with Google',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding:
+                                        MaterialStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                OutlinedButton.icon(
+                                  onPressed: () => onGoogleBtnPress(),
+                                  icon: const Icon(Icons.mail_outline_rounded,
+                                      color: AppColors.kindaGrey),
+                                  label: const Text(
+                                    'Continue with Email',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding:
+                                        MaterialStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                OutlinedButton.icon(
+                                  onPressed: () => showGuestLoginDialog(),
+                                  icon: const Icon(
+                                    Icons.perm_identity_rounded,
+                                    color: AppColors.kindaGrey,
+                                  ),
+                                  label: const Text(
+                                    'Continue as a Guest',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding:
+                                        MaterialStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                                ),
+                                // Padding(
+                                //   padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                //   child: Row(
+                                //     children: const [
+                                //       Expanded(child: Divider(thickness: 1)),
+                                //       Padding(
+                                //         padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                //         child: Text(
+                                //           'or',
+                                //           style: TextStyle(color: AppColors.kindaGrey),
+                                //         ),
+                                //       ),
+                                //       Expanded(child: Divider(thickness: 1)),
+                                //     ],
+                                //   ),
+                                // ),
+                                // FormBuilder(
+                                //   key: _loginFormKey,
+                                //   child: Column(
+                                //     crossAxisAlignment: CrossAxisAlignment.stretch,
+                                //     children: [
+                                //       FormBuilderTextField(
+                                //         key: _emailFieldKey,
+                                //         name: 'email',
+                                //         scrollPadding: const EdgeInsets.symmetric(vertical: 50),
+                                //         keyboardType: TextInputType.emailAddress,
+                                //         autovalidateMode: AutovalidateMode.onUserInteraction,
+                                //         validator: FormBuilderValidators.compose([
+                                //           FormBuilderValidators.required(),
+                                //           FormBuilderValidators.email(),
+                                //         ]),
+                                //         decoration: const InputDecoration(
+                                //           labelText: 'Email',
+                                //         ),
+                                //       ),
+                                //       const SizedBox(height: 12),
+                                //       FormBuilderTextField(
+                                //         key: _passwordFieldKey,
+                                //         name: 'password',
+                                //         scrollPadding: const EdgeInsets.symmetric(vertical: 50),
+                                //         obscureText: !_isPasswordVisible,
+                                //         keyboardType: TextInputType.visiblePassword,
+                                //         autovalidateMode: AutovalidateMode.onUserInteraction,
+                                //         validator: FormBuilderValidators.compose(
+                                //             [FormBuilderValidators.required()]),
+                                //         decoration: InputDecoration(
+                                //           labelText: 'Password',
+                                //           suffixIcon: IconButton(
+                                //             icon: Icon(_isPasswordVisible
+                                //                 ? Icons.visibility_off_rounded
+                                //                 : Icons.visibility_rounded),
+                                //             iconSize: 24,
+                                //             splashRadius: 1,
+                                //             color: Colors.white70,
+                                //             onPressed: () {
+                                //               setState(() {
+                                //                 _isPasswordVisible = !_isPasswordVisible;
+                                //               });
+                                //             },
+                                //           ),
+                                //         ),
+                                //       ),
+                                //       const SizedBox(height: 12),
+                                //       Padding(
+                                //         padding: const EdgeInsets.symmetric(horizontal: 21.0),
+                                //         child: OutlinedButton(
+                                //           onPressed: () => onLoginBtnPress(),
+                                //           child: AnimatedSwitcher(
+                                //             transitionBuilder: (child, animation) => ScaleTransition(
+                                //               scale: animation,
+                                //               child: child,
+                                //             ),
+                                //             duration: const Duration(milliseconds: 175),
+                                //             child: _isLoading
+                                //                 ? const SizedBox(
+                                //                     height: 18,
+                                //                     width: 18,
+                                //                     child: Center(
+                                //                       child: CircularProgressIndicator(strokeWidth: 2),
+                                //                     ),
+                                //                   )
+                                //                 : const Text('Login'),
+                                //           ),
+                                //         ),
+                                //       ),
+                                //       const SizedBox(height: 6),
+                                //       GestureDetector(
+                                //         onTap: () => showForgetPasswordDialog(),
+                                //         child: Text(
+                                //           'Forgot password?',
+                                //           style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                //           textAlign: TextAlign.center,
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
+                              ],
+                            ),
                           ),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'New Here?',
-                              style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
+                          Padding(
+                            padding: const EdgeInsets.only(top: 16),
+                            child: GestureDetector(
+                              onTap: () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const RegisterScreen(),
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                    'New Here?',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColors.kindaGrey),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    'Register!',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        color: AppColors.accentColour),
+                                  ),
+                                ],
+                              ),
                             ),
-                            const SizedBox(width: 3),
-                            Text(
-                              'Register!',
-                              style: TextStyle(fontSize: 14, color: AppColors.accentColour),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -402,6 +495,24 @@ class _LoginScreenState extends State<LoginScreen> {
         TextButton(
           child: const Text('Send'),
           onPressed: () => onSendPasswordResetBtnPress(),
+        ),
+      ],
+    );
+  }
+
+  AlertDialog guestLoginDialog(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Continue as a Guest'),
+      content: const Text(
+          'Using a guest account will prevent your favourites and setting from being synced. Are you sure you want to continue?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => onGuestLoginBtnPress(),
+          child: const Text('Continue'),
         ),
       ],
     );
