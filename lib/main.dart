@@ -1,5 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -32,6 +34,16 @@ void main() async {
   if (!isFirstRun && permission == LocationPermission.always ||
       permission == LocationPermission.whileInUse) {
     defaultHome = const MainScreen();
+  }
+
+  if (kDebugMode) {
+    try {
+      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+      debugPrint("Connected to the firebase emulators");
+    } on Exception catch (e) {
+      debugPrint('Failed to connect to the emulators: $e');
+    }
   }
 
   // load all svg assets
