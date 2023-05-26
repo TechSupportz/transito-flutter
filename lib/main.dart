@@ -12,6 +12,7 @@ import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/user_settings.dart';
+import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/search_provider.dart';
 import 'package:transito/providers/settings_service.dart';
@@ -73,6 +74,7 @@ void main() async {
           value: FirebaseAuth.instance.userChanges(),
           initialData: null,
         ),
+        ChangeNotifierProvider(create: (context) => CommonProvider()),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
       ],
@@ -96,6 +98,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
+    bool isTablet = context.read<CommonProvider>().isTablet;
     bool isLoggedIn =
         (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);
     return StreamBuilder<UserSettings>(
@@ -208,11 +211,18 @@ class _MyAppState extends State<MyApp> {
                 fillColor: AppColors.inputFieldBg,
                 filled: true,
               ),
+              iconTheme: isTablet
+                  ? const IconThemeData(
+                      size: 30,
+                    )
+                  : const IconThemeData(
+                      size: 24,
+                    ),
             ),
             home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
             builder: (context, child) {
               return MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                data: MediaQuery.of(context).copyWith(textScaleFactor: isTablet ? 1.25 : 1),
                 child: child!,
               );
             },

@@ -9,6 +9,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
+import 'package:transito/providers/common_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/arrival_info.dart';
@@ -165,6 +166,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool isTablet = context.read<CommonProvider>().isTablet;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Bus Stop Information'),
@@ -301,7 +304,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           ),
                           SizedBox(
                             width: double.infinity,
-                            height: 400,
+                            height: isTablet ? 800 : 400,
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(10),
                               child: FlutterMap(
