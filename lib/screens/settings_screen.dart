@@ -393,7 +393,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       if (val?.alpha != 255) {
                                         return "Please select a fully opaque colour";
                                       }
-                                      if ('0x${val.toString().substring(8, 16).toUpperCase()}' ==
+                                      if ('0x${val.toString().substring(10, 16).toUpperCase()}' ==
                                           snapshot.data!.accentColour) {
                                         return "This is already your accent colour";
                                       }
