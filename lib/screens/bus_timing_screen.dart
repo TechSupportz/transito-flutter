@@ -241,28 +241,19 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                 ),
                               ),
                             )
-                          : RefreshIndicator(
-                              onRefresh: () async {
-                                setState(() {
-                                  futureBusArrivalInfo = fetchArrivalTimings().then(
-                                    (value) => sortBusArrivalInfo(value),
-                                  );
-                                });
+                          : ListView.separated(
+                              itemBuilder: (context, int index) {
+                                return BusTimingRow(
+                                  serviceInfo: snapshot.data!.services[index],
+                                  userLatLng: widget.busStopLocation,
+                                  isETAminutes: userSettings.isETAminutes,
+                                );
                               },
-                              child: ListView.separated(
-                                  itemBuilder: (context, int index) {
-                                    return BusTimingRow(
-                                      serviceInfo: snapshot.data!.services[index],
-                                      userLatLng: widget.busStopLocation,
-                                      isETAminutes: userSettings.isETAminutes,
-                                    );
-                                  },
-                                  padding: const EdgeInsets.only(
-                                      top: 12, bottom: 32, left: 12, right: 12),
-                                  separatorBuilder: (BuildContext context, int index) =>
-                                      const Divider(),
-                                  itemCount: snapshot.data!.services.length),
-                            ),
+                              padding:
+                                  const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
+                              separatorBuilder: (BuildContext context, int index) =>
+                                  const Divider(),
+                              itemCount: snapshot.data!.services.length),
                     );
                   } else if (snapshot.hasError) {
                     // return Text("${snapshot.error}");

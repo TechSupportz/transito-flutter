@@ -1,7 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:transito/providers/common_provider.dart';
 import 'package:transito/screens/navbar_screens/favourites_screen.dart';
 import 'package:transito/screens/navbar_screens/home_screen.dart';
 import 'package:transito/screens/navbar_screens/recent_search_screen.dart';
@@ -29,8 +27,6 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isTablet = context.read<CommonProvider>().isTablet;
-
     return Scaffold(
       body: PageView(
         controller: controller,
@@ -47,7 +43,6 @@ class _MainScreenState extends State<MainScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
           BottomNavigationBarItem(icon: Icon(Icons.search_rounded), label: "Search"),
         ],
-        iconSize: isTablet ? 32 : 24,
         backgroundColor: Colors.black,
         unselectedItemColor: const Color(0xFFD8DBE2),
         showSelectedLabels: false,

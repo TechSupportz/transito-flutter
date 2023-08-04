@@ -10,7 +10,6 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/models/nearby_bus_stops.dart';
-import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/providers/settings_service.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
@@ -177,76 +176,66 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       // notification listener to call the hideFabOnScroll function when the user scrolls
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) => hideFabOnScroll(notification),
-        child: RefreshIndicator(
-          onRefresh: () async {
-            return Future.delayed(
-              const Duration(seconds: 0),
-              () {
-                getAllNearby();
-              },
-            );
-          },
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
-            child: FutureBuilder(
-                future: _isLocationPermissionGranted,
-                builder: (context, AsyncSnapshot<bool> snapshot) {
-                  // display a loading indicator while the user's location is being fetched
-                  if (snapshot.hasData) {
-                    // if the user has granted access to their location, display the list of nearby bus stops
-                    if (snapshot.data!) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          nearbyFavouritesList(),
-                          nearbyBusStopsGrid(),
-                        ],
-                      );
-                    } else {
-                      // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
-                      return Material(
-                        color: AppColors.cardBg,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                const Text(
-                                  "Please grant location permission to use this feature",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                TextButton(
-                                    onPressed: () => Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const LocationAccessScreen(),
-                                        ),
-                                        (route) => false),
-                                    child: const Text("Grant permission")),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  } else if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 3),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
+          child: FutureBuilder(
+              future: _isLocationPermissionGranted,
+              builder: (context, AsyncSnapshot<bool> snapshot) {
+                // display a loading indicator while the user's location is being fetched
+                if (snapshot.hasData) {
+                  // if the user has granted access to their location, display the list of nearby bus stops
+                  if (snapshot.data!) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        nearbyFavouritesList(),
+                        nearbyBusStopsGrid(),
+                      ],
                     );
                   } else {
-                    return const SizedBox(height: 0);
+                    // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
+                    return Material(
+                      color: AppColors.cardBg,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Please grant location permission to use this feature",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              TextButton(
+                                  onPressed: () => Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const LocationAccessScreen(),
+                                      ),
+                                      (route) => false),
+                                  child: const Text("Grant permission")),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   }
-                }),
-          ),
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(strokeWidth: 3),
+                  );
+                } else {
+                  return const SizedBox(height: 0);
+                }
+              }),
         ),
       ),
       // floating action button to refresh user's location and nearbyBusStops
@@ -264,8 +253,6 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   }
 
   Column nearbyBusStopsGrid() {
-    bool isTablet = context.read<CommonProvider>().isTablet;
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -288,9 +275,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                       if (snapshot.hasData && snapshot.data != null) {
                         if (snapshot.data!.isNotEmpty) {
                           return GridView.count(
-                            childAspectRatio: userSettings.isNearbyGrid
-                                ? 2.5 / (isTablet ? 0.6 : 1)
-                                : 5 / (isTablet ? 0.6 : 1),
+                            childAspectRatio: userSettings.isNearbyGrid ? 2.5 / 1 : 5 / 1,
                             crossAxisSpacing: 18,
                             mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
                             crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,

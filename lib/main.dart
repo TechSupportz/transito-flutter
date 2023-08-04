@@ -1,7 +1,5 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
@@ -12,7 +10,6 @@ import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/models/user_settings.dart';
-import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/search_provider.dart';
 import 'package:transito/providers/settings_service.dart';
@@ -23,28 +20,18 @@ import 'package:transito/screens/onboarding_screens/location_access_screen.dart'
 import 'firebase_options.dart';
 
 void main() async {
-  Widget defaultHome = const LocationAccessScreen();
+  Widget _defaultHome = const LocationAccessScreen();
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  bool isFirstRun = await IsFirstRun.isFirstRun();
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (!isFirstRun && permission == LocationPermission.always ||
-      permission == LocationPermission.whileInUse) {
-    defaultHome = const MainScreen();
-  }
-
-  if (kDebugMode) {
-    try {
-      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-      debugPrint("Connected to the firebase emulators");
-    } on Exception catch (e) {
-      debugPrint('Failed to connect to the emulators: $e');
-    }
+  bool _isFirstRun = await IsFirstRun.isFirstRun();
+  LocationPermission _permission = await Geolocator.checkPermission();
+  if (!_isFirstRun && _permission == LocationPermission.always ||
+      _permission == LocationPermission.whileInUse) {
+    _defaultHome = const MainScreen();
   }
 
   // load all svg assets
@@ -74,11 +61,10 @@ void main() async {
           value: FirebaseAuth.instance.userChanges(),
           initialData: null,
         ),
-        ChangeNotifierProvider(create: (context) => CommonProvider()),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
       ],
-      child: MyApp(defaultHome: defaultHome),
+      child: MyApp(defaultHome: _defaultHome),
     ),
   );
   FlutterNativeSplash.remove();
@@ -98,7 +84,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
-    bool isTablet = context.read<CommonProvider>().isTablet;
     bool isLoggedIn =
         (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);
     return StreamBuilder<UserSettings>(
@@ -116,7 +101,7 @@ class _MyAppState extends State<MyApp> {
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,
               androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-              scaffoldBackgroundColor: Color(0xFF0C0C0C),
+              scaffoldBackgroundColor: const Color(0xFF0C0C0C),
               cardColor: const Color(0xFF0C0C0C),
               colorScheme: const ColorScheme.dark().copyWith(
                 surface: Colors.black,
@@ -211,19 +196,12 @@ class _MyAppState extends State<MyApp> {
                 fillColor: AppColors.inputFieldBg,
                 filled: true,
               ),
-              iconTheme: isTablet
-                  ? const IconThemeData(
-                      size: 30,
-                    )
-                  : const IconThemeData(
-                      size: 24,
-                    ),
             ),
             home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
             builder: (context, child) {
               return MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: isTablet ? 1.25 : 1),
                 child: child!,
+                data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
               );
             },
           );
