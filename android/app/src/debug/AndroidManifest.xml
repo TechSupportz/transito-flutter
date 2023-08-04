@@ -3,5 +3,8 @@
     <!-- Flutter needs it to communicate with the running application
          to allow setting breakpoints, to provide hot reload, etc.
     -->
+    <application android:usesCleartextTraffic="true">
+        <!-- possibly other elements -->
+    </application>
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
