@@ -99,9 +99,9 @@
       "Category": "EXPRESS",
       "OriginCode": "77009",
       "DestinationCode": "10499",
-      "AM_Peak_Freq": "30-60",
-      "AM_Offpeak_Freq": "30-60",
-      "PM_Peak_Freq": "30-60",
+      "AM_Peak_Freq": "30-30",
+      "AM_Offpeak_Freq": "30-30",
+      "PM_Peak_Freq": "30-30",
       "PM_Offpeak_Freq": "-",
       "LoopDesc": ""
     },
@@ -113,7 +113,7 @@
       "OriginCode": "10499",
       "DestinationCode": "77009",
       "AM_Peak_Freq": "-",
-      "AM_Offpeak_Freq": "30-60",
+      "AM_Offpeak_Freq": "30-30",
       "PM_Peak_Freq": "30-30",
       "PM_Offpeak_Freq": "30-30",
       "LoopDesc": ""
@@ -528,10 +528,10 @@
       "Category": "TRUNK",
       "OriginCode": "75009",
       "DestinationCode": "77331",
-      "AM_Peak_Freq": "00-00",
-      "AM_Offpeak_Freq": "12-75",
-      "PM_Peak_Freq": "8-37",
-      "PM_Offpeak_Freq": "12-124",
+      "AM_Peak_Freq": "-",
+      "AM_Offpeak_Freq": "68-68",
+      "PM_Peak_Freq": "-",
+      "PM_Offpeak_Freq": "12-12",
       "LoopDesc": ""
     },
     {
@@ -951,6 +951,19 @@
       "LoopDesc": "Seletar Aerospace Avenue"
     },
     {
+      "ServiceNo": "102A",
+      "Operator": "SBST",
+      "Direction": 1,
+      "Category": "TRUNK",
+      "OriginCode": "67409",
+      "DestinationCode": "67991",
+      "AM_Peak_Freq": "-",
+      "AM_Offpeak_Freq": "-",
+      "PM_Peak_Freq": "-",
+      "PM_Offpeak_Freq": "-",
+      "LoopDesc": ""
+    },
+    {
       "ServiceNo": "103",
       "Operator": "SBST",
       "Direction": 1,
@@ -1061,7 +1074,7 @@
       "Category": "TRUNK",
       "OriginCode": "66009",
       "DestinationCode": "99009",
-      "AM_Peak_Freq": "09-13",
+      "AM_Peak_Freq": "10-14",
       "AM_Offpeak_Freq": "10-15",
       "PM_Peak_Freq": "14-18",
       "PM_Offpeak_Freq": "12-16",
@@ -1076,7 +1089,7 @@
       "DestinationCode": "66009",
       "AM_Peak_Freq": "11-14",
       "AM_Offpeak_Freq": "10-16",
-      "PM_Peak_Freq": "08-14",
+      "PM_Peak_Freq": "09-14",
       "PM_Offpeak_Freq": "13-18",
       "LoopDesc": ""
     },
@@ -1559,19 +1572,6 @@
       "AM_Offpeak_Freq": "11-15",
       "PM_Peak_Freq": "11-11",
       "PM_Offpeak_Freq": "14-15",
-      "LoopDesc": ""
-    },
-    {
-      "ServiceNo": "130A",
-      "Operator": "SBST",
-      "Direction": 1,
-      "Category": "TRUNK",
-      "OriginCode": "54009",
-      "DestinationCode": "53189",
-      "AM_Peak_Freq": "10-20",
-      "AM_Offpeak_Freq": "07-44",
-      "PM_Peak_Freq": "11-24",
-      "PM_Offpeak_Freq": "-",
       "LoopDesc": ""
     },
     {
@@ -2194,8 +2194,8 @@
       "DestinationCode": "17009",
       "AM_Peak_Freq": "10-15",
       "AM_Offpeak_Freq": "10-18",
-      "PM_Peak_Freq": "11-14",
-      "PM_Offpeak_Freq": "17-24",
+      "PM_Peak_Freq": "11-16",
+      "PM_Offpeak_Freq": "14-22",
       "LoopDesc": ""
     },
     {
@@ -2206,9 +2206,9 @@
       "OriginCode": "17009",
       "DestinationCode": "67009",
       "AM_Peak_Freq": "12-14",
-      "AM_Offpeak_Freq": "11-18",
-      "PM_Peak_Freq": "10-18",
-      "PM_Offpeak_Freq": "16-23",
+      "AM_Offpeak_Freq": "10-18",
+      "PM_Peak_Freq": "12-18",
+      "PM_Offpeak_Freq": "15-23",
       "LoopDesc": ""
     },
     {
@@ -2702,7 +2702,7 @@
       "AM_Peak_Freq": "10-15",
       "AM_Offpeak_Freq": "10-19",
       "PM_Peak_Freq": "15-20",
-      "PM_Offpeak_Freq": "17-24",
+      "PM_Offpeak_Freq": "19-24",
       "LoopDesc": ""
     },
     {
@@ -2714,7 +2714,7 @@
       "DestinationCode": "17009",
       "AM_Peak_Freq": "11-12",
       "AM_Offpeak_Freq": "12-19",
-      "PM_Peak_Freq": "11-20",
+      "PM_Peak_Freq": "11-19",
       "PM_Offpeak_Freq": "19-24",
       "LoopDesc": ""
     },
@@ -2751,10 +2751,10 @@
       "Category": "TRUNK",
       "OriginCode": "74009",
       "DestinationCode": "84299",
-      "AM_Peak_Freq": "14-15",
-      "AM_Offpeak_Freq": "13-16",
+      "AM_Peak_Freq": "11-15",
+      "AM_Offpeak_Freq": "14-16",
       "PM_Peak_Freq": "14-17",
-      "PM_Offpeak_Freq": "15-25",
+      "PM_Offpeak_Freq": "17-24",
       "LoopDesc": ""
     },
     {
@@ -2764,10 +2764,10 @@
       "Category": "TRUNK",
       "OriginCode": "84299",
       "DestinationCode": "74009",
-      "AM_Peak_Freq": "13-14",
-      "AM_Offpeak_Freq": "14-15",
-      "PM_Peak_Freq": "11-15",
-      "PM_Offpeak_Freq": "14-23",
+      "AM_Peak_Freq": "14-14",
+      "AM_Offpeak_Freq": "14-16",
+      "PM_Peak_Freq": "13-15",
+      "PM_Offpeak_Freq": "15-23",
       "LoopDesc": ""
     },
     {
@@ -2858,7 +2858,7 @@
       "AM_Peak_Freq": "15-17",
       "AM_Offpeak_Freq": "11-18",
       "PM_Peak_Freq": "11-14",
-      "PM_Offpeak_Freq": "12-24",
+      "PM_Offpeak_Freq": "11-22",
       "LoopDesc": ""
     },
     {
@@ -2870,7 +2870,7 @@
       "DestinationCode": "03239",
       "AM_Peak_Freq": "09-14",
       "AM_Offpeak_Freq": "12-18",
-      "PM_Peak_Freq": "14-19",
+      "PM_Peak_Freq": "13-18",
       "PM_Offpeak_Freq": "17-25",
       "LoopDesc": ""
     },
@@ -2882,9 +2882,9 @@
       "OriginCode": "75009",
       "DestinationCode": "75009",
       "AM_Peak_Freq": "06-07",
-      "AM_Offpeak_Freq": "06-16",
+      "AM_Offpeak_Freq": "07-16",
       "PM_Peak_Freq": "06-09",
-      "PM_Offpeak_Freq": "08-14",
+      "PM_Offpeak_Freq": "09-14",
       "LoopDesc": "Airport Cargo Rd"
     },
     {
@@ -2972,10 +2972,10 @@
       "Category": "TRUNK",
       "OriginCode": "02099",
       "DestinationCode": "02099",
-      "AM_Peak_Freq": "12-14",
-      "AM_Offpeak_Freq": "10-14",
-      "PM_Peak_Freq": "12-14",
-      "PM_Offpeak_Freq": "12-14",
+      "AM_Peak_Freq": "09-13",
+      "AM_Offpeak_Freq": "08-18",
+      "PM_Peak_Freq": "08-15",
+      "PM_Offpeak_Freq": "07-15",
       "LoopDesc": "C'wealth Ave"
     },
     {
@@ -3183,7 +3183,7 @@
       "AM_Peak_Freq": "09-11",
       "AM_Offpeak_Freq": "08-13",
       "PM_Peak_Freq": "10-13",
-      "PM_Offpeak_Freq": "11-15",
+      "PM_Offpeak_Freq": "10-14",
       "LoopDesc": "Pandan Gdns"
     },
     {
@@ -4171,7 +4171,7 @@
       "AM_Peak_Freq": "06-08",
       "AM_Offpeak_Freq": "06-13",
       "PM_Peak_Freq": "06-08",
-      "PM_Offpeak_Freq": "08-14",
+      "PM_Offpeak_Freq": "08-20",
       "LoopDesc": "Hougang St 91"
     },
     {
@@ -4623,7 +4623,7 @@
       "Category": "TRUNK",
       "OriginCode": "10009",
       "DestinationCode": "77009",
-      "AM_Peak_Freq": "10-10",
+      "AM_Peak_Freq": "10-11",
       "AM_Offpeak_Freq": "10-17",
       "PM_Peak_Freq": "08-17",
       "PM_Offpeak_Freq": "13-17",
@@ -5013,9 +5013,9 @@
       "Category": "TRUNK",
       "OriginCode": "53009",
       "DestinationCode": "99009",
-      "AM_Peak_Freq": "10-15",
-      "AM_Offpeak_Freq": "10-17",
-      "PM_Peak_Freq": "13-17",
+      "AM_Peak_Freq": "09-12",
+      "AM_Offpeak_Freq": "11-17",
+      "PM_Peak_Freq": "13-15",
       "PM_Offpeak_Freq": "15-17",
       "LoopDesc": ""
     },
@@ -5026,10 +5026,10 @@
       "Category": "TRUNK",
       "OriginCode": "99009",
       "DestinationCode": "53009",
-      "AM_Peak_Freq": "12-13",
-      "AM_Offpeak_Freq": "09-16",
-      "PM_Peak_Freq": "09-18",
-      "PM_Offpeak_Freq": "16-18",
+      "AM_Peak_Freq": "08-13",
+      "AM_Offpeak_Freq": "10-17",
+      "PM_Peak_Freq": "08-19",
+      "PM_Offpeak_Freq": "15-18",
       "LoopDesc": ""
     },
     {
@@ -5117,8 +5117,8 @@
       "Category": "TRUNK",
       "OriginCode": "80289",
       "DestinationCode": "80289",
-      "AM_Peak_Freq": "10-12",
-      "AM_Offpeak_Freq": "12-15",
+      "AM_Peak_Freq": "12-13",
+      "AM_Offpeak_Freq": "10-17",
       "PM_Peak_Freq": "14-16",
       "PM_Offpeak_Freq": "14-15",
       "LoopDesc": "Mei Ling St"
@@ -5937,8 +5937,8 @@
       "OriginCode": "59009",
       "DestinationCode": "05019",
       "AM_Peak_Freq": "30-30",
-      "AM_Offpeak_Freq": "30-60",
-      "PM_Peak_Freq": "60-60",
+      "AM_Offpeak_Freq": "30-30",
+      "PM_Peak_Freq": "-",
       "PM_Offpeak_Freq": "-",
       "LoopDesc": ""
     },
@@ -6119,9 +6119,9 @@
       "OriginCode": "64009",
       "DestinationCode": "64009",
       "AM_Peak_Freq": "06-10",
-      "AM_Offpeak_Freq": "05-15",
-      "PM_Peak_Freq": "06-16",
-      "PM_Offpeak_Freq": "16-19",
+      "AM_Offpeak_Freq": "04-14",
+      "PM_Peak_Freq": "08-16",
+      "PM_Offpeak_Freq": "17-19",
       "LoopDesc": "Airport Cargo Rd"
     },
     {
@@ -6131,7 +6131,7 @@
       "Category": "TRUNK",
       "OriginCode": "65199",
       "DestinationCode": "95039",
-      "AM_Peak_Freq": "07-07",
+      "AM_Peak_Freq": "08-08",
       "AM_Offpeak_Freq": "-",
       "PM_Peak_Freq": "-",
       "PM_Offpeak_Freq": "-",
@@ -6172,8 +6172,8 @@
       "DestinationCode": "84009",
       "AM_Peak_Freq": "05-09",
       "AM_Offpeak_Freq": "05-12",
-      "PM_Peak_Freq": "06-11",
-      "PM_Offpeak_Freq": "14-20",
+      "PM_Peak_Freq": "07-16",
+      "PM_Offpeak_Freq": "15-18",
       "LoopDesc": "Airport Cargo Rd"
     },
     {
@@ -6482,10 +6482,10 @@
       "Category": "TRUNK",
       "OriginCode": "46009",
       "DestinationCode": "22009",
-      "AM_Peak_Freq": "06-14",
-      "AM_Offpeak_Freq": "07-15",
-      "PM_Peak_Freq": "14-16",
-      "PM_Offpeak_Freq": "14-17",
+      "AM_Peak_Freq": "07-15",
+      "AM_Offpeak_Freq": "11-15",
+      "PM_Peak_Freq": "13-14",
+      "PM_Offpeak_Freq": "14-18",
       "LoopDesc": ""
     },
     {
@@ -6495,8 +6495,8 @@
       "Category": "TRUNK",
       "OriginCode": "22009",
       "DestinationCode": "46009",
-      "AM_Peak_Freq": "14-15",
-      "AM_Offpeak_Freq": "12-15",
+      "AM_Peak_Freq": "13-14",
+      "AM_Offpeak_Freq": "13-15",
       "PM_Peak_Freq": "14-15",
       "PM_Offpeak_Freq": "15-17",
       "LoopDesc": ""
@@ -6820,10 +6820,10 @@
       "Category": "TRUNK",
       "OriginCode": "44009",
       "DestinationCode": "75009",
-      "AM_Peak_Freq": "06-09",
-      "AM_Offpeak_Freq": "07-12",
-      "PM_Peak_Freq": "08-11",
-      "PM_Offpeak_Freq": "09-13",
+      "AM_Peak_Freq": "08-09",
+      "AM_Offpeak_Freq": "08-11",
+      "PM_Peak_Freq": "10-11",
+      "PM_Offpeak_Freq": "09-11",
       "LoopDesc": ""
     },
     {
@@ -6833,10 +6833,10 @@
       "Category": "TRUNK",
       "OriginCode": "75009",
       "DestinationCode": "44009",
-      "AM_Peak_Freq": "07-09",
-      "AM_Offpeak_Freq": "06-11",
-      "PM_Peak_Freq": "08-12",
-      "PM_Offpeak_Freq": "09-12",
+      "AM_Peak_Freq": "08-09",
+      "AM_Offpeak_Freq": "08-11",
+      "PM_Peak_Freq": "10-12",
+      "PM_Offpeak_Freq": "09-10",
       "LoopDesc": ""
     },
     {
@@ -6902,7 +6902,7 @@
       "AM_Offpeak_Freq": "04-07",
       "PM_Peak_Freq": "05-06",
       "PM_Offpeak_Freq": "-",
-      "LoopDesc": "Woodlands Dr 17"
+      "LoopDesc": "Champions Way"
     },
     {
       "ServiceNo": "901",
@@ -7404,11 +7404,11 @@
       "Direction": 1,
       "Category": "TRUNK",
       "OriginCode": "45009",
-      "DestinationCode": "03218",
-      "AM_Peak_Freq": "11-16",
-      "AM_Offpeak_Freq": "10-16",
-      "PM_Peak_Freq": "10-16",
-      "PM_Offpeak_Freq": "16-17",
+      "DestinationCode": "03239",
+      "AM_Peak_Freq": "11-15",
+      "AM_Offpeak_Freq": "10-17",
+      "PM_Peak_Freq": "10-18",
+      "PM_Offpeak_Freq": "15-18",
       "LoopDesc": ""
     },
     {
@@ -7418,10 +7418,10 @@
       "Category": "TRUNK",
       "OriginCode": "03239",
       "DestinationCode": "45009",
-      "AM_Peak_Freq": "13-14",
-      "AM_Offpeak_Freq": "10-15",
-      "PM_Peak_Freq": "10-11",
-      "PM_Offpeak_Freq": "11-16",
+      "AM_Peak_Freq": "15",
+      "AM_Offpeak_Freq": "08-16",
+      "PM_Peak_Freq": "11-13",
+      "PM_Offpeak_Freq": "12-16",
       "LoopDesc": ""
     },
     {
@@ -7575,9 +7575,9 @@
       "OriginCode": "45009",
       "DestinationCode": "45009",
       "AM_Peak_Freq": "04-06",
-      "AM_Offpeak_Freq": "05-08",
-      "PM_Peak_Freq": "05-06",
-      "PM_Offpeak_Freq": "06-09",
+      "AM_Offpeak_Freq": "06-11",
+      "PM_Peak_Freq": "05-07",
+      "PM_Offpeak_Freq": "06-13",
       "LoopDesc": "Choa Chu Kang Cres"
     },
     {
@@ -8081,7 +8081,7 @@
       "Category": "TRUNK",
       "OriginCode": "28009",
       "DestinationCode": "28009",
-      "AM_Peak_Freq": "09-14",
+      "AM_Peak_Freq": "07-14",
       "AM_Offpeak_Freq": "09-14",
       "PM_Peak_Freq": "09-10",
       "PM_Offpeak_Freq": "14-15",
@@ -8502,6 +8502,32 @@
       "PM_Peak_Freq": "06-08",
       "PM_Offpeak_Freq": "05-12",
       "LoopDesc": ""
+    },
+    {
+      "ServiceNo": "856A",
+      "Operator": "TTS",
+      "Direction": 1,
+      "Category": "TRUNK",
+      "OriginCode": "46009",
+      "DestinationCode": "46069",
+      "AM_Peak_Freq": "-",
+      "AM_Offpeak_Freq": "-",
+      "PM_Peak_Freq": "12-30",
+      "PM_Offpeak_Freq": "06-16",
+      "LoopDesc": "Woodlands Ctr Rd"
+    },
+    {
+      "ServiceNo": "856B",
+      "Operator": "TTS",
+      "Direction": 1,
+      "Category": "TRUNK",
+      "OriginCode": "47201",
+      "DestinationCode": "58159",
+      "AM_Peak_Freq": "13-28",
+      "AM_Offpeak_Freq": "10-10",
+      "PM_Peak_Freq": "-",
+      "PM_Offpeak_Freq": "-",
+      "LoopDesc": "Canberra Rd"
     },
     {
       "ServiceNo": "857",
