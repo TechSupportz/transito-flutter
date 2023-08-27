@@ -27,17 +27,18 @@ class _BusTimingRowState extends State<BusTimingRow> {
   final Distance distance = const Distance();
 
   // formats the arrival time into minutes or exact time depending on user's settings
-  String formatArrivalTime(arrivalTime) {
+  String formatArrivalTime(String? arrivalTime) {
     if (!widget.isETAminutes) {
-      if (arrivalTime != '') {
-        String formattedArrivalTime = Jiffy(arrivalTime).format("HH:mm");
+      if (arrivalTime != null && arrivalTime != '') {
+        String formattedArrivalTime = Jiffy.parse(arrivalTime.split("+")[0]).Hm;
         return formattedArrivalTime;
       } else {
         return '-';
       }
     } else {
-      if (arrivalTime != '') {
-        num minutesToArrival = Jiffy(arrivalTime).diff(Jiffy().format(), Units.MINUTE);
+      if (arrivalTime != null && arrivalTime != '') {
+        num minutesToArrival =
+            Jiffy.parse(arrivalTime.split("+")[0]).diff(Jiffy.now(), unit: Unit.minute, asFloat: false).ceil();
         if (minutesToArrival < -1) {
           return "left";
         } else if (minutesToArrival <= 1) {

@@ -257,7 +257,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                 if (snapshot.hasData) {
                                   return snapshot.data!.isEmpty
                                       ? Text(
-                                          Jiffy().hour > 5
+                                          Jiffy.now().hour > 5
                                               ? 'All the buses are lepaking 🦥'
                                               : "Buses are sleeping 💤",
                                           style: const TextStyle(

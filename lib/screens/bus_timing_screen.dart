@@ -230,7 +230,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Text(
-                                  Jiffy().hour > 5
+                                  Jiffy.now().hour > 5
                                       ? '🦥 All the buses are lepaking 🦥'
                                       : "💤 Buses are sleeping 💤",
                                   style: const TextStyle(

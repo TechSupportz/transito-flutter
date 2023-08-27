@@ -47,35 +47,25 @@ void main() async {
     }
   }
 
-  if (kDebugMode) {
-    try {
-      FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-      await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-      debugPrint("Connected to the firebase emulators");
-    } on Exception catch (e) {
-      debugPrint('Failed to connect to the emulators: $e');
-    }
-  }
-
   // load all svg assets
-  Future.wait([
-    precachePicture(
-      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/logo.svg'),
-      null,
-    ),
-    precachePicture(
-      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/google_logo.svg'),
-      null,
-    ),
-    precachePicture(
-      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/location.svg'),
-      null,
-    ),
-    precachePicture(
-      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/diagram.svg'),
-      null,
-    ),
-  ]);
+  // Future.wait([
+  //   precachePicture(
+  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/logo.svg'),
+  //     null,
+  //   ),
+  //   precachePicture(
+  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/google_logo.svg'),
+  //     null,
+  //   ),
+  //   precachePicture(
+  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/location.svg'),
+  //     null,
+  //   ),
+  //   precachePicture(
+  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/diagram.svg'),
+  //     null,
+  //   ),
+  // ]);
 
   runApp(
     MultiProvider(

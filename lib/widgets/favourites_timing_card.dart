@@ -173,7 +173,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                       child: Padding(
                                         padding: const EdgeInsets.all(16.0),
                                         child: Text(
-                                          Jiffy().hour > 5
+                                          Jiffy.now().hour > 5
                                               ? '🦥 Your favourites are lepaking 🦥'
                                               : "💤 Buses are sleeping 💤",
                                           style: const TextStyle(
