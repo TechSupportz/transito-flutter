@@ -214,9 +214,11 @@ class _MyAppState extends State<MyApp> {
               iconTheme: isTablet
                   ? const IconThemeData(
                       size: 30,
+                      color: AppColors.kindaGrey
                     )
                   : const IconThemeData(
                       size: 24,
+                      color: AppColors.kindaGrey,
                     ),
             ),
             home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
