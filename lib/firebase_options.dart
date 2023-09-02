@@ -59,12 +59,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDDxXYJ33YMI241T9axi37KOt-WbqRX0_k',
-    appId: '1:341566460699:ios:9f4d3c1f50a5354d6379be',
+    appId: '1:341566460699:ios:9ceb370c8d2cdb6e6379be',
     messagingSenderId: '341566460699',
     projectId: 'transito-8f50c',
     storageBucket: 'transito-8f50c.appspot.com',
     androidClientId: '341566460699-3bm3fv80co5oum2anvndhs0nogi4mrjq.apps.googleusercontent.com',
-    iosClientId: '341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com',
-    iosBundleId: 'com.tnitish.transitoFlutter',
+    iosClientId: '341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com',
+    iosBundleId: 'com.tnitish.transito',
   );
 }

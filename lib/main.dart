@@ -106,129 +106,127 @@ class _MyAppState extends State<MyApp> {
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
-          return SafeArea(
-            child: MaterialApp(
-              title: "Transito",
-              supportedLocales: const [Locale('en', 'US')],
-              localizationsDelegates: const [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                FormBuilderLocalizations.delegate,
-              ],
-              theme: ThemeData(
-                fontFamily: 'Poppins',
-                canvasColor: Colors.transparent,
-                androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-                scaffoldBackgroundColor: Color(0xFF0C0C0C),
-                cardColor: const Color(0xFF0C0C0C),
-                colorScheme: const ColorScheme.dark().copyWith(
-                  surface: Colors.black,
-                  primary: AppColors.accentColour,
-                  secondary: AppColors.accentColour,
-                  onPrimary: Colors.white,
-                  onSecondary: Colors.white,
-                ),
-                splashFactory: InkSplash.splashFactory,
-                tooltipTheme: TooltipThemeData(
-                  textStyle: const TextStyle(
-                    color: AppColors.kindaGrey,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.black54,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                checkboxTheme: CheckboxThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  visualDensity: VisualDensity.standard,
-                  side: const BorderSide(
-                    color: AppColors.kindaGrey,
-                    width: 1.75,
-                  ),
-                ),
-                elevatedButtonTheme: ElevatedButtonThemeData(
-                  style: ElevatedButton.styleFrom(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(7.5),
-                      ),
-                      minimumSize: const Size(15, 42)),
-                ),
-                outlinedButtonTheme: OutlinedButtonThemeData(
-                  style: OutlinedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7.5),
-                    ),
-                    side: BorderSide(color: AppColors.accentColour),
-                    minimumSize: const Size(15, 42),
-                  ),
-                ),
-                textButtonTheme: TextButtonThemeData(
-                  style: TextButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7.5),
-                    ),
-                  ),
-                ),
-                dialogTheme: DialogTheme(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  backgroundColor: AppColors.cardBg,
-                ),
-                tabBarTheme: TabBarTheme(
-                  labelColor: AppColors.accentColour,
-                  unselectedLabelColor: AppColors.kindaGrey,
-                ),
-                snackBarTheme: SnackBarThemeData(
-                  backgroundColor: const Color(0xFF262626),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  contentTextStyle: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.kindaGrey,
-                  ),
-                  actionTextColor: AppColors.accentColour,
-                ),
-                dividerColor: const Color(0xFF343434),
-                inputDecorationTheme: InputDecorationTheme(
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                        color: AppColors.kindaGrey,
-                        width: 2,
-                      )),
-                  enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: const BorderSide(
-                        width: 2,
-                        color: AppColors.cardBg,
-                      )),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  fillColor: AppColors.inputFieldBg,
-                  filled: true,
-                ),
-                iconTheme: isTablet
-                    ? const IconThemeData(size: 30, color: AppColors.kindaGrey)
-                    : const IconThemeData(
-                        size: 24,
-                        color: AppColors.kindaGrey,
-                      ),
+          return MaterialApp(
+            title: "Transito",
+            supportedLocales: const [Locale('en', 'US')],
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              FormBuilderLocalizations.delegate,
+            ],
+            theme: ThemeData(
+              fontFamily: 'Poppins',
+              canvasColor: Colors.transparent,
+              androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
+              scaffoldBackgroundColor: Color(0xFF0C0C0C),
+              cardColor: const Color(0xFF0C0C0C),
+              colorScheme: const ColorScheme.dark().copyWith(
+                surface: Colors.black,
+                primary: AppColors.accentColour,
+                secondary: AppColors.accentColour,
+                onPrimary: Colors.white,
+                onSecondary: Colors.white,
               ),
-              home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
-              builder: (context, child) {
-                return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(textScaleFactor: isTablet ? 1.25 : 1),
-                  child: child!,
-                );
-              },
+              splashFactory: InkSplash.splashFactory,
+              tooltipTheme: TooltipThemeData(
+                textStyle: const TextStyle(
+                  color: AppColors.kindaGrey,
+                  fontWeight: FontWeight.w500,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.black54,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              checkboxTheme: CheckboxThemeData(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                visualDensity: VisualDensity.standard,
+                side: const BorderSide(
+                  color: AppColors.kindaGrey,
+                  width: 1.75,
+                ),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(7.5),
+                    ),
+                    minimumSize: const Size(15, 42)),
+              ),
+              outlinedButtonTheme: OutlinedButtonThemeData(
+                style: OutlinedButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7.5),
+                  ),
+                  side: BorderSide(color: AppColors.accentColour),
+                  minimumSize: const Size(15, 42),
+                ),
+              ),
+              textButtonTheme: TextButtonThemeData(
+                style: TextButton.styleFrom(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(7.5),
+                  ),
+                ),
+              ),
+              dialogTheme: DialogTheme(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: AppColors.cardBg,
+              ),
+              tabBarTheme: TabBarTheme(
+                labelColor: AppColors.accentColour,
+                unselectedLabelColor: AppColors.kindaGrey,
+              ),
+              snackBarTheme: SnackBarThemeData(
+                backgroundColor: const Color(0xFF262626),
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentTextStyle: const TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.kindaGrey,
+                ),
+                actionTextColor: AppColors.accentColour,
+              ),
+              dividerColor: const Color(0xFF343434),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      color: AppColors.kindaGrey,
+                      width: 2,
+                    )),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(
+                      width: 2,
+                      color: AppColors.cardBg,
+                    )),
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                fillColor: AppColors.inputFieldBg,
+                filled: true,
+              ),
+              iconTheme: isTablet
+                  ? const IconThemeData(size: 30, color: AppColors.kindaGrey)
+                  : const IconThemeData(
+                      size: 24,
+                      color: AppColors.kindaGrey,
+                    ),
             ),
+            home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
+            builder: (context, child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(textScaleFactor: isTablet ? 1.25 : 1),
+                child: SafeArea(child: child!),
+              );
+            },
           );
         });
   }

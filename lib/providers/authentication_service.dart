@@ -5,7 +5,8 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn _googleSignIn = GoogleSignIn();
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+      clientId: "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com");
   final CollectionReference _favourites = FirebaseFirestore.instance.collection('favourites');
   final CollectionReference _settings = FirebaseFirestore.instance.collection('settings');
 
