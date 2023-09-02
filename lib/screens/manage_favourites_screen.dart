@@ -29,7 +29,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   // api headers
   Map<String, String> requestHeaders = {
     'Accept': 'application/json',
-    'AccountKey': Secret.LtaApiKey
+    'AccountKey': Secret.LTA_API_KEY
   };
 
   // fetch arrival into to retrieve what buses are available if user wants to edit a favourite

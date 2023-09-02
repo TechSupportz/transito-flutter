@@ -46,7 +46,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   // api request headers
   Map<String, String> requestHeaders = {
     'Accept': 'application/json',
-    'AccountKey': Secret.LtaApiKey
+    'AccountKey': Secret.LTA_API_KEY
   };
 
   // function to fetch bus arrival info
