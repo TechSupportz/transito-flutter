@@ -63,10 +63,10 @@
               "client_type": 3
             },
             {
-              "client_id": "341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com",
+              "client_id": "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.tnitish.transito"
+                "bundle_id": "com.tnitish.transitoFlutter"
               }
             }
           ]
