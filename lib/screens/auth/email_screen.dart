@@ -361,14 +361,13 @@ class _EmailScreenState extends State<EmailScreen> {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Email Sign in'),
-      ),
+      appBar: AppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
         child: ScrollConfiguration(
           behavior: const ScrollBehavior().copyWith(overscroll: false),
           child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
             slivers: [
               SliverFillRemaining(
                 hasScrollBody: false,

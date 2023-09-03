@@ -1,18 +1,11 @@
-import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
-import 'package:provider/provider.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 
 import '../../providers/authentication_service.dart';
-import '../../widgets/email_verification_dialog.dart';
 import '../navbar_screens/main_screen.dart';
 import '../onboarding_screens/location_access_screen.dart';
 
@@ -128,24 +121,40 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     const Spacer(),
-                    Column(
+                    Stack(
+                      alignment: Alignment.center,
+                      fit: StackFit.passthrough,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: SvgPicture.asset('assets/images/logo.svg'),
+                        Container(
+                          height: MediaQuery.of(context).size.width,
+                          decoration: const BoxDecoration(
+                            gradient: RadialGradient(
+                              colors: [Color(0xff542f95), Color(0xff0C0C0C)],
+                              stops: [0, 0.85],
+                            ),
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Simply login and never miss a bus again!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: SvgPicture.asset('assets/images/logo.svg'),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Simply login and never miss a bus again!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
+                            ),
+                          ],
                         ),
                       ],
                     ),
                     const Spacer(),
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
+                        color: const Color(0xFF151515),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -208,7 +217,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-										
                   ],
                 ),
               ),
@@ -230,7 +238,10 @@ class _LoginScreenState extends State<LoginScreen> {
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () => onGuestLoginBtnPress(),
+          onPressed: () {
+            Navigator.pop(context);
+            onGuestLoginBtnPress();
+          },
           child: const Text('Continue'),
         ),
       ],
