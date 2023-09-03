@@ -307,9 +307,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             context: context,
                             builder: (context) => AlertDialog(
                                   title: const Text('Delete account'),
-                                  content: Column(
+                                  content: const Column(
                                     mainAxisSize: MainAxisSize.min,
-                                    children: const [
+                                    children: [
                                       Text(
                                           'Are you sure you want to delete your account and all the data related to it?'),
                                       SizedBox(height: 12),
@@ -369,7 +369,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.all(12),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                             decoration: BoxDecoration(
                               color: AppColors.cardBg,
                               borderRadius: BorderRadius.circular(10),
@@ -379,7 +379,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               children: [
                                 const Text(
                                   "Accent Colour",
-                                  style: TextStyle(fontSize: 18),
+                                  style: TextStyle(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                                 const SizedBox(height: 6),
                                 FormBuilderColorPickerField(
@@ -387,6 +390,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   name: "Accent Colour",
                                   initialValue: Color(int.parse(snapshot.data!.accentColour)),
                                   autovalidateMode: AutovalidateMode.onUserInteraction,
+                                  keyboardType: TextInputType.none,
                                   validator: FormBuilderValidators.compose([
                                     FormBuilderValidators.required(),
                                     (val) {
@@ -487,9 +491,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: AppColors.cardBg,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
+                        children: [
                           Text(
                             "View Quick Start",
                             style: TextStyle(fontSize: 18),
@@ -540,9 +544,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           color: AppColors.cardBg,
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Row(
+                        child: const Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: const [
+                          children: [
                             Text(
                               "About",
                               style: TextStyle(fontSize: 18),
