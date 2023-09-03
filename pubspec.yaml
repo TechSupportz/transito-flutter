@@ -14,6 +14,8 @@ scripts:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.2
   jiffy: ^6.2.1
