@@ -98,6 +98,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
+    print(user);
     bool isTablet = context.read<CommonProvider>().isTablet;
     bool isLoggedIn =
         (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);

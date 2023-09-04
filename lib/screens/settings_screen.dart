@@ -331,15 +331,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                     TextButton(
                                       onPressed: () {
-                                        AuthenticationService().deleteAccount().then(
-                                              (value) => Navigator.pushAndRemoveUntil(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => const LoginScreen(),
-                                                ),
-                                                (Route<dynamic> route) => false,
-                                              ),
-                                            );
+                                        AuthenticationService().deleteAccount();
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => const LoginScreen(),
+                                          ),
+                                          (Route<dynamic> route) => false,
+                                        );
                                       },
                                       child: const Text('Yes'),
                                     ),

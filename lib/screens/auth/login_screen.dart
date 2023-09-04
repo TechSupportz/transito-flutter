@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 
@@ -40,19 +43,39 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void setIsGoogleLoading(bool value) {
-    if (value) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) => const Center(
-            child: CircularProgressIndicator(
-          strokeWidth: 3,
-        )),
-      );
-    } else {
-      Navigator.of(context).pop();
+  void onAppleBtnPress() async {
+    final bool isAppleSignInAvailable = await SignInWithApple.isAvailable();
+
+    if (!isAppleSignInAvailable) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'Sign in with Apple is not available on this device. Please try another method.'),
+          ),
+        );
+      }
+      return;
     }
+
+    AuthenticationService().signInWithApple().then(
+      (err) {
+        if (err == null) {
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => _defaultHome,
+            ),
+            (Route<dynamic> route) => false,
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Something went wrong... Please try again'),
+            ),
+          );
+        }
+      },
+    );
   }
 
   void onEmailBtnPress() async {
@@ -179,11 +202,26 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
+                                if (Platform.isIOS) ...[
+                                  const SizedBox(height: 16),
+                                  OutlinedButton.icon(
+                                    onPressed: () => onAppleBtnPress(),
+                                    icon: SvgPicture.asset('assets/images/apple_logo.svg'),
+                                    label: const Text(
+                                      'Continue with Apple',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ButtonStyle(
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                    ),
+                                  )
+                                ],
                                 const SizedBox(height: 16),
                                 OutlinedButton.icon(
                                   onPressed: () => onEmailBtnPress(),
-                                  icon: const Icon(Icons.mail_outline_rounded,
-                                      color: AppColors.kindaGrey),
+                                  icon: const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
                                   label: const Text(
                                     'Continue with Email',
                                     style: TextStyle(color: Colors.white),
@@ -198,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 OutlinedButton.icon(
                                   onPressed: () => showGuestLoginDialog(),
                                   icon: const Icon(
-                                    Icons.perm_identity_rounded,
+                                    Icons.person_rounded,
                                     color: AppColors.kindaGrey,
                                   ),
                                   label: const Text(
