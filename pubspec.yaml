@@ -52,8 +52,6 @@ dev_dependencies:
   flutter_lints: ^2.0.1
   json_serializable: ^6.2.0
   build_runner: ^2.1.11
-  flutter_launcher_icons: ^0.13.1
-
 
 
 flutter_native_splash:
@@ -63,19 +61,8 @@ flutter_native_splash:
   image: "assets/images/logo.png"
   android_12:
     image: "assets/icons/a12-splash-1152x1152.png"
-    icon_background_color: "#0c0c0c"
+    icon_background_color: "#030108"
     color: "#000000"
-
-
-flutter_launcher_icons:
-  image_path: "assets/icons/Icon-1024x1024.png"
-  ios: true
-  remove_alpha_ios: true
-  android: true
-  adaptive_icon_background: "#000000"
-  adaptive_icon_foreground: "assets/icons/icon-foreground-1024x1024.png"
-  adaptive_icon_padding: true
-
 
 flutter:
   uses-material-design: true

@@ -152,8 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: MediaQuery.of(context).size.width,
                           decoration: const BoxDecoration(
                             gradient: RadialGradient(
-                              colors: [Color(0xff542f95), Color(0xff0C0C0C)],
-                              stops: [0, 0.85],
+                              colors: [Color(0xAA3C18BF), Color(0xff0C0C0C)],
+                              stops: [0, 0.90],
                             ),
                             shape: BoxShape.circle,
                           ),
@@ -162,7 +162,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           children: [
                             Padding(
                               padding: const EdgeInsets.only(top: 12.0),
-                              child: SvgPicture.asset('assets/images/logo.svg'),
+                              child: SvgPicture.asset('assets/images/logo.svg', height: 200),
                             ),
                             const SizedBox(height: 20),
                             const Text(
