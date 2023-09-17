@@ -15,6 +15,7 @@ import 'package:transito/providers/authentication_service.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
 import 'package:transito/widgets/settings_others_card.dart';
 import 'package:transito/widgets/settings_radio_card.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../models/app_colors.dart';
 import '../providers/settings_service.dart';
@@ -495,9 +496,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 16),
                 SettingsOthersCard(
-                  title: "View Quick State",
+                  title: "View Quick Start",
                   icon: Icons.description_rounded,
                   onTap: () => goToQuickStart(),
+                ),
+                const SizedBox(height: 16),
+                SettingsOthersCard(
+                  title: "Feedback Form",
+                  icon: Icons.feedback_rounded,
+                  onTap: () => launchUrl(
+                    Uri.parse("https://transito.tnitish.com/feedback"),
+                    mode: LaunchMode.inAppWebView,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 FutureBuilder(
