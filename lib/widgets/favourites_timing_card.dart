@@ -166,7 +166,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                             height: 6,
                                           ),
                                       physics: const NeverScrollableScrollPhysics(),
-                                      padding: const EdgeInsets.only(bottom: 18),
+                                      padding: const EdgeInsets.only(bottom: 16),
                                       shrinkWrap: true,
                                       itemCount: snapshot.data!.length)
                                   : Center(
@@ -211,7 +211,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                         height: 12,
                                       ),
                                   physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.only(bottom: 18),
+                                  padding: const EdgeInsets.only(bottom: 16),
                                   shrinkWrap: true,
                                   itemCount: widget.services.length);
                             } else {

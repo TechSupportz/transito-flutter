@@ -224,7 +224,7 @@ class _EmailScreenState extends State<EmailScreen> {
                     const Spacer(flex: 1),
                     Container(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: Container(
                           constraints: const BoxConstraints(minHeight: 264),
                           child: AnimatedSwitcher(
@@ -357,8 +357,8 @@ class _EmailScreenState extends State<EmailScreen> {
                 duration: const Duration(milliseconds: 125),
                 child: _isLoading
                     ? const SizedBox(
-                        height: 18,
-                        width: 18,
+                        height: 16,
+                        width: 16,
                         child: Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
@@ -431,8 +431,8 @@ class _EmailScreenState extends State<EmailScreen> {
                 duration: const Duration(milliseconds: 175),
                 child: _isLoading
                     ? const SizedBox(
-                        height: 18,
-                        width: 18,
+                        height: 16,
+                        width: 16,
                         child: Center(
                           child: CircularProgressIndicator(strokeWidth: 2),
                         ),
@@ -467,7 +467,7 @@ class _EmailScreenState extends State<EmailScreen> {
                 fontSize: 16,
                 color: AppColors.kindaGrey,
               )),
-          const SizedBox(height: 18),
+          const SizedBox(height: 16),
           FormBuilderTextField(
             key: _forgotPasswordEmailFieldKey,
             name: 'email',

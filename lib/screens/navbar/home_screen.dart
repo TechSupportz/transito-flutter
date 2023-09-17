@@ -292,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                             childAspectRatio: userSettings.isNearbyGrid
                                 ? 2.5 / (isTablet ? 0.6 : 1)
                                 : 5 / (isTablet ? 0.6 : 1),
-                            crossAxisSpacing: 18,
+                            crossAxisSpacing: 16,
                             mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
                             crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
                             shrinkWrap: true,
@@ -310,7 +310,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                         } else {
                           return Center(
                             child: Padding(
-                              padding: const EdgeInsets.only(bottom: 18.0),
+                              padding: const EdgeInsets.only(bottom: 16.0),
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
@@ -379,9 +379,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                     );
                   },
                   separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                    height: 18,
+                    height: 16,
                   ),
-                  padding: const EdgeInsets.only(bottom: 18.0),
+                  padding: const EdgeInsets.only(bottom: 16.0),
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: snapshot.data!.length,
@@ -389,7 +389,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               } else {
                 // if user has no favourites within 750m of their current location, display a message to tell them
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 18.0),
+                  padding: const EdgeInsets.only(bottom: 16.0),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),

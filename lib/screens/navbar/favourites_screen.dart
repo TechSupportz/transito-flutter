@@ -82,7 +82,7 @@ class _FavouritesScreenState extends State<FavouritesScreen>
                         },
                         padding: const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
                         separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                          height: 18,
+                          height: 16,
                         ),
                         itemCount: favouritesList.length,
                         cacheExtent: favouritesList.length.toDouble() * 250,

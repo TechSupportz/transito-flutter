@@ -6,11 +6,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletons/skeletons.dart';
 import 'package:transito/models/settings_card_options.dart';
 import 'package:transito/models/user_settings.dart';
 import 'package:transito/providers/authentication_service.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
+import 'package:transito/widgets/settings_others_card.dart';
 import 'package:transito/widgets/settings_radio_card.dart';
 
 import '../models/app_colors.dart';
@@ -31,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _accentColourFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
   final TextStyle titleStyle = const TextStyle(fontSize: 30, fontWeight: FontWeight.w700);
+  late Future<PackageInfo> _appInfo;
 
   void updateDisplayName(User? user) async {
     setState(() {
@@ -171,12 +175,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
   }
 
+  Future<PackageInfo> getAppInfo() async {
+    print("Fetching App Info...");
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    return packageInfo;
+  }
+
   void goToQuickStart() {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const QuickStartScreen(),
       ),
     );
+  }
+
+  // initializes the screen
+  @override
+  void initState() {
+    super.initState();
+    _appInfo = getAppInfo();
   }
 
   @override
@@ -187,7 +204,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         title: const Text('Settings'),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.only(top: 12, bottom: 18, left: 12, right: 12),
+        padding: const EdgeInsets.only(top: 12, bottom: 16, left: 12, right: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -198,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   "About you",
                   style: titleStyle,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 6),
                 FormBuilderTextField(
                   key: _nameFieldKey,
                   name: 'name',
@@ -223,8 +240,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           duration: const Duration(milliseconds: 175),
                           child: _isNameFieldLoading
                               ? const SizedBox(
-                                  height: 18,
-                                  width: 18,
+                                  height: 16,
+                                  width: 16,
                                   child: Center(
                                     child: CircularProgressIndicator(
                                         strokeWidth: 2, color: Colors.white),
@@ -247,7 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 12),
                 Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                       (user != null &&
                               user.providerData.map((e) => e.providerId).contains('password'))
@@ -359,7 +376,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   "Aesthetics ✨",
                   style: titleStyle,
                 ),
-                const SizedBox(height: 18),
+                const SizedBox(height: 16),
                 StreamBuilder(
                   stream: SettingsService().streamSettings(user?.uid),
                   builder: (context, AsyncSnapshot<UserSettings> snapshot) {
@@ -420,7 +437,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 16),
                           SettingsRadioCard(
                             title: "ETA Format",
                             initialValue: snapshot.data!.isETAminutes,
@@ -430,7 +447,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: false, text: "Time of arrival (18:21)")
                             ],
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 16),
                           SettingsRadioCard(
                             title: "Nearby Layout",
                             initialValue: snapshot.data!.isNearbyGrid,
@@ -440,7 +457,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: false, text: "Column layout")
                             ],
                           ),
-                          const SizedBox(height: 18),
+                          const SizedBox(height: 16),
                           SettingsRadioCard(
                               title: "Nearby Detail",
                               initialValue: snapshot.data!.showNearbyDistance ?? true,
@@ -476,87 +493,58 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   "Others",
                   style: titleStyle,
                 ),
-                const SizedBox(height: 18),
-                Material(
-                  child: InkWell(
-                    onTap: () => goToQuickStart(),
-                    customBorder: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Ink(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.cardBg,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "View Quick Start",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                          Icon(
-                            Icons.description_rounded,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                const SizedBox(height: 16),
+                SettingsOthersCard(
+                  title: "View Quick State",
+                  icon: Icons.description_rounded,
+                  onTap: () => goToQuickStart(),
                 ),
-                const SizedBox(height: 18),
-                Material(
-                  child: InkWell(
-                    onTap: () => showAboutDialog(
-                        context: context,
-                        applicationIcon: ClipRRect(
+                const SizedBox(height: 16),
+                FutureBuilder(
+                    future: _appInfo,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        print(snapshot.data);
+                        return SettingsOthersCard(
+                          title: "About",
+                          icon: Icons.info_outline_rounded,
+                          onTap: () => showAboutDialog(
+                              context: context,
+                              applicationIcon: ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.asset(
+                                  "assets/icons/Icon-1024x1024.png",
+                                  width: 64,
+                                  height: 64,
+                                ),
+                              ),
+                              applicationName: "Transito",
+                              applicationVersion: "v${snapshot.data!.version}",
+                              applicationLegalese: "© 2023 Transito",
+                              children: const [
+                                SizedBox(height: 16),
+                                Text(
+                                  "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  "Transito is not responsible for any inaccuracies in the data.",
+                                  style: TextStyle(fontSize: 14),
+                                ),
+                              ]),
+                        );
+                      } else if (snapshot.hasError) {
+                        print(snapshot.error);
+                      }
+                      return SkeletonItem(
+                          child: SkeletonLine(
+                        style: SkeletonLineStyle(
+                          height: 45,
                           borderRadius: BorderRadius.circular(10),
-                          child: Image.asset(
-                            "assets/icons/Icon-1024x1024.png",
-                            width: 56,
-                            height: 56,
-                          ),
                         ),
-                        applicationName: "Transito",
-                        applicationVersion: "1.3.0",
-                        applicationLegalese: "© 2022 Transito",
-                        children: const [
-                          SizedBox(height: 18),
-                          Text(
-                            "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Transito is not responsible for any inaccuracies in the data.",
-                            style: TextStyle(fontSize: 14),
-                          ),
-                        ]),
-                    customBorder: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Ink(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppColors.cardBg,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "About",
-                              style: TextStyle(fontSize: 18),
-                            ),
-                            Icon(
-                              Icons.info_outline_rounded,
-                            ),
-                          ],
-                        )),
-                  ),
-                )
+                      ));
+                    })
               ],
             )
           ],
