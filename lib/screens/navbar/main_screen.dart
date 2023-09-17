@@ -5,6 +5,7 @@ import 'package:transito/providers/common_provider.dart';
 import 'package:transito/screens/navbar/favourites_screen.dart';
 import 'package:transito/screens/navbar/home_screen.dart';
 import 'package:transito/screens/navbar/recent_search_screen.dart';
+import 'package:upgrader/upgrader.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
@@ -32,14 +33,19 @@ class _MainScreenState extends State<MainScreen> {
     bool isTablet = context.read<CommonProvider>().isTablet;
 
     return Scaffold(
-      body: PageView(
-        controller: controller,
-        children: widgetList,
-        pageSnapping: true,
-        dragStartBehavior: DragStartBehavior.start,
-        onPageChanged: (index) {
-          setState(() => _pageIndex = index);
-        },
+      body: UpgradeAlert(
+        upgrader: Upgrader(
+          countryCode: "SG",
+        ),
+        child: PageView(
+          controller: controller,
+          children: widgetList,
+          pageSnapping: true,
+          dragStartBehavior: DragStartBehavior.start,
+          onPageChanged: (index) {
+            setState(() => _pageIndex = index);
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
