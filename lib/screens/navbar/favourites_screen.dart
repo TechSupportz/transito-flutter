@@ -52,6 +52,7 @@ class _FavouritesScreenState extends State<FavouritesScreen>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     String userId = context.watch<User>().uid;
 
     return Scaffold(
@@ -84,13 +85,14 @@ class _FavouritesScreenState extends State<FavouritesScreen>
                           height: 18,
                         ),
                         itemCount: favouritesList.length,
+                        cacheExtent: favouritesList.length.toDouble() * 250,
                       ),
                     )
                   // if the user has no favourites display a message
-                  : Center(
+                  : const Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           Text(
                             "This place is real empty",
                             style: TextStyle(

@@ -2,9 +2,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/providers/common_provider.dart';
-import 'package:transito/screens/navbar_screens/favourites_screen.dart';
-import 'package:transito/screens/navbar_screens/home_screen.dart';
-import 'package:transito/screens/navbar_screens/recent_search_screen.dart';
+import 'package:transito/screens/navbar/favourites_screen.dart';
+import 'package:transito/screens/navbar/home_screen.dart';
+import 'package:transito/screens/navbar/recent_search_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);

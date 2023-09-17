@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../navbar_screens/main_screen.dart';
+import '../navbar/main_screen.dart';
 
 class QuickStartScreen extends StatelessWidget {
   const QuickStartScreen({Key? key}) : super(key: key);

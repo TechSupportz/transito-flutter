@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
-import 'package:transito/screens/navbar_screens/main_screen.dart';
-import 'package:transito/screens/onboarding_screens/quick_start_screen.dart';
+import 'package:transito/screens/navbar/main_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_screen.dart';
 
 class LocationAccessScreen extends StatefulWidget {
   const LocationAccessScreen({Key? key}) : super(key: key);

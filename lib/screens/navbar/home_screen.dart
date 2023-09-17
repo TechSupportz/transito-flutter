@@ -14,7 +14,7 @@ import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/providers/settings_service.dart';
 import 'package:transito/screens/mrt_map_screen.dart';
-import 'package:transito/screens/onboarding_screens/location_access_screen.dart';
+import 'package:transito/screens/onboarding/location_access_screen.dart';
 import 'package:transito/screens/settings_screen.dart';
 import 'package:transito/widgets/error_text.dart';
 
@@ -147,6 +147,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     var user = context.watch<User?>();
 
     return Scaffold(

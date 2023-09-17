@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/favourites_service.dart';
-import 'package:transito/screens/navbar_screens/main_screen.dart';
+import 'package:transito/screens/navbar/main_screen.dart';
 
 import '../models/app_colors.dart';
 

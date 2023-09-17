@@ -10,14 +10,14 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/settings_card_options.dart';
 import 'package:transito/models/user_settings.dart';
 import 'package:transito/providers/authentication_service.dart';
-import 'package:transito/screens/onboarding_screens/quick_start_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_screen.dart';
 import 'package:transito/widgets/settings_radio_card.dart';
 
 import '../models/app_colors.dart';
 import '../providers/settings_service.dart';
 import '../widgets/error_text.dart';
 import 'auth/login_screen.dart';
-import 'navbar_screens/main_screen.dart';
+import 'navbar/main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);

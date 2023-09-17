@@ -10,7 +10,7 @@ import 'package:provider/provider.dart';
 import '../../models/app_colors.dart';
 import '../../providers/authentication_service.dart';
 import '../../widgets/email_verification_dialog.dart';
-import '../onboarding_screens/location_access_screen.dart';
+import '../onboarding/location_access_screen.dart';
 import 'login_screen.dart';
 
 class EmailScreen extends StatefulWidget {
@@ -193,7 +193,98 @@ class _EmailScreenState extends State<EmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var registerForm = FormBuilder(
+    return Scaffold(
+      appBar: AppBar(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: ScrollConfiguration(
+          behavior: const ScrollBehavior().copyWith(overscroll: false),
+          child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    const Spacer(flex: 1),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: SvgPicture.asset('assets/images/logo.svg', height: 200),
+                        ),
+                        const SizedBox(height: 20),
+                        const Text(
+                          'Simply login and never miss a bus again!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
+                        ),
+                      ],
+                    ),
+                    const Spacer(flex: 1),
+                    Container(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                        child: Container(
+                          constraints: const BoxConstraints(minHeight: 264),
+                          child: AnimatedSwitcher(
+                            transitionBuilder: (child, animation) => ScaleTransition(
+                              scale: animation,
+                              child: child,
+                            ),
+                            duration: const Duration(milliseconds: 175),
+                            child: _isLogin ? renderLoginForm() : renderRegisterForm(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: GestureDetector(
+                        onTap: () => setState(() {
+                          _isLogin = !_isLogin;
+                        }),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: _isLogin
+                              ? [
+                                  const Text(
+                                    'New Here?',
+                                    style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    'Register!',
+                                    style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                  ),
+                                ]
+                              : [
+                                  const Text(
+                                    'Already have an account?',
+                                    style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    'Login!',
+                                    style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                  ),
+                                ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  FormBuilder renderRegisterForm() {
+    return FormBuilder(
       key: _registerFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -279,7 +370,10 @@ class _EmailScreenState extends State<EmailScreen> {
         ],
       ),
     );
-    var loginForm = FormBuilder(
+  }
+
+  FormBuilder renderLoginForm() {
+    return FormBuilder(
       key: _loginFormKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -357,95 +451,6 @@ class _EmailScreenState extends State<EmailScreen> {
             ),
           ),
         ],
-      ),
-    );
-
-    return Scaffold(
-      appBar: AppBar(),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: ScrollConfiguration(
-          behavior: const ScrollBehavior().copyWith(overscroll: false),
-          child: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  children: [
-                    const Spacer(flex: 1),
-                    Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12.0),
-                          child: SvgPicture.asset('assets/images/logo.svg'),
-                        ),
-                        const SizedBox(height: 20),
-                        const Text(
-                          'Simply login and never miss a bus again!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
-                        ),
-                      ],
-                    ),
-                    const Spacer(flex: 1),
-                    Container(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18.0),
-                        child: Container(
-                          constraints: const BoxConstraints(minHeight: 264),
-                          child: AnimatedSwitcher(
-                            transitionBuilder: (child, animation) => ScaleTransition(
-                              scale: animation,
-                              child: child,
-                            ),
-                            duration: const Duration(milliseconds: 175),
-                            child: _isLogin ? loginForm : registerForm,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16),
-                      child: GestureDetector(
-                        onTap: () => setState(() {
-                          _isLogin = !_isLogin;
-                        }),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: _isLogin
-                              ? [
-                                  const Text(
-                                    'New Here?',
-                                    style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    'Register!',
-                                    style: TextStyle(fontSize: 14, color: AppColors.accentColour),
-                                  ),
-                                ]
-                              : [
-                                  const Text(
-                                    'Already have an account?',
-                                    style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    'Login!',
-                                    style: TextStyle(fontSize: 14, color: AppColors.accentColour),
-                                  ),
-                                ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

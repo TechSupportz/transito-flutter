@@ -9,8 +9,8 @@ import 'package:transito/models/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 
 import '../../providers/authentication_service.dart';
-import '../navbar_screens/main_screen.dart';
-import '../onboarding_screens/location_access_screen.dart';
+import '../navbar/main_screen.dart';
+import '../onboarding/location_access_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
