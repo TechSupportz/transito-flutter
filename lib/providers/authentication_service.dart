@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,9 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
-      clientId: "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com");
+      clientId: Platform.isIOS
+          ? "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com"
+          : null);
   final CollectionReference _favourites = FirebaseFirestore.instance.collection('favourites');
   final CollectionReference _settings = FirebaseFirestore.instance.collection('settings');
 
