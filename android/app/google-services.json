@@ -38,6 +38,14 @@
           }
         },
         {
+          "client_id": "341566460699-ph1edt20km0ecqokoll07rthuo1h4tb6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tnitish.transito",
+            "certificate_hash": "279aa1b18c28ba05c45952010e44e718fc9ae698"
+          }
+        },
+        {
           "client_id": "341566460699-rss9d575snt1o2n72a4bss9iaoovu4md.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

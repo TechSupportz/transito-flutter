@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com</string>
+	<string>341566460699-d4qipc5q00f1mblrjsap0u75eaacneip.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo</string>
+	<string>com.googleusercontent.apps.341566460699-d4qipc5q00f1mblrjsap0u75eaacneip</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>341566460699-3bm3fv80co5oum2anvndhs0nogi4mrjq.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.tnitish.transitoFlutter</string>
+	<string>com.tnitish.transito</string>
 	<key>PROJECT_ID</key>
 	<string>transito-8f50c</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:341566460699:ios:9f4d3c1f50a5354d6379be</string>
+	<string>1:341566460699:ios:9ceb370c8d2cdb6e6379be</string>
 </dict>
 </plist>
