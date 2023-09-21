@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -49,24 +51,18 @@ void main() async {
   }
 
   // load all svg assets
-  // Future.wait([
-  //   precachePicture(
-  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/logo.svg'),
-  //     null,
-  //   ),
-  //   precachePicture(
-  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/google_logo.svg'),
-  //     null,
-  //   ),
-  //   precachePicture(
-  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/location.svg'),
-  //     null,
-  //   ),
-  //   precachePicture(
-  //     ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, 'assets/images/diagram.svg'),
-  //     null,
-  //   ),
-  // ]);
+  final manifestJson = await rootBundle.loadString('AssetManifest.json');
+  List svgsPaths = (json
+              .decode(manifestJson)
+              .keys
+              .where((String key) => key.startsWith('assets/images/') && key.endsWith('.svg'))
+          as Iterable)
+      .toList();
+
+  for (var svgPath in svgsPaths as List<String>) {
+    var loader = SvgAssetLoader(svgPath);
+    await svg.cache.putIfAbsent(loader.cacheKey(null), () => loader.loadBytes(null));
+  }
 
   runApp(
     MultiProvider(

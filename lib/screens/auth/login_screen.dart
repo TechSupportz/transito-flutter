@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
@@ -132,83 +133,72 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: true,
       // appBar: AppBar(title: const Text('Welcome!')),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: ScrollConfiguration(
-          behavior: const ScrollBehavior().copyWith(overscroll: false),
-          child: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Column(
-                  children: [
-                    const Spacer(),
-                    Stack(
-                      alignment: Alignment.center,
-                      fit: StackFit.passthrough,
-                      children: [
-                        Container(
-                          height: MediaQuery.of(context).size.width,
-                          decoration: const BoxDecoration(
-                            gradient: RadialGradient(
-                              colors: [Color(0xAA3C18BF), Color(0xff0C0C0C)],
-                              stops: [0, 0.90],
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: const SystemUiOverlayStyle(
+          statusBarColor: Color(0xff0C0C0C),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+          child: ScrollConfiguration(
+            behavior: const ScrollBehavior().copyWith(overscroll: false),
+            child: CustomScrollView(
+              physics: const NeverScrollableScrollPhysics(),
+              slivers: [
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  child: Column(
+                    children: [
+                      const Spacer(),
+                      Stack(
+                        alignment: Alignment.center,
+                        fit: StackFit.passthrough,
+                        children: [
+                          Container(
+                            height: MediaQuery.of(context).size.width,
+                            decoration: const BoxDecoration(
+                              gradient: RadialGradient(
+                                colors: [Color(0xAA3C18BF), Color(0xff0C0C0C)],
+                                stops: [0, 0.90],
+                              ),
+                              shape: BoxShape.circle,
                             ),
-                            shape: BoxShape.circle,
                           ),
+                          Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 12.0),
+                                child: SvgPicture.asset('assets/images/logo.svg', height: 200),
+                              ),
+                              const SizedBox(height: 20),
+                              const Text(
+                                'Simply login and never miss a bus again!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF151515),
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                        Column(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        margin: const EdgeInsets.only(bottom: 48),
+                        child: Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.only(top: 12.0),
-                              child: SvgPicture.asset('assets/images/logo.svg', height: 200),
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Simply login and never miss a bus again!',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    const Spacer(),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF151515),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      margin: const EdgeInsets.only(bottom: 48),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                OutlinedButton.icon(
-                                  onPressed: () => onGoogleBtnPress(),
-                                  icon: SvgPicture.asset('assets/images/google_logo.svg'),
-                                  label: const Text(
-                                    'Continue with Google',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ButtonStyle(
-                                    padding: MaterialStateProperty.all<EdgeInsets>(
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                  ),
-                                ),
-                                if (Platform.isIOS) ...[
-                                  const SizedBox(height: 16),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
                                   OutlinedButton.icon(
-                                    onPressed: () => onAppleBtnPress(),
-                                    icon: SvgPicture.asset('assets/images/apple_logo.svg'),
+                                    onPressed: () => onGoogleBtnPress(),
+                                    icon: SvgPicture.asset('assets/images/google_logo.svg'),
                                     label: const Text(
-                                      'Continue with Apple',
+                                      'Continue with Google',
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     style: ButtonStyle(
@@ -216,49 +206,66 @@ class _LoginScreenState extends State<LoginScreen> {
                                         const EdgeInsets.symmetric(vertical: 12),
                                       ),
                                     ),
-                                  )
+                                  ),
+                                  if (Platform.isIOS) ...[
+                                    const SizedBox(height: 16),
+                                    OutlinedButton.icon(
+                                      onPressed: () => onAppleBtnPress(),
+                                      icon: SvgPicture.asset('assets/images/apple_logo.svg'),
+                                      label: const Text(
+                                        'Continue with Apple',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                      style: ButtonStyle(
+                                        padding: MaterialStateProperty.all<EdgeInsets>(
+                                          const EdgeInsets.symmetric(vertical: 12),
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                  const SizedBox(height: 16),
+                                  OutlinedButton.icon(
+                                    onPressed: () => onEmailBtnPress(),
+                                    icon:
+                                        const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
+                                    label: const Text(
+                                      'Continue with Email',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ButtonStyle(
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  OutlinedButton.icon(
+                                    onPressed: () => showGuestLoginDialog(),
+                                    icon: const Icon(
+                                      Icons.person_rounded,
+                                      color: AppColors.kindaGrey,
+                                    ),
+                                    label: const Text(
+                                      'Continue as a Guest',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    style: ButtonStyle(
+                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                        const EdgeInsets.symmetric(vertical: 12),
+                                      ),
+                                    ),
+                                  ),
                                 ],
-                                const SizedBox(height: 16),
-                                OutlinedButton.icon(
-                                  onPressed: () => onEmailBtnPress(),
-                                  icon: const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
-                                  label: const Text(
-                                    'Continue with Email',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ButtonStyle(
-                                    padding: MaterialStateProperty.all<EdgeInsets>(
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                OutlinedButton.icon(
-                                  onPressed: () => showGuestLoginDialog(),
-                                  icon: const Icon(
-                                    Icons.person_rounded,
-                                    color: AppColors.kindaGrey,
-                                  ),
-                                  label: const Text(
-                                    'Continue as a Guest',
-                                    style: TextStyle(color: Colors.white),
-                                  ),
-                                  style: ButtonStyle(
-                                    padding: MaterialStateProperty.all<EdgeInsets>(
-                                      const EdgeInsets.symmetric(vertical: 12),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
