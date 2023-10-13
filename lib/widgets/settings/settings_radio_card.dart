@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app_colors.dart';
-import 'package:transito/models/settings_card_options.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/settings_card_options.dart';
 
-import '../providers/settings_service.dart';
+import '../../providers/settings_service.dart';
 
 class SettingsRadioCard extends StatelessWidget {
   const SettingsRadioCard(

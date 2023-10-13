@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../models/favourite.dart';
+import 'package:transito/models/favourites/favourite.dart';
 
 class FavouritesProvider extends ChangeNotifier {
   final List<Favourite> _favouritesList = [];

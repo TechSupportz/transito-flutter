@@ -9,15 +9,14 @@ import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
-import 'package:transito/widgets/bus_timing_row.dart';
-
-import '../models/app_colors.dart';
-import '../models/arrival_info.dart';
-import '../models/secret.dart';
-import '../models/user_settings.dart';
-import '../providers/settings_service.dart';
-import '../screens/bus_timing_screen.dart';
-import 'error_text.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/secret.dart';
+import 'package:transito/models/user/user_settings.dart';
+import 'package:transito/providers/settings_service.dart';
+import 'package:transito/screens/bus_info/bus_timing_screen.dart';
+import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
+import 'package:transito/widgets/common/error_text.dart';
 
 class FavouritesTimingCard extends StatefulWidget {
   const FavouritesTimingCard({
@@ -71,11 +70,11 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   // function to properly sort the bus arrival info according to the Bus Service number and to filter it based on users favourite services
   List<ServiceInfo> filterBusArrivalInfo(BusArrivalInfo value) {
     var _value = value;
-    var _filteredList =
+    var filteredList =
         _value.services.where((value) => widget.services.contains(value.serviceNum)).toList();
-    _filteredList.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
+    filteredList.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
 
-    return _filteredList;
+    return filteredList;
   }
 
   // function to fetch bus arrival info and update the state of the widget, and to set a timer to fetch bus arrival info again after 30 seconds

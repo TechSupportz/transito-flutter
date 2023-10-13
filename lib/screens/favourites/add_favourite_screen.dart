@@ -3,12 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/favourite.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/favourites_service.dart';
-import 'package:transito/screens/navbar/main_screen.dart';
-
-import '../models/app_colors.dart';
+import 'package:transito/screens/navigator_screen.dart';
 
 class AddFavouritesScreen extends StatefulWidget {
   const AddFavouritesScreen(
@@ -83,14 +82,14 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
         // navigate back to main screen
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => const NavigatorScreen()),
           (Route<dynamic> route) => false,
         );
       } else {
         // if user somehow accesses this screen with a bus stop that already exists in favourites list, display snackbar to notify user
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
+          MaterialPageRoute(builder: (context) => const NavigatorScreen()),
           (Route<dynamic> route) => false,
         );
         _showSnackBar('Something went wrong...');

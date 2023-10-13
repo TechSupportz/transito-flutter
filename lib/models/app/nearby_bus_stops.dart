@@ -1,6 +1,5 @@
-import 'package:transito/models/favourite.dart';
-
-import 'bus_stops.dart';
+import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/favourites/favourite.dart';
 
 class NearbyBusStops {
   BusStopInfo busStopInfo;

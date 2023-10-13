@@ -11,17 +11,17 @@ import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/arrival_info.dart';
-import 'package:transito/models/user_settings.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/secret.dart';
+import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/providers/settings_service.dart';
-import 'package:transito/widgets/bus_timing_row.dart';
+import 'package:transito/screens/favourites/add_favourite_screen.dart';
+import 'package:transito/screens/favourites/edit_favourite_screen.dart';
+import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
+import 'package:transito/widgets/common/error_text.dart';
 
-import '../models/secret.dart';
-import '../widgets/error_text.dart';
-import 'add_favourite_screen.dart';
 import 'bus_stop_info_screen.dart';
-import 'edit_favourite_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen(

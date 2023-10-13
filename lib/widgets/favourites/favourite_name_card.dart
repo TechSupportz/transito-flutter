@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/app_colors.dart';
+import '../../models/app/app_colors.dart';
 
 class FavouriteNameCard extends StatelessWidget {
   const FavouriteNameCard({

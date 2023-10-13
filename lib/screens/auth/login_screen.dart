@@ -6,11 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:transito/models/app_colors.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 
 import '../../providers/authentication_service.dart';
-import '../navbar/main_screen.dart';
+import '../navigator_screen.dart';
 import '../onboarding/location_access_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -114,11 +114,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   initialiseDefaultHome() async {
-    bool _isFirstRun = await IsFirstRun.isFirstRun();
-    LocationPermission _permission = await Geolocator.checkPermission();
-    if (!_isFirstRun && _permission == LocationPermission.always ||
-        _permission == LocationPermission.whileInUse) {
-      _defaultHome = const MainScreen();
+    bool isFirstRun = await IsFirstRun.isFirstRun();
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (!isFirstRun && permission == LocationPermission.always ||
+        permission == LocationPermission.whileInUse) {
+      _defaultHome = const NavigatorScreen();
     }
   }
 

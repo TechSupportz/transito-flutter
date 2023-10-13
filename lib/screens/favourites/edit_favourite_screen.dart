@@ -4,12 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/favourite.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/providers/favourites_service.dart';
-import 'package:transito/screens/navbar/main_screen.dart';
-
-import '../models/app_colors.dart';
-import '../models/arrival_info.dart';
+import 'package:transito/screens/navigator_screen.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
   const EditFavouritesScreen(
@@ -92,7 +91,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
-            builder: (context) => const MainScreen(),
+            builder: (context) => const NavigatorScreen(),
           ),
           (Route<dynamic> route) => false,
         );
@@ -133,7 +132,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => const MainScreen(),
+                              builder: (context) => const NavigatorScreen(),
                             ),
                             (Route<dynamic> route) => false,
                           );

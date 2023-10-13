@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:transito/models/favourite.dart';
+import 'package:transito/models/favourites/favourite.dart';
 
 part 'user_collection.g.dart';
 

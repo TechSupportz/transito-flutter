@@ -2,19 +2,19 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/providers/common_provider.dart';
-import 'package:transito/screens/navbar/favourites_screen.dart';
-import 'package:transito/screens/navbar/home_screen.dart';
-import 'package:transito/screens/navbar/recent_search_screen.dart';
+import 'package:transito/screens/favourites/favourites_screen.dart';
+import 'package:transito/screens/main/home_screen.dart';
+import 'package:transito/screens/search/recent_search_screen.dart';
 import 'package:upgrader/upgrader.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({Key? key}) : super(key: key);
+class NavigatorScreen extends StatefulWidget {
+  const NavigatorScreen({Key? key}) : super(key: key);
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<NavigatorScreen> createState() => _NavigatorScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _NavigatorScreenState extends State<NavigatorScreen> {
   int _pageIndex = 0;
   final controller = PageController(
     initialPage: 0,

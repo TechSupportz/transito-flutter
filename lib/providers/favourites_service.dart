@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:transito/models/favourite.dart';
+import 'package:transito/models/favourites/favourite.dart';
 
 class FavouritesService {
   final CollectionReference _favouritesCollection =
@@ -32,12 +32,12 @@ class FavouritesService {
 
   Future<Map<String?, List<String?>>> getFavouriteServicesByBusStopCode(
       String userId, String busStopCode) async {
-    var _favouritesList =
+    var favouritesList =
         FavouritesList.fromFirestore(await _favouritesCollection.doc(userId).get()).favouritesList;
 
     Map<String?, List<String?>> initialSelectedChildren = {
       'Bus Services':
-          _favouritesList.firstWhere((element) => element.busStopCode == busStopCode).services,
+          favouritesList.firstWhere((element) => element.busStopCode == busStopCode).services,
     };
 
     return initialSelectedChildren;
@@ -92,14 +92,14 @@ class FavouritesService {
     _favouritesCollection.doc(userId).get().then(
       (snapshot) {
         if (snapshot.exists) {
-          List<Favourite> _favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
-          _favouritesList[_favouritesList
+          List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
+          favouritesList[favouritesList
               .indexWhere((element) => element.busStopCode == favourite.busStopCode)] = favourite;
 
           _favouritesCollection
               .doc(userId)
               .update(
-                  {'favouritesList': _favouritesList.map((element) => element.toJson()).toList()})
+                  {'favouritesList': favouritesList.map((element) => element.toJson()).toList()})
               .then(
                 (_) => debugPrint('✔️ Updated ${favourite.busStopCode}\'s favourites'),
               )

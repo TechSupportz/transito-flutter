@@ -9,19 +9,18 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletons/skeletons.dart';
-import 'package:transito/models/settings_card_options.dart';
-import 'package:transito/models/user_settings.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/settings_card_options.dart';
+import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/providers/authentication_service.dart';
+import 'package:transito/providers/settings_service.dart';
+import 'package:transito/screens/auth/login_screen.dart';
+import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
-import 'package:transito/widgets/settings_others_card.dart';
-import 'package:transito/widgets/settings_radio_card.dart';
+import 'package:transito/widgets/common/error_text.dart';
+import 'package:transito/widgets/settings/settings_others_card.dart';
+import 'package:transito/widgets/settings/settings_radio_card.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../models/app_colors.dart';
-import '../providers/settings_service.dart';
-import '../widgets/error_text.dart';
-import 'auth/login_screen.dart';
-import 'navbar/main_screen.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -138,7 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         Navigator.of(context).pop();
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => const MainScreen(),
+                            builder: (context) => const NavigatorScreen(),
                           ),
                           (Route<dynamic> route) => false,
                         );
@@ -164,7 +163,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Navigator.of(context).pop();
                     Navigator.of(context).pushAndRemoveUntil(
                       MaterialPageRoute(
-                        builder: (context) => const MainScreen(),
+                        builder: (context) => const NavigatorScreen(),
                       ),
                       (Route<dynamic> route) => false,
                     );

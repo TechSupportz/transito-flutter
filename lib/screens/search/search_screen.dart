@@ -3,13 +3,12 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:transito/models/app_colors.dart';
-
-import '../models/bus_services.dart';
-import '../models/bus_stops.dart';
-import '../widgets/bus_service_card.dart';
-import '../widgets/bus_stop_card.dart';
-import '../widgets/error_text.dart';
+import 'package:transito/models/api/lta/bus_services.dart';
+import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/widgets/bus_info/bus_service_card.dart';
+import 'package:transito/widgets/bus_info/bus_stop_card.dart';
+import 'package:transito/widgets/common/error_text.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({Key? key}) : super(key: key);

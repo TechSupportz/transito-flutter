@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/api/lta/bus_stops.dart';
 import 'package:transito/providers/search_provider.dart';
-import 'package:transito/widgets/bus_service_card.dart';
+import 'package:transito/widgets/bus_info/bus_service_card.dart';
+import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 
-import '../models/bus_stops.dart';
-import 'bus_stop_card.dart';
 
 class RecentSearchList extends StatelessWidget {
   const RecentSearchList({Key? key}) : super(key: key);

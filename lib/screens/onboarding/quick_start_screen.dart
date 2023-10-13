@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-
-import '../navbar/main_screen.dart';
+import 'package:transito/screens/navigator_screen.dart';
 
 class QuickStartScreen extends StatelessWidget {
   const QuickStartScreen({Key? key}) : super(key: key);
@@ -54,7 +53,7 @@ class QuickStartScreen extends StatelessWidget {
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const MainScreen(),
+                    builder: (context) => const NavigatorScreen(),
                   ),
                   (Route<dynamic> route) => false,
                 ),

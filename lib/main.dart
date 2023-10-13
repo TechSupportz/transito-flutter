@@ -13,14 +13,14 @@ import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app_colors.dart';
-import 'package:transito/models/user_settings.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_provider.dart';
 import 'package:transito/providers/search_provider.dart';
 import 'package:transito/providers/settings_service.dart';
 import 'package:transito/screens/auth/login_screen.dart';
-import 'package:transito/screens/navbar/main_screen.dart';
+import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
 
 import 'firebase_options.dart';
@@ -37,7 +37,7 @@ void main() async {
   LocationPermission permission = await Geolocator.checkPermission();
   if (!isFirstRun && permission == LocationPermission.always ||
       permission == LocationPermission.whileInUse) {
-    defaultHome = const MainScreen();
+    defaultHome = const NavigatorScreen();
   }
 
   if (kDebugMode) {

@@ -5,13 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
-import 'package:transito/models/favourite.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/favourites/favourite.dart';
+import 'package:transito/models/secret.dart';
 import 'package:transito/providers/favourites_service.dart';
-import 'package:transito/widgets/favourite_name_card.dart';
+import 'package:transito/widgets/favourites/favourite_name_card.dart';
 
-import '../models/app_colors.dart';
-import '../models/arrival_info.dart';
-import '../models/secret.dart';
 import 'edit_favourite_screen.dart';
 
 class ManageFavouritesScreen extends StatefulWidget {

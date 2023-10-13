@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/widgets/recent_search_list.dart';
+import 'package:transito/providers/search_provider.dart';
+import 'package:transito/widgets/search/recent_search_list.dart';
 
-import '../../providers/search_provider.dart';
-import '../search_screen.dart';
+import 'search_screen.dart';
 
 class RecentSearchScreen extends StatefulWidget {
   const RecentSearchScreen({Key? key}) : super(key: key);

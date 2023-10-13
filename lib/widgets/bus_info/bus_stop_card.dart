@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app_colors.dart';
-
-import '../models/bus_stops.dart';
-import '../providers/search_provider.dart';
-import '../screens/bus_stop_info_screen.dart';
-import '../screens/bus_timing_screen.dart';
+import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/providers/search_provider.dart';
+import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
+import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 
 class BusStopCard extends StatelessWidget {
   const BusStopCard(

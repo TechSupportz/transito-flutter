@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:transito/models/app/app_colors.dart';
 
-import '../models/app_colors.dart';
-
-class BusServiceBox extends StatelessWidget {
-  const BusServiceBox({Key? key, required this.busServiceNumber}) : super(key: key);
+class BusServiceChip extends StatelessWidget {
+  const BusServiceChip({Key? key, required this.busServiceNumber}) : super(key: key);
 
   final String busServiceNumber;
 

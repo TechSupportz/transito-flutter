@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
-import 'package:transito/screens/navbar/main_screen.dart';
+import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
 
 class LocationAccessScreen extends StatefulWidget {
@@ -27,7 +27,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
   void goToMainScreen() {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (context) => const MainScreen(),
+        builder: (context) => const NavigatorScreen(),
       ),
     );
   }

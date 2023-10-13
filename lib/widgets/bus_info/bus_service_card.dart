@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/bus_services.dart';
+import 'package:transito/models/api/lta/bus_services.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
-
-import '../models/app_colors.dart';
-import '../providers/search_provider.dart';
-import '../screens/bus_service_info_screen.dart';
+import 'package:transito/providers/search_provider.dart';
+import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceCard extends StatelessWidget {
   const BusServiceCard({Key? key, required this.busServiceInfo}) : super(key: key);

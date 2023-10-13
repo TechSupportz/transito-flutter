@@ -8,18 +8,18 @@ import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app_colors.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/secret.dart';
 import 'package:transito/providers/common_provider.dart';
+import 'package:transito/providers/favourites_service.dart';
+import 'package:transito/screens/favourites/add_favourite_screen.dart';
+import 'package:transito/screens/favourites/edit_favourite_screen.dart';
+import 'package:transito/widgets/bus_info/bus_service_chip.dart';
+import 'package:transito/widgets/common/error_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../models/arrival_info.dart';
-import '../models/secret.dart';
-import '../providers/favourites_service.dart';
-import '../widgets/bus_service_box.dart';
-import '../widgets/error_text.dart';
-import 'add_favourite_screen.dart';
 import 'bus_timing_screen.dart';
-import 'edit_favourite_screen.dart';
 
 class BusStopInfoScreen extends StatefulWidget {
   const BusStopInfoScreen(
@@ -269,7 +269,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                           runSpacing: 8,
                                           children: snapshot.data!
                                               .map(
-                                                (serviceNum) => BusServiceBox(
+                                                (serviceNum) => BusServiceChip(
                                                   busServiceNumber: serviceNum,
                                                 ),
                                               )

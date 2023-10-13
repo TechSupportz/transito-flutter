@@ -2,11 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/providers/favourites_service.dart';
-import 'package:transito/screens/manage_favourites_screen.dart';
-import 'package:transito/widgets/favourites_timing_card.dart';
-
-import '../../models/favourite.dart';
+import 'package:transito/screens/favourites/manage_favourites_screen.dart';
+import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class FavouritesScreen extends StatefulWidget {
   const FavouritesScreen({Key? key}) : super(key: key);

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:transito/models/api/lta/bus_services.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/enums/bus_operator_enum.dart';
 
-import '../models/app_colors.dart';
-import '../models/bus_services.dart';
-import '../models/enums/bus_operator_enum.dart';
 
 class BusServiceInfoScreen extends StatelessWidget {
   const BusServiceInfoScreen({

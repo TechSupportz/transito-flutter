@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:transito/models/app_colors.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_type_enum.dart';
 import 'package:transito/models/enums/crowd_lvl_enum.dart';
-
-import '../models/arrival_info.dart';
 
 class BusTimingRow extends StatefulWidget {
   const BusTimingRow({
@@ -37,8 +36,9 @@ class _BusTimingRowState extends State<BusTimingRow> {
       }
     } else {
       if (arrivalTime != null && arrivalTime != '') {
-        num minutesToArrival =
-            Jiffy.parse(arrivalTime.split("+")[0]).diff(Jiffy.now(), unit: Unit.minute, asFloat: false).ceil();
+        num minutesToArrival = Jiffy.parse(arrivalTime.split("+")[0])
+            .diff(Jiffy.now(), unit: Unit.minute, asFloat: false)
+            .ceil();
         if (minutesToArrival < -1) {
           return "left";
         } else if (minutesToArrival <= 1) {

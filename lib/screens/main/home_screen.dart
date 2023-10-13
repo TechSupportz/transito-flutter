@@ -7,21 +7,20 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app_colors.dart';
-import 'package:transito/models/favourite.dart';
-import 'package:transito/models/nearby_bus_stops.dart';
+import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/nearby_bus_stops.dart';
+import 'package:transito/models/favourites/favourite.dart';
+import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_service.dart';
 import 'package:transito/providers/settings_service.dart';
-import 'package:transito/screens/mrt_map_screen.dart';
+import 'package:transito/screens/main/mrt_map_screen.dart';
+import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
-import 'package:transito/screens/settings_screen.dart';
-import 'package:transito/widgets/error_text.dart';
-
-import '../../models/bus_stops.dart';
-import '../../models/user_settings.dart';
-import '../../widgets/bus_stop_card.dart';
-import '../../widgets/favourites_timing_card.dart';
+import 'package:transito/widgets/bus_info/bus_stop_card.dart';
+import 'package:transito/widgets/common/error_text.dart';
+import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({Key? key}) : super(key: key);
