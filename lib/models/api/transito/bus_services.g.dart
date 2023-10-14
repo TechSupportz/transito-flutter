@@ -16,14 +16,13 @@ AllBusServices _$AllBusServicesFromJson(Map<String, dynamic> json) =>
 
 BusServiceInfo _$BusServiceInfoFromJson(Map<String, dynamic> json) =>
     BusServiceInfo(
-      serviceNo: json['ServiceNo'] as String,
-      operator: BusServiceInfo.decodeBusOperator(json['Operator'] as String),
-      direction: json['Direction'] as int,
-      category: json['Category'] as String,
-      originCode: json['OriginCode'] as String,
-      destinationCode: json['DestinationCode'] as String,
-      AMPeakFreq: json['AM_Peak_Freq'] as String,
-      AMOffPeakFreq: json['AM_Offpeak_Freq'] as String,
-      PMPeakFreq: json['PM_Peak_Freq'] as String,
-      PMOffPeakFreq: json['PM_Offpeak_Freq'] as String,
+      serviceNo: json['serviceNo'] as String,
+      operator: BusServiceInfo.decodeBusOperator(json['operator'] as String),
+      isLoopService: json['isLoopService'] as bool,
+      interchanges: (json['interchanges'] as List<dynamic>)
+          .map((e) => SimpleBusStopInfo.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      busRoutes: (json['busRoutes'] as List<dynamic>)
+          .map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );

@@ -33,12 +33,14 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
       // floating action button to clear the recent searches list by calling a function in the search provider
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SearchScreen(),
-            ),
-          );
+          // FIXME - this is a temp fix to the issue of the search screen not being able to be opened from the recent search screen
+          // 
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => const SearchScreen(),
+          //   ),
+          // );
           HapticFeedback.selectionClick();
         },
         heroTag: 'searchIcon',

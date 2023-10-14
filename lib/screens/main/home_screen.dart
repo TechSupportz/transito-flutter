@@ -5,12 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/app/nearby_bus_stops.dart';
 import 'package:transito/models/favourites/favourite.dart';
+import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/providers/common_provider.dart';
 import 'package:transito/providers/favourites_service.dart';
@@ -32,7 +33,7 @@ class HomeScreen extends StatefulWidget {
 const distance = Distance();
 
 class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin<HomeScreen> {
-  late Future<List<NearbyBusStops>> nearbyBusStops;
+  late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
   bool isFabVisible = true;
@@ -68,31 +69,21 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     return position;
   }
 
-  // fetches the bus stop json file from the assets folder and decodes it into a list of BusStops objects
-  Future<List<BusStopInfo>> fetchBusStops() async {
-    debugPrint("Fetching bus stops");
-    final String response = await rootBundle.loadString('assets/bus_stops.json');
-    return AllBusStops.fromJson(jsonDecode(response)).busStops;
-  }
-
-  Future<List<NearbyBusStops>> getNearbyBusStops() async {
+  Future<List<NearbyBusStop>> getNearbyBusStops() async {
     debugPrint("Fetching nearby bus stops");
-    List<NearbyBusStops> _nearbyBusStops = [];
     Position userLocation = await getUserLocation();
-    List<BusStopInfo> allBusStops = await fetchBusStops();
 
-    // searches through the list of bus stops and returns those within 500m to the user's current location sorted by nearest to farthest
-    for (var busStop in allBusStops) {
-      LatLng busStopLocation = LatLng(busStop.latitude, busStop.longitude);
-      double distanceAway = distance.as(
-          LengthUnit.Meter, LatLng(userLocation.latitude, userLocation.longitude), busStopLocation);
-      if (distanceAway <= 500) {
-        _nearbyBusStops.add(NearbyBusStops(busStopInfo: busStop, distanceFromUser: distanceAway));
-      }
+    final response = await http.get(Uri.parse(
+        '${Secret.API_URL}/bus-stops/nearby?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}'));
+
+    if (response.statusCode == 200) {
+      debugPrint("Nearby bus stops fetched");
+      // print(response.body);
+      return NearbyBusStopsApiResponse.fromJson(jsonDecode(response.body)).data;
+    } else {
+      debugPrint("Failed to fetch nearby bus stops");
+      throw Exception('Failed to fetch nearby bus stops');
     }
-    List<NearbyBusStops> _tempNearbyBusStops = _nearbyBusStops;
-    _tempNearbyBusStops.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
-    return _tempNearbyBusStops;
   }
 
   // function to get the user's nearby favourites
@@ -283,7 +274,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                 UserSettings userSettings = snapshot.data as UserSettings;
                 return FutureBuilder(
                     future: nearbyBusStops,
-                    builder: (BuildContext context, AsyncSnapshot<List<NearbyBusStops>> snapshot) {
+                    builder: (BuildContext context, AsyncSnapshot<List<NearbyBusStop>> snapshot) {
                       // display a loading indicator while the list of nearby bus stops is being fetched
                       if (snapshot.hasData && snapshot.data != null) {
                         if (snapshot.data!.isNotEmpty) {
@@ -298,10 +289,10 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                             physics: const NeverScrollableScrollPhysics(),
                             children: [
                               // loop through nearby bus stops and send their data to the BusStopCard widget to display them
-                              for (var busStop in snapshot.data!)
+                              for (var data in snapshot.data!)
                                 BusStopCard(
-                                  busStopInfo: busStop.busStopInfo,
-                                  distanceFromUser: busStop.distanceFromUser,
+                                  busStopInfo: data.busStop,
+                                  distanceFromUser: data.distanceAway.toDouble(),
                                   showDistanceFromUser: userSettings.showNearbyDistance ?? true,
                                 ),
                             ],

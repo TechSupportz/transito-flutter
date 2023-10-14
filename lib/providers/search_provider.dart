@@ -1,8 +1,8 @@
 // ignore_for_file: no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
-import 'package:transito/models/api/lta/bus_services.dart';
-import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 
 class SearchProvider extends ChangeNotifier {
   // stores both the bus services and bus stops hence its a dynamic list

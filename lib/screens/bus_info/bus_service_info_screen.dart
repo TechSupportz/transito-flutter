@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:transito/models/api/lta/bus_services.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
-
 
 class BusServiceInfoScreen extends StatelessWidget {
   const BusServiceInfoScreen({
@@ -81,6 +80,7 @@ class BusServiceInfoScreen extends StatelessWidget {
                   child: Table(
                     defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     defaultColumnWidth: const FixedColumnWidth(250),
+                    // FIXME - Display actual information here
                     children: [
                       const TableRow(
                         children: [
@@ -92,25 +92,25 @@ class BusServiceInfoScreen extends StatelessWidget {
                       TableRow(
                         children: [
                           const Text('6:30am - 8:30am', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.AMPeakFreq, style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Text('8:31am - 4:59pm', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.AMOffPeakFreq, style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Text('5:00pm - 7:00pm', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.PMPeakFreq, style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                       TableRow(
                         children: [
                           const Text('After 7:00pm', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.PMOffPeakFreq, style: const TextStyle(fontSize: 21)),
+                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
                         ],
                       ),
                     ],

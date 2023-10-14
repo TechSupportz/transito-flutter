@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/api/lta/bus_services.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
+
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
 import 'package:transito/providers/search_provider.dart';

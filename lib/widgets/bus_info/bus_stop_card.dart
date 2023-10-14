@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/api/lta/bus_stops.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/providers/search_provider.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
@@ -68,23 +68,23 @@ class BusStopCard extends StatelessWidget {
       child: Tooltip(
         preferBelow: false,
         showDuration: const Duration(milliseconds: 350),
-        message: busStopInfo.busStopName,
+        message: busStopInfo.name,
         child: InkWell(
           onTap: () {
             if (searchMode) {
               searchProvider.addRecentSearch(busStopInfo);
               goToBusStopInfoScreen(
                 context,
-                busStopInfo.busStopCode,
-                busStopInfo.busStopName,
+                busStopInfo.code,
+                busStopInfo.name,
                 busStopInfo.roadName,
                 LatLng(busStopInfo.latitude, busStopInfo.longitude),
               );
             } else {
               goToBusTimingScreen(
                 context,
-                busStopInfo.busStopCode,
-                busStopInfo.busStopName,
+                busStopInfo.code,
+                busStopInfo.name,
                 busStopInfo.roadName,
                 LatLng(busStopInfo.latitude, busStopInfo.longitude),
               );
@@ -102,7 +102,7 @@ class BusStopCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  busStopInfo.busStopName,
+                  busStopInfo.name,
                   overflow: TextOverflow.fade,
                   maxLines: 1,
                   softWrap: false,
@@ -120,7 +120,7 @@ class BusStopCard extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
                       child: Text(
-                        busStopInfo.busStopCode,
+                        busStopInfo.code,
                       ),
                     ),
                     Expanded(
