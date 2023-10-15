@@ -17,7 +17,7 @@ BusRouteInfo _$BusRouteInfoFromJson(Map<String, dynamic> json) => BusRouteInfo(
           SimpleBusStopInfo.fromJson(json['busStop'] as Map<String, dynamic>),
       direction: json['direction'] as int,
       sequence: json['sequence'] as int,
-      distance: json['distance'] as int,
+      distance: (json['distance'] as num).toDouble(),
       firstBus: BusSchedule.fromJson(json['firstBus'] as Map<String, dynamic>),
       lastBus: BusSchedule.fromJson(json['lastBus'] as Map<String, dynamic>),
     );

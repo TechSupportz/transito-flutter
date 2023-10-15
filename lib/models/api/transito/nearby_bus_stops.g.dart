@@ -18,5 +18,5 @@ NearbyBusStopsApiResponse _$NearbyBusStopsApiResponseFromJson(
 NearbyBusStop _$NearbyBusStopFromJson(Map<String, dynamic> json) =>
     NearbyBusStop(
       busStop: BusStopInfo.fromJson(json['busStop'] as Map<String, dynamic>),
-      distanceAway: json['distanceAway'] as int,
+      distanceAway: (json['distanceAway'] as num).toDouble(),
     );

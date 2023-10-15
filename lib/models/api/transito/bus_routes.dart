@@ -26,7 +26,7 @@ class BusRouteInfo {
   int direction;
 
   int sequence;
-  int distance;
+  double distance;
   BusSchedule firstBus;
   BusSchedule lastBus;
 

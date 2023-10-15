@@ -292,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                               for (var data in snapshot.data!)
                                 BusStopCard(
                                   busStopInfo: data.busStop,
-                                  distanceFromUser: data.distanceAway.toDouble(),
+                                  distanceFromUser: data.distanceAway,
                                   showDistanceFromUser: userSettings.showNearbyDistance ?? true,
                                 ),
                             ],

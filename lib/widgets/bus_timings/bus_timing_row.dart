@@ -88,7 +88,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
               Text(
-                'about ${calculateDistanceAway()} away',
+                '~ ${calculateDistanceAway()} away',
                 style: const TextStyle(
                     fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
               ),
