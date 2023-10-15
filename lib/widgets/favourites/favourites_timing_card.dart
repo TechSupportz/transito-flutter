@@ -21,18 +21,18 @@ import 'package:transito/widgets/common/error_text.dart';
 class FavouritesTimingCard extends StatefulWidget {
   const FavouritesTimingCard({
     Key? key,
-    required this.busStopCode,
-    required this.busStopName,
-    required this.busStopAddress,
-    required this.busStopLocation,
+    required this.code,
+    required this.name,
+    required this.address,
     required this.services,
+    required this.busStopLocation,
   }) : super(key: key);
 
-  final String busStopCode;
-  final String busStopName;
-  final String busStopAddress;
-  final LatLng busStopLocation;
+  final String code;
+  final String name;
+  final String address;
   final List<String?> services;
+  final LatLng busStopLocation;
 
   @override
   State<FavouritesTimingCard> createState() => _FavouritesTimingCardState();
@@ -54,7 +54,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     // gets response from api
     final response = await http.get(
         Uri.parse(
-            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.busStopCode}'),
+            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.code}'),
         headers: requestHeaders);
 
     // if response is successful, parse the response and return it as a BusArrivalInfo object
@@ -109,15 +109,15 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 fontWeight: FontWeight.w500,
               ),
               showDuration: const Duration(milliseconds: 350),
-              message: widget.busStopName,
+              message: widget.name,
               child: GestureDetector(
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => BusTimingScreen(
-                      busStopCode: widget.busStopCode,
-                      busStopName: widget.busStopName,
-                      busStopAddress: widget.busStopAddress,
+                      code: widget.code,
+                      name: widget.name,
+                      address: widget.address,
                       busStopLocation: widget.busStopLocation,
                     ),
                   ),
@@ -134,7 +134,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                       Padding(
                         padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
                         child: Text(
-                          widget.busStopName,
+                          widget.name,
                           overflow: TextOverflow.fade,
                           maxLines: 1,
                           softWrap: false,

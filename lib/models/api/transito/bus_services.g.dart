@@ -14,6 +14,13 @@ AllBusServices _$AllBusServicesFromJson(Map<String, dynamic> json) =>
           .toList(),
     );
 
+BusStopServicesApiResponse _$BusStopServicesApiResponseFromJson(
+        Map<String, dynamic> json) =>
+    BusStopServicesApiResponse(
+      count: json['count'] as int,
+      data: (json['data'] as List<dynamic>).map((e) => e as String).toList(),
+    );
+
 BusServiceInfo _$BusServiceInfoFromJson(Map<String, dynamic> json) =>
     BusServiceInfo(
       serviceNo: json['serviceNo'] as String,

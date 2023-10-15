@@ -22,30 +22,42 @@ class BusStopCard extends StatelessWidget {
   final bool searchMode;
 
   // function that navigates user to bus timing screen
-  void goToBusTimingScreen(BuildContext context, String busStopCode, String busStopName,
-      String busStopAddress, LatLng busStopLocation) {
+  void goToBusTimingScreen(
+    BuildContext context,
+    String code,
+    String name,
+    String address,
+    List<String> services,
+    LatLng busStopLocation,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BusTimingScreen(
-          busStopCode: busStopCode,
-          busStopName: busStopName,
-          busStopAddress: busStopAddress,
+          code: code,
+          name: name,
+          address: address,
           busStopLocation: busStopLocation,
         ),
       ),
     );
   }
 
-  void goToBusStopInfoScreen(BuildContext context, String busStopCode, String busStopName,
-      String busStopAddress, LatLng busStopLocation) {
+  void goToBusStopInfoScreen(
+    BuildContext context,
+    String code,
+    String name,
+    String address,
+    List<String> services,
+    LatLng busStopLocation,
+  ) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BusStopInfoScreen(
-          busStopCode: busStopCode,
-          busStopName: busStopName,
-          busStopAddress: busStopAddress,
+          code: code,
+          name: name,
+          address: address,
           busStopLocation: busStopLocation,
         ),
       ),
@@ -78,6 +90,7 @@ class BusStopCard extends StatelessWidget {
                 busStopInfo.code,
                 busStopInfo.name,
                 busStopInfo.roadName,
+                busStopInfo.services,
                 LatLng(busStopInfo.latitude, busStopInfo.longitude),
               );
             } else {
@@ -86,6 +99,7 @@ class BusStopCard extends StatelessWidget {
                 busStopInfo.code,
                 busStopInfo.name,
                 busStopInfo.roadName,
+                busStopInfo.services,
                 LatLng(busStopInfo.latitude, busStopInfo.longitude),
               );
             }

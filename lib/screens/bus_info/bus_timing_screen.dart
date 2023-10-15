@@ -24,16 +24,17 @@ import 'package:transito/widgets/common/error_text.dart';
 import 'bus_stop_info_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
-  const BusTimingScreen(
-      {Key? key,
-      required this.busStopCode,
-      required this.busStopName,
-      required this.busStopAddress,
-      required this.busStopLocation})
-      : super(key: key);
-  final String busStopCode;
-  final String busStopName;
-  final String busStopAddress;
+  const BusTimingScreen({
+    Key? key,
+    required this.code,
+    required this.name,
+    required this.address,
+    required this.busStopLocation,
+  }) : super(key: key);
+
+  final String code;
+  final String name;
+  final String address;
   final LatLng busStopLocation;
 
   @override
@@ -66,7 +67,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     // gets response from api
     final response = await http.get(
         Uri.parse(
-            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.busStopCode}'),
+            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.code}'),
         headers: requestHeaders);
 
     // if response is successful, parse the response and return it as a BusArrivalInfo object
@@ -112,9 +113,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => AddFavouritesScreen(
-          busStopCode: widget.busStopCode,
-          busStopName: widget.busStopName,
-          busStopAddress: widget.busStopAddress,
+          busStopCode: widget.code,
+          busStopName: widget.name,
+          busStopAddress: widget.address,
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
@@ -130,9 +131,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => EditFavouritesScreen(
-          busStopCode: widget.busStopCode,
-          busStopName: widget.busStopName,
-          busStopAddress: widget.busStopAddress,
+          busStopCode: widget.code,
+          busStopName: widget.name,
+          busStopAddress: widget.address,
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
@@ -156,9 +157,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => BusStopInfoScreen(
-          busStopCode: widget.busStopCode,
-          busStopName: widget.busStopName,
-          busStopAddress: widget.busStopAddress,
+          code: widget.code,
+          name: widget.name,
+          address: widget.address,
           busStopLocation: widget.busStopLocation,
         ),
       ),
@@ -181,7 +182,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
             ));
 
     var userId = context.read<User?>()?.uid;
-    FavouritesService().isAddedToFavourites(widget.busStopCode, userId!).then((value) {
+    FavouritesService().isAddedToFavourites(widget.code, userId!).then((value) {
       print(value);
       setState(() {
         isAddedToFavourites = value;
@@ -197,7 +198,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
       appBar: AppBar(
         title: GestureDetector(
           onTap: () => goToBusStopInfoScreen(context),
-          child: Text(widget.busStopName),
+          child: Text(widget.name),
         ),
         actions: [
           // display different IconButtons depending on whether the bus stop is a favourite or not

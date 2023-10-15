@@ -72,9 +72,9 @@ class _FavouritesScreenState extends State<FavouritesScreen>
                       child: ListView.separated(
                         itemBuilder: (context, int index) {
                           return FavouritesTimingCard(
-                            busStopCode: favouritesList[index].busStopCode,
-                            busStopName: favouritesList[index].busStopName,
-                            busStopAddress: favouritesList[index].busStopAddress,
+                            code: favouritesList[index].busStopCode,
+                            name: favouritesList[index].busStopName,
+                            address: favouritesList[index].busStopAddress,
                             busStopLocation: favouritesList[index].busStopLocation,
                             services: favouritesList[index].services,
                           );

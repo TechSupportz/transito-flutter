@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 // import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:http/http.dart' as http;
-import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:skeletons/skeletons.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/providers/common_provider.dart';
@@ -22,17 +23,17 @@ import 'package:url_launcher/url_launcher.dart';
 import 'bus_timing_screen.dart';
 
 class BusStopInfoScreen extends StatefulWidget {
-  const BusStopInfoScreen(
-      {Key? key,
-      required this.busStopCode,
-      required this.busStopName,
-      required this.busStopAddress,
-      required this.busStopLocation})
-      : super(key: key);
+  const BusStopInfoScreen({
+    Key? key,
+    required this.code,
+    required this.name,
+    required this.address,
+    required this.busStopLocation,
+  }) : super(key: key);
 
-  final String busStopCode;
-  final String busStopName;
-  final String busStopAddress;
+  final String code;
+  final String name;
+  final String address;
   final LatLng busStopLocation;
 
   @override
@@ -40,8 +41,8 @@ class BusStopInfoScreen extends StatefulWidget {
 }
 
 class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
-  late Future<BusArrivalInfo> futureBusArrivalInfo;
-  late Future<List<String>> futureBusServices;
+  late Future<List<String>> futureCurrOperatingServices;
+  late Future<List<String>> futureServices;
   bool isAddedToFavourites = false;
 
   // api request headers
@@ -50,40 +51,41 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
     'AccountKey': Secret.LTA_API_KEY
   };
 
-  // function to fetch bus arrival info
-  Future<BusArrivalInfo> fetchArrivalTimings() async {
-    debugPrint("Fetching arrival timings");
+  // function to fetch all services of a bus stop
+  Future<List<String>> fetchServices() async {
+    debugPrint("Fetching all services");
+
+    final response = await http.get(
+      Uri.parse('${Secret.API_URL}/bus-stop/${widget.code}/services'),
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint("Services fetched");
+      return BusStopServicesApiResponse.fromJson(json.decode(response.body)).data;
+    } else {
+      debugPrint("Error fetching bus stop services");
+      throw Exception("Error fetching bus stop services");
+    }
+  }
+
+  // function to fetch currently operating services bus arrival info
+  Future<List<String>> fetchCurrOperatingServices() async {
+    debugPrint("Fetching currently operating services");
     // gets response from api
     final response = await http.get(
         Uri.parse(
-            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.busStopCode}'),
+            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.code}'),
         headers: requestHeaders);
 
     // if response is successful, parse the response and return it as a BusArrivalInfo object
     if (response.statusCode == 200) {
-      debugPrint("Timing fetched");
-      return BusArrivalInfo.fromJson(jsonDecode(response.body));
+      debugPrint("Currently operating services fetched");
+      final busArrivalInfo = BusArrivalInfo.fromJson(jsonDecode(response.body));
+      return busArrivalInfo.services.map((e) => e.serviceNum).toList();
     } else {
-      debugPrint("Error fetching arrival timings");
+      debugPrint("Error fetching currently operating services");
       throw Exception('Failed to load data');
     }
-  }
-
-  // function to get the list of bus services that are currently operating at that bus stop
-  Future<List<String>> getBusServiceNumList() async {
-    List<String> busServicesList = await futureBusArrivalInfo.then(
-      (value) {
-        List<String> _busServicesList = [];
-        for (var service in value.services) {
-          _busServicesList.add(service.serviceNum);
-          // debugPrint('$_busServicesList');
-        }
-        return _busServicesList;
-      },
-    );
-    // debugPrint('$busServicesList');
-    // debugPrint('${busServicesList.isEmpty}');
-    return busServicesList;
   }
 
   Future<void> openMaps(LatLng navigationLocation) async {
@@ -103,9 +105,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => BusTimingScreen(
-          busStopCode: widget.busStopCode,
-          busStopName: widget.busStopName,
-          busStopAddress: widget.busStopAddress,
+          code: widget.code,
+          name: widget.name,
+          address: widget.address,
           busStopLocation: widget.busStopLocation,
         ),
       ),
@@ -114,15 +116,15 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
   Future<void> goToAddFavouritesScreen() async {
-    List<String> busServicesList = await getBusServiceNumList();
+    List<String> busServicesList = await fetchCurrOperatingServices();
     // debugPrint('$busServicesList');
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => AddFavouritesScreen(
-          busStopCode: widget.busStopCode,
-          busStopName: widget.busStopName,
-          busStopAddress: widget.busStopAddress,
+          busStopCode: widget.code,
+          busStopName: widget.name,
+          busStopAddress: widget.address,
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
@@ -132,15 +134,15 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the edit favourites screen
   Future<void> goToEditFavouritesScreen() async {
-    List<String> busServicesList = await getBusServiceNumList();
+    List<String> busServicesList = await fetchCurrOperatingServices();
     // debugPrint('$busServicesList');
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => EditFavouritesScreen(
-          busStopCode: widget.busStopCode,
-          busStopName: widget.busStopName,
-          busStopAddress: widget.busStopAddress,
+          busStopCode: widget.code,
+          busStopName: widget.name,
+          busStopAddress: widget.address,
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
@@ -152,11 +154,11 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   @override
   void initState() {
     super.initState();
-    futureBusArrivalInfo = fetchArrivalTimings();
-    futureBusServices = getBusServiceNumList();
+    futureCurrOperatingServices = fetchCurrOperatingServices();
+    futureServices = fetchServices();
 
     var userId = context.read<User?>()?.uid;
-    FavouritesService().isAddedToFavourites(widget.busStopCode, userId!).then((value) {
+    FavouritesService().isAddedToFavourites(widget.code, userId!).then((value) {
       setState(() {
         isAddedToFavourites = value;
         debugPrint('isAddedToFavourites: $isAddedToFavourites');
@@ -199,7 +201,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            widget.busStopName,
+                            widget.name,
                             overflow: TextOverflow.fade,
                             maxLines: 1,
                             softWrap: false,
@@ -219,11 +221,11 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                 decoration: BoxDecoration(
                                     color: AppColors.accentColour,
                                     borderRadius: BorderRadius.circular(5)),
-                                child: Text(widget.busStopCode,
+                                child: Text(widget.code,
                                     style: const TextStyle(fontWeight: FontWeight.w500)),
                               ),
                               Text(
-                                widget.busStopAddress,
+                                widget.address,
                                 overflow: TextOverflow.fade,
                                 maxLines: 1,
                                 softWrap: false,
@@ -241,7 +243,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const Text(
-                            'Operating Bus Services',
+                            'Bus Services',
                             style: TextStyle(
                               fontSize: 21,
                               fontWeight: FontWeight.w600,
@@ -251,37 +253,38 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                             height: 8,
                           ),
                           FutureBuilder(
-                              future: futureBusServices,
-                              builder:
-                                  (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+                              future: Future.wait([fetchCurrOperatingServices(), fetchServices()]),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<List<List<String>>> snapshot) {
                                 if (snapshot.hasData) {
-                                  return snapshot.data!.isEmpty
-                                      ? Text(
-                                          Jiffy.now().hour > 5
-                                              ? 'All the buses are lepaking 🦥'
-                                              : "Buses are sleeping 💤",
-                                          style: const TextStyle(
-                                            fontSize: 18,
+                                  final currOperatingServices = snapshot.data![0];
+                                  final services = snapshot.data![1];
+
+                                  return Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: services
+                                        .map(
+                                          (service) => BusServiceChip(
+                                            busServiceNumber: service,
+                                            isOperating: currOperatingServices.contains(service),
                                           ),
                                         )
-                                      : Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          children: snapshot.data!
-                                              .map(
-                                                (serviceNum) => BusServiceChip(
-                                                  busServiceNumber: serviceNum,
-                                                ),
-                                              )
-                                              .toList(),
-                                        );
+                                        .toList(),
+                                  );
                                 } else if (snapshot.hasError) {
                                   // return Text("${snapshot.error}");
                                   debugPrint("<=== ERROR ${snapshot.error} ===>");
                                   return const ErrorText();
                                 } else {
-                                  return const Center(
-                                      child: CircularProgressIndicator(strokeWidth: 3));
+                                  return Center(
+                                    child: SkeletonLine(
+                                      style: SkeletonLineStyle(
+                                        height: 50,
+                                        borderRadius: BorderRadius.circular(7.5),
+                                      ),
+                                    ),
+                                  );
                                 }
                               }),
                         ],

@@ -22,6 +22,20 @@ class AllBusServices {
 }
 
 @JsonSerializable(explicitToJson: true, createToJson: false)
+class BusStopServicesApiResponse {
+  int count;
+  List<String> data;
+
+  BusStopServicesApiResponse({
+    required this.count,
+    required this.data,
+  });
+
+  factory BusStopServicesApiResponse.fromJson(Map<String, dynamic> json) =>
+      _$BusStopServicesApiResponseFromJson(json);
+}
+
+@JsonSerializable(explicitToJson: true, createToJson: false)
 class BusServiceInfo {
   String serviceNo;
 
@@ -64,8 +78,6 @@ class BusServiceInfo {
     required this.interchanges,
     required this.busRoutes,
   });
-
-  
 
   factory BusServiceInfo.fromJson(Map<String, dynamic> json) => _$BusServiceInfoFromJson(json);
 }

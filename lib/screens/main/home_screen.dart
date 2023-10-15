@@ -361,9 +361,9 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                 return ListView.separated(
                   itemBuilder: (context, int index) {
                     return FavouritesTimingCard(
-                      busStopCode: snapshot.data![index].busStopInfo.busStopCode,
-                      busStopName: snapshot.data![index].busStopInfo.busStopName,
-                      busStopAddress: snapshot.data![index].busStopInfo.busStopAddress,
+                      code: snapshot.data![index].busStopInfo.busStopCode,
+                      name: snapshot.data![index].busStopInfo.busStopName,
+                      address: snapshot.data![index].busStopInfo.busStopAddress,
                       busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
                       services: snapshot.data![index].busStopInfo.services,
                     );
