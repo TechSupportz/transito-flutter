@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
@@ -36,14 +37,15 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
-  bool isFabVisible = true;
+  bool _isFabVisible = true;
+  bool _isFetchingLocation = false;
 
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
-      !isFabVisible ? setState(() => isFabVisible = true) : null;
+      !_isFabVisible ? setState(() => _isFabVisible = true) : null;
     } else if (notification.direction == ScrollDirection.reverse) {
-      isFabVisible ? setState(() => isFabVisible = false) : null;
+      _isFabVisible ? setState(() => _isFabVisible = false) : null;
     }
 
     return true;
@@ -62,16 +64,34 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   }
 
   // gets the user's current location
-  Future<Position> getUserLocation() async {
+  Future<Position> getUserLocation(bool refresh) async {
     debugPrint("Fetching user location");
+    setState(() => _isFetchingLocation = true);
+    Position? lastKnownPosition = await Geolocator.getLastKnownPosition();
+
+    if (!refresh &&
+        lastKnownPosition != null &&
+        Jiffy.parse(lastKnownPosition.timestamp.toString())
+            .subtract(minutes: 5)
+            .isBefore(Jiffy.now())) {
+      debugPrint("Fetched user location from cache");
+
+      setState(() => _isFetchingLocation = false);
+      return lastKnownPosition;
+    }
+
     Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
     debugPrint('$position');
+
+    setState(() => _isFetchingLocation = false);
     return position;
   }
 
-  Future<List<NearbyBusStop>> getNearbyBusStops() async {
+  Future<List<NearbyBusStop>> getNearbyBusStops({
+    bool refresh = false,
+  }) async {
     debugPrint("Fetching nearby bus stops");
-    Position userLocation = await getUserLocation();
+    Position userLocation = await getUserLocation(refresh);
 
     final response = await http.get(Uri.parse(
         '${Secret.API_URL}/bus-stops/nearby?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}'));
@@ -94,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
     List<NearbyFavourites> _nearbyFavourites = [];
     List<Favourite> favouritesList =
         await FavouritesService().getFavourites(context.read<User>().uid);
-    Position userLocation = await getUserLocation();
+    Position userLocation = await getUserLocation(refresh);
 
     // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
     for (var favourite in favouritesList) {
@@ -115,11 +135,10 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
   // function to get the list of all nearby bus stops
   void getAllNearby() async {
     print("Getting all nearby");
-    // Position userLocation = await getUserLocation();
 
     setState(() {
-      nearbyBusStops = getNearbyBusStops();
-      nearbyFavourites = getNearbyFavourites();
+      nearbyBusStops = getNearbyBusStops(refresh: true);
+      nearbyFavourites = getNearbyFavourites(refresh: true);
     });
   }
 
@@ -241,14 +260,16 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
         ),
       ),
       // floating action button to refresh user's location and nearbyBusStops
-      floatingActionButton: isFabVisible
+      floatingActionButton: _isFabVisible
           ? FloatingActionButton(
               heroTag: "homeFAB",
               onPressed: () {
                 getAllNearby();
                 HapticFeedback.selectionClick();
               },
-              child: const Icon(Icons.my_location_rounded),
+              child: _isFetchingLocation
+                  ? const Icon(Icons.location_searching_rounded)
+                  : const Icon(Icons.my_location_rounded),
             )
           : null,
     );
