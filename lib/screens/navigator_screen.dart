@@ -1,7 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/providers/common_provider.dart';
+import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
 import 'package:transito/screens/main/home_screen.dart';
 import 'package:transito/screens/search/recent_search_screen.dart';

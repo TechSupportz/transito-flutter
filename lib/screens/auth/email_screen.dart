@@ -9,7 +9,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/app/app_colors.dart';
-import '../../providers/authentication_service.dart';
+import '../../global/services/authentication_service.dart';
 import '../../widgets/auth/email_verification_dialog.dart';
 import '../onboarding/location_access_screen.dart';
 import 'login_screen.dart';

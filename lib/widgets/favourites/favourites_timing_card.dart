@@ -13,7 +13,7 @@ import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
-import 'package:transito/providers/settings_service.dart';
+import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
 import 'package:transito/widgets/common/error_text.dart';

@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
 
-import '../../providers/settings_service.dart';
+import '../../global/services/settings_service.dart';
 
 class SettingsRadioCard extends StatelessWidget {
   const SettingsRadioCard(

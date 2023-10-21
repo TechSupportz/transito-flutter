@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
-import 'package:transito/providers/search_provider.dart';
+import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/widgets/bus_info/bus_service_card.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 

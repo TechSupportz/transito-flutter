@@ -9,7 +9,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 
-import '../../providers/authentication_service.dart';
+import '../../global/services/authentication_service.dart';
 import '../navigator_screen.dart';
 import '../onboarding/location_access_screen.dart';
 

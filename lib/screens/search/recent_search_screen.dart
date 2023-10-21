@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/providers/search_provider.dart';
+import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/widgets/search/recent_search_list.dart';
 
 import 'search_screen.dart';

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/providers/favourites_service.dart';
+import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 

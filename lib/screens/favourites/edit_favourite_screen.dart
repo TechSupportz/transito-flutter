@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/providers/favourites_service.dart';
+import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/screens/navigator_screen.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
