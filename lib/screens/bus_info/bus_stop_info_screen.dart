@@ -29,12 +29,14 @@ class BusStopInfoScreen extends StatefulWidget {
     required this.name,
     required this.address,
     required this.busStopLocation,
+    this.services,
   }) : super(key: key);
 
   final String code;
   final String name;
   final String address;
   final LatLng busStopLocation;
+  final List<String>? services;
 
   @override
   State<BusStopInfoScreen> createState() => _BusStopInfoScreenState();
@@ -53,6 +55,11 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to fetch all services of a bus stop
   Future<List<String>> fetchServices() async {
+    if (widget.services != null) {
+      debugPrint("Retrieving services from props");
+      return widget.services!;
+    }
+
     debugPrint("Fetching all services");
 
     final response = await http.get(

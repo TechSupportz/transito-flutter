@@ -12,6 +12,7 @@ import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/global/services/favourites_service.dart';
@@ -30,11 +31,13 @@ class BusTimingScreen extends StatefulWidget {
     required this.name,
     required this.address,
     required this.busStopLocation,
+    this.services,
   }) : super(key: key);
 
   final String code;
   final String name;
   final String address;
+  final List<String>? services;
   final LatLng busStopLocation;
 
   @override
@@ -43,6 +46,7 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
+  late Future<List<String>> futureServices;
   bool isFabVisible = true;
   bool isAddedToFavourites = false;
   late Timer timer;
@@ -60,6 +64,28 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     'Accept': 'application/json',
     'AccountKey': Secret.LTA_API_KEY
   };
+
+  // function to fetch all services of a bus stop
+  Future<List<String>> fetchServices() async {
+    if (widget.services != null) {
+      debugPrint("Retrieving services from props");
+      return widget.services!;
+    }
+
+    debugPrint("Fetching all services");
+
+    final response = await http.get(
+      Uri.parse('${Secret.API_URL}/bus-stop/${widget.code}/services'),
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint("Services fetched");
+      return BusStopServicesApiResponse.fromJson(json.decode(response.body)).data;
+    } else {
+      debugPrint("Error fetching bus stop services");
+      throw Exception("Error fetching bus stop services");
+    }
+  }
 
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
@@ -161,6 +187,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           name: widget.name,
           address: widget.address,
           busStopLocation: widget.busStopLocation,
+          services: widget.services,
         ),
       ),
     );
@@ -172,6 +199,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     super.initState();
     // print(widget.busStopLocation);
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+    futureServices = fetchServices();
     timer = Timer.periodic(
         const Duration(seconds: 30),
         (Timer t) => setState(
