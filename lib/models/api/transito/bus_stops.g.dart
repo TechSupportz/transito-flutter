@@ -25,6 +25,16 @@ BusStopSearch _$BusStopSearchFromJson(Map<String, dynamic> json) =>
       longitude: (json['longitude'] as num).toDouble(),
     );
 
+BusStopSearchApiResponse _$BusStopSearchApiResponseFromJson(
+        Map<String, dynamic> json) =>
+    BusStopSearchApiResponse(
+      message: json['message'] as String,
+      count: json['count'] as int,
+      data: (json['data'] as List<dynamic>)
+          .map((e) => BusStopSearch.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
 SimpleBusStop _$SimpleBusStopFromJson(Map<String, dynamic> json) =>
     SimpleBusStop(
       code: json['code'] as String,

@@ -44,7 +44,7 @@ class BusService {
 
   bool isLoopService;
   List<SimpleBusStop> interchanges;
-  List<BusRouteInfo> busRoutes;
+  List<BusRouteInfo>? busRoutes;
 
   static BusOperator decodeBusOperator(String busOperator) {
     switch (busOperator) {
@@ -76,7 +76,7 @@ class BusService {
     required this.operator,
     required this.isLoopService,
     required this.interchanges,
-    required this.busRoutes,
+    this.busRoutes,
   });
 
   factory BusService.fromJson(Map<String, dynamic> json) => _$BusServiceFromJson(json);

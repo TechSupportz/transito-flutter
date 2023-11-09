@@ -46,7 +46,7 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
-  late Future<List<String>> futureServices;
+  late Future<List<String>> futureServices; // TODO - Use this to display the non operational services at the bottom of the list
   bool isFabVisible = true;
   bool isAddedToFavourites = false;
   late Timer timer;
@@ -187,7 +187,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           name: widget.name,
           address: widget.address,
           busStopLocation: widget.busStopLocation,
-          services: widget.services,
+          services: widget.services, // NOTE - This can most likely use the futureServices variable instead
         ),
       ),
     );

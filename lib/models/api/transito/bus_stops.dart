@@ -25,23 +25,44 @@ class BusStop {
 }
 
 @JsonSerializable(explicitToJson: true, createToJson: false)
-class BusStopSearch {
-  String code;
-  String name;
-  String roadName;
-
-  double latitude;
-  double longitude;
+class BusStopSearch extends BusStop {
+  @JsonKey(includeFromJson: false)
+  @override
+  // ignore: overridden_fields
+  List<String> services = [];
 
   BusStopSearch({
-    required this.code,
-    required this.roadName,
-    required this.name,
-    required this.latitude,
-    required this.longitude,
-  });
+    required String code,
+    required String roadName,
+    required String name,
+    required double latitude,
+    required double longitude,
+  }) : super(
+          code: code,
+          roadName: roadName,
+          name: name,
+          latitude: latitude,
+          longitude: longitude,
+          services: [],
+        );
 
   factory BusStopSearch.fromJson(Map<String, dynamic> json) => _$BusStopSearchFromJson(json);
+}
+
+@JsonSerializable(explicitToJson: true, createToJson: false)
+class BusStopSearchApiResponse {
+  String message;
+  int count;
+  List<BusStopSearch> data;
+
+  BusStopSearchApiResponse({
+    required this.message,
+    required this.count,
+    required this.data,
+  });
+
+  factory BusStopSearchApiResponse.fromJson(Map<String, dynamic> json) =>
+      _$BusStopSearchApiResponseFromJson(json);
 }
 
 @JsonSerializable(explicitToJson: true, createToJson: false)

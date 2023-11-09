@@ -34,13 +34,12 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // FIXME - this is a temp fix to the issue of the search screen not being able to be opened from the recent search screen
-          // 
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => const SearchScreen(),
-          //   ),
-          // );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SearchScreen(),
+            ),
+          );
           HapticFeedback.selectionClick();
         },
         heroTag: 'searchIcon',

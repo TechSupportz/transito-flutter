@@ -96,7 +96,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   }
 
   Future<void> openMaps(LatLng navigationLocation) async {
-    var uri = Uri.parse(
+    Uri uri = Uri.parse(
         'https://www.google.com/maps/search/?api=1&query=${navigationLocation.latitude},${navigationLocation.longitude}');
 
     if (await canLaunchUrl(uri)) {

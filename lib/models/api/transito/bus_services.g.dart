@@ -28,7 +28,7 @@ BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       interchanges: (json['interchanges'] as List<dynamic>)
           .map((e) => SimpleBusStop.fromJson(e as Map<String, dynamic>))
           .toList(),
-      busRoutes: (json['busRoutes'] as List<dynamic>)
-          .map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))
+      busRoutes: (json['busRoutes'] as List<dynamic>?)
+          ?.map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
