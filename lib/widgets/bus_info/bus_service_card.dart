@@ -10,7 +10,7 @@ import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 class BusServiceCard extends StatelessWidget {
   const BusServiceCard({Key? key, required this.busServiceInfo}) : super(key: key);
 
-  final BusServiceInfo busServiceInfo;
+  final BusService busServiceInfo;
 
   // function that returns the correct colours for each bus operator
   Color getOperatorColor(BusOperator operator) {

@@ -9,7 +9,7 @@ class BusServiceInfoScreen extends StatelessWidget {
     required this.busServiceInfo,
   }) : super(key: key);
 
-  final BusServiceInfo busServiceInfo;
+  final BusService busServiceInfo;
 
   // function that returns the correct colours for each bus operator
   Color getOperatorColor(BusOperator operator) {

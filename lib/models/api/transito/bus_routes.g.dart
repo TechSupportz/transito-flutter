@@ -13,8 +13,7 @@ BusSchedule _$BusScheduleFromJson(Map<String, dynamic> json) => BusSchedule(
     );
 
 BusRouteInfo _$BusRouteInfoFromJson(Map<String, dynamic> json) => BusRouteInfo(
-      busStop:
-          SimpleBusStopInfo.fromJson(json['busStop'] as Map<String, dynamic>),
+      busStop: SimpleBusStop.fromJson(json['busStop'] as Map<String, dynamic>),
       direction: json['direction'] as int,
       sequence: json['sequence'] as int,
       distance: (json['distance'] as num).toDouble(),

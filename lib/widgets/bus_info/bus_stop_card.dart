@@ -16,7 +16,7 @@ class BusStopCard extends StatelessWidget {
       this.showDistanceFromUser = false})
       : super(key: key);
 
-  final BusStopInfo busStopInfo;
+  final BusStop busStopInfo;
   final double? distanceFromUser;
   final bool showDistanceFromUser;
   final bool searchMode;

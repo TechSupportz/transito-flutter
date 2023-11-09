@@ -11,7 +11,7 @@ class AllBusServices {
   String metadata;
 
   @JsonKey(name: 'value')
-  List<BusServiceInfo> busServices;
+  List<BusService> busServices;
 
   AllBusServices({
     required this.metadata,
@@ -36,14 +36,14 @@ class BusStopServicesApiResponse {
 }
 
 @JsonSerializable(explicitToJson: true, createToJson: false)
-class BusServiceInfo {
+class BusService {
   String serviceNo;
 
   @JsonKey(fromJson: decodeBusOperator)
   BusOperator operator;
 
   bool isLoopService;
-  List<SimpleBusStopInfo> interchanges;
+  List<SimpleBusStop> interchanges;
   List<BusRouteInfo> busRoutes;
 
   static BusOperator decodeBusOperator(String busOperator) {
@@ -71,7 +71,7 @@ class BusServiceInfo {
     }
   }
 
-  BusServiceInfo({
+  BusService({
     required this.serviceNo,
     required this.operator,
     required this.isLoopService,
@@ -79,5 +79,5 @@ class BusServiceInfo {
     required this.busRoutes,
   });
 
-  factory BusServiceInfo.fromJson(Map<String, dynamic> json) => _$BusServiceInfoFromJson(json);
+  factory BusService.fromJson(Map<String, dynamic> json) => _$BusServiceFromJson(json);
 }

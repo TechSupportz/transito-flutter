@@ -5,7 +5,6 @@ import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/widgets/bus_info/bus_service_card.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 
-
 class RecentSearchList extends StatelessWidget {
   const RecentSearchList({Key? key}) : super(key: key);
 
@@ -29,7 +28,7 @@ class RecentSearchList extends StatelessWidget {
       itemCount: value.recentSearches.length,
       itemBuilder: (context, index) {
         // determines which widget to show depending on if the recent search is a bus stop or a bus service
-        if (value.recentSearches[index].runtimeType == BusStopInfo) {
+        if (value.recentSearches[index].runtimeType == BusStop) {
           return BusStopCard(busStopInfo: value.recentSearches[index], searchMode: true);
         } else {
           return BusServiceCard(busServiceInfo: value.recentSearches[index]);

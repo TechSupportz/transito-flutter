@@ -20,7 +20,7 @@ class NearbyBusStopsApiResponse {
 
 @JsonSerializable(explicitToJson: true, createToJson: false)
 class NearbyBusStop {
-  BusStopInfo busStop;
+  BusStop busStop;
   double distanceAway;
 
   NearbyBusStop({
