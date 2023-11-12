@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:skeletons/skeletons.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
@@ -32,9 +33,10 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     Tab(text: 'Bus Services'),
   ];
 
+  // debounces the search query to prevent spamming the api
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 250), () {
+    _debounce = Timer(Duration(milliseconds: query.length < 3 ? 0 : 200), () {
       if (_tabController.index == 0) {
         setState(() {
           _futureBusStopSearchResults = searchBusStops(query);
@@ -78,12 +80,12 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     super.initState();
     _tabController = TabController(length: searchTabs.length, vsync: this, initialIndex: 0);
     _futureBusStopSearchResults = Future(() => BusStopSearchApiResponse(
-          message: "",
+          message: "NA",
           count: 0,
           data: [],
         ));
     _futureBusServiceSearchResults = Future(() => BusServiceSearchApiResponse(
-          message: "",
+          message: "NA",
           count: 0,
           data: [],
         ));
@@ -104,6 +106,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
         title: TextField(
           controller: _textFieldController,
           onChanged: (_) => _onSearchChanged(_textFieldController.text),
+          autofocus: true,
           // enabled: _busStopList.isNotEmpty,
           decoration: InputDecoration(
             suffixIcon: IconButton(
@@ -145,21 +148,91 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           if (snapshot.hasData) {
             BusStopSearchApiResponse res = snapshot.data!;
 
-            return ListView.separated(
-              itemCount: res.count,
-              padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-              itemBuilder: (BuildContext context, int index) {
-                return BusStopCard(busStopInfo: res.data[index], searchMode: true);
-              },
-              separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+            if (res.count == 0 && _textFieldController.text.isEmpty) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "🔍 Start typing to find a bus stop 🚏",
+                      style: TextStyle(
+                        color: AppColors.kindaGrey,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "You can search by the bus stop code, \n name or road name",
+                      style: TextStyle(
+                        color: AppColors.kindaGrey,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            if (res.count == 0) {
+              return const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "🔍 We couldn't find any bus stops 🤔",
+                      style: TextStyle(
+                        color: AppColors.kindaGrey,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "Try checking search for typos or use a different search term",
+                      style: TextStyle(
+                        color: AppColors.kindaGrey,
+                        fontWeight: FontWeight.w500,
+                        fontSize: 16,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              );
+            }
+
+            return Skeleton(
+              isLoading: snapshot.connectionState == ConnectionState.waiting,
+              skeleton: SkeletonListView(
+                padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+                itemBuilder: (context, _) => SkeletonLine(
+                  style: SkeletonLineStyle(
+                      height: 79,
+                      borderRadius: BorderRadius.circular(10),
+                      padding: EdgeInsets.only(bottom: 16)),
+                ),
+              ),
+              child: ListView.separated(
+                itemCount: res.count,
+                padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+                itemBuilder: (BuildContext context, int index) {
+                  return BusStopCard(busStopInfo: res.data[index], searchMode: true);
+                },
+                separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+              ),
             );
           } else if (snapshot.hasError) {
             // return Text("${snapshot.error}");
             debugPrint("<=== ERROR ${snapshot.error} ===>");
             return const ErrorText();
-          } else {
-            return const Center(child: CircularProgressIndicator(strokeWidth: 3));
           }
+
+          return const Center(child: CircularProgressIndicator(strokeWidth: 3));
         });
   }
 
@@ -171,6 +244,64 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
         // if the bus service list is not yet loaded, show a loading indicator
         if (snapshot.hasData) {
           BusServiceSearchApiResponse res = snapshot.data!;
+
+          if (res.count == 0 && _textFieldController.text.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "🔍 Start typing to find a bus service 🚍",
+                    style: TextStyle(
+                      color: AppColors.kindaGrey,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Just enter in the bus service number",
+                    style: TextStyle(
+                      color: AppColors.kindaGrey,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (res.count == 0) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "🔍 We couldn't find any bus services 🤔",
+                    style: TextStyle(
+                      color: AppColors.kindaGrey,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "Are you sure you typed the correct bus service number?",
+                    style: TextStyle(
+                      color: AppColors.kindaGrey,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            );
+          }
 
           return ListView.separated(
             itemCount: res.count,

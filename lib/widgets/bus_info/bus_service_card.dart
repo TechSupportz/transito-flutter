@@ -35,7 +35,7 @@ class BusServiceCard extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          // searchProvider.addRecentSearch(busServiceInfo);
+          searchProvider.addRecentSearch(busServiceInfo);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -60,18 +60,20 @@ class BusServiceCard extends StatelessWidget {
                 maxLines: 1,
                 softWrap: false,
                 style: const TextStyle(
-                  fontSize: 28,
+                  fontSize: 24,
                   fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                     color: getOperatorColor(busServiceInfo.operator),
                     borderRadius: BorderRadius.circular(5)),
-                child: Text(busServiceInfo.operator.name,
-                    style: const TextStyle(fontWeight: FontWeight.w500)),
+                child: Text(
+                  busServiceInfo.operator.name,
+                ),
               ),
             ],
           ),

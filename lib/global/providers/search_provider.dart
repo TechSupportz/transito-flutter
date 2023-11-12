@@ -44,6 +44,8 @@ class SearchProvider extends ChangeNotifier {
     }).toList();
 
     prefs?.setStringList('recentSearchesList', localRecentSearches);
+
+    print(prefs?.getStringList('recentSearchesList'));
   }
 
   void clearSharedPref() {
@@ -58,19 +60,17 @@ class SearchProvider extends ChangeNotifier {
     // checks if the the type of the recent search to be added is a bus service or bus stop
     if (search.runtimeType == BusStop) {
       // if the recent search is a bus stop, then the list is filtered to only include bus stops
-      List _busStopRecents =
-          _recentSearches.where((element) => element.runtimeType == BusStop).toList();
+      List<BusStop> _busStopRecents = _recentSearches.whereType<BusStop>().toList();
       // checks if the bus stop is already in the list
-      if (_busStopRecents.every((element) => element.busStopCode != search.busStopCode)) {
+      if (_busStopRecents.every((element) => element.code != search.code)) {
         _recentSearches.add(search);
-        debugPrint('Added recent search: ${search.busStopName}');
+        debugPrint('Added recent search: ${search.name}');
       } else {
         debugPrint("Already added in recent");
       }
     } else if (search.runtimeType == BusService) {
       // if the recent search is a bus service, then the list is filtered to only include bus services
-      List _busServiceRecents =
-          _recentSearches.where((element) => element.runtimeType == BusService).toList();
+      List<BusService> _busServiceRecents = _recentSearches.whereType<BusService>().toList();
       // checks if the bus service is already in the list
       if (_busServiceRecents.every((element) => element.serviceNo != search.serviceNo)) {
         _recentSearches.add(search);

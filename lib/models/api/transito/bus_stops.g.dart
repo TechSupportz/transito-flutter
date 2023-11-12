@@ -17,6 +17,15 @@ BusStop _$BusStopFromJson(Map<String, dynamic> json) => BusStop(
           .toList(),
     );
 
+Map<String, dynamic> _$BusStopToJson(BusStop instance) => <String, dynamic>{
+      'code': instance.code,
+      'name': instance.name,
+      'roadName': instance.roadName,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
+      'services': instance.services,
+    };
+
 BusStopSearchApiResponse _$BusStopSearchApiResponseFromJson(
         Map<String, dynamic> json) =>
     BusStopSearchApiResponse(
@@ -32,3 +41,9 @@ SimpleBusStop _$SimpleBusStopFromJson(Map<String, dynamic> json) =>
       code: json['code'] as String,
       name: json['name'] as String,
     );
+
+Map<String, dynamic> _$SimpleBusStopToJson(SimpleBusStop instance) =>
+    <String, dynamic>{
+      'code': instance.code,
+      'name': instance.name,
+    };

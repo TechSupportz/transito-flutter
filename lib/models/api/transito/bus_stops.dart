@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'bus_stops.g.dart';
 
-@JsonSerializable(explicitToJson: true, createToJson: false)
+@JsonSerializable(explicitToJson: true)
 class BusStop {
   String code;
   String name;
@@ -22,6 +22,7 @@ class BusStop {
   });
 
   factory BusStop.fromJson(Map<String, dynamic> json) => _$BusStopFromJson(json);
+  Map<String, dynamic> toJson() => _$BusStopToJson(this);
 }
 
 @JsonSerializable(explicitToJson: true, createToJson: false)
@@ -40,7 +41,7 @@ class BusStopSearchApiResponse {
       _$BusStopSearchApiResponseFromJson(json);
 }
 
-@JsonSerializable(explicitToJson: true, createToJson: false)
+@JsonSerializable(explicitToJson: true)
 class SimpleBusStop {
   String code;
   String name;
@@ -51,4 +52,5 @@ class SimpleBusStop {
   });
 
   factory SimpleBusStop.fromJson(Map<String, dynamic> json) => _$SimpleBusStopFromJson(json);
+  Map<String, dynamic> toJson() => _$SimpleBusStopToJson(this);
 }

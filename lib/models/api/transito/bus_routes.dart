@@ -3,7 +3,7 @@ import 'package:transito/models/api/transito/bus_stops.dart';
 
 part 'bus_routes.g.dart';
 
-@JsonSerializable(explicitToJson: true, createToJson: false)
+@JsonSerializable(explicitToJson: true)
 class BusSchedule {
   String weekdays;
   String saturday;
@@ -16,9 +16,10 @@ class BusSchedule {
   });
 
   factory BusSchedule.fromJson(Map<String, dynamic> json) => _$BusScheduleFromJson(json);
+  Map<String, dynamic> toJson() => _$BusScheduleToJson(this);
 }
 
-@JsonSerializable(explicitToJson: true, createToJson: false)
+@JsonSerializable(explicitToJson: true)
 class BusRouteInfo {
   SimpleBusStop busStop;
 
@@ -40,4 +41,5 @@ class BusRouteInfo {
   });
 
   factory BusRouteInfo.fromJson(Map<String, dynamic> json) => _$BusRouteInfoFromJson(json);
+  Map<String, dynamic> toJson() => _$BusRouteInfoToJson(this);
 }

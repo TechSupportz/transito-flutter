@@ -51,7 +51,7 @@ class BusServiceSearchApiResponse {
       _$BusServiceSearchApiResponseFromJson(json);
 }
 
-@JsonSerializable(explicitToJson: true, createToJson: false)
+@JsonSerializable(explicitToJson: true)
 class BusService {
   String serviceNo;
 
@@ -96,4 +96,5 @@ class BusService {
   });
 
   factory BusService.fromJson(Map<String, dynamic> json) => _$BusServiceFromJson(json);
+  Map<String, dynamic> toJson() => _$BusServiceToJson(this);
 }

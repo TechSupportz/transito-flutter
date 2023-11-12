@@ -42,3 +42,20 @@ BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
           ?.map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
+
+Map<String, dynamic> _$BusServiceToJson(BusService instance) =>
+    <String, dynamic>{
+      'serviceNo': instance.serviceNo,
+      'operator': _$BusOperatorEnumMap[instance.operator]!,
+      'isLoopService': instance.isLoopService,
+      'interchanges': instance.interchanges.map((e) => e.toJson()).toList(),
+      'busRoutes': instance.busRoutes?.map((e) => e.toJson()).toList(),
+    };
+
+const _$BusOperatorEnumMap = {
+  BusOperator.SBST: 'SBST',
+  BusOperator.SMRT: 'SMRT',
+  BusOperator.TTS: 'TTS',
+  BusOperator.GAS: 'GAS',
+  BusOperator.NA: 'NA',
+};
