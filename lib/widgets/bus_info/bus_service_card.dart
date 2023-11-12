@@ -11,7 +11,6 @@ class BusServiceCard extends StatelessWidget {
   const BusServiceCard({Key? key, required this.busServiceInfo}) : super(key: key);
 
   final BusService busServiceInfo;
-
   // function that returns the correct colours for each bus operator
   Color getOperatorColor(BusOperator operator) {
     switch (operator) {
@@ -31,11 +30,12 @@ class BusServiceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchProvider = Provider.of<SearchProvider>(context, listen: false);
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          searchProvider.addRecentSearch(busServiceInfo);
+          // searchProvider.addRecentSearch(busServiceInfo);
           Navigator.push(
             context,
             MaterialPageRoute(

@@ -21,6 +21,16 @@ BusStopServicesApiResponse _$BusStopServicesApiResponseFromJson(
       data: (json['data'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
+BusServiceSearchApiResponse _$BusServiceSearchApiResponseFromJson(
+        Map<String, dynamic> json) =>
+    BusServiceSearchApiResponse(
+      message: json['message'] as String,
+      count: json['count'] as int,
+      data: (json['data'] as List<dynamic>)
+          .map((e) => BusService.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+
 BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       serviceNo: json['serviceNo'] as String,
       operator: BusService.decodeBusOperator(json['operator'] as String),

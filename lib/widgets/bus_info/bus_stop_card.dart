@@ -27,7 +27,7 @@ class BusStopCard extends StatelessWidget {
     String code,
     String name,
     String address,
-    List<String> services,
+    List<String>? services,
     LatLng busStopLocation,
   ) {
     Navigator.push(
@@ -49,7 +49,7 @@ class BusStopCard extends StatelessWidget {
     String code,
     String name,
     String address,
-    List<String> services,
+    List<String>? services,
     LatLng busStopLocation,
   ) {
     Navigator.push(
@@ -86,7 +86,7 @@ class BusStopCard extends StatelessWidget {
         child: InkWell(
           onTap: () {
             if (searchMode) {
-              searchProvider.addRecentSearch(busStopInfo);
+              // searchProvider.addRecentSearch(busStopInfo);
               goToBusStopInfoScreen(
                 context,
                 busStopInfo.code,
