@@ -1,5 +1,3 @@
-// ignore_for_file: no_leading_underscores_for_local_identifiers
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -24,7 +22,8 @@ class SearchProvider extends ChangeNotifier {
     var localRecentSearches = prefs?.getStringList('recentSearchesList');
 
     if (localRecentSearches != null) {
-      _recentSearches = recentSearches.map((e) {
+      debugPrint('Retrieving search shared preferences');
+      _recentSearches = localRecentSearches.map((e) {
         var json = jsonDecode(e);
 
         if (json['serviceNo'] != null) {
@@ -44,12 +43,12 @@ class SearchProvider extends ChangeNotifier {
     }).toList();
 
     prefs?.setStringList('recentSearchesList', localRecentSearches);
-
-    print(prefs?.getStringList('recentSearchesList'));
+    debugPrint('Updated search shared preferences');
   }
 
   void clearSharedPref() {
     prefs?.remove('recentSearchesList');
+    debugPrint('Cleared search shared preferences');
   }
 
   void addRecentSearch(dynamic search) {
@@ -66,6 +65,7 @@ class SearchProvider extends ChangeNotifier {
         _recentSearches.add(search);
         debugPrint('Added recent search: ${search.name}');
       } else {
+        _busStopRecents.indexWhere((element) => element.code == search.code);
         debugPrint("Already added in recent");
       }
     } else if (search.runtimeType == BusService) {

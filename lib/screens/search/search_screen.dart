@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -26,6 +27,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   late TabController _tabController;
   Timer? _debounce;
   final _textFieldController = TextEditingController();
+  late FocusNode _searchFocusNode = FocusNode();
 
   // tabs to switch between bus stops and bus services
   static const List<Tab> searchTabs = <Tab>[
@@ -42,6 +44,8 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           _futureBusStopSearchResults = searchBusStops(query);
         });
       } else {
+        if (query.isEmpty) return;
+
         setState(() {
           _futureBusServiceSearchResults = searchBusServices(query);
         });
@@ -79,6 +83,23 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     _tabController = TabController(length: searchTabs.length, vsync: this, initialIndex: 0);
+
+    _tabController.addListener(() {
+      if (_tabController.indexIsChanging) {
+        setState(() {
+          _textFieldController.clear();
+
+          // Only enabled on iOS cause it looks too jank on android
+          if (Platform.isIOS) {
+            _searchFocusNode.unfocus();
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => _searchFocusNode.requestFocus(),
+            );
+          }
+        });
+      }
+    });
+
     _futureBusStopSearchResults = Future(() => BusStopSearchApiResponse(
           message: "NA",
           count: 0,
@@ -105,8 +126,10 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
       appBar: AppBar(
         title: TextField(
           controller: _textFieldController,
-          onChanged: (_) => _onSearchChanged(_textFieldController.text),
+          focusNode: _searchFocusNode,
           autofocus: true,
+          keyboardType: _tabController.index == 0 ? TextInputType.text : TextInputType.number,
+          onChanged: (_) => _onSearchChanged(_textFieldController.text),
           // enabled: _busStopList.isNotEmpty,
           decoration: InputDecoration(
             suffixIcon: IconButton(
@@ -177,7 +200,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
               );
             }
 
-            if (res.count == 0) {
+            if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
               return const Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -214,7 +237,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                   style: SkeletonLineStyle(
                       height: 79,
                       borderRadius: BorderRadius.circular(10),
-                      padding: EdgeInsets.only(bottom: 16)),
+                      padding: const EdgeInsets.only(bottom: 16)),
                 ),
               ),
               child: ListView.separated(
@@ -274,7 +297,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             );
           }
 
-          if (res.count == 0) {
+          if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
             return const Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -311,9 +334,13 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             },
             separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
           );
-        } else {
-          return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+        } else if (snapshot.hasError) {
+          // return Text("${snapshot.error}");
+          debugPrint("<=== ERROR ${snapshot.error} ===>");
+          return const ErrorText();
         }
+
+        return const Center(child: CircularProgressIndicator(strokeWidth: 3));
       },
     );
   }
