@@ -326,13 +326,25 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             );
           }
 
-          return ListView.separated(
-            itemCount: res.count,
-            padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-            itemBuilder: (BuildContext context, int index) {
-              return BusServiceCard(busServiceInfo: res.data[index]);
-            },
-            separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+          return Skeleton(
+            isLoading: snapshot.connectionState == ConnectionState.waiting,
+            skeleton: SkeletonListView(
+              padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+              itemBuilder: (context, _) => SkeletonLine(
+                style: SkeletonLineStyle(
+                    height: 79,
+                    borderRadius: BorderRadius.circular(10),
+                    padding: const EdgeInsets.only(bottom: 16)),
+              ),
+            ),
+            child: ListView.separated(
+              itemCount: res.count,
+              padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+              itemBuilder: (BuildContext context, int index) {
+                return BusServiceCard(busServiceInfo: res.data[index]);
+              },
+              separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+            ),
           );
         } else if (snapshot.hasError) {
           // return Text("${snapshot.error}");
