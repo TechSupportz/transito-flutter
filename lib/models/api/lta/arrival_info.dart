@@ -36,25 +36,15 @@ class ServiceInfo {
   static BusOperator decodeBusOperator(String busOperator) {
     switch (busOperator) {
       case "SBS":
-        {
-          return BusOperator.SBST;
-        }
+        return BusOperator.SBST;
       case "SMRT":
-        {
-          return BusOperator.SMRT;
-        }
+        return BusOperator.SMRT;
       case "TTS":
-        {
-          return BusOperator.TTS;
-        }
+        return BusOperator.TTS;
       case "GAS":
-        {
-          return BusOperator.GAS;
-        }
+        return BusOperator.GAS;
       default:
-        {
-          return BusOperator.NA;
-        }
+        return BusOperator.NA;
     }
   }
 
@@ -116,42 +106,26 @@ class IndivArrivalInfo {
   static CrowdLvl decodeCrowdLvl(String crowdLvl) {
     switch (crowdLvl) {
       case "SEA":
-        {
-          return CrowdLvl.SEA;
-        }
+        return CrowdLvl.SEA;
       case "SDA":
-        {
-          return CrowdLvl.SDA;
-        }
+        return CrowdLvl.SDA;
       case "LSD":
-        {
-          return CrowdLvl.LSD;
-        }
+        return CrowdLvl.LSD;
       default:
-        {
-          return CrowdLvl.NA;
-        }
+        return CrowdLvl.NA;
     }
   }
 
   static BusType decodeBusType(busTypeString) {
     switch (busTypeString) {
       case "SD":
-        {
-          return BusType.SD;
-        }
+        return BusType.SD;
       case "DD":
-        {
-          return BusType.DD;
-        }
+        return BusType.DD;
       case "BD":
-        {
-          return BusType.BD;
-        }
+        return BusType.BD;
       default:
-        {
-          return BusType.NA;
-        }
+        return BusType.NA;
     }
   }
 

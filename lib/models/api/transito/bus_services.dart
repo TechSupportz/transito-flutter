@@ -65,25 +65,15 @@ class BusService {
   static BusOperator decodeBusOperator(String busOperator) {
     switch (busOperator) {
       case "SBST":
-        {
-          return BusOperator.SBST;
-        }
+        return BusOperator.SBST;
       case "SMRT":
-        {
-          return BusOperator.SMRT;
-        }
+        return BusOperator.SMRT;
       case "TTS":
-        {
-          return BusOperator.TTS;
-        }
+        return BusOperator.TTS;
       case "GAS":
-        {
-          return BusOperator.GAS;
-        }
+        return BusOperator.GAS;
       default:
-        {
-          return BusOperator.NA;
-        }
+        return BusOperator.NA;
     }
   }
 

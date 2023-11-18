@@ -175,23 +175,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
                       color: (() {
                         switch (widget.crowdLvl) {
                           case CrowdLvl.SEA:
-                            {
-                              return AppColors.prettyGreen;
-                            }
-
+                            return AppColors.prettyGreen;
                           case CrowdLvl.SDA:
-                            {
-                              return AppColors.notReallyYellow;
-                            }
-
+                            return AppColors.notReallyYellow;
                           case CrowdLvl.LSD:
-                            {
-                              return AppColors.sortaRed;
-                            }
+                            return AppColors.sortaRed;
                           case CrowdLvl.NA:
-                            {
-                              return Colors.white;
-                            }
+                            return Colors.white;
                         }
                       })(),
                     ),
@@ -206,23 +196,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
                       (() {
                         switch (widget.busType) {
                           case BusType.SD:
-                            {
                               return "Single";
-                            }
-
                           case BusType.DD:
-                            {
                               return "Double";
-                            }
-
                           case BusType.BD:
-                            {
                               return "Bendy";
-                            }
                           case BusType.NA:
-                            {
                               return "Error";
-                            }
                         }
                       })(),
                       style: TextStyle(
