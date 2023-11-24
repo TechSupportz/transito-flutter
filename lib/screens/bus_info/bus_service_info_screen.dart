@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
+import 'package:transito/widgets/bus_info/basic_bus_stop_card.dart';
 
 class BusServiceInfoScreen extends StatelessWidget {
   const BusServiceInfoScreen({
     Key? key,
-    required this.busServiceInfo,
+    required this.busService,
   }) : super(key: key);
 
-  final BusService busServiceInfo;
+  final BusService busService;
 
   // function that returns the correct colours for each bus operator
   Color getOperatorColor(BusOperator operator) {
@@ -42,7 +43,7 @@ class BusServiceInfoScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bus ${busServiceInfo.serviceNo}',
+                  'Bus ${busService.serviceNo}',
                   overflow: TextOverflow.fade,
                   maxLines: 1,
                   softWrap: false,
@@ -55,69 +56,32 @@ class BusServiceInfoScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                      color: getOperatorColor(busServiceInfo.operator),
+                      color: getOperatorColor(busService.operator),
                       borderRadius: BorderRadius.circular(5)),
-                  child: Text(busServiceInfo.operator.name,
+                  child: Text(busService.operator.name,
                       style: const TextStyle(fontWeight: FontWeight.w500)),
                 ),
               ],
             ),
             const SizedBox(height: 32),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
-                  "Dispatch Frequency",
-                  style: TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+                Text(
+                  "Interchange${busService.isLoopService ? "" : "s"}",
+                  style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.cardBg,
+                const SizedBox(height: 6),
+                BasicBusStopCard(busStop: busService.interchanges[0]),
+                if (!busService.isLoopService) ...[
+                  const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.swap_vert_rounded, size: 30, color: AppColors.kindaGrey),
                   ),
-                  child: Table(
-                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-                    defaultColumnWidth: const FixedColumnWidth(250),
-                    // FIXME - Display actual information here
-                    children: [
-                      const TableRow(
-                        children: [
-                          Text('Time', style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
-                          Text('Minutes',
-                              style: TextStyle(fontSize: 21, fontWeight: FontWeight.w600)),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          const Text('6:30am - 8:30am', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          const Text('8:31am - 4:59pm', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          const Text('5:00pm - 7:00pm', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
-                        ],
-                      ),
-                      TableRow(
-                        children: [
-                          const Text('After 7:00pm', style: TextStyle(fontSize: 21)),
-                          Text(busServiceInfo.serviceNo, style: const TextStyle(fontSize: 21)),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
+                  BasicBusStopCard(busStop: busService.interchanges[1]),
+                ]
               ],
-            )
+            ),
           ],
         ),
       ),
