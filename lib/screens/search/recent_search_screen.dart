@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/widgets/search/recent_search_list.dart';
 
 import 'search_screen.dart';
@@ -16,6 +17,33 @@ class RecentSearchScreen extends StatefulWidget {
 class _RecentSearchScreenState extends State<RecentSearchScreen> {
   TextEditingController textFieldController = TextEditingController();
 
+  showClearAlertDialog(BuildContext context) => showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Clear recent searches?'),
+          content: const Text(
+              'Are you sure you want to clear your recent searches? \n\nThis action cannot be undone.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();
+                Navigator.pop(context);
+              },
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(AppColors.sortaRed),
+              ),
+              child: const Text('Clear'),
+            )
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,9 +51,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
         // button to open the search interface
         IconButton(
           icon: const Icon(Icons.delete_rounded),
-          onPressed: () {
-            Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();
-          },
+          onPressed: () => showClearAlertDialog(context),
         ),
       ]),
       // displays the recent search list widget
