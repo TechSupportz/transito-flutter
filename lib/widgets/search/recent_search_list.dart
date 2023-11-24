@@ -30,13 +30,13 @@ class RecentSearchList extends StatelessWidget {
       itemBuilder: (context, index) {
         // determines which widget to show depending on if the recent search is a bus stop or a bus service
         if (value.recentSearches[index] is BusStop) {
-          BusStopCard(busStopInfo: value.recentSearches[index], searchMode: true);
+          return BusStopCard(busStopInfo: value.recentSearches[index], searchMode: true);
         }
 
         if (value.recentSearches[index] is BusService) {
-          BusServiceCard(busServiceInfo: value.recentSearches[index]);
+          return BusServiceCard(busServiceInfo: value.recentSearches[index]);
         }
-        
+
         return null;
       },
       separatorBuilder: (context, index) => const SizedBox(height: 16),
