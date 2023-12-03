@@ -117,6 +117,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           address: widget.address,
           busStopLocation: widget.busStopLocation,
         ),
+        settings: const RouteSettings(name: 'BusTimingScreen'),
       ),
     );
   }
@@ -135,6 +136,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
+        settings: const RouteSettings(name: 'AddFavouritesScreen'),
       ),
     );
   }
@@ -153,6 +155,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
+        settings: const RouteSettings(name: 'EditFavouritesScreen'),
       ),
     );
   }

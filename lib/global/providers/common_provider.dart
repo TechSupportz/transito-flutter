@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
 class CommonProvider extends ChangeNotifier {
-  final bool isTablet =
-      MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.shortestSide > 600;
+  final bool isTablet = MediaQueryData.fromView(WidgetsBinding.instance.platformDispatcher.views.single).size.shortestSide > 600;
 }

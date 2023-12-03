@@ -82,6 +82,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
           busStopLocation: favourite.busStopLocation,
           busServicesList: busServicesList,
         ),
+        settings: const RouteSettings(name: 'EditFavouritesScreen'),
       ),
     );
   }
@@ -114,11 +115,11 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
         padding: const EdgeInsets.only(top: 12.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
+            const Padding(
+              padding: EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
+                children: [
                   Text(
                     "Drag and drop to reorder your favourites",
                     style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),

@@ -40,6 +40,7 @@ class BusStopCard extends StatelessWidget {
           services: services,
           busStopLocation: busStopLocation,
         ),
+        settings: const RouteSettings(name: 'BusTimingScreen'),
       ),
     );
   }
@@ -62,6 +63,7 @@ class BusStopCard extends StatelessWidget {
           services: services,
           busStopLocation: busStopLocation,
         ),
+        settings: const RouteSettings(name: 'BusStopInfoScreen'),
       ),
     );
   }

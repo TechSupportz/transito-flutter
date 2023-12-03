@@ -34,6 +34,7 @@ class _FavouritesScreenState extends State<FavouritesScreen>
       context,
       MaterialPageRoute(
         builder: (context) => const ManageFavouritesScreen(),
+        settings: const RouteSettings(name: 'ManageFavouritesScreen')
       ),
     );
   }

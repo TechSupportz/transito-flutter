@@ -63,6 +63,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
             context,
             MaterialPageRoute(
               builder: (context) => const SearchScreen(),
+              settings: const RouteSettings(name: 'SearchScreen'),
             ),
           );
           HapticFeedback.selectionClick();

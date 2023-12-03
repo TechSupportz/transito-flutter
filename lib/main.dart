@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -33,6 +34,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
   bool isFirstRun = await IsFirstRun.isFirstRun();
   LocationPermission permission = await Geolocator.checkPermission();
   if (!isFirstRun && permission == LocationPermission.always ||
@@ -44,6 +46,7 @@ void main() async {
     try {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8088);
       await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
       debugPrint("Connected to the firebase emulators");
     } on Exception catch (e) {
       debugPrint('Failed to connect to the emulators: $e');
@@ -95,10 +98,15 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
-    print(user);
+    debugPrint("$user");
+
     bool isTablet = context.read<CommonProvider>().isTablet;
     bool isLoggedIn =
         (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);
+
+    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+    analytics.logAppOpen();
+
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
@@ -110,11 +118,14 @@ class _MyAppState extends State<MyApp> {
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizations.delegate,
             ],
+            navigatorObservers: kReleaseMode
+                ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
+                : [],
             theme: ThemeData(
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,
               androidOverscrollIndicator: AndroidOverscrollIndicator.stretch,
-              scaffoldBackgroundColor: Color(0xFF0C0C0C),
+              scaffoldBackgroundColor: const Color(0xFF0C0C0C),
               cardColor: const Color(0xFF0C0C0C),
               colorScheme: const ColorScheme.dark().copyWith(
                 surface: Colors.black,

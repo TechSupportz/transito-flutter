@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:skeletons/skeletons.dart';
@@ -24,6 +25,8 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   late Future<BusStopSearchApiResponse> _futureBusStopSearchResults;
   late Future<BusServiceSearchApiResponse> _futureBusServiceSearchResults;
 
+  FirebaseAnalytics analytics = FirebaseAnalytics.instance;
+
   late TabController _tabController;
   Timer? _debounce;
   final _textFieldController = TextEditingController();
@@ -39,6 +42,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(Duration(milliseconds: query.length < 3 ? 0 : 200), () {
+      analytics.logSearch(searchTerm: query);
       if (_tabController.index == 0) {
         setState(() {
           _futureBusStopSearchResults = searchBusStops(query);

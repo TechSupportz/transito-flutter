@@ -96,7 +96,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Navigator.of(context).pop();
                   Navigator.pushAndRemoveUntil(
                     context,
-                    MaterialPageRoute(builder: (context) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (context) => const LoginScreen(),
+                      settings: const RouteSettings(name: 'LoginScreen'),
+                    ),
                     (Route<dynamic> route) => false,
                   );
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -185,6 +188,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const QuickStartScreen(),
+        settings: const RouteSettings(name: 'QuickStartScreen'),
       ),
     );
   }
@@ -301,6 +305,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) => const LoginScreen(),
+                                                    settings: const RouteSettings(name: 'LoginScreen'),
                                                   ),
                                                   (Route<dynamic> route) => false,
                                                 ),
@@ -353,6 +358,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) => const LoginScreen(),
+                                            settings: const RouteSettings(name: 'LoginScreen'),
                                           ),
                                           (Route<dynamic> route) => false,
                                         );

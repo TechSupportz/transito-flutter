@@ -11,12 +11,12 @@ import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
-import 'package:transito/global/services/favourites_service.dart';
-import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
@@ -145,6 +145,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
+        settings: const RouteSettings(name: 'AddFavouritesScreen'),
       ),
     );
   }
@@ -163,6 +164,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
         ),
+        settings: const RouteSettings(name: 'EditFavouritesScreen'),
       ),
     );
   }
@@ -189,6 +191,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           busStopLocation: widget.busStopLocation,
           services: widget.services, // NOTE - This can most likely use the futureServices variable instead
         ),
+        settings: const RouteSettings(name: 'BusStopInfoScreen'),
       ),
     );
   }

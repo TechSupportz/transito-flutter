@@ -162,6 +162,7 @@ class _EmailScreenState extends State<EmailScreen> {
           Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
               builder: (context) => const LoginScreen(),
+              settings: const RouteSettings(name: 'LoginScreen'),
             ),
             (Route<dynamic> route) => false,
           );

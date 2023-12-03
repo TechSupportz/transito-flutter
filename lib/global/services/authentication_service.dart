@@ -1,12 +1,14 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthenticationService {
+  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
       clientId: Platform.isIOS
@@ -62,6 +64,8 @@ class AuthenticationService {
         await addNewUser(userId: user!.uid).then(
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
+
+        _analytics.logSignUp(signUpMethod: 'Google');
       }
       debugPrint('✔️ Signed in with google');
       debugPrint('✔️ $user');
@@ -94,6 +98,8 @@ class AuthenticationService {
         await addNewUser(userId: user!.uid).then(
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
+
+        _analytics.logSignUp(signUpMethod: 'Apple');
       }
       debugPrint('✔️ Signed in with apple');
       debugPrint('✔️ $user');
@@ -115,6 +121,8 @@ class AuthenticationService {
         await addNewUser(userId: user!.uid).then(
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
+
+        _analytics.logSignUp(signUpMethod: 'Guest');
       }
       debugPrint("✔️ Signed in anonymously");
     } on FirebaseAuthException catch (e) {
@@ -148,6 +156,7 @@ class AuthenticationService {
       await user?.updateDisplayName(name);
       await user?.sendEmailVerification();
       await addNewUser(userId: user!.uid);
+      _analytics.logSignUp(signUpMethod: 'Email');
       // user?.reload();
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Registration failed with code: ${e.code}");
@@ -160,6 +169,7 @@ class AuthenticationService {
   Future<String?> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
+      _analytics.logEvent(name: "password_reset");
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Reset password failed with code: ${e.code}");
       debugPrint("❌ Reset password failed with message: ${e.message}");
@@ -171,7 +181,6 @@ class AuthenticationService {
   // Logout
   Future<void> logout() async {
     await _auth.signOut();
-
     if (_userProviders.contains('google.com')) {
       await _googleSignIn.signOut();
     }
@@ -189,5 +198,7 @@ class AuthenticationService {
     }
 
     await _auth.currentUser!.delete();
+
+    _analytics.logEvent(name: "delete_account");
   }
 }

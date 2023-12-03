@@ -40,6 +40,7 @@ class BusServiceCard extends StatelessWidget {
             context,
             MaterialPageRoute(
               builder: (context) => BusServiceInfoScreen(busService: busServiceInfo),
+              settings: const RouteSettings(name: 'BusServiceInfoScreen'),
             ),
           );
         },

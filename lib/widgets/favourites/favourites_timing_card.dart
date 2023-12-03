@@ -120,6 +120,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                       address: widget.address,
                       busStopLocation: widget.busStopLocation,
                     ),
+                    settings: const RouteSettings(name: "BusTimingScreen")
                   ),
                 ),
                 child: Container(

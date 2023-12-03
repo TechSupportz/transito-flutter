@@ -83,6 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => const EmailScreen(),
+        settings: const RouteSettings(name: 'EmailScreen'),
       ),
     );
   }

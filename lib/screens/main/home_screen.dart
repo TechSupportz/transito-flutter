@@ -169,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               context,
               MaterialPageRoute(
                 builder: (context) => const MrtMapScreen(),
+                settings: const RouteSettings(name: 'MrtMapScreen'),
               ),
             ),
             icon: const Icon(Icons.map_rounded),
@@ -178,6 +179,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
               context,
               MaterialPageRoute(
                 builder: (context) => const SettingsScreen(),
+                settings: const RouteSettings(name: 'SettingsScreen'),
               ),
             ),
             icon: const Icon(Icons.settings_rounded),
@@ -237,6 +239,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const LocationAccessScreen(),
+                                          settings: const RouteSettings(name: 'LocationAccessScreen'),
                                         ),
                                         (route) => false),
                                     child: const Text("Grant permission")),

@@ -37,6 +37,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => const QuickStartScreen(),
+        settings: const RouteSettings(name: 'QuickStartScreen'),
       ),
     );
   }
@@ -56,9 +57,9 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
           barrierDismissible: false, // user must tap button!
           builder: (context) => AlertDialog(
             title: const Text('Location Permission Denied'),
-            content: Column(
+            content: const Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Text('Location permission is required to use key features of this app.'),
                 SizedBox(height: 8),
                 Text('Please enable location permission via your settings.'),
