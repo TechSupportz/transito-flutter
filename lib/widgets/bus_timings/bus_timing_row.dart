@@ -37,7 +37,11 @@ class _BusTimingRowState extends State<BusTimingRow> {
     } else {
       if (arrivalTime != null && arrivalTime != '') {
         num minutesToArrival = Jiffy.parse(arrivalTime.split("+")[0])
-            .diff(Jiffy.now(), unit: Unit.minute, asFloat: false)
+            .diff(
+              Jiffy.now(),
+              unit: Unit.minute,
+              asFloat: false,
+            ) // NOTE - for some reason asFloat: false is how you return a decimal (https://github.com/jama5262/jiffy/blob/master/doc/README.md#difference)
             .floor();
         if (minutesToArrival < -1) {
           return "left";
@@ -196,13 +200,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
                       (() {
                         switch (widget.busType) {
                           case BusType.SD:
-                              return "Single";
+                            return "Single";
                           case BusType.DD:
-                              return "Double";
+                            return "Double";
                           case BusType.BD:
-                              return "Bendy";
+                            return "Bendy";
                           case BusType.NA:
-                              return "Error";
+                            return "Error";
                         }
                       })(),
                       style: TextStyle(
