@@ -38,7 +38,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
       if (arrivalTime != null && arrivalTime != '') {
         num minutesToArrival = Jiffy.parse(arrivalTime.split("+")[0])
             .diff(Jiffy.now(), unit: Unit.minute, asFloat: false)
-            .ceil();
+            .floor();
         if (minutesToArrival < -1) {
           return "left";
         } else if (minutesToArrival <= 1) {
