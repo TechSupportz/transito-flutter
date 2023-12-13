@@ -324,7 +324,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                 options: MapOptions(
                                   center: widget.busStopLocation,
                                   minZoom: 11,
-                                  zoom: 17,
+                                  zoom: 17.5,
                                   maxZoom: 18,
                                   interactiveFlags: InteractiveFlag.all &
                                       ~InteractiveFlag.pinchMove &
@@ -333,9 +333,12 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                 children: [
                                   TileLayer(
                                     urlTemplate:
-                                        "https://maps-a.onemap.sg/v3/Night/{z}/{x}/{y}.png",
+                                        "https://www.onemap.gov.sg/maps/tiles/Night_HD/{z}/{x}/{y}.png",
+                                    fallbackUrl:
+                                        "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png",
                                     userAgentPackageName: 'com.tnitish.transito',
                                     errorImage: const AssetImage('assets/images/mapError.png'),
+                                    backgroundColor: const Color(0xFF003653),
                                   ),
                                   MarkerLayer(
                                     markers: [

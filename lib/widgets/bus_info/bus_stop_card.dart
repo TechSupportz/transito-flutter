@@ -138,7 +138,7 @@ class BusStopCard extends StatelessWidget {
                       decoration: BoxDecoration(
                           color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
                       child: Text(
-                        busStopInfo.code,
+                        busStopInfo.code
                       ),
                     ),
                     Expanded(
@@ -154,7 +154,7 @@ class BusStopCard extends StatelessWidget {
                         style: const TextStyle(
                             color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
                       ),
-                    )
+                    ),
                   ],
                 )
               ],
