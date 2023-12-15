@@ -27,7 +27,8 @@
 		<key>LSRequiresIPhoneOS</key>
 		<true />
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>This app needs access to location when open.</string>
+		<string>Transito needs access to location to determine where you are and display nearby bus
+			stops and favourites.</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true />
 		<key>UILaunchStoryboardName</key>
@@ -49,14 +50,18 @@
 		</array>
 		<key>NSAppTransportSecurity</key>
 		<dict>
-			<key>NSAllowsArbitraryLoads</key>
-			<true />
 			<key>NSExceptionDomains</key>
 			<dict>
 				<key>datamall2.mytransport.sg</key>
-				<string></string>
+				<dict>
+					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+					<true />
+				</dict>
 				<key>api.transito.tnitish.com</key>
-				<string></string>
+				<dict>
+					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+					<true />
+				</dict>
 			</dict>
 		</dict>
 		<!-- Google Sign-in Section -->
