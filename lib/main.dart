@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +12,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/user/user_settings.dart';
@@ -34,7 +34,6 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(true);
   bool isFirstRun = await IsFirstRun.isFirstRun();
   LocationPermission permission = await Geolocator.checkPermission();
   if (!isFirstRun && permission == LocationPermission.always ||
@@ -46,7 +45,7 @@ void main() async {
     try {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8088);
       await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-      FirebaseAnalytics.instance.setAnalyticsCollectionEnabled(false);
+      Posthog().debug(true);
       debugPrint("Connected to the firebase emulators");
     } on Exception catch (e) {
       debugPrint('Failed to connect to the emulators: $e');
@@ -104,9 +103,6 @@ class _MyAppState extends State<MyApp> {
     bool isLoggedIn =
         (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);
 
-    FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-    analytics.logAppOpen();
-
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
@@ -118,9 +114,7 @@ class _MyAppState extends State<MyApp> {
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizations.delegate,
             ],
-            navigatorObservers: kReleaseMode
-                ? [FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance)]
-                : [],
+            navigatorObservers: true ? [PosthogObserver()] : [],
             theme: ThemeData(
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,

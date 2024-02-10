@@ -1,15 +1,16 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthenticationService {
-  final FirebaseAnalytics _analytics = FirebaseAnalytics.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  Posthog _posthog = Posthog();
+
   final GoogleSignIn _googleSignIn = GoogleSignIn(
       clientId: Platform.isIOS
           ? "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com"
@@ -65,7 +66,7 @@ class AuthenticationService {
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
 
-        _analytics.logSignUp(signUpMethod: 'Google');
+        _posthog.capture(eventName: 'sign_up', properties: {'method': 'Google'});
       }
       debugPrint('✔️ Signed in with google');
       debugPrint('✔️ $user');
@@ -99,7 +100,7 @@ class AuthenticationService {
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
 
-        _analytics.logSignUp(signUpMethod: 'Apple');
+        _posthog.capture(eventName: 'sign_up', properties: {'method': 'Apple'});
       }
       debugPrint('✔️ Signed in with apple');
       debugPrint('✔️ $user');
@@ -122,7 +123,7 @@ class AuthenticationService {
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
 
-        _analytics.logSignUp(signUpMethod: 'Guest');
+        _posthog.capture(eventName: 'sign_up', properties: {'method': 'Guest'});
       }
       debugPrint("✔️ Signed in anonymously");
     } on FirebaseAuthException catch (e) {
@@ -156,7 +157,8 @@ class AuthenticationService {
       await user?.updateDisplayName(name);
       await user?.sendEmailVerification();
       await addNewUser(userId: user!.uid);
-      _analytics.logSignUp(signUpMethod: 'Email');
+
+      _posthog.capture(eventName: 'sign_up', properties: {'method': 'Email'});
       // user?.reload();
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Registration failed with code: ${e.code}");
@@ -169,7 +171,7 @@ class AuthenticationService {
   Future<String?> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      _analytics.logEvent(name: "password_reset");
+      _posthog.capture(eventName: 'reset_password');
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Reset password failed with code: ${e.code}");
       debugPrint("❌ Reset password failed with message: ${e.message}");
@@ -199,6 +201,6 @@ class AuthenticationService {
 
     await _auth.currentUser!.delete();
 
-    _analytics.logEvent(name: "delete_account");
+    _posthog.capture(eventName: "delete_account");
   }
 }
