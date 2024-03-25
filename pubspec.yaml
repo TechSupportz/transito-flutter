@@ -3,7 +3,7 @@ description: A bus timing application to view your bus arrival timings in Singap
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.0.0+20
+version: 2.1.0+21
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
