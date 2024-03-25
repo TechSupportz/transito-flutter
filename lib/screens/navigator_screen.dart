@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
-import 'package:transito/screens/main/home_screen.dart';
+import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/recent_search_screen.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -23,7 +23,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
 
   // Screens to be displayed by the bottom navigation bar
   List<StatefulWidget> widgetList = const [
-    HomeScreen(),
+    NearbyScreen(),
     FavouritesScreen(),
     RecentSearchScreen(),
   ];
@@ -49,7 +49,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: "Home"),
+          BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: "Nearby"),
           BottomNavigationBarItem(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
           BottomNavigationBarItem(icon: Icon(Icons.search_rounded), label: "Search"),
         ],

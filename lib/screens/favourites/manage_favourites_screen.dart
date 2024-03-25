@@ -72,6 +72,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   Future<void> goToEditFavouritesScreen(BuildContext context, Favourite favourite) async {
     List<String> busServicesList = await getBusServiceNumList(favourite.busStopCode);
     // debugPrint('$busServicesList');
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(

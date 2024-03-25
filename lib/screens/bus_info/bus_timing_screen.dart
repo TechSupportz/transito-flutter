@@ -13,12 +13,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
+import 'package:transito/global/utils/scroll_to_content.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
+import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
@@ -46,7 +48,10 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
-  late Future<List<String>> futureServices; // TODO - Use this to display the non operational services at the bottom of the list
+  late Future<List<String>> futureServices;
+
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey expansionTileKey = GlobalKey();
   bool isFabVisible = true;
   bool isAddedToFavourites = false;
   late Timer timer;
@@ -135,6 +140,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   Future<void> goToAddFavouritesScreen(BuildContext context) async {
     List<String> busServicesList = await getBusServiceNumList();
     // debugPrint('$busServicesList');
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -154,6 +160,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   Future<void> goToEditFavouritesScreen(BuildContext context) async {
     List<String> busServicesList = await getBusServiceNumList();
     // debugPrint('$busServicesList');
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -180,8 +187,11 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return true;
   }
 
-  void goToBusStopInfoScreen(context) {
-    Navigator.pushReplacement(
+  Future<void> goToBusStopInfoScreen(BuildContext context) async {
+    List<String> services = await futureServices;
+
+    if (!context.mounted) return;
+    Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => BusStopInfoScreen(
@@ -189,7 +199,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
           name: widget.name,
           address: widget.address,
           busStopLocation: widget.busStopLocation,
-          services: widget.services, // NOTE - This can most likely use the futureServices variable instead
+          services: services,
         ),
         settings: const RouteSettings(name: 'BusStopInfoScreen'),
       ),
@@ -251,13 +261,14 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
               UserSettings userSettings = snapshot.data as UserSettings;
               return FutureBuilder(
                 future: futureBusArrivalInfo,
-                builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> snapshot) {
+                builder:
+                    (BuildContext context, AsyncSnapshot<BusArrivalInfo> busArrivalInfoSnapshot) {
                   // check if the snapshot has data, if not then display a loading indicator
-                  if (snapshot.hasData) {
+                  if (busArrivalInfoSnapshot.hasData) {
                     // notification listener to hide the fab when the user is scrolling down the list
                     return NotificationListener<UserScrollNotification>(
                       onNotification: (notification) => hideFabOnScroll(notification),
-                      child: snapshot.data!.services.isEmpty
+                      child: busArrivalInfoSnapshot.data!.services.isEmpty
                           ? Center(
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
@@ -281,24 +292,113 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                   );
                                 });
                               },
-                              child: ListView.separated(
-                                  itemBuilder: (context, int index) {
-                                    return BusTimingRow(
-                                      serviceInfo: snapshot.data!.services[index],
-                                      userLatLng: widget.busStopLocation,
-                                      isETAminutes: userSettings.isETAminutes,
-                                    );
-                                  },
-                                  padding: const EdgeInsets.only(
-                                      top: 12, bottom: 32, left: 12, right: 12),
-                                  separatorBuilder: (BuildContext context, int index) =>
-                                      const Divider(),
-                                  itemCount: snapshot.data!.services.length),
+                              child: ListView(
+                                controller: _scrollController,
+                                padding:
+                                    const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
+                                children: [
+                                  ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, int index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(bottom: 8.0),
+                                          child: BusTimingRow(
+                                            serviceInfo:
+                                                busArrivalInfoSnapshot.data!.services[index],
+                                            userLatLng: widget.busStopLocation,
+                                            isETAminutes: userSettings.isETAminutes,
+                                          ),
+                                        );
+                                      },
+                                      separatorBuilder: (BuildContext context, int index) =>
+                                          const Divider(),
+                                      itemCount: busArrivalInfoSnapshot.data!.services.length),
+                                  FutureBuilder(
+                                      future: futureServices,
+                                      builder: (context, servicesSnapshot) {
+                                        final currOperatingServices = busArrivalInfoSnapshot
+                                            .data!.services
+                                            .map((e) => e.serviceNum)
+                                            .toList();
+
+                                        if (servicesSnapshot.hasData) {
+                                          final services = servicesSnapshot.data as List<String>;
+                                          final nonOperatingServices = services
+                                              .where((element) =>
+                                                  !currOperatingServices.contains(element))
+                                              .toList();
+
+                                          if (nonOperatingServices.isEmpty) {
+                                            return const SizedBox.shrink();
+                                          }
+
+                                          return Opacity(
+                                            opacity: 0.65,
+                                            child: Column(
+                                              children: [
+                                                const Divider(),
+                                                Theme(
+                                                  data: Theme.of(context).copyWith(
+                                                    splashFactory: NoSplash.splashFactory,
+                                                    highlightColor: Colors.transparent,
+                                                  ),
+                                                  child: ExpansionTile(
+                                                    key: expansionTileKey,
+                                                    title: const Text(
+                                                      "Non-operational services",
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                    controlAffinity:
+                                                        ListTileControlAffinity.leading,
+                                                    leading: const Icon(
+                                                      Icons.info_outline_rounded,
+                                                    ),
+                                                    onExpansionChanged: (value) {
+                                                      if (value) {
+                                                        scrollToSelectedContent(expansionTileKey);
+                                                      }
+                                                    },
+                                                    shape: const Border(),
+                                                    children: [
+                                                      Wrap(
+                                                        spacing: 8,
+                                                        runSpacing: 8,
+                                                        direction: Axis.horizontal,
+                                                        alignment: WrapAlignment.start,
+                                                        children: nonOperatingServices
+                                                            .map(
+                                                              (service) => BusServiceChip(
+                                                                busServiceNumber: service,
+                                                                isOperating: true,
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                      )
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          );
+                                        } else if (servicesSnapshot.hasError) {
+                                          return const ErrorText();
+                                        }
+
+                                        return const Center(
+                                          child: CircularProgressIndicator(strokeWidth: 3),
+                                        );
+                                      })
+                                ],
+                              ),
                             ),
                     );
-                  } else if (snapshot.hasError) {
+                  } else if (busArrivalInfoSnapshot.hasError) {
                     // return Text("${snapshot.error}");
-                    debugPrint("<=== ERROR ${snapshot.error} ===>");
+                    debugPrint("<=== ERROR ${busArrivalInfoSnapshot.error} ===>");
                     return const ErrorText();
                   } else {
                     return const Center(

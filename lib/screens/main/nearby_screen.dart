@@ -24,16 +24,17 @@ import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class NearbyScreen extends StatefulWidget {
+  const NearbyScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<NearbyScreen> createState() => _NearbyScreenState();
 }
 
 const distance = Distance();
 
-class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin<HomeScreen> {
+class _NearbyScreenState extends State<NearbyScreen>
+    with AutomaticKeepAliveClientMixin<NearbyScreen> {
   late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
@@ -239,7 +240,8 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) => const LocationAccessScreen(),
-                                          settings: const RouteSettings(name: 'LocationAccessScreen'),
+                                          settings:
+                                              const RouteSettings(name: 'LocationAccessScreen'),
                                         ),
                                         (route) => false),
                                     child: const Text("Grant permission")),

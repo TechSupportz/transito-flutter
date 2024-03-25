@@ -126,6 +126,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   Future<void> goToAddFavouritesScreen() async {
     List<String> busServicesList = await fetchCurrOperatingServices();
     // debugPrint('$busServicesList');
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -145,6 +146,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   Future<void> goToEditFavouritesScreen() async {
     List<String> busServicesList = await fetchCurrOperatingServices();
     // debugPrint('$busServicesList');
+    if (!context.mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -263,7 +265,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                             height: 8,
                           ),
                           FutureBuilder(
-                              future: Future.wait([fetchCurrOperatingServices(), fetchServices()]),
+                              future: Future.wait([futureCurrOperatingServices, futureServices]),
                               builder: (BuildContext context,
                                   AsyncSnapshot<List<List<String>>> snapshot) {
                                 if (snapshot.hasData) {
