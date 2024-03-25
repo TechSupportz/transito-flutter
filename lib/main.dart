@@ -114,7 +114,7 @@ class _MyAppState extends State<MyApp> {
               GlobalWidgetsLocalizations.delegate,
               FormBuilderLocalizations.delegate,
             ],
-            navigatorObservers: true ? [PosthogObserver()] : [],
+            navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
             theme: ThemeData(
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,
