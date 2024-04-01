@@ -20,7 +20,7 @@ Map<String, dynamic> _$BusScheduleToJson(BusSchedule instance) =>
     };
 
 BusRouteInfo _$BusRouteInfoFromJson(Map<String, dynamic> json) => BusRouteInfo(
-      busStop: SimpleBusStop.fromJson(json['busStop'] as Map<String, dynamic>),
+      busStop: BusStop.fromJson(json['busStop'] as Map<String, dynamic>),
       direction: json['direction'] as int,
       sequence: json['sequence'] as int,
       distance: (json['distance'] as num).toDouble(),

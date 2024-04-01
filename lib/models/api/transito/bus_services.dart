@@ -59,7 +59,7 @@ class BusService {
   BusOperator operator;
 
   bool isLoopService;
-  List<SimpleBusStop> interchanges;
+  List<BusStop> interchanges;
   List<BusRouteInfo>? busRoutes;
 
   static BusOperator decodeBusOperator(String busOperator) {

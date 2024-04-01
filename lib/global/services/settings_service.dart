@@ -49,7 +49,9 @@ class SettingsService {
           AppColors.accentColour = Color(int.parse(newValue));
         },
       ).catchError(
-        (error) => debugPrint('❌ Error updating accentColour in Firestore: $error'),
+        (error) {
+          debugPrint('❌ Error updating accentColour in Firestore: $error');
+        },
       );
     }
   }

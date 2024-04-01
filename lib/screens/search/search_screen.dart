@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:skeletons/skeletons.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/widgets/bus_info/basic_bus_stop_card.dart';
+import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 
 class BusServiceInfoScreen extends StatelessWidget {
   const BusServiceInfoScreen({
@@ -55,13 +55,19 @@ class BusServiceInfoScreen extends StatelessWidget {
                   style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 6),
-                BasicBusStopCard(busStop: busService.interchanges[0]),
+                BusStopCard(
+                  busStopInfo: busService.interchanges[0],
+                  searchMode: true,
+                ),
                 if (!busService.isLoopService) ...[
                   const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Icon(Icons.swap_vert_rounded, size: 30, color: AppColors.kindaGrey),
                   ),
-                  BasicBusStopCard(busStop: busService.interchanges[1]),
+                  BusStopCard(
+                    busStopInfo: busService.interchanges[1],
+                    searchMode: true,
+                  ),
                 ]
               ],
             ),

@@ -21,7 +21,7 @@ class BusSchedule {
 
 @JsonSerializable(explicitToJson: true)
 class BusRouteInfo {
-  SimpleBusStop busStop;
+  BusStop busStop;
 
   // NOTE - this can probably be improved, only values possible are 1 and 2
   int direction;

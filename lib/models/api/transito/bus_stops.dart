@@ -40,17 +40,3 @@ class BusStopSearchApiResponse {
   factory BusStopSearchApiResponse.fromJson(Map<String, dynamic> json) =>
       _$BusStopSearchApiResponseFromJson(json);
 }
-
-@JsonSerializable(explicitToJson: true)
-class SimpleBusStop {
-  String code;
-  String name;
-
-  SimpleBusStop({
-    required this.code,
-    required this.name,
-  });
-
-  factory SimpleBusStop.fromJson(Map<String, dynamic> json) => _$SimpleBusStopFromJson(json);
-  Map<String, dynamic> toJson() => _$SimpleBusStopToJson(this);
-}

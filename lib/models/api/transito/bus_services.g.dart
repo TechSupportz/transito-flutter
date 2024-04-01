@@ -36,7 +36,7 @@ BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       operator: BusService.decodeBusOperator(json['operator'] as String),
       isLoopService: json['isLoopService'] as bool,
       interchanges: (json['interchanges'] as List<dynamic>)
-          .map((e) => SimpleBusStop.fromJson(e as Map<String, dynamic>))
+          .map((e) => BusStop.fromJson(e as Map<String, dynamic>))
           .toList(),
       busRoutes: (json['busRoutes'] as List<dynamic>?)
           ?.map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))

@@ -137,17 +137,13 @@ class BusStopCard extends StatelessWidget {
                       margin: const EdgeInsets.only(right: 8),
                       decoration: BoxDecoration(
                           color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
-                      child: Text(
-                        busStopInfo.code
-                      ),
+                      child: Text(busStopInfo.code),
                     ),
                     Expanded(
                       child: Text(
-                        searchMode
+                        (searchMode || !showDistanceFromUser)
                             ? busStopInfo.roadName
-                            : showDistanceFromUser
-                                ? '${transformDistanceFromUser(distanceFromUser!)} away'
-                                : busStopInfo.roadName,
+                            : '${transformDistanceFromUser(distanceFromUser!)} away',
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         softWrap: false,
