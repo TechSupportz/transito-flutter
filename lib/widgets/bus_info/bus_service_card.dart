@@ -1,31 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/api/transito/bus_services.dart';
-
-import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/enums/bus_operator_enum.dart';
 import 'package:transito/global/providers/search_provider.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceCard extends StatelessWidget {
   const BusServiceCard({Key? key, required this.busServiceInfo}) : super(key: key);
 
   final BusService busServiceInfo;
-  // function that returns the correct colours for each bus operator
-  Color getOperatorColor(BusOperator operator) {
-    switch (operator) {
-      case BusOperator.SBST:
-        return AppColors.SBST;
-      case BusOperator.SMRT:
-        return AppColors.SMRT;
-      case BusOperator.TTS:
-        return AppColors.TTS;
-      case BusOperator.GAS:
-        return AppColors.GAS;
-      default:
-        return AppColors.accentColour;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +53,7 @@ class BusServiceCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
-                    color: getOperatorColor(busServiceInfo.operator),
+                    color: AppColors.getOperatorColor(busServiceInfo.operator),
                     borderRadius: BorderRadius.circular(5)),
                 child: Text(
                   busServiceInfo.operator.name,

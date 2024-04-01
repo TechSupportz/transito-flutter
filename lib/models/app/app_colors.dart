@@ -1,6 +1,7 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:transito/models/enums/bus_operator_enum.dart';
 
 class AppColors with ChangeNotifier {
   Color primaryColor = const Color(0xFF7E6BFF);
@@ -21,4 +22,20 @@ class AppColors with ChangeNotifier {
 
   static const Color cardBg = Color(0xFF1d1d1d);
   static const Color inputFieldBg = Color(0xff202020);
+
+  // function that returns the correct colours for each bus operator
+  static Color getOperatorColor(BusOperator operator) {
+    switch (operator) {
+      case BusOperator.SBST:
+        return AppColors.SBST;
+      case BusOperator.SMRT:
+        return AppColors.SMRT;
+      case BusOperator.TTS:
+        return AppColors.TTS;
+      case BusOperator.GAS:
+        return AppColors.GAS;
+      default:
+        return AppColors.accentColour;
+    }
+  }
 }
