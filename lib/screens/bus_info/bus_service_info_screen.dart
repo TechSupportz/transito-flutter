@@ -3,13 +3,20 @@ import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 
-class BusServiceInfoScreen extends StatelessWidget {
+class BusServiceInfoScreen extends StatefulWidget {
   const BusServiceInfoScreen({
     Key? key,
     required this.busService,
   }) : super(key: key);
 
   final BusService busService;
+
+  @override
+  State<BusServiceInfoScreen> createState() => _BusServiceInfoScreenState();
+}
+
+class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
+  int _destinationIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +33,7 @@ class BusServiceInfoScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Bus ${busService.serviceNo}',
+                  'Bus ${widget.busService.serviceNo}',
                   overflow: TextOverflow.fade,
                   maxLines: 1,
                   softWrap: false,
@@ -39,36 +46,84 @@ class BusServiceInfoScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                   margin: const EdgeInsets.only(right: 8),
                   decoration: BoxDecoration(
-                      color: AppColors.getOperatorColor(busService.operator),
+                      color: AppColors.getOperatorColor(widget.busService.operator),
                       borderRadius: BorderRadius.circular(5)),
-                  child: Text(busService.operator.name,
+                  child: Text(widget.busService.operator.name,
                       style: const TextStyle(fontWeight: FontWeight.w500)),
                 ),
               ],
             ),
             const SizedBox(height: 32),
             Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Interchange${busService.isLoopService ? "" : "s"}",
+                  "Interchange${widget.busService.isLoopService ? "" : "s"}",
                   style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.start,
                 ),
-                const SizedBox(height: 6),
-                BusStopCard(
-                  busStopInfo: busService.interchanges[0],
-                  searchMode: true,
-                ),
-                if (!busService.isLoopService) ...[
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Icon(Icons.swap_vert_rounded, size: 30, color: AppColors.kindaGrey),
-                  ),
-                  BusStopCard(
-                    busStopInfo: busService.interchanges[1],
-                    searchMode: true,
-                  ),
-                ]
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Column(
+                        verticalDirection: _destinationIndex == 0
+                            ? VerticalDirection.down
+                            : VerticalDirection.up, // TODO - figure out how to animate this
+                        children: [
+                          BusStopCard(
+                            busStopInfo: widget.busService.interchanges[0],
+                            searchMode: true,
+                          ),
+                          if (!widget.busService.isLoopService) ...[
+                            const SizedBox(height: 24),
+                            BusStopCard(
+                              busStopInfo: widget.busService.interchanges[1],
+                              searchMode: true,
+                            ),
+                          ]
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        const SizedBox(
+                          height: 79,
+                          child: Icon(
+                            Icons.radio_button_unchecked_rounded,
+                            color: AppColors.prettyGreen,
+                            size: 28,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 28,
+                          child: IconButton(
+                            padding: EdgeInsets.zero,
+                            iconSize: 30,
+                            splashRadius: 28,
+                            icon: const Icon(
+                              Icons.swap_calls_rounded,
+                            ),
+                            onPressed: () {
+                              setState(() => _destinationIndex = (_destinationIndex + 1) % 2);
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 79,
+                          child: Icon(
+                            Icons.place_rounded,
+                            color: AppColors.sortaRed,
+                            size: 28,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                )
               ],
             ),
           ],
