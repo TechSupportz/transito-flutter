@@ -99,13 +99,13 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                           ),
                         ),
                         SizedBox(
-                          height: 28,
+                          height: 30,
                           child: IconButton(
                             padding: EdgeInsets.zero,
-                            iconSize: 30,
-                            splashRadius: 28,
+                            iconSize: 32,
+                            splashRadius: 24,
                             icon: const Icon(
-                              Icons.swap_calls_rounded,
+                              Icons.swap_vert_rounded,
                             ),
                             onPressed: () {
                               setState(() => _destinationIndex = (_destinationIndex + 1) % 2);
