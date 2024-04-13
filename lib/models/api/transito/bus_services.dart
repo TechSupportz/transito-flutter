@@ -51,6 +51,20 @@ class BusServiceSearchApiResponse {
       _$BusServiceSearchApiResponseFromJson(json);
 }
 
+@JsonSerializable(explicitToJson: true, createToJson: false)
+class BusServiceDetailsApiResponse {
+  String message;
+  BusService data;
+
+  BusServiceDetailsApiResponse({
+    required this.message,
+    required this.data,
+  });
+
+  factory BusServiceDetailsApiResponse.fromJson(Map<String, dynamic> json) =>
+      _$BusServiceDetailsApiResponseFromJson(json);
+}
+
 @JsonSerializable(explicitToJson: true)
 class BusService {
   String serviceNo;
@@ -60,7 +74,7 @@ class BusService {
 
   bool isLoopService;
   List<BusStop> interchanges;
-  List<BusRouteInfo>? busRoutes;
+  List<List<BusRouteInfo>>? routes;
 
   static BusOperator decodeBusOperator(String busOperator) {
     switch (busOperator) {
@@ -82,7 +96,7 @@ class BusService {
     required this.operator,
     required this.isLoopService,
     required this.interchanges,
-    this.busRoutes,
+    this.routes,
   });
 
   factory BusService.fromJson(Map<String, dynamic> json) => _$BusServiceFromJson(json);

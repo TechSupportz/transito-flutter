@@ -31,6 +31,13 @@ BusServiceSearchApiResponse _$BusServiceSearchApiResponseFromJson(
           .toList(),
     );
 
+BusServiceDetailsApiResponse _$BusServiceDetailsApiResponseFromJson(
+        Map<String, dynamic> json) =>
+    BusServiceDetailsApiResponse(
+      message: json['message'] as String,
+      data: BusService.fromJson(json['data'] as Map<String, dynamic>),
+    );
+
 BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       serviceNo: json['serviceNo'] as String,
       operator: BusService.decodeBusOperator(json['operator'] as String),
@@ -38,8 +45,10 @@ BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       interchanges: (json['interchanges'] as List<dynamic>)
           .map((e) => BusStop.fromJson(e as Map<String, dynamic>))
           .toList(),
-      busRoutes: (json['busRoutes'] as List<dynamic>?)
-          ?.map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))
+      routes: (json['routes'] as List<dynamic>?)
+          ?.map((e) => (e as List<dynamic>)
+              .map((e) => BusRouteInfo.fromJson(e as Map<String, dynamic>))
+              .toList())
           .toList(),
     );
 
@@ -49,7 +58,9 @@ Map<String, dynamic> _$BusServiceToJson(BusService instance) =>
       'operator': _$BusOperatorEnumMap[instance.operator]!,
       'isLoopService': instance.isLoopService,
       'interchanges': instance.interchanges.map((e) => e.toJson()).toList(),
-      'busRoutes': instance.busRoutes?.map((e) => e.toJson()).toList(),
+      'routes': instance.routes
+          ?.map((e) => e.map((e) => e.toJson()).toList())
+          .toList(),
     };
 
 const _$BusOperatorEnumMap = {
