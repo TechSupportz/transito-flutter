@@ -9,7 +9,7 @@ import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  Posthog _posthog = Posthog();
+  Posthog posthog = Posthog();
 
   final GoogleSignIn _googleSignIn = GoogleSignIn(
       clientId: Platform.isIOS
@@ -66,7 +66,7 @@ class AuthenticationService {
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
 
-        _posthog.capture(eventName: 'sign_up', properties: {'method': 'Google'});
+        posthog.capture(eventName: 'sign_up', properties: {'method': 'Google'});
       }
       debugPrint('✔️ Signed in with google');
       debugPrint('✔️ $user');
@@ -100,7 +100,7 @@ class AuthenticationService {
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
 
-        _posthog.capture(eventName: 'sign_up', properties: {'method': 'Apple'});
+        posthog.capture(eventName: 'sign_up', properties: {'method': 'Apple'});
       }
       debugPrint('✔️ Signed in with apple');
       debugPrint('✔️ $user');
@@ -123,7 +123,7 @@ class AuthenticationService {
           (_) => debugPrint('✔️ Initialised user in Firestore'),
         );
 
-        _posthog.capture(eventName: 'sign_up', properties: {'method': 'Guest'});
+        posthog.capture(eventName: 'sign_up', properties: {'method': 'Guest'});
       }
       debugPrint("✔️ Signed in anonymously");
     } on FirebaseAuthException catch (e) {
@@ -158,7 +158,7 @@ class AuthenticationService {
       await user?.sendEmailVerification();
       await addNewUser(userId: user!.uid);
 
-      _posthog.capture(eventName: 'sign_up', properties: {'method': 'Email'});
+      posthog.capture(eventName: 'sign_up', properties: {'method': 'Email'});
       // user?.reload();
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Registration failed with code: ${e.code}");
@@ -171,7 +171,7 @@ class AuthenticationService {
   Future<String?> sendPasswordResetEmail(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email);
-      _posthog.capture(eventName: 'reset_password');
+      posthog.capture(eventName: 'reset_password');
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Reset password failed with code: ${e.code}");
       debugPrint("❌ Reset password failed with message: ${e.message}");
@@ -201,6 +201,6 @@ class AuthenticationService {
 
     await _auth.currentUser!.delete();
 
-    _posthog.capture(eventName: "delete_account");
+    posthog.capture(eventName: "delete_account");
   }
 }

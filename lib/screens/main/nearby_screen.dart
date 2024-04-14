@@ -112,7 +112,7 @@ class _NearbyScreenState extends State<NearbyScreen>
     bool refresh = false,
   }) async {
     debugPrint("Fetching nearby favourites");
-    List<NearbyFavourites> _nearbyFavourites = [];
+    List<NearbyFavourites> nearbyFavourites = [];
     List<Favourite> favouritesList =
         await FavouritesService().getFavourites(context.read<User>().uid);
     Position userLocation = await getUserLocation(refresh);
@@ -122,14 +122,14 @@ class _NearbyScreenState extends State<NearbyScreen>
       double distanceAway = distance.as(LengthUnit.Meter,
           LatLng(userLocation.latitude, userLocation.longitude), favourite.busStopLocation);
       if (distanceAway <= 750) {
-        _nearbyFavourites
+        nearbyFavourites
             .add(NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway));
       }
     }
-    List<NearbyFavourites> _tempNearbyFavourites = _nearbyFavourites;
-    _tempNearbyFavourites.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
+    List<NearbyFavourites> tempNearbyFavourites = nearbyFavourites;
+    tempNearbyFavourites.sort((a, b) => a.distanceFromUser.compareTo(b.distanceFromUser));
     // _nearbyFavouritesCache = _tempNearbyFavourites;
-    return _tempNearbyFavourites;
+    return tempNearbyFavourites;
     // }
   }
 

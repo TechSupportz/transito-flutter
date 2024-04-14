@@ -59,20 +59,20 @@ class SearchProvider extends ChangeNotifier {
     // checks if the the type of the recent search to be added is a bus service or bus stop
     if (search.runtimeType == BusStop) {
       // if the recent search is a bus stop, then the list is filtered to only include bus stops
-      List<BusStop> _busStopRecents = _recentSearches.whereType<BusStop>().toList();
+      List<BusStop> busStopRecents = _recentSearches.whereType<BusStop>().toList();
       // checks if the bus stop is already in the list
-      if (_busStopRecents.every((element) => element.code != search.code)) {
+      if (busStopRecents.every((element) => element.code != search.code)) {
         _recentSearches.add(search);
         debugPrint('Added recent search: ${search.name}');
       } else {
-        _busStopRecents.indexWhere((element) => element.code == search.code);
+        busStopRecents.indexWhere((element) => element.code == search.code);
         debugPrint("Already added in recent");
       }
     } else if (search.runtimeType == BusService) {
       // if the recent search is a bus service, then the list is filtered to only include bus services
-      List<BusService> _busServiceRecents = _recentSearches.whereType<BusService>().toList();
+      List<BusService> busServiceRecents = _recentSearches.whereType<BusService>().toList();
       // checks if the bus service is already in the list
-      if (_busServiceRecents.every((element) => element.serviceNo != search.serviceNo)) {
+      if (busServiceRecents.every((element) => element.serviceNo != search.serviceNo)) {
         _recentSearches.add(search);
         debugPrint('Added recent search: ${search.serviceNo}');
       } else {

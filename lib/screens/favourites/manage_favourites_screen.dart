@@ -138,35 +138,35 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
               future: _futureFavouritesList,
               builder: (context, AsyncSnapshot<List<Favourite>> snapshot) {
                 if (snapshot.hasData) {
-                  List<Favourite> _favouritesList = snapshot.data!;
+                  List<Favourite> favouritesList = snapshot.data!;
                   return Expanded(
                     child: NotificationListener<UserScrollNotification>(
                       onNotification: (notification) => hideFabOnScroll(notification),
                       child: ReorderableListView.builder(
                           itemBuilder: (context, index) {
                             return Padding(
-                              key: Key(_favouritesList[index].busStopCode),
+                              key: Key(favouritesList[index].busStopCode),
                               padding: const EdgeInsets.only(bottom: 18),
                               child: FavouriteNameCard(
-                                  busStopName: _favouritesList[index].busStopName,
+                                  busStopName: favouritesList[index].busStopName,
                                   onTap: () =>
-                                      goToEditFavouritesScreen(context, _favouritesList[index])),
+                                      goToEditFavouritesScreen(context, favouritesList[index])),
                             );
                           },
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           shrinkWrap: true,
                           buildDefaultDragHandles: true,
-                          itemCount: _favouritesList.length,
+                          itemCount: favouritesList.length,
                           // calls reorder function in FavouritesProvider to reorder the favourites list
                           onReorder: (oldIndex, newIndex) {
                             if (oldIndex < newIndex) {
                               // removing the item at oldIndex will shorten the list by 1
                               newIndex--;
                             }
-                            _favouritesList.insert(newIndex, _favouritesList.removeAt(oldIndex));
+                            favouritesList.insert(newIndex, favouritesList.removeAt(oldIndex));
 
                             setState(() {
-                              reorderedFavouritesList = _favouritesList;
+                              reorderedFavouritesList = favouritesList;
                             });
                           }),
                     ),
