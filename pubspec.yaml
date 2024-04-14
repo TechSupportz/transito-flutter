@@ -48,6 +48,7 @@ dependencies:
   upgrader: ^8.1.0
   shared_preferences: ^2.2.2
   posthog_flutter: ^3.3.0
+  measure_size: ^4.0.0
 
 dev_dependencies:
   flutter_test:
