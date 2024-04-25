@@ -48,6 +48,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text('Bus Service Info'),
       ),
@@ -58,7 +59,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
             LayoutBuilder(
               builder: (context, constraints) => MeasureSize(
                 onChange: (Size size) {
-                  double heightPercentage = (0.98 - (size.height / constraints.maxHeight));
+                  double gapPercentage =
+                      MediaQuery.of(context).viewInsets.bottom > 0.0 ? 0.04 : 0.02;
+                  double heightPercentage =
+                      (1 - gapPercentage) - (size.height / constraints.maxHeight);
                   setState(() {
                     sheetHeight = heightPercentage;
                   });
@@ -182,6 +186,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                 0.885,
               ],
               builder: (context, scrollController) {
+                print(sheetHeight);
                 return Container(
                   decoration: BoxDecoration(
                     color: AppColors.drawerBg,
@@ -213,7 +218,6 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                   separatorBuilder: (context, _) => SizedBox(height: 12),
                                   itemBuilder: (context, index) => BusStopCard(
                                     busStopInfo: routes[0][index].busStop,
-                                    searchMode: true,
                                   ),
                                 )
                               : ListView.separated(
@@ -223,7 +227,6 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                   separatorBuilder: (context, _) => SizedBox(height: 12),
                                   itemBuilder: (context, index) => BusStopCard(
                                     busStopInfo: routes[1][index].busStop,
-                                    searchMode: true,
                                   ),
                                 ),
                         );
