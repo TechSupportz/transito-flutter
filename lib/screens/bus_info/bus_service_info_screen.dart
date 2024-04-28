@@ -215,18 +215,28 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                   key: const ValueKey(0),
                                   controller: scrollController,
                                   itemCount: routes[0].length,
-                                  separatorBuilder: (context, _) => SizedBox(height: 12),
+                                  separatorBuilder: (context, _) => const SizedBox(height: 12),
                                   itemBuilder: (context, index) => BusStopCard(
                                     busStopInfo: routes[0][index].busStop,
+                                    routeMode: true,
+                                    busSchedule: (
+                                      firstBus: routes[0][index].firstBus,
+                                      lastBus: routes[0][index].lastBus
+                                    ),
                                   ),
                                 )
                               : ListView.separated(
                                   key: const ValueKey(1),
                                   controller: scrollController,
                                   itemCount: routes[1].length,
-                                  separatorBuilder: (context, _) => SizedBox(height: 12),
+                                  separatorBuilder: (context, _) => const SizedBox(height: 12),
                                   itemBuilder: (context, index) => BusStopCard(
                                     busStopInfo: routes[1][index].busStop,
+                                    routeMode: true,
+                                    busSchedule: (
+                                      firstBus: routes[0][index].firstBus,
+                                      lastBus: routes[0][index].lastBus
+                                    ),
                                   ),
                                 ),
                         );

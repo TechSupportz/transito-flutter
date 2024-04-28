@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/global/providers/search_provider.dart';
@@ -8,18 +9,22 @@ import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 
 class BusStopCard extends StatelessWidget {
-  const BusStopCard(
-      {Key? key,
-      required this.busStopInfo,
-      this.distanceFromUser,
-      this.searchMode = false,
-      this.showDistanceFromUser = false})
-      : super(key: key);
+  const BusStopCard({
+    Key? key,
+    required this.busStopInfo,
+    this.showDistanceFromUser = false,
+    this.distanceFromUser,
+    this.searchMode = false,
+    this.routeMode = false,
+    this.busSchedule,
+  }) : super(key: key);
 
   final BusStop busStopInfo;
   final double? distanceFromUser;
   final bool showDistanceFromUser;
   final bool searchMode;
+  final bool routeMode;
+  final ({BusSchedule firstBus, BusSchedule lastBus})? busSchedule;
 
   // function that navigates user to bus timing screen
   void goToBusTimingScreen(
@@ -115,44 +120,58 @@ class BusStopCard extends StatelessWidget {
             decoration:
                 BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Row(
               children: [
-                Text(
-                  busStopInfo.name,
-                  overflow: TextOverflow.fade,
-                  maxLines: 1,
-                  softWrap: false,
-                  style: TextStyle(
-                    fontSize: searchMode ? 24 : 21,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: searchMode ? 4 : 0),
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                      margin: const EdgeInsets.only(right: 8),
-                      decoration: BoxDecoration(
-                          color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
-                      child: Text(busStopInfo.code),
-                    ),
-                    Expanded(
-                      child: Text(
-                        (searchMode || !showDistanceFromUser)
-                            ? busStopInfo.roadName
-                            : '${transformDistanceFromUser(distanceFromUser!)} away',
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        busStopInfo.name,
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         softWrap: false,
-                        style: const TextStyle(
-                            color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                        style: TextStyle(
+                          fontSize: searchMode ? 24 : 21,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
-                )
+                      SizedBox(height: searchMode ? 4 : 0),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                                color: AppColors.accentColour,
+                                borderRadius: BorderRadius.circular(5)),
+                            child: Text(busStopInfo.code),
+                          ),
+                          Expanded(
+                            child: Text(
+                              (searchMode || !showDistanceFromUser)
+                                  ? busStopInfo.roadName
+                                  : '${transformDistanceFromUser(distanceFromUser!)} away',
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: const TextStyle(
+                                  color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                            ),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                ),
+                if (routeMode && busSchedule != null) ...[
+                  IconButton(
+                    splashRadius: 21,
+                    onPressed: () => print(busSchedule?.firstBus.weekdays),
+                    icon: Icon(Icons.schedule_rounded),
+                  )
+                ]
               ],
             ),
           ),
