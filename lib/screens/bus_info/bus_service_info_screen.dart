@@ -129,36 +129,48 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                             ),
                             const SizedBox(width: 12),
                             Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 if (!widget.busService.isLoopService) ...[
-                                  const SizedBox(
-                                    height: 79,
+                                  const Padding(
+                                    padding: EdgeInsets.only(bottom: 20),
                                     child: Icon(
                                       Icons.radio_button_unchecked_rounded,
                                       color: AppColors.prettyGreen,
                                       size: 28,
                                     ),
                                   ),
-                                  SizedBox(
-                                    height: 30,
-                                    child: IconButton(
-                                      padding: EdgeInsets.zero,
-                                      iconSize: 32,
-                                      splashRadius: 24,
-                                      icon: const Icon(
-                                        Icons.swap_vert_rounded,
+                                  Ink(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.accentColour,
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: AnimatedRotation(
+                                      turns: _destinationIndex == 0 ? 0 : -0.5,
+                                      duration: const Duration(milliseconds: 175),
+                                      child: IconButton(
+                                        padding: EdgeInsets.zero,
+                                        iconSize: 30,
+                                        splashRadius: 20,
+                                        enableFeedback: true,
+                                        icon: const Icon(
+                                          Icons.swap_vert_rounded,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          setState(
+                                            () => _destinationIndex = (_destinationIndex + 1) % 2,
+                                          );
+                                        },
                                       ),
-                                      onPressed: () {
-                                        setState(
-                                            () => _destinationIndex = (_destinationIndex + 1) % 2);
-                                      },
                                     ),
                                   ),
                                 ],
-                                const SizedBox(
-                                  height: 79,
+                                const Padding(
+                                  padding: EdgeInsets.only(top: 20),
                                   child: Icon(
                                     Icons.place_rounded,
                                     color: AppColors.sortaRed,

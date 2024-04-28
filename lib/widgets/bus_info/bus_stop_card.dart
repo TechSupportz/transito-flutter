@@ -167,9 +167,12 @@ class BusStopCard extends StatelessWidget {
                 ),
                 if (routeMode && busSchedule != null) ...[
                   IconButton(
-                    splashRadius: 21,
-                    onPressed: () => print(busSchedule?.firstBus.weekdays),
-                    icon: Icon(Icons.schedule_rounded),
+                    splashRadius: 20,
+                    onPressed: () => showDialog(
+                      context: context,
+                      builder: (context) => busScheduleDialog(context),
+                    ),
+                    icon: const Icon(Icons.info_outline_rounded),
                   )
                 ]
               ],
@@ -177,6 +180,78 @@ class BusStopCard extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  AlertDialog busScheduleDialog(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Bus Schedule'),
+      insetPadding: const EdgeInsets.all(16),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Table(
+          children: [
+            TableRow(
+              children: [
+                TableCell(
+                  child: Container(),
+                ),
+                const TableCell(
+                  child: Text("First Bus"),
+                ),
+                const TableCell(
+                  child: Text("Last Bus"),
+                )
+              ],
+            ),
+            TableRow(
+              children: [
+                const TableCell(
+                  child: Text("Weekdays"),
+                ),
+                TableCell(
+                  child: Text(busSchedule!.firstBus.weekdays),
+                ),
+                TableCell(
+                  child: Text(busSchedule!.lastBus.weekdays),
+                )
+              ],
+            ),
+            TableRow(
+              children: [
+                const TableCell(
+                  child: Text("Saturday"),
+                ),
+                TableCell(
+                  child: Text(busSchedule!.firstBus.saturday),
+                ),
+                TableCell(
+                  child: Text(busSchedule!.lastBus.saturday),
+                )
+              ],
+            ),
+            TableRow(
+              children: [
+                const TableCell(
+                  child: Text("Sunday"),
+                ),
+                TableCell(
+                  child: Text(busSchedule!.firstBus.sunday),
+                ),
+                TableCell(
+                  child: Text(busSchedule!.lastBus.sunday),
+                )
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Close'),
+        )
+      ],
     );
   }
 }
