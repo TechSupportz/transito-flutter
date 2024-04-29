@@ -92,7 +92,7 @@ class BusStopCard extends StatelessWidget {
         message: busStopInfo.name,
         child: InkWell(
           onTap: () {
-            if (searchMode) {
+            if (searchMode || routeMode) {
               searchProvider.addRecentSearch(busStopInfo);
               goToBusStopInfoScreen(
                 context,
