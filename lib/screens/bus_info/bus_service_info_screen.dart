@@ -198,13 +198,12 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                 0.885,
               ],
               builder: (context, scrollController) {
-                print(sheetHeight);
                 return Container(
                   decoration: BoxDecoration(
                     color: AppColors.drawerBg,
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
                   child: FutureBuilder(
                     future: futureBusServiceInfo,
                     builder: (context, snapshot) {
@@ -225,6 +224,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                           child: _destinationIndex == 0
                               ? ListView.separated(
                                   key: const ValueKey(0),
+                                  padding: const EdgeInsets.only(bottom: 16),
                                   controller: scrollController,
                                   itemCount: routes[0].length,
                                   separatorBuilder: (context, _) => const SizedBox(height: 12),
@@ -239,6 +239,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 )
                               : ListView.separated(
                                   key: const ValueKey(1),
+                                  padding: const EdgeInsets.only(bottom: 16),
                                   controller: scrollController,
                                   itemCount: routes[1].length,
                                   separatorBuilder: (context, _) => const SizedBox(height: 12),
