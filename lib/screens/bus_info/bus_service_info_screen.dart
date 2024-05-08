@@ -133,10 +133,13 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
                                   if (widget.busService.isLoopService) ...[
-                                    const Icon(
-                                      Icons.restart_alt_rounded,
-                                      color: AppColors.notReallyYellow,
-                                      size: 28,
+                                    Transform.rotate(
+                                      angle: 45,
+                                      child: const Icon(
+                                        Icons.loop_rounded,
+                                        color: AppColors.notReallyYellow,
+                                        size: 28,
+                                      ),
                                     ),
                                   ] else ...[
                                     const Padding(
