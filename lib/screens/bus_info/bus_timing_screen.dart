@@ -119,26 +119,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
     return _value;
   }
 
-  // function to get the list of bus services that are currently operating at that bus stop
-  // this is used to display the bus stops in the add favourites screen
-  Future<List<String>> getBusServiceNumList() async {
-    List<String> busServicesList = await futureBusArrivalInfo.then(
-      (value) {
-        List<String> _busServicesList = [];
-        for (var service in value.services) {
-          _busServicesList.add(service.serviceNum);
-          // debugPrint('$_busServicesList');
-        }
-        return _busServicesList;
-      },
-    );
-    // debugPrint('$busServicesList');
-    return busServicesList;
-  }
-
   // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
   Future<void> goToAddFavouritesScreen(BuildContext context) async {
-    List<String> busServicesList = await getBusServiceNumList();
+    List<String> busServicesList = await futureServices;
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(
@@ -158,7 +141,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the edit favourites screen
   Future<void> goToEditFavouritesScreen(BuildContext context) async {
-    List<String> busServicesList = await getBusServiceNumList();
+    List<String> busServicesList = await futureServices;
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(

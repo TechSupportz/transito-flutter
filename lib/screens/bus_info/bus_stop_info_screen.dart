@@ -124,7 +124,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
   Future<void> goToAddFavouritesScreen() async {
-    List<String> busServicesList = await fetchCurrOperatingServices();
+    List<String> busServicesList = await futureServices;
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(
@@ -144,7 +144,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the edit favourites screen
   Future<void> goToEditFavouritesScreen() async {
-    List<String> busServicesList = await fetchCurrOperatingServices();
+        List<String> busServicesList = await futureServices;
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(

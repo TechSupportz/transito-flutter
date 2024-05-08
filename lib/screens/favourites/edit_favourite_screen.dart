@@ -203,6 +203,20 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               future: favouriteServicesList,
               builder: (context, AsyncSnapshot<Map<String?, List<String?>>> snapshot) {
                 if (snapshot.hasData) {
+                  Map<String?, List<String?>> initialChildrenValue = snapshot.data!;
+
+                  // this filters out services which have stopped operating but are still in the user's favourites
+                  if (initialChildrenValue["Bus Services"] != null &&
+                      !initialChildrenValue["Bus Services"]!.every(
+                        (service) => widget.busServicesList.contains(service),
+                      )) {
+                    initialChildrenValue["Bus Services"] = initialChildrenValue["Bus Services"]!
+                        .where(
+                          (service) => widget.busServicesList.contains(service),
+                        )
+                        .toList();
+                  }
+
                   return Expanded(
                     child: ShaderMask(
                       shaderCallback: (Rect bounds) {
