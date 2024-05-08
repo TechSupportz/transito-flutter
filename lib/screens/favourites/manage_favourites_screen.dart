@@ -127,7 +127,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                   ),
                   SizedBox(height: 8),
                   Text(
-                    "Click the edit button to add/remove your favourited bus services",
+                    "Click the pencil icon to modify or delete your favourites",
                     style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                   ),
                   SizedBox(height: 18),
