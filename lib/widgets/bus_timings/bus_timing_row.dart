@@ -117,31 +117,36 @@ class _BusTimingRowState extends State<BusTimingRow> {
       textBaseline: TextBaseline.ideographic,
       children: [
         Expanded(
-          flex: 2,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              InkWell(
-                borderRadius: BorderRadius.circular(5),
-                onTap: goToBusServiceInfoScreen,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          flex: 3,
+          child: InkWell(
+            borderRadius: BorderRadius.circular(8),
+            onTap: goToBusServiceInfoScreen,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
                   child: Text(
                     widget.serviceInfo.serviceNum,
                     style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
                   ),
                 ),
-              ),
-              Text(
-                '~ ${calculateDistanceAway()} away',
-                style: const TextStyle(
-                    fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
-              ),
-            ],
+                Text(
+                  '~ ${calculateDistanceAway()} away',
+                  style: const TextStyle(
+                      fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
+                ),
+              ],
+            ),
           ),
         ),
+        const Expanded(
+          flex: 1,
+          child: SizedBox(),
+        ),
         Expanded(
-          flex: 3,
+          flex: 6,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
