@@ -42,6 +42,7 @@ BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       serviceNo: json['serviceNo'] as String,
       operator: BusService.decodeBusOperator(json['operator'] as String),
       isLoopService: json['isLoopService'] as bool,
+      isSingleRoute: json['isSingleRoute'] as bool,
       interchanges: (json['interchanges'] as List<dynamic>)
           .map((e) => BusStop.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -57,6 +58,7 @@ Map<String, dynamic> _$BusServiceToJson(BusService instance) =>
       'serviceNo': instance.serviceNo,
       'operator': _$BusOperatorEnumMap[instance.operator]!,
       'isLoopService': instance.isLoopService,
+      'isSingleRoute': instance.isSingleRoute,
       'interchanges': instance.interchanges.map((e) => e.toJson()).toList(),
       'routes': instance.routes
           ?.map((e) => e.map((e) => e.toJson()).toList())

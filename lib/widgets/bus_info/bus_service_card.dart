@@ -22,7 +22,10 @@ class BusServiceCard extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => BusServiceInfoScreen(busService: busServiceInfo),
+              builder: (context) => BusServiceInfoScreen(
+                serviceNo: busServiceInfo.serviceNo,
+                busService: busServiceInfo,
+              ),
               settings: const RouteSettings(name: 'BusServiceInfoScreen'),
             ),
           );

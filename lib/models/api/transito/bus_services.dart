@@ -73,6 +73,7 @@ class BusService {
   BusOperator operator;
 
   bool isLoopService;
+  bool isSingleRoute;
   List<BusStop> interchanges;
   List<List<BusRouteInfo>>? routes;
 
@@ -95,6 +96,7 @@ class BusService {
     required this.serviceNo,
     required this.operator,
     required this.isLoopService,
+    required this.isSingleRoute,
     required this.interchanges,
     this.routes,
   });
