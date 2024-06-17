@@ -3,7 +3,7 @@ description: Get on board with Transito and catch your bus right on time!
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 2.2.0+22
+version: 2.2.0+23
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
