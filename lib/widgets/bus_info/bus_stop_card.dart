@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 
@@ -183,75 +184,136 @@ class BusStopCard extends StatelessWidget {
     );
   }
 
-  AlertDialog busScheduleDialog(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Bus Schedule'),
-      insetPadding: const EdgeInsets.all(16),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Table(
+  Widget busScheduleDialog(BuildContext context) {
+    String currentDay = Jiffy.now().format(pattern: "E");
+    int selectedDay = currentDay == "Sat"
+        ? 1
+        : currentDay == "Sun"
+            ? 2
+            : 0;
+
+    const TextStyle titleStyle = TextStyle(
+      fontWeight: FontWeight.w400,
+      color: AppColors.kindaGrey,
+      fontFamily: 'Poppins',
+      fontSize: 18.0,
+    );
+
+    const TextStyle timeStyle = TextStyle(
+      fontWeight: FontWeight.w600,
+      fontFamily: 'Poppins',
+      fontSize: 30.0,
+    );
+
+    return StatefulBuilder(
+      builder: (context, setState) => AlertDialog(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            TableRow(
-              children: [
-                TableCell(
-                  child: Container(),
-                ),
-                const TableCell(
-                  child: Text("First Bus"),
-                ),
-                const TableCell(
-                  child: Text("Last Bus"),
-                )
-              ],
-            ),
-            TableRow(
-              children: [
-                const TableCell(
-                  child: Text("Weekdays"),
-                ),
-                TableCell(
-                  child: Text(busSchedule!.firstBus.weekdays),
-                ),
-                TableCell(
-                  child: Text(busSchedule!.lastBus.weekdays),
-                )
-              ],
-            ),
-            TableRow(
-              children: [
-                const TableCell(
-                  child: Text("Saturday"),
-                ),
-                TableCell(
-                  child: Text(busSchedule!.firstBus.saturday),
-                ),
-                TableCell(
-                  child: Text(busSchedule!.lastBus.saturday),
-                )
-              ],
-            ),
-            TableRow(
-              children: [
-                const TableCell(
-                  child: Text("Sunday"),
-                ),
-                TableCell(
-                  child: Text(busSchedule!.firstBus.sunday),
-                ),
-                TableCell(
-                  child: Text(busSchedule!.lastBus.sunday),
-                )
-              ],
-            ),
+            const Text('Bus Schedule'),
+            const SizedBox(height: 4.0),
+            Wrap(spacing: 6.0, children: [
+              ChoiceChip(
+                label: const Text("Weekday"),
+                selected: selectedDay == 0,
+                onSelected: (selected) {
+                  setState(() {
+                    selectedDay = 0;
+                  });
+                },
+                selectedColor: AppColors.accentColour.withOpacity(0.5),
+              ),
+              ChoiceChip(
+                label: const Text("Saturday"),
+                selected: selectedDay == 1,
+                onSelected: (selected) {
+                  setState(() {
+                    selectedDay = 1;
+                  });
+                },
+                selectedColor: AppColors.accentColour.withOpacity(0.5),
+              ),
+              ChoiceChip(
+                label: const Text("Sunday"),
+                selected: selectedDay == 2,
+                onSelected: (selected) {
+                  setState(() {
+                    selectedDay = 2;
+                  });
+                },
+                selectedColor: AppColors.accentColour.withOpacity(0.5),
+              ),
+            ]),
           ],
         ),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(
+                        Icons.light_mode_rounded,
+                        size: 24,
+                      ),
+                      SizedBox(width: 6.0),
+                      Text(
+                        "First Bus",
+                        style: titleStyle,
+                      )
+                    ],
+                  ),
+                  Text(
+                    Jiffy.parse(
+                      '${selectedDay == 0 ? busSchedule!.firstBus.weekdays : selectedDay == 1 ? busSchedule!.firstBus.saturday : busSchedule!.firstBus.sunday}',
+                      pattern: 'Hm',
+                    ).jm,
+                    style: timeStyle,
+                  )
+                ],
+              ),
+              const SizedBox(height: 8.0),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.nights_stay_rounded, size: 24),
+                      SizedBox(width: 6.0),
+                      Text(
+                        "Last Bus",
+                        style: titleStyle,
+                      )
+                    ],
+                  ),
+                  Text(
+                    Jiffy.parse(
+                      '${selectedDay == 0 ? busSchedule!.lastBus.weekdays : selectedDay == 1 ? busSchedule!.lastBus.saturday : busSchedule!.lastBus.sunday}',
+                      pattern: 'Hm',
+                    ).jm,
+                    style: timeStyle,
+                  )
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+        actionsPadding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Close'),
-        )
-      ],
     );
   }
 }

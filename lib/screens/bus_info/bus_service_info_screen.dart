@@ -69,7 +69,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Bus Service Info'),
+        title: const Text('Bus Service Information'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
@@ -173,8 +173,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                     child: Column(
                                       verticalDirection: _destinationIndex == 0
                                           ? VerticalDirection.down
-                                          : VerticalDirection
-                                              .up, // TODO - figure out how to animate this
+                                          : VerticalDirection.up,
                                       children: [
                                         BusStopCard(
                                           busStopInfo: busService.interchanges[0],
