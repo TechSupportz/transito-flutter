@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:skeletons/skeletons.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';

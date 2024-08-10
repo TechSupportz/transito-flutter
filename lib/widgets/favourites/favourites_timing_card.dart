@@ -8,7 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletons/skeletons.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
@@ -114,14 +114,13 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 onTap: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => BusTimingScreen(
-                      code: widget.code,
-                      name: widget.name,
-                      address: widget.address,
-                      busStopLocation: widget.busStopLocation,
-                    ),
-                    settings: const RouteSettings(name: "BusTimingScreen")
-                  ),
+                      builder: (context) => BusTimingScreen(
+                            code: widget.code,
+                            name: widget.name,
+                            address: widget.address,
+                            busStopLocation: widget.busStopLocation,
+                          ),
+                      settings: const RouteSettings(name: "BusTimingScreen")),
                 ),
                 child: Container(
                   decoration: BoxDecoration(

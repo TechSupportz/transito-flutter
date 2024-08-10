@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:measure_size/measure_size.dart';
-import 'package:skeletons/skeletons.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';

@@ -8,7 +8,7 @@ import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletons/skeletons.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
 import 'package:transito/models/user/user_settings.dart';
@@ -305,7 +305,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) => const LoginScreen(),
-                                                    settings: const RouteSettings(name: 'LoginScreen'),
+                                                    settings:
+                                                        const RouteSettings(name: 'LoginScreen'),
                                                   ),
                                                   (Route<dynamic> route) => false,
                                                 ),

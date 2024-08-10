@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletons/skeletons.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
@@ -144,7 +143,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the edit favourites screen
   Future<void> goToEditFavouritesScreen() async {
-        List<String> busServicesList = await futureServices;
+    List<String> busServicesList = await futureServices;
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(
@@ -324,13 +323,16 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               borderRadius: BorderRadius.circular(10),
                               child: FlutterMap(
                                 options: MapOptions(
-                                  center: widget.busStopLocation,
+                                  initialCenter: widget.busStopLocation,
                                   minZoom: 11,
-                                  zoom: 17.5,
+                                  initialZoom: 17.5,
                                   maxZoom: 18,
-                                  interactiveFlags: InteractiveFlag.all &
-                                      ~InteractiveFlag.pinchMove &
-                                      ~InteractiveFlag.rotate,
+                                  interactionOptions: const InteractionOptions(
+                                    flags: InteractiveFlag.all &
+                                        ~InteractiveFlag.pinchMove &
+                                        ~InteractiveFlag.rotate,
+                                  ),
+                                  backgroundColor: const Color(0xFF003653),
                                 ),
                                 children: [
                                   TileLayer(
@@ -340,13 +342,12 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                         "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png",
                                     userAgentPackageName: 'com.tnitish.transito',
                                     errorImage: const AssetImage('assets/images/mapError.png'),
-                                    backgroundColor: const Color(0xFF003653),
                                   ),
                                   MarkerLayer(
                                     markers: [
                                       Marker(
                                         point: widget.busStopLocation,
-                                        builder: (context) => Icon(
+                                        child: Icon(
                                           Icons.place_rounded,
                                           size: 35,
                                           color: AppColors.accentColour,
