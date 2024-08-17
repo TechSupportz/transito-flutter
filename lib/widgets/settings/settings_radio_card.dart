@@ -9,12 +9,11 @@ import '../../global/services/settings_service.dart';
 
 class SettingsRadioCard extends StatelessWidget {
   const SettingsRadioCard(
-      {Key? key,
+      {super.key,
       required this.title,
       required this.initialValue,
       required this.firebaseFieldName,
-      required this.options})
-      : super(key: key);
+      required this.options});
 
   final String title;
   final bool initialValue;

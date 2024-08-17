@@ -6,7 +6,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceCard extends StatelessWidget {
-  const BusServiceCard({Key? key, required this.busServiceInfo}) : super(key: key);
+  const BusServiceCard({super.key, required this.busServiceInfo});
 
   final BusService busServiceInfo;
 

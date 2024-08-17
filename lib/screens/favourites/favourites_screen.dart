@@ -8,7 +8,7 @@ import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class FavouritesScreen extends StatefulWidget {
-  const FavouritesScreen({Key? key}) : super(key: key);
+  const FavouritesScreen({super.key});
 
   @override
   State<FavouritesScreen> createState() => _FavouritesScreenState();

@@ -9,11 +9,11 @@ import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusTimingRow extends StatefulWidget {
   const BusTimingRow({
-    Key? key,
+    super.key,
     required this.serviceInfo,
     required this.userLatLng,
     required this.isETAminutes,
-  }) : super(key: key);
+  });
 
   final ServiceInfo serviceInfo;
   final LatLng userLatLng; // user's current latitude and longitude
@@ -160,13 +160,13 @@ class _BusTimingRowState extends State<BusTimingRow> {
 
 class ArrivalCard extends StatefulWidget {
   const ArrivalCard({
-    Key? key,
+    super.key,
     required this.eta,
     required this.accessible,
     required this.crowdLvl,
     required this.busType,
     required this.isETAminutes,
-  }) : super(key: key);
+  });
 
   final String eta;
   final bool accessible;

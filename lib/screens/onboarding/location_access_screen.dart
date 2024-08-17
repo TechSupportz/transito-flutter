@@ -6,7 +6,7 @@ import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
 
 class LocationAccessScreen extends StatefulWidget {
-  const LocationAccessScreen({Key? key}) : super(key: key);
+  const LocationAccessScreen({super.key});
 
   @override
   State<LocationAccessScreen> createState() => _LocationAccessScreenState();

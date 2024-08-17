@@ -7,7 +7,7 @@ import 'package:transito/widgets/bus_info/bus_service_card.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 
 class RecentSearchList extends StatelessWidget {
-  const RecentSearchList({Key? key}) : super(key: key);
+  const RecentSearchList({super.key});
 
   @override
   Widget build(BuildContext context) {

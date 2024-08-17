@@ -4,10 +4,10 @@ import '../../models/app/app_colors.dart';
 
 class FavouriteNameCard extends StatelessWidget {
   const FavouriteNameCard({
-    Key? key,
+    super.key,
     required this.busStopName,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   final String busStopName;
 

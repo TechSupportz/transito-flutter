@@ -20,13 +20,13 @@ import 'package:transito/widgets/common/error_text.dart';
 
 class FavouritesTimingCard extends StatefulWidget {
   const FavouritesTimingCard({
-    Key? key,
+    super.key,
     required this.code,
     required this.name,
     required this.address,
     required this.services,
     required this.busStopLocation,
-  }) : super(key: key);
+  });
 
   final String code;
   final String name;

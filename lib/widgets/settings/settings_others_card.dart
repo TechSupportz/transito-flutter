@@ -1,14 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/models/app/app_colors.dart';
 
 class SettingsOthersCard extends StatelessWidget {
   const SettingsOthersCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.icon,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   final String title;
   final IconData icon;

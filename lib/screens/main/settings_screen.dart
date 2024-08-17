@@ -23,7 +23,7 @@ import 'package:transito/widgets/settings/settings_radio_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -368,9 +368,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ],
                                 )),
-                        child: const Text("Delete account"),
                         style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(AppColors.sortaRed)),
+                            backgroundColor: WidgetStateProperty.all(AppColors.sortaRed)),
+                        child: const Text("Delete account"),
                       )
                     ])),
               ],

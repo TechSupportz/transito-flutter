@@ -10,14 +10,14 @@ import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/screens/navigator_screen.dart';
 
 class AddFavouritesScreen extends StatefulWidget {
-  const AddFavouritesScreen(
-      {Key? key,
-      required this.busStopCode,
-      required this.busStopName,
-      required this.busStopAddress,
-      required this.busStopLocation,
-      required this.busServicesList})
-      : super(key: key);
+  const AddFavouritesScreen({
+    super.key,
+    required this.busStopCode,
+    required this.busStopName,
+    required this.busStopAddress,
+    required this.busStopLocation,
+    required this.busServicesList,
+  });
   final String busStopCode;
   final String busStopName;
   final String busStopAddress;

@@ -49,6 +49,7 @@ dependencies:
     posthog_flutter: ^4.5.0
     measure_size: ^4.0.0
     flutter_skeleton_ui: ^0.0.6
+    collection: ^1.18.0
 
 dev_dependencies:
     flutter_test:

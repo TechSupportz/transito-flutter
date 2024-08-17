@@ -25,7 +25,7 @@ import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class NearbyScreen extends StatefulWidget {
-  const NearbyScreen({Key? key}) : super(key: key);
+  const NearbyScreen({super.key});
 
   @override
   State<NearbyScreen> createState() => _NearbyScreenState();
@@ -81,7 +81,7 @@ class _NearbyScreenState extends State<NearbyScreen>
       return lastKnownPosition;
     }
 
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.best));
     debugPrint('$position');
 
     setState(() => _isFetchingLocation = false);

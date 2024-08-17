@@ -84,7 +84,7 @@ void main() async {
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({Key? key, required this.defaultHome}) : super(key: key);
+  const MyApp({super.key, required this.defaultHome});
   final Widget defaultHome;
 
   @override
@@ -224,7 +224,8 @@ class _MyAppState extends State<MyApp> {
             home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
             builder: (context, child) {
               return MediaQuery(
-                data: MediaQuery.of(context).copyWith(textScaleFactor: isTablet ? 1.25 : 1),
+                data: MediaQuery.of(context).copyWith(
+                    textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
                 child: SafeArea(child: child!),
               );
             },

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 
 class MrtMapScreen extends StatelessWidget {
-  const MrtMapScreen({Key? key}) : super(key: key);
+  const MrtMapScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

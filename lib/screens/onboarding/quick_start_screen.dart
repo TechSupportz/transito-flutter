@@ -3,7 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:transito/screens/navigator_screen.dart';
 
 class QuickStartScreen extends StatelessWidget {
-  const QuickStartScreen({Key? key}) : super(key: key);
+  const QuickStartScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

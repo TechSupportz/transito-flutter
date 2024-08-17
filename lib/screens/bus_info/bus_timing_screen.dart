@@ -28,13 +28,13 @@ import 'bus_stop_info_screen.dart';
 
 class BusTimingScreen extends StatefulWidget {
   const BusTimingScreen({
-    Key? key,
+    super.key,
     required this.code,
     required this.name,
     required this.address,
     required this.busStopLocation,
     this.services,
-  }) : super(key: key);
+  });
 
   final String code;
   final String name;
@@ -59,7 +59,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   // function to get the user's location
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+    Position position = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.best));
     debugPrint('$position');
     return position;
   }
@@ -207,10 +207,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
 
     var userId = context.read<User?>()?.uid;
     FavouritesService().isAddedToFavourites(widget.code, userId!).then((value) {
-      print(value);
       setState(() {
         isAddedToFavourites = value;
-        print(isAddedToFavourites);
       });
     });
   }

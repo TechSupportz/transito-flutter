@@ -23,13 +23,13 @@ import 'bus_timing_screen.dart';
 
 class BusStopInfoScreen extends StatefulWidget {
   const BusStopInfoScreen({
-    Key? key,
+    super.key,
     required this.code,
     required this.name,
     required this.address,
     required this.busStopLocation,
     this.services,
-  }) : super(key: key);
+  });
 
   final String code;
   final String name;

@@ -8,7 +8,7 @@ import 'package:transito/screens/search/recent_search_screen.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {
-  const NavigatorScreen({Key? key}) : super(key: key);
+  const NavigatorScreen({super.key});
 
   @override
   State<NavigatorScreen> createState() => _NavigatorScreenState();
@@ -39,12 +39,12 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
         ),
         child: PageView(
           controller: controller,
-          children: widgetList,
           pageSnapping: true,
           dragStartBehavior: DragStartBehavior.start,
           onPageChanged: (index) {
             setState(() => _pageIndex = index);
           },
+          children: widgetList,
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(

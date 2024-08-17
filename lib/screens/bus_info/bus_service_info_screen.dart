@@ -13,10 +13,10 @@ import 'package:transito/widgets/common/error_text.dart';
 
 class BusServiceInfoScreen extends StatefulWidget {
   const BusServiceInfoScreen({
-    Key? key,
+    super.key,
     required this.serviceNo,
     this.busService,
-  }) : super(key: key);
+  });
 
   final String serviceNo;
   final BusService? busService;
@@ -292,7 +292,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                           child: FutureBuilder(
                             future: futureBusServiceRoutes,
                             builder: (context, snapshot) {
-                              Widget routeResults = CircularProgressIndicator(strokeWidth: 3);
+                              Widget routeResults = const CircularProgressIndicator(strokeWidth: 3);
 
                               if (snapshot.hasData) {
                                 final routes = snapshot.data!;

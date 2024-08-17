@@ -8,7 +8,7 @@ import 'package:transito/widgets/search/recent_search_list.dart';
 import 'search_screen.dart';
 
 class RecentSearchScreen extends StatefulWidget {
-  const RecentSearchScreen({Key? key}) : super(key: key);
+  const RecentSearchScreen({super.key});
 
   @override
   State<RecentSearchScreen> createState() => _RecentSearchScreenState();
@@ -36,7 +36,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
                 Navigator.pop(context);
               },
               style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(AppColors.sortaRed),
+                backgroundColor: WidgetStateProperty.all(AppColors.sortaRed),
               ),
               child: const Text('Clear'),
             )

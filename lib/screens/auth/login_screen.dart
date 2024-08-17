@@ -14,7 +14,7 @@ import '../navigator_screen.dart';
 import '../onboarding/location_access_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -203,7 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     style: ButtonStyle(
-                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                      padding: WidgetStateProperty.all<EdgeInsets>(
                                         const EdgeInsets.symmetric(vertical: 12),
                                       ),
                                     ),
@@ -218,7 +218,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         style: TextStyle(color: Colors.white),
                                       ),
                                       style: ButtonStyle(
-                                        padding: MaterialStateProperty.all<EdgeInsets>(
+                                        padding: WidgetStateProperty.all<EdgeInsets>(
                                           const EdgeInsets.symmetric(vertical: 12),
                                         ),
                                       ),
@@ -234,7 +234,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     style: ButtonStyle(
-                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                      padding: WidgetStateProperty.all<EdgeInsets>(
                                         const EdgeInsets.symmetric(vertical: 12),
                                       ),
                                     ),
@@ -251,7 +251,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     style: ButtonStyle(
-                                      padding: MaterialStateProperty.all<EdgeInsets>(
+                                      padding: WidgetStateProperty.all<EdgeInsets>(
                                         const EdgeInsets.symmetric(vertical: 12),
                                       ),
                                     ),

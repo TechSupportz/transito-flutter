@@ -15,7 +15,7 @@ import 'package:transito/widgets/favourites/favourite_name_card.dart';
 import 'edit_favourite_screen.dart';
 
 class ManageFavouritesScreen extends StatefulWidget {
-  const ManageFavouritesScreen({Key? key}) : super(key: key);
+  const ManageFavouritesScreen({super.key});
 
   @override
   State<ManageFavouritesScreen> createState() => _ManageFavouritesScreenState();

@@ -15,7 +15,7 @@ import '../onboarding/location_access_screen.dart';
 import 'login_screen.dart';
 
 class EmailScreen extends StatefulWidget {
-  const EmailScreen({Key? key}) : super(key: key);
+  const EmailScreen({super.key});
 
   @override
   State<EmailScreen> createState() => _EmailScreenState();
@@ -228,19 +228,17 @@ class _EmailScreenState extends State<EmailScreen> {
                         ],
                       ),
                       const Spacer(flex: 1),
-                      Container(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Container(
-                            constraints: const BoxConstraints(minHeight: 264),
-                            child: AnimatedSwitcher(
-                              transitionBuilder: (child, animation) => ScaleTransition(
-                                scale: animation,
-                                child: child,
-                              ),
-                              duration: const Duration(milliseconds: 175),
-                              child: _isLogin ? renderLoginForm() : renderRegisterForm(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Container(
+                          constraints: const BoxConstraints(minHeight: 264),
+                          child: AnimatedSwitcher(
+                            transitionBuilder: (child, animation) => ScaleTransition(
+                              scale: animation,
+                              child: child,
                             ),
+                            duration: const Duration(milliseconds: 185),
+                            child: _isLogin ? renderLoginForm() : renderRegisterForm(),
                           ),
                         ),
                       ),

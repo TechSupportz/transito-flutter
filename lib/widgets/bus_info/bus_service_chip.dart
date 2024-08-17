@@ -3,8 +3,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceChip extends StatelessWidget {
-  const BusServiceChip({Key? key, required this.busServiceNumber, required this.isOperating})
-      : super(key: key);
+  const BusServiceChip({super.key, required this.busServiceNumber, required this.isOperating});
 
   final String busServiceNumber;
   final bool isOperating;

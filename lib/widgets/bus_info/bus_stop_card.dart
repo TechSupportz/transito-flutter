@@ -11,14 +11,14 @@ import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 
 class BusStopCard extends StatelessWidget {
   const BusStopCard({
-    Key? key,
+    super.key,
     required this.busStopInfo,
     this.showDistanceFromUser = false,
     this.distanceFromUser,
     this.searchMode = false,
     this.routeMode = false,
     this.busSchedule,
-  }) : super(key: key);
+  });
 
   final BusStop busStopInfo;
   final double? distanceFromUser;
@@ -273,7 +273,7 @@ class BusStopCard extends StatelessWidget {
                   ),
                   Text(
                     Jiffy.parse(
-                      '${selectedDay == 0 ? busSchedule!.firstBus.weekdays : selectedDay == 1 ? busSchedule!.firstBus.saturday : busSchedule!.firstBus.sunday}',
+                      selectedDay == 0 ? busSchedule!.firstBus.weekdays : selectedDay == 1 ? busSchedule!.firstBus.saturday : busSchedule!.firstBus.sunday,
                       pattern: 'Hm',
                     ).jm,
                     style: timeStyle,
@@ -296,7 +296,7 @@ class BusStopCard extends StatelessWidget {
                   ),
                   Text(
                     Jiffy.parse(
-                      '${selectedDay == 0 ? busSchedule!.lastBus.weekdays : selectedDay == 1 ? busSchedule!.lastBus.saturday : busSchedule!.lastBus.sunday}',
+                      selectedDay == 0 ? busSchedule!.lastBus.weekdays : selectedDay == 1 ? busSchedule!.lastBus.saturday : busSchedule!.lastBus.sunday,
                       pattern: 'Hm',
                     ).jm,
                     style: timeStyle,

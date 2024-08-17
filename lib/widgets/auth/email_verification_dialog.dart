@@ -5,7 +5,7 @@ import 'package:android_intent_plus/flag.dart';
 import 'package:flutter/material.dart';
 
 class EmailVerificationDialog extends StatelessWidget {
-  const EmailVerificationDialog({Key? key}) : super(key: key);
+  const EmailVerificationDialog({super.key});
 
   @override
   Widget build(BuildContext context) {

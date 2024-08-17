@@ -14,7 +14,7 @@ import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({Key? key}) : super(key: key);
+  const SearchScreen({super.key});
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -27,7 +27,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
   late TabController _tabController;
   Timer? _debounce;
   final _textFieldController = TextEditingController();
-  late FocusNode _searchFocusNode = FocusNode();
+  late final FocusNode _searchFocusNode = FocusNode();
 
   // tabs to switch between bus stops and bus services
   static const List<Tab> searchTabs = <Tab>[
