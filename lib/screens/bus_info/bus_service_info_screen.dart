@@ -15,10 +15,14 @@ class BusServiceInfoScreen extends StatefulWidget {
   const BusServiceInfoScreen({
     super.key,
     required this.serviceNo,
+    this.originStopCode,
+    this.currentStopCode,
     this.busService,
   });
 
   final String serviceNo;
+  final String? originStopCode;
+  final String? currentStopCode;
   final BusService? busService;
 
   @override
@@ -114,6 +118,14 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
             if (snapshot.hasData || widget.busService != null) {
               final busService = snapshot.data as BusService;
+
+              if (widget.originStopCode != null &&
+                  !busService.isLoopService &&
+                  !busService.isSingleRoute) {
+                if (widget.originStopCode != busService.interchanges[0].code) {
+                  _destinationIndex = 1;
+                }
+              }
 
               child = Stack(
                 key: const ValueKey(1),

@@ -84,6 +84,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
       MaterialPageRoute(
         builder: (context) => BusServiceInfoScreen(
           serviceNo: widget.serviceInfo.serviceNum,
+          originStopCode: widget.serviceInfo.nextBus.originCode,
         ),
       ),
     );
