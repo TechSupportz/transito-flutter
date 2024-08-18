@@ -59,7 +59,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
   // function to get the user's location
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
-    Position position = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.best));
+    Position position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.best));
     debugPrint('$position');
     return position;
   }
@@ -285,6 +286,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                         return Padding(
                                           padding: const EdgeInsets.only(bottom: 8.0),
                                           child: BusTimingRow(
+                                            busStopCode: widget.code,
                                             serviceInfo:
                                                 busArrivalInfoSnapshot.data!.services[index],
                                             userLatLng: widget.busStopLocation,

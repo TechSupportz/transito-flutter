@@ -154,6 +154,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                         return Transform.scale(
                                           scale: 0.9,
                                           child: BusTimingRow(
+                                            busStopCode: widget.code,
                                             serviceInfo: snapshot.data![index],
                                             userLatLng: widget.busStopLocation,
                                             isETAminutes: userSettings.isETAminutes,

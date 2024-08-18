@@ -10,11 +10,13 @@ import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 class BusTimingRow extends StatefulWidget {
   const BusTimingRow({
     super.key,
+    required this.busStopCode,
     required this.serviceInfo,
     required this.userLatLng,
     required this.isETAminutes,
   });
 
+  final String busStopCode;
   final ServiceInfo serviceInfo;
   final LatLng userLatLng; // user's current latitude and longitude
   final bool isETAminutes; // whether to display ETA in minutes or exact time
@@ -85,6 +87,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
         builder: (context) => BusServiceInfoScreen(
           serviceNo: widget.serviceInfo.serviceNum,
           originStopCode: widget.serviceInfo.nextBus.originCode,
+          currentStopCode: widget.busStopCode,
         ),
       ),
     );

@@ -1,13 +1,15 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:measure_size/measure_size.dart';
-import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
+import 'package:transito/widgets/bus_info/bus_routes_list.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
@@ -32,6 +34,9 @@ class BusServiceInfoScreen extends StatefulWidget {
 class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   late Future<BusService> futureBusServiceInfo;
   late Future<List<List<BusRouteInfo>>> futureBusServiceRoutes;
+  late ScrollController routeScrollController;
+
+  DraggableScrollableController drawerScrollController = DraggableScrollableController();
   int _destinationIndex = 0;
   double sheetHeight = 0;
 
@@ -243,7 +248,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                               ),
                                               child: AnimatedRotation(
                                                 turns: _destinationIndex == 0 ? 0 : -0.5,
-                                                duration: const Duration(milliseconds: 175),
+                                                duration: const Duration(milliseconds: 200),
                                                 child: IconButton(
                                                   padding: EdgeInsets.zero,
                                                   iconSize: 30,
@@ -285,6 +290,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                     opacity: sheetHeight == 0 ? 0 : 1,
                     duration: const Duration(milliseconds: 350),
                     child: DraggableScrollableSheet(
+                      controller: drawerScrollController,
                       expand: true,
                       minChildSize: sheetHeight,
                       maxChildSize: 0.885,
@@ -296,6 +302,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                       ],
                       builder: (context, scrollController) {
                         return Container(
+                          clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
                             color: AppColors.drawerBg,
                             borderRadius: BorderRadius.circular(20),
@@ -308,69 +315,72 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
                               if (snapshot.hasData) {
                                 final routes = snapshot.data!;
+                                int currentStopIndex = 0;
+
+                                if (widget.currentStopCode != null) {
+                                  int busStopIndex = routes[_destinationIndex].indexWhere(
+                                    (route) => route.busStop.code == widget.currentStopCode,
+                                  );
+
+                                  if (busStopIndex != -1) {
+                                    currentStopIndex = busStopIndex;
+                                  }
+                                }
 
                                 routeResults = AnimatedSwitcher(
                                   transitionBuilder: (child, animation) => SlideTransition(
                                     position: Tween<Offset>(
-                                      begin: const Offset(0, 1),
+                                      begin: const Offset(0, 2),
                                       end: Offset.zero,
                                     ).animate(animation),
+                                    transformHitTests: false,
+                                    textDirection: TextDirection.ltr,
                                     child: child,
                                   ),
-                                  switchInCurve: Curves.easeInOut,
-                                  switchOutCurve: Curves.easeInOut,
-                                  duration: const Duration(milliseconds: 275),
+                                  switchInCurve: Curves.ease,
+                                  switchOutCurve: Curves.ease,
+                                  duration: const Duration(milliseconds: 350),
                                   child: _destinationIndex == 0
-                                      ? ListView.separated(
+                                      ? BusRoutesList(
                                           key: const ValueKey(0),
-                                          padding: const EdgeInsets.only(bottom: 16),
+                                          routes: routes[0],
                                           controller: scrollController,
-                                          itemCount: routes[0].length,
-                                          separatorBuilder: (context, _) =>
-                                              const SizedBox(height: 12),
-                                          itemBuilder: (context, index) => BusStopCard(
-                                            busStopInfo: routes[0][index].busStop,
-                                            routeMode: true,
-                                            busSchedule: (
-                                              firstBus: routes[0][index].firstBus,
-                                              lastBus: routes[0][index].lastBus
-                                            ),
-                                          ),
                                         )
-                                      : ListView.separated(
+                                      : BusRoutesList(
                                           key: const ValueKey(1),
-                                          padding: const EdgeInsets.only(bottom: 16),
+                                          routes: routes[1],
                                           controller: scrollController,
-                                          itemCount: routes[1].length,
-                                          separatorBuilder: (context, _) =>
-                                              const SizedBox(height: 12),
-                                          itemBuilder: (context, index) => BusStopCard(
-                                            busStopInfo: routes[1][index].busStop,
-                                            routeMode: true,
-                                            busSchedule: (
-                                              firstBus: routes[0][index].firstBus,
-                                              lastBus: routes[0][index].lastBus
-                                            ),
-                                          ),
                                         ),
+                                );
+
+                                Timer(
+                                  const Duration(milliseconds: 0),
+                                  () {
+                                    scrollController.animateTo(
+                                      currentStopIndex * 82.0,
+                                      duration: const Duration(seconds: 1),
+                                      curve: Curves.ease,
+                                    );
+                                  },
                                 );
                               } else if (snapshot.hasError) {
                                 return const ErrorText();
                               }
 
                               return Skeleton(
-                                  isLoading: snapshot.connectionState == ConnectionState.waiting,
-                                  skeleton: SkeletonListView(
-                                    padding: EdgeInsets.zero,
-                                    itemBuilder: (context, _) => SkeletonLine(
-                                      style: SkeletonLineStyle(
-                                        height: 70,
-                                        borderRadius: BorderRadius.circular(10),
-                                        padding: const EdgeInsets.only(bottom: 12),
-                                      ),
+                                isLoading: snapshot.connectionState == ConnectionState.waiting,
+                                skeleton: SkeletonListView(
+                                  padding: EdgeInsets.zero,
+                                  itemBuilder: (context, _) => SkeletonLine(
+                                    style: SkeletonLineStyle(
+                                      height: 70,
+                                      borderRadius: BorderRadius.circular(10),
+                                      padding: const EdgeInsets.only(bottom: 12),
                                     ),
                                   ),
-                                  child: routeResults);
+                                ),
+                                child: routeResults,
+                              );
                             },
                           ),
                         );
