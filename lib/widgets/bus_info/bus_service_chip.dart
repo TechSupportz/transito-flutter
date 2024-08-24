@@ -3,10 +3,18 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceChip extends StatelessWidget {
-  const BusServiceChip({super.key, required this.busServiceNumber, required this.isOperating});
+  const BusServiceChip({
+    super.key,
+    required this.busServiceNumber,
+    required this.isOperating,
+    this.originStopCode,
+    this.currentStopCode,
+  });
 
   final String busServiceNumber;
   final bool isOperating;
+  final String? originStopCode;
+  final String? currentStopCode;
 
   Future<void> goToBusServiceInfoScreen(BuildContext context) async {
     if (!context.mounted) return;
@@ -15,6 +23,8 @@ class BusServiceChip extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => BusServiceInfoScreen(
           serviceNo: busServiceNumber,
+          originStopCode: originStopCode,
+          currentStopCode: currentStopCode,
         ),
       ),
     );

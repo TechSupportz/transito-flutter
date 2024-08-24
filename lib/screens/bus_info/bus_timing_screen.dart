@@ -352,14 +352,16 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                                         runSpacing: 8,
                                                         direction: Axis.horizontal,
                                                         alignment: WrapAlignment.start,
-                                                        children: nonOperatingServices
-                                                            .map(
-                                                              (service) => BusServiceChip(
-                                                                busServiceNumber: service,
-                                                                isOperating: true,
-                                                              ),
-                                                            )
-                                                            .toList(),
+                                                        children:
+                                                            nonOperatingServices //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
+                                                                .map(
+                                                                  (service) => BusServiceChip(
+                                                                    busServiceNumber: service,
+                                                                    currentStopCode: widget.code,
+                                                                    isOperating: true,
+                                                                  ),
+                                                                )
+                                                                .toList(),
                                                       )
                                                     ],
                                                   ),

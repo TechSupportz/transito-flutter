@@ -274,14 +274,17 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                   return Wrap(
                                     spacing: 8,
                                     runSpacing: 8,
-                                    children: services
-                                        .map(
-                                          (service) => BusServiceChip(
-                                            busServiceNumber: service,
-                                            isOperating: currOperatingServices.contains(service),
-                                          ),
-                                        )
-                                        .toList(),
+                                    children:
+                                        services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
+                                            .map(
+                                              (service) => BusServiceChip(
+                                                busServiceNumber: service,
+                                                currentStopCode: widget.code,
+                                                isOperating:
+                                                    currOperatingServices.contains(service),
+                                              ),
+                                            )
+                                            .toList(),
                                   );
                                 } else if (snapshot.hasError) {
                                   // return Text("${snapshot.error}");
