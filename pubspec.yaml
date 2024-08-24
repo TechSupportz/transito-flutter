@@ -50,6 +50,7 @@ dependencies:
     measure_size: ^4.0.0
     flutter_skeleton_ui: ^0.0.6
     collection: ^1.18.0
+    smooth_highlight: ^0.1.1
 
 dev_dependencies:
     flutter_test:

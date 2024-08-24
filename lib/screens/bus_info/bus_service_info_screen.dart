@@ -345,11 +345,13 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                           key: const ValueKey(0),
                                           routes: routes[0],
                                           controller: scrollController,
+                                          currentStopCode: widget.currentStopCode,
                                         )
                                       : BusRoutesList(
                                           key: const ValueKey(1),
                                           routes: routes[1],
                                           controller: scrollController,
+                                          currentStopCode: widget.currentStopCode,
                                         ),
                                 );
 
