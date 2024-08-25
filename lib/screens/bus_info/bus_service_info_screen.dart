@@ -307,83 +307,114 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                             color: AppColors.drawerBg,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          padding: const EdgeInsets.only(top: 16, left: 16, right: 16),
-                          child: FutureBuilder(
-                            future: futureBusServiceRoutes,
-                            builder: (context, snapshot) {
-                              Widget routeResults = const CircularProgressIndicator(strokeWidth: 3);
-
-                              if (snapshot.hasData) {
-                                final routes = snapshot.data!;
-                                int currentStopIndex = 0;
-
-                                if (widget.currentStopCode != null) {
-                                  int busStopIndex = routes[_destinationIndex].indexWhere(
-                                    (route) => route.busStop.code == widget.currentStopCode,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                          ),
+                          child: Column(
+                            children: [
+                              InkWell(
+                                onTapDown: (_) {
+                                  drawerScrollController.animateTo(
+                                    drawerScrollController.size < 0.885 ? 0.885 : sheetHeight,
+                                    duration: const Duration(milliseconds: 350),
+                                    curve: Curves.ease,
                                   );
-
-                                  if (busStopIndex != -1) {
-                                    currentStopIndex = busStopIndex;
-                                  }
-                                }
-
-                                routeResults = AnimatedSwitcher(
-                                  transitionBuilder: (child, animation) => SlideTransition(
-                                    position: Tween<Offset>(
-                                      begin: const Offset(0, 2),
-                                      end: Offset.zero,
-                                    ).animate(animation),
-                                    transformHitTests: false,
-                                    textDirection: TextDirection.ltr,
-                                    child: child,
-                                  ),
-                                  switchInCurve: Curves.ease,
-                                  switchOutCurve: Curves.ease,
-                                  duration: const Duration(milliseconds: 350),
-                                  child: _destinationIndex == 0
-                                      ? BusRoutesList(
-                                          key: const ValueKey(0),
-                                          routes: routes[0],
-                                          controller: scrollController,
-                                          currentStopCode: widget.currentStopCode,
-                                        )
-                                      : BusRoutesList(
-                                          key: const ValueKey(1),
-                                          routes: routes[1],
-                                          controller: scrollController,
-                                          currentStopCode: widget.currentStopCode,
+                                },
+                                child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: FractionallySizedBox(
+                                      widthFactor: 0.2,
+                                      child: Container(
+                                        height: 6,
+                                        decoration: BoxDecoration(
+                                          color: AppColors.kindaGrey.withOpacity(0.15),
+                                          borderRadius: BorderRadius.circular(10),
                                         ),
-                                );
+                                      ),
+                                    )),
+                              ),
+                              Expanded(
+                                child: FutureBuilder(
+                                  future: futureBusServiceRoutes,
+                                  builder: (context, snapshot) {
+                                    Widget routeResults =
+                                        const CircularProgressIndicator(strokeWidth: 3);
 
-                                Timer(
-                                  const Duration(milliseconds: 0),
-                                  () {
-                                    scrollController.animateTo(
-                                      currentStopIndex * 82.0,
-                                      duration: const Duration(seconds: 1),
-                                      curve: Curves.ease,
+                                    if (snapshot.hasData) {
+                                      final routes = snapshot.data!;
+                                      int currentStopIndex = 0;
+
+                                      if (widget.currentStopCode != null) {
+                                        int busStopIndex = routes[_destinationIndex].indexWhere(
+                                          (route) => route.busStop.code == widget.currentStopCode,
+                                        );
+
+                                        if (busStopIndex != -1) {
+                                          currentStopIndex = busStopIndex;
+                                        }
+                                      }
+
+                                      routeResults = AnimatedSwitcher(
+                                        transitionBuilder: (child, animation) => SlideTransition(
+                                          position: Tween<Offset>(
+                                            begin: const Offset(0, 2),
+                                            end: Offset.zero,
+                                          ).animate(animation),
+                                          transformHitTests: false,
+                                          textDirection: TextDirection.ltr,
+                                          child: child,
+                                        ),
+                                        switchInCurve: Curves.ease,
+                                        switchOutCurve: Curves.ease,
+                                        duration: const Duration(milliseconds: 350),
+                                        child: _destinationIndex == 0
+                                            ? BusRoutesList(
+                                                key: const ValueKey(0),
+                                                routes: routes[0],
+                                                controller: scrollController,
+                                                currentStopCode: widget.currentStopCode,
+                                              )
+                                            : BusRoutesList(
+                                                key: const ValueKey(1),
+                                                routes: routes[1],
+                                                controller: scrollController,
+                                                currentStopCode: widget.currentStopCode,
+                                              ),
+                                      );
+
+                                      Timer(
+                                        const Duration(milliseconds: 0),
+                                        () {
+                                          scrollController.animateTo(
+                                            currentStopIndex * 82.0,
+                                            duration: const Duration(seconds: 1),
+                                            curve: Curves.ease,
+                                          );
+                                        },
+                                      );
+                                    } else if (snapshot.hasError) {
+                                      return const ErrorText();
+                                    }
+
+                                    return Skeleton(
+                                      isLoading:
+                                          snapshot.connectionState == ConnectionState.waiting,
+                                      skeleton: SkeletonListView(
+                                        padding: EdgeInsets.zero,
+                                        itemBuilder: (context, _) => SkeletonLine(
+                                          style: SkeletonLineStyle(
+                                            height: 70,
+                                            borderRadius: BorderRadius.circular(10),
+                                            padding: const EdgeInsets.only(bottom: 12),
+                                          ),
+                                        ),
+                                      ),
+                                      child: routeResults,
                                     );
                                   },
-                                );
-                              } else if (snapshot.hasError) {
-                                return const ErrorText();
-                              }
-
-                              return Skeleton(
-                                isLoading: snapshot.connectionState == ConnectionState.waiting,
-                                skeleton: SkeletonListView(
-                                  padding: EdgeInsets.zero,
-                                  itemBuilder: (context, _) => SkeletonLine(
-                                    style: SkeletonLineStyle(
-                                      height: 70,
-                                      borderRadius: BorderRadius.circular(10),
-                                      padding: const EdgeInsets.only(bottom: 12),
-                                    ),
-                                  ),
                                 ),
-                                child: routeResults,
-                              );
-                            },
+                              ),
+                            ],
                           ),
                         );
                       },
