@@ -23,6 +23,7 @@ import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
+import 'package:transito/widgets/android_stretch_behaviour.dart';
 
 import 'firebase_options.dart';
 
@@ -226,7 +227,10 @@ class _MyAppState extends State<MyApp> {
               return MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                     textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
-                child: SafeArea(child: child!),
+                child: ScrollConfiguration(
+                  behavior: const AndroidStretchScrollBehavior(), //NOTE - This is a temporary solution till the app migrates to use Material 3
+                  child: SafeArea(child: child!),
+                ),
               );
             },
           );
