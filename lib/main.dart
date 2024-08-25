@@ -23,7 +23,6 @@ import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
-import 'package:transito/widgets/android_stretch_scroll_behavior.dart';
 
 import 'firebase_options.dart';
 
