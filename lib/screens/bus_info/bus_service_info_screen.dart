@@ -38,6 +38,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   DraggableScrollableController drawerScrollController = DraggableScrollableController();
   int _destinationIndex = 0;
+  bool initialisedDestinationIndex = false;
   double sheetHeight = 0;
 
   Future<BusService> getBusService() async {
@@ -125,10 +126,12 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
               final busService = snapshot.data as BusService;
 
               if (widget.originStopCode != null &&
+                  !initialisedDestinationIndex &&
                   !busService.isLoopService &&
                   !busService.isSingleRoute) {
                 if (widget.originStopCode != busService.interchanges[0].code) {
                   _destinationIndex = 1;
+                  initialisedDestinationIndex = true;
                 }
               }
 
