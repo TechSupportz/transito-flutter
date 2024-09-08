@@ -131,9 +131,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                   !busService.isSingleRoute) {
                 if (widget.originStopCode != busService.interchanges[0].code) {
                   _destinationIndex = 1;
-                  initialisedDestinationIndex = true;
                 }
               }
+
+              initialisedDestinationIndex = true;
 
               child = Stack(
                 key: const ValueKey(1),
