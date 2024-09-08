@@ -306,7 +306,7 @@
           "value" : "dark"
         }
       ],
-      "filename" : "AppIcon-ios-marketing-Dark.png",
+      "filename" : "AppIcon~ios-marketing 1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
@@ -318,7 +318,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-40@2x-Tinted.png",
+      "filename" : "AppIcon-20@2x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -331,7 +331,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-60@3x-Tinted.png",
+      "filename" : "AppIcon-20@3x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -344,7 +344,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-58@2x-Tinted.png",
+      "filename" : "AppIcon-29@2x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -357,7 +357,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-87@3x-Tinted.png",
+      "filename" : "AppIcon-29@3x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -370,7 +370,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-76@2x-Tinted.png",
+      "filename" : "AppIcon~ipad (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -383,7 +383,6 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-114@3x-Tinted.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -396,7 +395,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-80@2x-Tinted.png",
+      "filename" : "AppIcon-40@2x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -409,7 +408,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-120@3x-Tinted.png",
+      "filename" : "AppIcon-40@3x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -422,7 +421,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-120@2x-Tinted.png",
+      "filename" : "AppIcon-40@3x (Tinted)  1.png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -435,7 +434,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-180@3x-Tinted.png",
+      "filename" : "AppIcon@3x (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "3x",
@@ -484,7 +483,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-152@2x-Tinted.png",
+      "filename" : "AppIcon@2x~ipad (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -497,7 +496,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-167@2x-Tinted.png",
+      "filename" : "AppIcon-83.5@2x~ipad (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "scale" : "2x",
@@ -510,7 +509,7 @@
           "value" : "tinted"
         }
       ],
-      "filename" : "AppIcon-ios-marketing-Tinted.png",
+      "filename" : "AppIcon~ios-marketing (Tinted) .png",
       "idiom" : "universal",
       "platform" : "ios",
       "size" : "1024x1024"
