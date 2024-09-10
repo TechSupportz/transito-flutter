@@ -136,6 +136,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
               ArrivalCard(
                 eta: formatArrivalTime(widget.serviceInfo.nextBus.estimatedArrival),
                 accessible: widget.serviceInfo.nextBus.isAccessible,
+                isMonitored: widget.serviceInfo.nextBus.isMonitored,
                 crowdLvl: widget.serviceInfo.nextBus.crowdLvl,
                 busType: widget.serviceInfo.nextBus.busType,
                 isETAminutes: widget.isETAminutes,
@@ -143,6 +144,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
               ArrivalCard(
                 eta: formatArrivalTime(widget.serviceInfo.nextBus2.estimatedArrival),
                 accessible: widget.serviceInfo.nextBus2.isAccessible,
+                isMonitored: widget.serviceInfo.nextBus2.isMonitored,
                 crowdLvl: widget.serviceInfo.nextBus2.crowdLvl,
                 busType: widget.serviceInfo.nextBus2.busType,
                 isETAminutes: widget.isETAminutes,
@@ -150,6 +152,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
               ArrivalCard(
                 eta: formatArrivalTime(widget.serviceInfo.nextBus3.estimatedArrival),
                 accessible: widget.serviceInfo.nextBus3.isAccessible,
+                isMonitored: widget.serviceInfo.nextBus3.isMonitored,
                 crowdLvl: widget.serviceInfo.nextBus3.crowdLvl,
                 busType: widget.serviceInfo.nextBus3.busType,
                 isETAminutes: widget.isETAminutes,
@@ -167,6 +170,7 @@ class ArrivalCard extends StatefulWidget {
     super.key,
     required this.eta,
     required this.accessible,
+    required this.isMonitored,
     required this.crowdLvl,
     required this.busType,
     required this.isETAminutes,
@@ -174,6 +178,7 @@ class ArrivalCard extends StatefulWidget {
 
   final String eta;
   final bool accessible;
+  final bool isMonitored;
   final CrowdLvl crowdLvl;
   final BusType busType;
   final bool isETAminutes;
@@ -205,6 +210,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                     style: TextStyle(
                       fontSize: widget.isETAminutes ? 30 : 18,
                       fontWeight: FontWeight.w500,
+                      fontStyle: widget.isMonitored ? FontStyle.normal : FontStyle.italic,
                       color: (() {
                         switch (widget.crowdLvl) {
                           case CrowdLvl.SEA:

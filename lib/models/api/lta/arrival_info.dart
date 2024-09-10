@@ -65,6 +65,9 @@ class IndivArrivalInfo {
   String? destinationCode;
   String? estimatedArrival;
 
+  @JsonKey(name: "Monitored", fromJson: intToBool)
+  bool isMonitored;
+
   @JsonKey(fromJson: stringToDouble)
   double latitude;
 
@@ -103,6 +106,10 @@ class IndivArrivalInfo {
     return feature == 'WAB';
   }
 
+  static bool intToBool(int value) {
+    return value == 1;
+  }
+
   static CrowdLvl decodeCrowdLvl(String crowdLvl) {
     switch (crowdLvl) {
       case "SEA":
@@ -129,8 +136,18 @@ class IndivArrivalInfo {
     }
   }
 
-  IndivArrivalInfo(this.originCode, this.destinationCode, this.estimatedArrival, this.latitude,
-      this.longitude, this.visitNumber, this.crowdLvl, this.isAccessible, this.busType);
+  IndivArrivalInfo(
+    this.originCode,
+    this.destinationCode,
+    this.estimatedArrival,
+    this.isMonitored,
+    this.latitude,
+    this.longitude,
+    this.visitNumber,
+    this.crowdLvl,
+    this.isAccessible,
+    this.busType,
+  );
 
   factory IndivArrivalInfo.fromJson(Map<String, dynamic> json) => _$IndivArrivalInfoFromJson(json);
 }

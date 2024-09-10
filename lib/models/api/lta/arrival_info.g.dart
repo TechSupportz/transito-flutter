@@ -31,6 +31,7 @@ IndivArrivalInfo _$IndivArrivalInfoFromJson(Map<String, dynamic> json) =>
       json['OriginCode'] as String?,
       json['DestinationCode'] as String?,
       json['EstimatedArrival'] as String?,
+      IndivArrivalInfo.intToBool((json['Monitored'] as num).toInt()),
       IndivArrivalInfo.stringToDouble(json['Latitude'] as String),
       IndivArrivalInfo.stringToDouble(json['Longitude'] as String),
       IndivArrivalInfo.stringToInt(json['VisitNumber'] as String),

@@ -48,22 +48,6 @@
 			<string>UIInterfaceOrientationPortrait</string>
 			<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		</array>
-		<key>NSAppTransportSecurity</key>
-		<dict>
-			<key>NSExceptionDomains</key>
-			<dict>
-				<key>datamall2.mytransport.sg</key>
-				<dict>
-					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-					<true />
-				</dict>
-				<key>api.transito.tnitish.com</key>
-				<dict>
-					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-					<true />
-				</dict>
-			</dict>
-		</dict>
 		<!-- Google Sign-in Section -->
 		<key>CFBundleURLTypes</key>
 		<array>

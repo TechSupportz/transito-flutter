@@ -54,7 +54,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     // gets response from api
     final response = await http.get(
         Uri.parse(
-            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=${widget.code}'),
+            'https://datamall2.mytransport.sg/ltaodataservice/v3/BusArrival?BusStopCode=${widget.code}'),
         headers: requestHeaders);
 
     // if response is successful, parse the response and return it as a BusArrivalInfo object

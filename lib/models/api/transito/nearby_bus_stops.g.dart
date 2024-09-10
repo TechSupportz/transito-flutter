@@ -9,7 +9,7 @@ part of 'nearby_bus_stops.dart';
 NearbyBusStopsApiResponse _$NearbyBusStopsApiResponseFromJson(
         Map<String, dynamic> json) =>
     NearbyBusStopsApiResponse(
-      count: json['count'] as int,
+      count: (json['count'] as num).toInt(),
       data: (json['data'] as List<dynamic>)
           .map((e) => NearbyBusStop.fromJson(e as Map<String, dynamic>))
           .toList(),

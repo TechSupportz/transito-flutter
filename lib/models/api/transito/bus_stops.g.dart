@@ -30,7 +30,7 @@ BusStopSearchApiResponse _$BusStopSearchApiResponseFromJson(
         Map<String, dynamic> json) =>
     BusStopSearchApiResponse(
       message: json['message'] as String,
-      count: json['count'] as int,
+      count: (json['count'] as num).toInt(),
       data: (json['data'] as List<dynamic>)
           .map((e) => BusStop.fromJson(e as Map<String, dynamic>))
           .toList(),

@@ -38,7 +38,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     // gets response from api
     final response = await http.get(
         Uri.parse(
-            'http://datamall2.mytransport.sg/ltaodataservice/BusArrivalv2?BusStopCode=$busStopCode'),
+            'https://datamall2.mytransport.sg/ltaodataservice/v3/BusArrival?BusStopCode=$busStopCode'),
         headers: requestHeaders);
 
     // if response is successful, parse the response and return it as a BusArrivalInfo object
