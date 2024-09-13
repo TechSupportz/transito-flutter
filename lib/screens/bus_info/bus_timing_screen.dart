@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
@@ -245,10 +246,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                 future: futureBusArrivalInfo,
                 builder:
                     (BuildContext context, AsyncSnapshot<BusArrivalInfo> busArrivalInfoSnapshot) {
+                  Widget arrivalInfoResults = const CircularProgressIndicator(strokeWidth: 3);
+
                   // check if the snapshot has data, if not then display a loading indicator
                   if (busArrivalInfoSnapshot.hasData) {
                     // notification listener to hide the fab when the user is scrolling down the list
-                    return NotificationListener<UserScrollNotification>(
+                    arrivalInfoResults = NotificationListener<UserScrollNotification>(
                       onNotification: (notification) => hideFabOnScroll(notification),
                       child: busArrivalInfoSnapshot.data!.services.isEmpty
                           ? Center(
@@ -300,6 +303,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                   FutureBuilder(
                                       future: futureServices,
                                       builder: (context, servicesSnapshot) {
+                                        Widget nonOperationalServicesResults = Container();
                                         final currOperatingServices = busArrivalInfoSnapshot
                                             .data!.services
                                             .map((e) => e.serviceNum)
@@ -316,7 +320,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                             return const SizedBox.shrink();
                                           }
 
-                                          return Opacity(
+                                          nonOperationalServicesResults = Opacity(
                                             opacity: 0.65,
                                             child: Column(
                                               children: [
@@ -370,12 +374,24 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                                             ),
                                           );
                                         } else if (servicesSnapshot.hasError) {
-                                          return const ErrorText();
+                                          nonOperationalServicesResults = const ErrorText();
                                         }
 
-                                        return const Center(
-                                          child: CircularProgressIndicator(strokeWidth: 3),
-                                        );
+                                        return Skeleton(
+                                            isLoading: servicesSnapshot.connectionState ==
+                                                ConnectionState.waiting,
+                                            skeleton: Column(
+                                              children: [
+                                                const Divider(),
+                                                SkeletonLine(
+                                                  style: SkeletonLineStyle(
+                                                    height: 58,
+                                                    borderRadius: BorderRadius.circular(10),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            child: nonOperationalServicesResults);
                                       })
                                 ],
                               ),
@@ -384,12 +400,19 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                   } else if (busArrivalInfoSnapshot.hasError) {
                     // return Text("${snapshot.error}");
                     debugPrint("<=== ERROR ${busArrivalInfoSnapshot.error} ===>");
-                    return const ErrorText();
-                  } else {
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 3),
-                    );
+                    arrivalInfoResults = const ErrorText();
                   }
+
+                  return Skeleton(
+                      isLoading:
+                          busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
+                              !busArrivalInfoSnapshot.hasData,
+                      skeleton: const SkeletonLine(
+                        style: SkeletonLineStyle(
+                          height: double.infinity,
+                        ),
+                      ),
+                      child: arrivalInfoResults);
                 },
               );
             } else if (snapshot.hasError) {
