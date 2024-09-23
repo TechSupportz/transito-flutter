@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:transito/screens/navigator_screen.dart';
+import 'package:transito/widgets/common/bus_timing_guide.dart';
 
 class QuickStartScreen extends StatelessWidget {
   const QuickStartScreen({super.key});
@@ -25,28 +25,7 @@ class QuickStartScreen extends StatelessWidget {
                 height: 1.25,
               ),
             ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SvgPicture.asset(
-                  "assets/images/diagram.svg",
-                  placeholderBuilder: (context) => const CircularProgressIndicator(strokeWidth: 3),
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                const Text('Clicking the Bus Service Number will provide more details about it',
-                    style:
-                        TextStyle(fontFamily: 'Itim', fontSize: 18, fontWeight: FontWeight.w500)),
-                // const SizedBox(
-                //   height: 4,
-                // ),
-                // const Text(
-                //     'If you press and hold on a bus service, you will get notification alerts on the bus\'s timing',
-                //     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-              ],
-            ),
+            const BusTimingGuide(),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: ElevatedButton(

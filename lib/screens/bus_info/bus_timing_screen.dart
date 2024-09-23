@@ -23,6 +23,7 @@ import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
+import 'package:transito/widgets/common/bus_timing_guide.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
 import 'bus_stop_info_screen.dart';
@@ -192,6 +193,24 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     );
   }
 
+  void showTimingGuideDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Bus Timing Guide"),
+          content: const BusTimingGuide(),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text("Close"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // initialise bus arrival info and start the timer to automatically re-fetch the bus arrival info every 30 seconds
   @override
   void initState() {
@@ -231,6 +250,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
           child: Text(widget.name),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.help_outline_rounded,
+            ),
+            onPressed: () => showTimingGuideDialog(),
+          ),
           // display different IconButtons depending on whether the bus stop is a favourite or not
           isAddedToFavourites
               ? IconButton(
@@ -240,7 +265,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
               : IconButton(
                   icon: const Icon(Icons.favorite_border_rounded),
                   onPressed: () => goToAddFavouritesScreen(context),
-                )
+                ),
         ],
       ),
       body: StreamBuilder(
