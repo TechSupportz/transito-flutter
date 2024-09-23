@@ -47,9 +47,10 @@ class BusTimingScreen extends StatefulWidget {
   State<BusTimingScreen> createState() => _BusTimingScreenState();
 }
 
-class _BusTimingScreenState extends State<BusTimingScreen> {
+class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProviderStateMixin {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
   late Future<List<String>> futureServices;
+  late AnimationController _animationController;
 
   final ScrollController _scrollController = ScrollController();
   final GlobalKey expansionTileKey = GlobalKey();
@@ -213,6 +214,11 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
         isAddedToFavourites = value;
       });
     });
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
   }
 
   @override
@@ -246,7 +252,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                 future: futureBusArrivalInfo,
                 builder:
                     (BuildContext context, AsyncSnapshot<BusArrivalInfo> busArrivalInfoSnapshot) {
-                  Widget arrivalInfoResults = const CircularProgressIndicator(strokeWidth: 3);
+                  Widget arrivalInfoResults = Container();
 
                   // check if the snapshot has data, if not then display a loading indicator
                   if (busArrivalInfoSnapshot.hasData) {
@@ -403,16 +409,28 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
                     arrivalInfoResults = const ErrorText();
                   }
 
-                  return Skeleton(
-                      isLoading:
-                          busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
-                              !busArrivalInfoSnapshot.hasData,
-                      skeleton: const SkeletonLine(
-                        style: SkeletonLineStyle(
-                          height: double.infinity,
-                        ),
-                      ),
-                      child: arrivalInfoResults);
+                  Animation<double> _animation =
+                      Tween(begin: 0.0, end: 0.5).animate(_animationController);
+                  _animationController.forward();
+
+                  return AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 350),
+                      transitionBuilder: (child, animation) {
+                        return FadeTransition(
+                          opacity: animation,
+                          child: child,
+                        );
+                      },
+                      child: busArrivalInfoSnapshot.connectionState != ConnectionState.done
+                          ? FadeTransition(
+                              opacity: _animation,
+                              child: const SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: double.infinity,
+                                ),
+                              ),
+                            )
+                          : arrivalInfoResults);
                 },
               );
             } else if (snapshot.hasError) {
@@ -420,9 +438,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> {
               debugPrint("<=== ERROR ${snapshot.error} ===>");
               return const ErrorText();
             } else {
-              return const Center(
-                child: CircularProgressIndicator(strokeWidth: 3),
-              );
+              return const Center();
             }
           }),
       floatingActionButton: isFabVisible
