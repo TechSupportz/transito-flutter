@@ -446,7 +446,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                           child: child,
                         );
                       },
-                      child: busArrivalInfoSnapshot.connectionState != ConnectionState.done
+                      child: busArrivalInfoSnapshot.connectionState == ConnectionState.waiting && !busArrivalInfoSnapshot.hasData
                           ? FadeTransition(
                               opacity: _animation,
                               child: const SkeletonLine(

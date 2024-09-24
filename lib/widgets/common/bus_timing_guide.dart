@@ -20,12 +20,12 @@ class BusTimingGuide extends StatelessWidget {
         RichText(
             text: const TextSpan(
           children: [
-            TextSpan(text: 'If the timing is in '),
+            TextSpan(text: 'Timings in '),
             TextSpan(
               text: 'italics ',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
-            TextSpan(text: 'it\'s an estimated timing based on the bus schedule')
+            TextSpan(text: 'are a rough estimate based on the bus\'s schedule'),
           ],
           style: TextStyle(fontFamily: 'Itim', fontSize: 18, fontWeight: FontWeight.w500),
         )),
@@ -33,7 +33,7 @@ class BusTimingGuide extends StatelessWidget {
           height: 16,
         ),
         const Text(
-          'Clicking the Bus Service Number will provide more details such as routes!',
+          'Tap the Bus Service Number to view more details such as routes!',
           style: TextStyle(fontFamily: 'Itim', fontSize: 18, fontWeight: FontWeight.w500),
         ),
       ],
