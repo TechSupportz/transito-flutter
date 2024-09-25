@@ -228,7 +228,8 @@ class _MyAppState extends State<MyApp> {
                 data: MediaQuery.of(context).copyWith(
                     textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
                 child: ScrollConfiguration(
-                  behavior: const AndroidStretchScrollBehavior(), //NOTE - This is a temporary solution till the app migrates to use Material 3
+                  behavior:
+                      const AndroidStretchScrollBehavior(), //NOTE - This is a temporary solution till the app migrates to use Material 3
                   child: SafeArea(child: child!),
                 ),
               );
