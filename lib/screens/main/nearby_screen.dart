@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -38,6 +39,7 @@ class _NearbyScreenState extends State<NearbyScreen>
   late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
+  late StreamSubscription<Position> userLocationStream;
   bool _isFabVisible = true;
   bool _isFetchingLocation = false;
 
@@ -81,7 +83,11 @@ class _NearbyScreenState extends State<NearbyScreen>
       return lastKnownPosition;
     }
 
-    Position position = await Geolocator.getCurrentPosition(locationSettings: const LocationSettings(accuracy: LocationAccuracy.best));
+    Position position = await Geolocator.getCurrentPosition(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.best,
+      ),
+    );
     debugPrint('$position');
 
     setState(() => _isFetchingLocation = false);
@@ -90,9 +96,10 @@ class _NearbyScreenState extends State<NearbyScreen>
 
   Future<List<NearbyBusStop>> getNearbyBusStops({
     bool refresh = false,
+    Position? currentLocation,
   }) async {
     debugPrint("Fetching nearby bus stops");
-    Position userLocation = await getUserLocation(refresh);
+    Position userLocation = currentLocation ?? await getUserLocation(refresh);
 
     final response = await http.get(Uri.parse(
         '${Secret.API_URL}/bus-stops/nearby?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}'));
@@ -110,12 +117,13 @@ class _NearbyScreenState extends State<NearbyScreen>
   // function to get the user's nearby favourites
   Future<List<NearbyFavourites>> getNearbyFavourites({
     bool refresh = false,
+    Position? currentLocation,
   }) async {
     debugPrint("Fetching nearby favourites");
     List<NearbyFavourites> nearbyFavourites = [];
     List<Favourite> favouritesList =
         await FavouritesService().getFavourites(context.read<User>().uid);
-    Position userLocation = await getUserLocation(refresh);
+    Position userLocation = currentLocation ?? await getUserLocation(refresh);
 
     // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
     for (var favourite in favouritesList) {
@@ -135,11 +143,27 @@ class _NearbyScreenState extends State<NearbyScreen>
 
   // function to get the list of all nearby bus stops
   void getAllNearby() async {
-    print("Getting all nearby");
+    debugPrint("Getting all nearby");
 
     setState(() {
       nearbyBusStops = getNearbyBusStops(refresh: true);
       nearbyFavourites = getNearbyFavourites(refresh: true);
+    });
+  }
+
+  void streamUserLocation() {
+    userLocationStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.best,
+        distanceFilter: 50,
+      ),
+    ).listen((Position position) {
+      debugPrint(">>> User location changed");
+      debugPrint(">>> $position");
+      setState(() {
+        nearbyBusStops = getNearbyBusStops(currentLocation: position);
+        nearbyFavourites = getNearbyFavourites(currentLocation: position);
+      });
     });
   }
 
@@ -153,6 +177,7 @@ class _NearbyScreenState extends State<NearbyScreen>
     _isLocationPermissionGranted = checkLocationPermissions();
     nearbyBusStops = getNearbyBusStops();
     nearbyFavourites = getNearbyFavourites();
+    streamUserLocation();
   }
 
   @override
@@ -280,6 +305,13 @@ class _NearbyScreenState extends State<NearbyScreen>
     );
   }
 
+  @override
+  void dispose() {
+    userLocationStream.cancel();
+    debugPrint("Cancelling user location stream");
+    super.dispose();
+  }
+
   Column nearbyBusStopsGrid() {
     bool isTablet = context.read<CommonProvider>().isTablet;
 
@@ -300,10 +332,11 @@ class _NearbyScreenState extends State<NearbyScreen>
                 UserSettings userSettings = snapshot.data as UserSettings;
                 return FutureBuilder(
                     future: nearbyBusStops,
-                    builder: (BuildContext context, AsyncSnapshot<List<NearbyBusStop>> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<List<NearbyBusStop>> nearbyBusStopList) {
                       // display a loading indicator while the list of nearby bus stops is being fetched
-                      if (snapshot.hasData && snapshot.data != null) {
-                        if (snapshot.data!.isNotEmpty) {
+                      if (nearbyBusStopList.hasData && nearbyBusStopList.data != null) {
+                        if (nearbyBusStopList.data!.isNotEmpty) {
                           return GridView.count(
                             childAspectRatio: userSettings.isNearbyGrid
                                 ? 2.5 / (isTablet ? 0.6 : 1)
@@ -315,7 +348,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                             physics: const NeverScrollableScrollPhysics(),
                             children: [
                               // loop through nearby bus stops and send their data to the BusStopCard widget to display them
-                              for (var data in snapshot.data!)
+                              for (var data in nearbyBusStopList.data!)
                                 BusStopCard(
                                   busStopInfo: data.busStop,
                                   distanceFromUser: data.distanceAway,
@@ -342,9 +375,9 @@ class _NearbyScreenState extends State<NearbyScreen>
                             ),
                           );
                         }
-                      } else if (snapshot.hasError) {
+                      } else if (nearbyBusStopList.hasError) {
                         // return Text("${snapshot.error}");
-                        debugPrint("<=== ERROR ${snapshot.error} ===>");
+                        debugPrint("<=== ERROR ${nearbyBusStopList.error} ===>");
                         return const ErrorText();
                       } else {
                         return const Center(
