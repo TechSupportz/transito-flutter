@@ -289,7 +289,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Text(
-                                  Jiffy.now().hour > 5
+                                  Jiffy.now().hour >= 5
                                       ? '🦥 All the buses are lepaking 🦥'
                                       : "💤 Buses are sleeping 💤",
                                   style: const TextStyle(
@@ -411,17 +411,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                         return Skeleton(
                                             isLoading: servicesSnapshot.connectionState ==
                                                 ConnectionState.waiting,
-                                            skeleton: Column(
-                                              children: [
-                                                const Divider(),
-                                                SkeletonLine(
-                                                  style: SkeletonLineStyle(
-                                                    height: 58,
-                                                    borderRadius: BorderRadius.circular(10),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
+                                            skeleton: Container(),
                                             child: nonOperationalServicesResults);
                                       })
                                 ],
@@ -446,7 +436,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                           child: child,
                         );
                       },
-                      child: busArrivalInfoSnapshot.connectionState == ConnectionState.waiting && !busArrivalInfoSnapshot.hasData
+                      child: busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
+                              !busArrivalInfoSnapshot.hasData
                           ? FadeTransition(
                               opacity: _animation,
                               child: const SkeletonLine(
