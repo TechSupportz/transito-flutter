@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +77,7 @@ class _NearbyScreenState extends State<NearbyScreen>
     if (!refresh &&
         lastKnownPosition != null &&
         Jiffy.parse(lastKnownPosition.timestamp.toString())
-            .subtract(minutes: 5)
+            .add(minutes: 5)
             .isBefore(Jiffy.now())) {
       debugPrint("Fetched user location from cache");
 
@@ -84,12 +85,20 @@ class _NearbyScreenState extends State<NearbyScreen>
       return lastKnownPosition;
     }
 
+    if (Platform.isIOS) {
+      userLocationStream.cancel();
+    }
+
     Position position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.best,
       ),
     );
-    debugPrint('$position');
+    debugPrint('Refetched user location');
+
+	if (Platform.isIOS) {
+      streamUserLocation();
+    }
 
     setState(() => _isFetchingLocation = false);
     return position;
@@ -331,7 +340,7 @@ class _NearbyScreenState extends State<NearbyScreen>
             builder: (context, userSettingsSnapshot) {
               if (userSettingsSnapshot.hasData) {
                 UserSettings userSettings = userSettingsSnapshot.data as UserSettings;
-				
+
                 GridView renderGridView(List<Widget> children) {
                   return GridView.count(
                     childAspectRatio: userSettings.isNearbyGrid
