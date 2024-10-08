@@ -328,26 +328,36 @@ class _NearbyScreenState extends State<NearbyScreen>
         ),
         StreamBuilder(
             stream: SettingsService().streamSettings(context.watch<User?>()?.uid),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                UserSettings userSettings = snapshot.data as UserSettings;
+            builder: (context, userSettingsSnapshot) {
+              if (userSettingsSnapshot.hasData) {
+                UserSettings userSettings = userSettingsSnapshot.data as UserSettings;
+				
+                GridView renderGridView(List<Widget> children) {
+                  return GridView.count(
+                    childAspectRatio: userSettings.isNearbyGrid
+                        ? 2.5 / (isTablet ? 0.6 : 1)
+                        : 5 / (isTablet ? 0.6 : 1),
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
+                    crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: children,
+                  );
+                }
+
                 return FutureBuilder(
                     future: nearbyBusStops,
-                    builder: (BuildContext context,
-                        AsyncSnapshot<List<NearbyBusStop>> nearbyBusStopList) {
+                    builder: (
+                      BuildContext context,
+                      AsyncSnapshot<List<NearbyBusStop>> nearbyBusStopList,
+                    ) {
+                      Widget _busStopsResultsWidget = const SizedBox();
                       // display a loading indicator while the list of nearby bus stops is being fetched
                       if (nearbyBusStopList.hasData && nearbyBusStopList.data != null) {
                         if (nearbyBusStopList.data!.isNotEmpty) {
-                          return GridView.count(
-                            childAspectRatio: userSettings.isNearbyGrid
-                                ? 2.5 / (isTablet ? 0.6 : 1)
-                                : 5 / (isTablet ? 0.6 : 1),
-                            crossAxisSpacing: 16,
-                            mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
-                            crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            children: [
+                          _busStopsResultsWidget = renderGridView(
+                            [
                               // loop through nearby bus stops and send their data to the BusStopCard widget to display them
                               for (var data in nearbyBusStopList.data!)
                                 BusStopCard(
@@ -358,7 +368,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                             ],
                           );
                         } else {
-                          return Center(
+                          _busStopsResultsWidget = Center(
                             child: Padding(
                               padding: const EdgeInsets.only(bottom: 16.0),
                               child: Container(
@@ -376,25 +386,45 @@ class _NearbyScreenState extends State<NearbyScreen>
                             ),
                           );
                         }
-                      } else if (nearbyBusStopList.hasError) {
+                      }
+
+                      if (nearbyBusStopList.hasError) {
                         // return Text("${snapshot.error}");
                         debugPrint("<=== ERROR ${nearbyBusStopList.error} ===>");
-                        return const ErrorText();
-                      } else {
-                        return const Center(
-                          child: CircularProgressIndicator(strokeWidth: 3),
+                        _busStopsResultsWidget = const ErrorText(
+                          enableBackground: true,
                         );
                       }
+
+                      return Skeleton(
+                        isLoading: nearbyBusStopList.connectionState == ConnectionState.waiting,
+                        skeleton: renderGridView(
+                          [
+                            for (var i = 0; i < 16; i++)
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 120,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                          ],
+                        ),
+                        child: _busStopsResultsWidget,
+                      );
                     });
-              } else if (snapshot.hasError) {
+              }
+
+              if (userSettingsSnapshot.hasError) {
                 // return Text("${snapshot.error}");
-                debugPrint("<=== ERROR ${snapshot.error} ===>");
-                return const ErrorText();
-              } else {
-                return const Center(
-                  child: CircularProgressIndicator(strokeWidth: 3),
+                debugPrint("<=== ERROR ${userSettingsSnapshot.error} ===>");
+                return const ErrorText(
+                  enableBackground: true,
                 );
               }
+
+              return const Center(
+                child: CircularProgressIndicator(strokeWidth: 3),
+              );
             })
       ],
     );
@@ -432,8 +462,10 @@ class _NearbyScreenState extends State<NearbyScreen>
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Center(
-                        child: Text("No favourites nearby",
-                            style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
+                        child: Text(
+                          "No favourites nearby",
+                          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                        ),
                       ),
                     ),
                   );
@@ -462,19 +494,8 @@ class _NearbyScreenState extends State<NearbyScreen>
               if (snapshot.hasError) {
                 // return Text("${snapshot.error}");
                 debugPrint("<=== ERROR ${snapshot.error} ===>");
-                _favouritesListWidget = Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.cardBg,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: ErrorText(),
-                    ),
-                  ),
+                _favouritesListWidget = const ErrorText(
+                  enableBackground: true,
                 );
               }
 
