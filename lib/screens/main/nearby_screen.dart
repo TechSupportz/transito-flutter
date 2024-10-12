@@ -76,9 +76,7 @@ class _NearbyScreenState extends State<NearbyScreen>
 
     if (!refresh &&
         lastKnownPosition != null &&
-        Jiffy.parse(lastKnownPosition.timestamp.toString())
-            .add(minutes: 5)
-            .isBefore(Jiffy.now())) {
+        Jiffy.parse(lastKnownPosition.timestamp.toString()).add(minutes: 5).isBefore(Jiffy.now())) {
       debugPrint("Fetched user location from cache");
 
       setState(() => _isFetchingLocation = false);
@@ -96,7 +94,7 @@ class _NearbyScreenState extends State<NearbyScreen>
     );
     debugPrint('Refetched user location');
 
-	if (Platform.isIOS) {
+    if (Platform.isIOS) {
       streamUserLocation();
     }
 
@@ -450,20 +448,20 @@ class _NearbyScreenState extends State<NearbyScreen>
         const SizedBox(
           height: 12,
         ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: FutureBuilder(
-            future: nearbyFavourites,
-            builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-              Widget _favouritesListWidget = const SizedBox();
+        Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            child: FutureBuilder(
+              future: nearbyFavourites,
+              builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
+                Widget _favouritesListWidget = const SizedBox();
 
-              if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-                // checks if user has any favourites within 750m of their current location and displays them if they do
-                if (snapshot.data!.isEmpty) {
-                  _favouritesListWidget = Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
+                if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+                  // checks if user has any favourites within 750m of their current location and displays them if they do
+                  if (snapshot.data!.isEmpty) {
+                    _favouritesListWidget = Container(
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -476,47 +474,46 @@ class _NearbyScreenState extends State<NearbyScreen>
                           style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
                         ),
                       ),
-                    ),
-                  );
-                } else {
-                  _favouritesListWidget = ListView.separated(
-                    itemBuilder: (context, int index) {
-                      return FavouritesTimingCard(
-                        code: snapshot.data![index].busStopInfo.busStopCode,
-                        name: snapshot.data![index].busStopInfo.busStopName,
-                        address: snapshot.data![index].busStopInfo.busStopAddress,
-                        busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
-                        services: snapshot.data![index].busStopInfo.services,
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                      height: 16,
-                    ),
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: snapshot.data!.length,
+                    );
+                  } else {
+                    _favouritesListWidget = ListView.separated(
+                      itemBuilder: (context, int index) {
+                        return FavouritesTimingCard(
+                          code: snapshot.data![index].busStopInfo.busStopCode,
+                          name: snapshot.data![index].busStopInfo.busStopName,
+                          address: snapshot.data![index].busStopInfo.busStopAddress,
+                          busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
+                          services: snapshot.data![index].busStopInfo.services,
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                        height: 16,
+                      ),
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: snapshot.data!.length,
+                    );
+                  }
+                }
+
+                if (snapshot.hasError) {
+                  // return Text("${snapshot.error}");
+                  debugPrint("<=== ERROR ${snapshot.error} ===>");
+                  _favouritesListWidget = const ErrorText(
+                    enableBackground: true,
                   );
                 }
-              }
 
-              if (snapshot.hasError) {
-                // return Text("${snapshot.error}");
-                debugPrint("<=== ERROR ${snapshot.error} ===>");
-                _favouritesListWidget = const ErrorText(
-                  enableBackground: true,
+                return Skeleton(
+                  isLoading: snapshot.connectionState == ConnectionState.waiting,
+                  skeleton: SkeletonLine(
+                    style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: _favouritesListWidget,
                 );
-              }
-
-              return Skeleton(
-                isLoading: snapshot.connectionState == ConnectionState.waiting && !snapshot.hasData,
-                skeleton: SkeletonLine(
-                  style: SkeletonLineStyle(height: 64, borderRadius: BorderRadius.circular(10)),
-                ),
-                child: _favouritesListWidget,
-              );
-              // display a loading indicator while the list of nearby favourites is being fetched
-            },
+                // display a loading indicator while the list of nearby favourites is being fetched
+              },
+            ),
           ),
         )
       ],
