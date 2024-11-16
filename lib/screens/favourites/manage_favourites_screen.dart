@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
-import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/widgets/favourites/favourite_name_card.dart';
 
 import 'edit_favourite_screen.dart';
@@ -51,26 +51,8 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     }
   }
 
-  // function to get the list of bus services that are currently operating at that bus stop
-  // this is used to display the bus stops in the edit favourites screen
-  Future<List<String>> getBusServiceNumList(String busStopCode) async {
-    List<String> busServicesList = await fetchArrivalTimings(busStopCode).then(
-      (value) {
-        List<String> _busServicesList = [];
-        for (var service in value.services) {
-          _busServicesList.add(service.serviceNum);
-          // debugPrint('$_busServicesList');
-        }
-        return _busServicesList;
-      },
-    );
-    // debugPrint('$busServicesList');
-    return busServicesList;
-  }
-
-  // function to get the list of bus stops that are currently operating at that bus service and route to edit favourites screen
+  // function to route to edit favourites screen
   Future<void> goToEditFavouritesScreen(BuildContext context, Favourite favourite) async {
-    List<String> busServicesList = await getBusServiceNumList(favourite.busStopCode);
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(
@@ -81,7 +63,6 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
           busStopName: favourite.busStopName,
           busStopAddress: favourite.busStopAddress,
           busStopLocation: favourite.busStopLocation,
-          busServicesList: busServicesList,
         ),
         settings: const RouteSettings(name: 'EditFavouritesScreen'),
       ),

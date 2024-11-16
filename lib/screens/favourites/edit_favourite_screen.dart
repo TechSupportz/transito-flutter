@@ -1,13 +1,18 @@
+import 'dart:convert';
+
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/models/secret.dart';
 import 'package:transito/screens/navigator_screen.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
@@ -17,13 +22,13 @@ class EditFavouritesScreen extends StatefulWidget {
     required this.busStopName,
     required this.busStopAddress,
     required this.busStopLocation,
-    required this.busServicesList,
+    this.busServicesList,
   });
   final String busStopCode;
   final String busStopName;
   final String busStopAddress;
   final LatLng busStopLocation;
-  final List<String> busServicesList;
+  final List<String>? busServicesList;
 
   @override
   State<EditFavouritesScreen> createState() => _EditFavouritesScreenState();
@@ -34,7 +39,8 @@ const checkBoxFontStyle = TextStyle(
 );
 
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
-  late Future<Map<String?, List<String?>>> favouriteServicesList;
+  late Future<Map<String?, List<String?>>> futureFavouriteServicesList;
+  late Future<List<String>> futureBusServicesList;
 
   // function to display snackbar
   void _showSnackBar(String message) {
@@ -54,12 +60,34 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     return _value;
   }
 
+  // function to fetch the list of services available at the bus stop
+  // if the services are already available in the props, then it will return the services from the props
+  Future<List<String>> fetchServicesList() async {
+    if (widget.busServicesList != null) {
+      debugPrint("Retrieving services from props");
+      return widget.busServicesList!;
+    }
+
+    debugPrint("Fetching all services");
+
+    final response = await http.get(
+      Uri.parse('${Secret.API_URL}/bus-stop/${widget.busStopCode}/services'),
+    );
+
+    if (response.statusCode == 200) {
+      debugPrint("Services fetched");
+      return BusStopServicesApiResponse.fromJson(json.decode(response.body)).data;
+    } else {
+      debugPrint("Error fetching bus stop services");
+      throw Exception("Error fetching bus stop services");
+    }
+  }
+
   @override
   void initState() {
     super.initState();
-    // sorts bus services list according to the Bus Service number correctly
-    widget.busServicesList.sort((a, b) => compareNatural(a, b));
-    favouriteServicesList = FavouritesService()
+    futureBusServicesList = fetchServicesList();
+    futureFavouriteServicesList = FavouritesService()
         .getFavouriteServicesByBusStopCode(context.read<User?>()!.uid, widget.busStopCode);
   }
 
@@ -69,7 +97,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
     Future<void> deleteFavorites() async {
       // retrieve the list of services that the user initially had in their favourites
-      List<String?> initialServices = await favouriteServicesList.then((value) {
+      List<String?> initialServices = await futureFavouriteServicesList.then((value) {
         return value['Bus Services']!;
       });
 
@@ -212,19 +240,20 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               ],
             ),
             FutureBuilder(
-              future: favouriteServicesList,
-              builder: (context, AsyncSnapshot<Map<String?, List<String?>>> snapshot) {
+              future: Future.wait([futureFavouriteServicesList, futureBusServicesList]),
+              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
                 if (snapshot.hasData) {
-                  Map<String?, List<String?>> initialChildrenValue = snapshot.data!;
+                  var initialChildrenValue = snapshot.data![0] as Map<String?, List<String?>>;
+                  var busServicesList = snapshot.data![1] as List<String>;
 
                   // this filters out services which have stopped operating but are still in the user's favourites
                   if (initialChildrenValue["Bus Services"] != null &&
                       !initialChildrenValue["Bus Services"]!.every(
-                        (service) => widget.busServicesList.contains(service),
+                        (service) => busServicesList.contains(service),
                       )) {
                     initialChildrenValue["Bus Services"] = initialChildrenValue["Bus Services"]!
                         .where(
-                          (service) => widget.busServicesList.contains(service),
+                          (service) => busServicesList.contains(service),
                         )
                         .toList();
                   }
@@ -252,14 +281,14 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                             ParentChildCheckbox(
                               parent: const Text("Bus Services", style: checkBoxFontStyle),
                               // initialParentValue: {'Bus Services': true},
-                              initialChildrenValue: snapshot.data,
+                              initialChildrenValue: initialChildrenValue,
                               parentCheckboxColor: AppColors.accentColour,
                               childrenCheckboxColor: AppColors.accentColour,
                               parentCheckboxScale: 1.35,
                               childrenCheckboxScale: 1.35,
                               gap: 2,
                               children: [
-                                for (var service in widget.busServicesList)
+                                for (var service in busServicesList)
                                   Text(service, style: checkBoxFontStyle),
                               ],
                             ),
