@@ -13,13 +13,16 @@ class ErrorText extends StatelessWidget {
         children: [
           Text(
             'Oops something went wrong',
+            textAlign: TextAlign.center,
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 20,
               fontWeight: FontWeight.w500,
             ),
           ),
+          SizedBox(height: 4),
           Text(
             'Restarting the app might help',
+            textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 16,
             ),

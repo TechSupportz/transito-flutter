@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
@@ -14,6 +15,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/navigator_screen.dart';
+import 'package:transito/widgets/common/chekbox_skeleton.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
   const EditFavouritesScreen({
@@ -242,6 +244,8 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
             FutureBuilder(
               future: Future.wait([futureFavouriteServicesList, futureBusServicesList]),
               builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                Widget servicesChecklist = Expanded(child: const SizedBox());
+
                 if (snapshot.hasData) {
                   var initialChildrenValue = snapshot.data![0] as Map<String?, List<String?>>;
                   var busServicesList = snapshot.data![1] as List<String>;
@@ -258,22 +262,23 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                         .toList();
                   }
 
-                  return Expanded(
-                    child: ShaderMask(
-                      shaderCallback: (Rect bounds) {
-                        return const LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Color(0xFF0c0c0c),
-                            Colors.transparent,
-                            Colors.transparent,
-                            Color(0xFF0c0c0c)
-                          ],
-                          stops: [0.0, 0.05, 0.95, 1.0],
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.dstOut,
+                  servicesChecklist = ShaderMask(
+                    shaderCallback: (Rect bounds) {
+                      return const LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Color(0xFF0c0c0c),
+                          Colors.transparent,
+                          Colors.transparent,
+                          Color(0xFF0c0c0c)
+                        ],
+                        stops: [0.0, 0.05, 0.95, 1.0],
+                      ).createShader(bounds);
+                    },
+                    blendMode: BlendMode.dstOut,
+                    child: Align(
+                      alignment: Alignment.topCenter,
                       child: SingleChildScrollView(
                         padding: const EdgeInsets.only(top: 8, bottom: 16),
                         child: Column(
@@ -297,11 +302,35 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                       ),
                     ),
                   );
-                } else {
-                  return const Center(
-                    child: CircularProgressIndicator(strokeWidth: 3),
-                  );
                 }
+
+                return Expanded(
+                  child: Skeleton(
+                    isLoading:
+                        snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData,
+                    skeleton: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          CheckboxSkeleton(),
+                          SizedBox(
+                            height: 2,
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(left: 15),
+                              child: SkeletonListView(
+                                spacing: 10,
+                                item: CheckboxSkeleton(),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    child: servicesChecklist,
+                  ),
+                );
               },
             ),
             Padding(
