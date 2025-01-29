@@ -175,41 +175,6 @@ class _NearbyScreenState extends State<NearbyScreen>
     });
   }
 
-  void showWarningSnackbar(Duration duration) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.fixed,
-        backgroundColor: Colors.amber[400],
-        duration: duration,
-        showCloseIcon: true,
-        closeIconColor: Colors.black,
-        content: Row(
-          children: [
-            Icon(
-              Icons.warning_rounded,
-              color: Colors.black,
-            ),
-            SizedBox(width: 16),
-            Flexible(
-              child: Text.rich(
-                style: TextStyle(color: Colors.black),
-                softWrap: true,
-                overflow: TextOverflow.visible,
-                TextSpan(text: "Bus timings may be unavailable on\n", children: [
-                  TextSpan(
-                    text: "5th January 2025 from 12am to 8am\n",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(text: "due to scheduled maintenance by LTA"),
-                ]),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   bool get wantKeepAlive => true;
 
@@ -221,17 +186,6 @@ class _NearbyScreenState extends State<NearbyScreen>
     nearbyBusStops = getNearbyBusStops();
     nearbyFavourites = getNearbyFavourites();
     streamUserLocation();
-
-    if (Jiffy.now().isBefore(Jiffy.parse("2025-01-05T08:15:00")) &&
-        Jiffy.now().isAfter(Jiffy.parse("2025-01-04T00:00:00"))) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => showWarningSnackbar(
-          Jiffy.now().isAfter(Jiffy.parse("2025-01-05T00:00:00"))
-              ? Duration(seconds: 8)
-              : Duration(seconds: 5),
-        ),
-      );
-    }
   }
 
   @override
