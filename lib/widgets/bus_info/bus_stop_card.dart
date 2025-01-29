@@ -271,17 +271,35 @@ class BusStopCard extends StatelessWidget {
                       )
                     ],
                   ),
-                  Text(
-                    Jiffy.parse(
-                      selectedDay == 0
-                          ? busSchedule!.firstBus.weekdays
-                          : selectedDay == 1
-                              ? busSchedule!.firstBus.saturday
-                              : busSchedule!.firstBus.sunday,
-                      pattern: 'Hm',
-                    ).jm,
-                    style: timeStyle,
-                  )
+                  if (selectedDay == 0 && busSchedule!.firstBus.weekdays != "-:")
+                    Text(
+                      Jiffy.parse(
+                        busSchedule!.firstBus.weekdays,
+                        pattern: 'Hm',
+                      ).jm,
+                      style: timeStyle,
+                    )
+                  else if (selectedDay == 1 && busSchedule!.firstBus.saturday != "-:")
+                    Text(
+                      Jiffy.parse(
+                        busSchedule!.firstBus.saturday,
+                        pattern: 'Hm',
+                      ).jm,
+                      style: timeStyle,
+                    )
+                  else if (selectedDay == 2 && busSchedule!.firstBus.sunday != "-:")
+                    Text(
+                      Jiffy.parse(
+                        busSchedule!.firstBus.sunday,
+                        pattern: 'Hm',
+                      ).jm,
+                      style: timeStyle,
+                    )
+                  else
+                    const Text(
+                      "never o'clock",
+                      style: timeStyle,
+                    ),
                 ],
               ),
               const SizedBox(height: 8.0),
@@ -298,17 +316,35 @@ class BusStopCard extends StatelessWidget {
                       )
                     ],
                   ),
-                  Text(
-                    Jiffy.parse(
-                      selectedDay == 0
-                          ? busSchedule!.lastBus.weekdays
-                          : selectedDay == 1
-                              ? busSchedule!.lastBus.saturday
-                              : busSchedule!.lastBus.sunday,
-                      pattern: 'Hm',
-                    ).jm,
-                    style: timeStyle,
-                  )
+                  if (selectedDay == 0 && busSchedule!.lastBus.weekdays != "-:")
+                    Text(
+                      Jiffy.parse(
+                        busSchedule!.lastBus.weekdays,
+                        pattern: 'Hm',
+                      ).jm,
+                      style: timeStyle,
+                    )
+                  else if (selectedDay == 1 && busSchedule!.lastBus.saturday != "-:")
+                    Text(
+                      Jiffy.parse(
+                        busSchedule!.lastBus.saturday,
+                        pattern: 'Hm',
+                      ).jm,
+                      style: timeStyle,
+                    )
+                  else if (selectedDay == 2 && busSchedule!.lastBus.sunday != "-:")
+                    Text(
+                      Jiffy.parse(
+                        busSchedule!.lastBus.sunday,
+                        pattern: 'Hm',
+                      ).jm,
+                      style: timeStyle,
+                    )
+                  else
+                    const Text(
+                     "never o'clock",
+                      style: timeStyle,
+                    ),
                 ],
               ),
             ],
