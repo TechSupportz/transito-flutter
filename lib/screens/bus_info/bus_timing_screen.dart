@@ -57,6 +57,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   final GlobalKey expansionTileKey = GlobalKey();
   bool isFabVisible = true;
   bool isAddedToFavourites = false;
+  bool sortByArrivalTime = false;
   late Timer timer;
 
   // function to get the user's location
@@ -118,6 +119,18 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   // function to properly sort the bus arrival info according to the Bus Service number
   BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
     var _value = value;
+
+    if (sortByArrivalTime) {
+      _value.services
+          .sort((a, b) => Jiffy.parse(a.nextBus.estimatedArrival!.split("+")[0]).isBefore(
+                Jiffy.parse(b.nextBus.estimatedArrival!.split("+")[0]),
+              )
+                  ? 0
+                  : 1);
+
+      return _value;
+    }
+
     _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
 
     return _value;
@@ -255,6 +268,19 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
               Icons.help_outline_rounded,
             ),
             onPressed: () => showTimingGuideDialog(),
+          ),
+          IconButton(
+            icon: Icon(
+              sortByArrivalTime ? Icons.sort_by_alpha_rounded : Icons.access_time_rounded,
+            ),
+            onPressed: () {
+              setState(() {
+                sortByArrivalTime = !sortByArrivalTime;
+                futureBusArrivalInfo = fetchArrivalTimings().then(
+                  (value) => sortBusArrivalInfo(value),
+                );
+              });
+            },
           ),
           // display different IconButtons depending on whether the bus stop is a favourite or not
           isAddedToFavourites
@@ -437,7 +463,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                         );
                       },
                       child: busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
-                                  !busArrivalInfoSnapshot.hasData
+                              !busArrivalInfoSnapshot.hasData
                           ? FadeTransition(
                               opacity: _animation,
                               child: const SkeletonLine(
