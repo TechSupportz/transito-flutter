@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
@@ -264,15 +265,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
         ),
         actions: [
           IconButton(
-            icon: const Icon(
-              Icons.help_outline_rounded,
-            ),
-            onPressed: () => showTimingGuideDialog(),
-          ),
-          IconButton(
-            icon: Icon(
-              sortByArrivalTime ? Icons.sort_by_alpha_rounded : Icons.access_time_rounded,
-            ),
+            icon: sortByArrivalTime
+                ? SvgPicture.asset('assets/icons/ui/sort_by_number.svg')
+                : SvgPicture.asset('assets/icons/ui/sort_by_time.svg'),
             onPressed: () {
               setState(() {
                 sortByArrivalTime = !sortByArrivalTime;
@@ -292,6 +287,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                   icon: const Icon(Icons.favorite_border_rounded),
                   onPressed: () => goToAddFavouritesScreen(context),
                 ),
+          IconButton(
+            icon: const Icon(
+              Icons.help_outline_rounded,
+            ),
+            onPressed: () => showTimingGuideDialog(),
+          ),
         ],
       ),
       body: StreamBuilder(
