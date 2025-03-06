@@ -122,12 +122,20 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     var _value = value;
 
     if (sortByArrivalTime) {
-      _value.services
-          .sort((a, b) => Jiffy.parse(a.nextBus.estimatedArrival!.split("+")[0]).isAfter(
-                Jiffy.parse(b.nextBus.estimatedArrival!.split("+")[0]),
-              )
-                  ? 1
-                  : 0);
+      _value.services.sort((a, b) {
+        if (a.nextBus.estimatedArrival == null ||
+            b.nextBus.estimatedArrival == null ||
+            a.nextBus.estimatedArrival == "" ||
+            b.nextBus.estimatedArrival == "") {
+          return 0;
+        }
+
+        return Jiffy.parse(a.nextBus.estimatedArrival!.split("+")[0]).isAfter(
+          Jiffy.parse(b.nextBus.estimatedArrival!.split("+")[0]),
+        )
+            ? 1
+            : 0;
+      });
 
       return _value;
     }
