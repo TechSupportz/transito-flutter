@@ -251,7 +251,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                     } else {
                       // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
                       return Material(
-                        color: AppColors.cardBg,
+                        color: AppColors.cardBg(context),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -382,7 +382,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.cardBg,
+                                  color: AppColors.cardBg(context),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const Center(
@@ -465,7 +465,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.cardBg,
+                        color: AppColors.cardBg(context),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Center(

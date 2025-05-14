@@ -117,18 +117,13 @@ class _MyAppState extends State<MyApp> {
             ],
             navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
             theme: ThemeData(
-              useMaterial3: false,
+              // useMaterial3: false,
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,
-              scaffoldBackgroundColor: const Color(0xFF0C0C0C),
-              cardColor: const Color(0xFF0C0C0C),
-              colorScheme: const ColorScheme.dark().copyWith(
-                surface: Colors.black,
-                primary: AppColors.accentColour,
-                secondary: AppColors.accentColour,
-                onPrimary: Colors.white,
-                onSecondary: Colors.white,
-              ),
+              // scaffoldBackgroundColor: const Color(0xFF0C0C0C),
+              // cardColor: const Color(0xFF0C0C0C),
+              colorScheme: ColorScheme.fromSeed(
+                  seedColor: AppColors.accentColour, brightness: Brightness.dark),
               splashFactory: InkSplash.splashFactory,
               tooltipTheme: TooltipThemeData(
                 textStyle: const TextStyle(
@@ -177,7 +172,7 @@ class _MyAppState extends State<MyApp> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                backgroundColor: AppColors.cardBg,
+                backgroundColor: AppColors.cardBg(context),
               ),
               tabBarTheme: TabBarTheme(
                 labelColor: AppColors.accentColour,
@@ -206,9 +201,9 @@ class _MyAppState extends State<MyApp> {
                     )),
                 enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
+                    borderSide: BorderSide(
                       width: 2,
-                      color: AppColors.cardBg,
+                      color: AppColors.cardBg(context),
                     )),
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

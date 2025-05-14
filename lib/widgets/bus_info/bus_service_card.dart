@@ -34,8 +34,8 @@ class BusServiceCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Container(
-          decoration:
-              BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(
+              color: AppColors.cardBg(context), borderRadius: BorderRadius.circular(10)),
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

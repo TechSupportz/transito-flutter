@@ -119,7 +119,7 @@ class BusStopCard extends StatelessWidget {
           ),
           child: Ink(
             decoration:
-                BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(10)),
+                BoxDecoration(color: AppColors.cardBg(context), borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             child: Row(
               children: [

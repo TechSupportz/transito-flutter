@@ -101,8 +101,8 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             UserSettings userSettings = snapshot.data as UserSettings;
             return Tooltip(
               preferBelow: false,
-              decoration: const BoxDecoration(
-                color: AppColors.cardBg,
+              decoration: BoxDecoration(
+                color: AppColors.cardBg(context),
               ),
               textStyle: const TextStyle(
                 fontSize: 18,
@@ -124,7 +124,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardBg,
+                    color: AppColors.cardBg(context),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Column(
@@ -190,7 +190,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.cardBg,
+                                  color: AppColors.cardBg(context),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: const ErrorText(),
@@ -229,7 +229,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.cardBg,
+                color: AppColors.cardBg(context),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: const ErrorText(),

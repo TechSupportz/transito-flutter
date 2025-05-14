@@ -30,7 +30,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
 
   @override
   Widget build(BuildContext context) {
-    bool isTablet = context.read<CommonProvider>().isTablet;
+    bool isTablet = context.read<CommonProvider>().isTablet; //REVIEW - Check if this is still needed
 
     return Scaffold(
       body: UpgradeAlert(
@@ -47,19 +47,17 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           children: widgetList,
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: Icon(Icons.explore_rounded), label: "Nearby"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
-          BottomNavigationBarItem(icon: Icon(Icons.search_rounded), label: "Search"),
+      bottomNavigationBar: NavigationBar(
+        destinations: const <NavigationDestination>[
+          NavigationDestination(icon: Icon(Icons.explore_rounded), label: "Nearby"),
+          NavigationDestination(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
+          NavigationDestination(icon: Icon(Icons.search_rounded), label: "Search"),
         ],
-        iconSize: isTablet ? 32 : 24,
-        backgroundColor: Colors.black,
-        unselectedItemColor: const Color(0xFFD8DBE2),
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        currentIndex: _pageIndex,
-        onTap: (index) {
+        
+        selectedIndex: _pageIndex,
+        height: 72,
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        onDestinationSelected: (index) {
           // updates _pageIndex and animates the page transition
           setState(() {
             _pageIndex = index;
