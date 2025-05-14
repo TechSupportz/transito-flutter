@@ -107,6 +107,8 @@ class _MyAppState extends State<MyApp> {
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
+          ColorScheme appColorScheme = Theme.of(context).colorScheme;
+
           return MaterialApp(
             title: "Transito",
             supportedLocales: const [Locale('en', 'US')],
@@ -124,14 +126,14 @@ class _MyAppState extends State<MyApp> {
               // cardColor: const Color(0xFF0C0C0C),
               colorScheme: ColorScheme.fromSeed(
                   seedColor: AppColors.accentColour, brightness: Brightness.dark),
-              splashFactory: InkSplash.splashFactory,
+              splashFactory: InkSparkle.splashFactory,
               tooltipTheme: TooltipThemeData(
                 textStyle: const TextStyle(
                   color: AppColors.kindaGrey,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.black54,
+                  color: appColorScheme.inverseSurface,
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -139,35 +141,50 @@ class _MyAppState extends State<MyApp> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),
-                visualDensity: VisualDensity.standard,
+                fillColor: WidgetStateProperty.resolveWith<Color>(
+                  (Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return appColorScheme.primary;
+                    }
+                    return appColorScheme.onSurface;
+                  },
+                ),
+                checkColor: WidgetStateProperty.resolveWith<Color>(
+                  (Set<WidgetState> states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return appColorScheme.onPrimary;
+                    }
+                    return appColorScheme.onSurface;
+                  },
+                ),
                 side: const BorderSide(
                   color: AppColors.kindaGrey,
                   width: 1.75,
                 ),
               ),
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(7.5),
-                    ),
-                    minimumSize: const Size(15, 42)),
-              ),
-              outlinedButtonTheme: OutlinedButtonThemeData(
-                style: OutlinedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7.5),
-                  ),
-                  side: BorderSide(color: AppColors.accentColour),
-                  minimumSize: const Size(15, 42),
-                ),
-              ),
-              textButtonTheme: TextButtonThemeData(
-                style: TextButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(7.5),
-                  ),
-                ),
-              ),
+              // elevatedButtonTheme: ElevatedButtonThemeData(
+              //   style: ElevatedButton.styleFrom(
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(7.5),
+              //       ),
+              //       minimumSize: const Size(15, 42)),
+              // ),
+              // outlinedButtonTheme: OutlinedButtonThemeData(
+              //   style: OutlinedButton.styleFrom(
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(7.5),
+              //     ),
+              //     side: BorderSide(color: AppColors.accentColour),
+              //     minimumSize: const Size(15, 42),
+              //   ),
+              // ),
+              // textButtonTheme: TextButtonThemeData(
+              //   style: TextButton.styleFrom(
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(7.5),
+              //     ),
+              //   ),
+              // ),
               dialogTheme: DialogTheme(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),

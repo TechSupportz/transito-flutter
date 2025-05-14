@@ -19,7 +19,7 @@ class BusRoutesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.drawerBg,
+      color: AppColors.drawerBg(context),
       child: ListView.separated(
           shrinkWrap: true,
           controller: controller,

@@ -184,12 +184,12 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ElevatedButton(
+                  FilledButton(
                       onPressed: () => addToFavorites(), child: const Text("Add to favourites")),
                   const SizedBox(
                     height: 8,
                   ),
-                  OutlinedButton(
+                  FilledButton.tonal(
                       onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
                 ],
               ),

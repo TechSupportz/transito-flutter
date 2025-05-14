@@ -21,7 +21,7 @@ class AppColors with ChangeNotifier {
   static const Color GAS = Color(0xFFF4BD00);
 
   static Color cardBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainer;
-  static const Color drawerBg = Color(0xFF151515);
+  static Color drawerBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerLow;
   static const Color inputFieldBg = Color(0xff202020);
 
   // function that returns the correct colours for each bus operator

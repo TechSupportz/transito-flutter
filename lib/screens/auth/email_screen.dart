@@ -352,7 +352,7 @@ class _EmailScreenState extends State<EmailScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 16),
-            child: OutlinedButton(
+            child: FilledButton.tonal(
               onPressed: () => onRegisterBtnPress(),
               child: AnimatedSwitcher(
                 transitionBuilder: (child, animation) => ScaleTransition(
@@ -426,7 +426,7 @@ class _EmailScreenState extends State<EmailScreen> {
           const SizedBox(height: 12),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 21.0),
-            child: OutlinedButton(
+            child: FilledButton.tonal(
               onPressed: () => onLoginBtnPress(),
               child: AnimatedSwitcher(
                 transitionBuilder: (child, animation) => ScaleTransition(

@@ -30,7 +30,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
               },
               child: const Text('Cancel'),
             ),
-            ElevatedButton(
+            FilledButton(
               onPressed: () {
                 Provider.of<SearchProvider>(context, listen: false).clearAllRecentSearches();
                 Navigator.pop(context);

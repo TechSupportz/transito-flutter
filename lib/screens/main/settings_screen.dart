@@ -88,7 +88,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.of(context).pop();
             },
           ),
-          ElevatedButton(
+          FilledButton(
             child: const Text('Yes'),
             onPressed: () {
               if (email != null) {
@@ -275,7 +275,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               user.providerData.map((e) => e.providerId).contains('password'))
                           ? Padding(
                               padding: const EdgeInsets.only(bottom: 6.0),
-                              child: OutlinedButton(
+                              child: FilledButton.tonal(
                                 onPressed: () => showResetPasswordDialog(user.email),
                                 child: Text(
                                   'Reset password',
@@ -288,7 +288,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       (user != null && !user.isAnonymous)
                           ? Padding(
                               padding: const EdgeInsets.only(bottom: 6.0),
-                              child: ElevatedButton(
+                              child: FilledButton(
                                 onPressed: () => showDialog(
                                   context: context,
                                   builder: (context) => AlertDialog(
@@ -326,7 +326,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                             )
                           : const SizedBox(),
-                      ElevatedButton(
+                      FilledButton(
                         onPressed: () => showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -433,11 +433,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
-                                    OutlinedButton(
+                                    FilledButton.tonal(
                                         onPressed: () => resetAccentColour(user),
                                         child: const Text("Reset to default")),
                                     const SizedBox(width: 8),
-                                    ElevatedButton(
+                                    FilledButton(
                                         onPressed: () => updateAccentColour(user),
                                         child: const Text("Apply"))
                                   ],

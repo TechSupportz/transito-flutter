@@ -28,7 +28,7 @@ class QuickStartScreen extends StatelessWidget {
             const BusTimingGuide(),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: ElevatedButton(
+              child: FilledButton(
                 onPressed: () => Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(

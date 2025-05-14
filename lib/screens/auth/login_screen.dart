@@ -195,7 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
-                                  OutlinedButton.icon(
+                                  FilledButton.tonalIcon(
                                     onPressed: () => onGoogleBtnPress(),
                                     icon: SvgPicture.asset('assets/images/google_logo.svg'),
                                     label: const Text(
@@ -210,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                                   if (Platform.isIOS) ...[
                                     const SizedBox(height: 16),
-                                    OutlinedButton.icon(
+                                    FilledButton.tonalIcon(
                                       onPressed: () => onAppleBtnPress(),
                                       icon: SvgPicture.asset('assets/images/apple_logo.svg'),
                                       label: const Text(
@@ -225,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     )
                                   ],
                                   const SizedBox(height: 16),
-                                  OutlinedButton.icon(
+                                  FilledButton.tonalIcon(
                                     onPressed: () => onEmailBtnPress(),
                                     icon:
                                         const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 16),
-                                  OutlinedButton.icon(
+                                  FilledButton.tonalIcon(
                                     onPressed: () => showGuestLoginDialog(),
                                     icon: const Icon(
                                       Icons.person_rounded,

@@ -131,7 +131,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
-              child: ElevatedButton(
+              child: FilledButton(
                 onPressed: () => requestLocationPermission(context),
                 child: const Text("Check Permission"),
               ),

@@ -338,12 +338,12 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  ElevatedButton(
+                  FilledButton(
                       onPressed: () => updateFavorites(), child: const Text("Save changes")),
                   const SizedBox(
                     height: 8,
                   ),
-                  OutlinedButton(
+                  FilledButton.tonal(
                       onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
                 ],
               ),

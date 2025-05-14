@@ -372,13 +372,13 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
             Align(
               alignment: Alignment.bottomCenter,
               child: Container(
-                padding: const EdgeInsets.only(bottom: 16, top: 8),
-                decoration: const BoxDecoration(
+                padding: const EdgeInsets.only(bottom: 16, top: 16),
+                decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      Color(0xFF0c0c0c),
+                      Theme.of(context).colorScheme.surface,
                       Colors.transparent,
                     ],
                     stops: [0.9, 1.0],
@@ -387,17 +387,15 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
+                  spacing: 8,
                   children: [
+                    FilledButton(
+                      onPressed: () => goToBusTimingScreen(),
+                      child: const Text('View Bus Timings'),
+                    ),
                     OutlinedButton(
                       onPressed: () => openMaps(widget.busStopLocation),
                       child: const Text("Take me there!"),
-                    ),
-                    const SizedBox(
-                      height: 8,
-                    ),
-                    ElevatedButton(
-                      onPressed: () => goToBusTimingScreen(),
-                      child: const Text('View Bus Timings'),
                     ),
                   ],
                 ),
