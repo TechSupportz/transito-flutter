@@ -221,9 +221,13 @@ class _EmailScreenState extends State<EmailScreen> {
                           ),
                           const SizedBox(height: 20),
                           const Text(
-                            'Simply login and never miss a bus again!',
+                            'The last bus timing app you\'ll ever need.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: AppColors.kindaGrey,
+                              fontWeight: FontWeight.w200,
+                            ),
                           ),
                         ],
                       ),
@@ -244,7 +248,7 @@ class _EmailScreenState extends State<EmailScreen> {
                       ),
                       const Spacer(),
                       Padding(
-                        padding: const EdgeInsets.only(top: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
                         child: GestureDetector(
                           onTap: () => setState(() {
                             _isLogin = !_isLogin;
@@ -306,7 +310,7 @@ class _EmailScreenState extends State<EmailScreen> {
               labelText: 'Name',
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           FormBuilderTextField(
             key: _emailRegisterFieldKey,
             name: 'email',
@@ -321,7 +325,7 @@ class _EmailScreenState extends State<EmailScreen> {
               labelText: 'Email',
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           FormBuilderTextField(
             key: _passwordRegisterFieldKey,
             name: 'password',
@@ -350,26 +354,24 @@ class _EmailScreenState extends State<EmailScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0, vertical: 16),
-            child: FilledButton.tonal(
-              onPressed: () => onRegisterBtnPress(),
-              child: AnimatedSwitcher(
-                transitionBuilder: (child, animation) => ScaleTransition(
-                  scale: animation,
-                  child: child,
-                ),
-                duration: const Duration(milliseconds: 125),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : const Text('Register'),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () => onRegisterBtnPress(),
+            child: AnimatedSwitcher(
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation,
+                child: child,
               ),
+              duration: const Duration(milliseconds: 125),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : const Text('Register'),
             ),
           )
         ],
@@ -423,30 +425,27 @@ class _EmailScreenState extends State<EmailScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 21.0),
-            child: FilledButton.tonal(
-              onPressed: () => onLoginBtnPress(),
-              child: AnimatedSwitcher(
-                transitionBuilder: (child, animation) => ScaleTransition(
-                  scale: animation,
-                  child: child,
-                ),
-                duration: const Duration(milliseconds: 175),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
-                      )
-                    : const Text('Login'),
+          const SizedBox(height: 16),
+          FilledButton(
+            onPressed: () => onLoginBtnPress(),
+            child: AnimatedSwitcher(
+              transitionBuilder: (child, animation) => ScaleTransition(
+                scale: animation,
+                child: child,
               ),
+              duration: const Duration(milliseconds: 175),
+              child: _isLoading
+                  ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                    )
+                  : const Text('Login'),
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           GestureDetector(
             onTap: () => showForgetPasswordDialog(),
             child: Text(

@@ -133,140 +133,147 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
-      // appBar: AppBar(title: const Text('Welcome!')),
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xff0C0C0C),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: ScrollConfiguration(
-            behavior: const ScrollBehavior().copyWith(overscroll: false),
-            child: CustomScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(
-                    children: [
-                      const Spacer(),
-                      Stack(
-                        alignment: Alignment.center,
-                        fit: StackFit.passthrough,
-                        children: [
-                          Container(
-                            height: MediaQuery.of(context).size.width,
-                            decoration: const BoxDecoration(
-                              gradient: RadialGradient(
-                                colors: [Color(0xAA3C18BF), Color(0xff0C0C0C)],
-                                stops: [0, 0.90],
-                              ),
-                              shape: BoxShape.circle,
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: ScrollConfiguration(
+          behavior: const ScrollBehavior().copyWith(overscroll: false),
+          child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    const Spacer(),
+                    Stack(
+                      alignment: Alignment.center,
+                      fit: StackFit.passthrough,
+                      children: [
+                        Container(
+                          height: MediaQuery.of(context).size.width,
+                          decoration: BoxDecoration(
+                            gradient: RadialGradient(
+                              colors: [Color(0xAA3C18BF), Color(0xAA3C18BF).withAlpha(0)],
+                              stops: [0, 1],
                             ),
+                            shape: BoxShape.circle,
                           ),
-                          Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 12.0),
-                                child: SvgPicture.asset('assets/images/logo.svg', height: 200),
-                              ),
-                              const SizedBox(height: 20),
-                              const Text(
-                                'Simply login and never miss a bus again!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(fontSize: 18, color: AppColors.kindaGrey),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const Spacer(),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF151515),
-                          borderRadius: BorderRadius.circular(12),
                         ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        margin: const EdgeInsets.only(bottom: 48),
-                        child: Column(
+                        Column(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: [
-                                  FilledButton.tonalIcon(
-                                    onPressed: () => onGoogleBtnPress(),
-                                    icon: SvgPicture.asset('assets/images/google_logo.svg'),
-                                    label: const Text(
-                                      'Continue with Google',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    style: ButtonStyle(
-                                      padding: WidgetStateProperty.all<EdgeInsets>(
-                                        const EdgeInsets.symmetric(vertical: 12),
-                                      ),
-                                    ),
-                                  ),
-                                  if (Platform.isIOS) ...[
-                                    const SizedBox(height: 16),
-                                    FilledButton.tonalIcon(
-                                      onPressed: () => onAppleBtnPress(),
-                                      icon: SvgPicture.asset('assets/images/apple_logo.svg'),
-                                      label: const Text(
-                                        'Continue with Apple',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      style: ButtonStyle(
-                                        padding: WidgetStateProperty.all<EdgeInsets>(
-                                          const EdgeInsets.symmetric(vertical: 12),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                  const SizedBox(height: 16),
-                                  FilledButton.tonalIcon(
-                                    onPressed: () => onEmailBtnPress(),
-                                    icon:
-                                        const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
-                                    label: const Text(
-                                      'Continue with Email',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    style: ButtonStyle(
-                                      padding: WidgetStateProperty.all<EdgeInsets>(
-                                        const EdgeInsets.symmetric(vertical: 12),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  FilledButton.tonalIcon(
-                                    onPressed: () => showGuestLoginDialog(),
-                                    icon: const Icon(
-                                      Icons.person_rounded,
-                                      color: AppColors.kindaGrey,
-                                    ),
-                                    label: const Text(
-                                      'Continue as a Guest',
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    style: ButtonStyle(
-                                      padding: WidgetStateProperty.all<EdgeInsets>(
-                                        const EdgeInsets.symmetric(vertical: 12),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              padding: const EdgeInsets.only(top: 12.0),
+                              child: SvgPicture.asset('assets/images/logo.svg', height: 200),
+                            ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'The last bus timing app you\'ll ever need.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: AppColors.kindaGrey,
+                                fontWeight: FontWeight.w200,
                               ),
                             ),
                           ],
                         ),
+                      ],
+                    ),
+                    const Spacer(),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF151515),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
-                  ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      margin: const EdgeInsets.only(bottom: 48),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Column(
+                              spacing: 12,
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                FilledButton.icon(
+                                  onPressed: () => onGoogleBtnPress(),
+                                  icon: SvgPicture.asset(
+                                    'assets/images/google_logo.svg',
+                                    height: 20,
+                                    width: 20,
+                                  ),
+                                  label: const Text(
+                                    'Continue with Google',
+                                    style: TextStyle(color: Color(0xFF1F1F1F)),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    backgroundColor: WidgetStateProperty.all<Color>(
+                                      Color(0xFFF2F2F2),
+                                    ),
+                                  ),
+                                ),
+                                FilledButton.tonalIcon(
+                                  onPressed: () => onAppleBtnPress(),
+                                  icon: SvgPicture.asset(
+                                    'assets/images/apple_logo.svg',
+                                    height: 20,
+                                    width: 20,
+                                  ),
+                                  label: const Text(
+                                    'Continue with Apple',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    backgroundColor: WidgetStateProperty.all<Color>(
+                                      Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                FilledButton.tonalIcon(
+                                  onPressed: () => onEmailBtnPress(),
+                                  icon: const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
+                                  label: const Text(
+                                    'Continue with Email',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                                ),
+                                OutlinedButton.icon(
+                                  onPressed: () => showGuestLoginDialog(),
+                                  icon: const Icon(
+                                    Icons.person_rounded,
+                                    color: AppColors.kindaGrey,
+                                  ),
+                                  label: const Text(
+                                    'Continue as a Guest',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  style: ButtonStyle(
+                                    padding: WidgetStateProperty.all<EdgeInsets>(
+                                      const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
