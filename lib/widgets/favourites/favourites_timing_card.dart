@@ -125,14 +125,14 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 child: Container(
                   decoration: BoxDecoration(
                     color: AppColors.cardBg(context),
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 12, bottom: 2),
+                        padding: const EdgeInsets.only(left: 16, top: 18, bottom: 4),
                         child: Text(
                           widget.name,
                           overflow: TextOverflow.fade,
@@ -163,15 +163,21 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                       },
                                       separatorBuilder: (BuildContext context, int index) =>
                                           const SizedBox(
-                                            height: 6,
-                                          ),
+                                        height: 6,
+                                      ),
                                       physics: const NeverScrollableScrollPhysics(),
-                                      padding: const EdgeInsets.only(bottom: 16),
+                                      padding: const EdgeInsets.only(bottom: 18),
                                       shrinkWrap: true,
-                                      itemCount: snapshot.data!.length)
+                                      itemCount: snapshot.data!.length,
+                                    )
                                   : Center(
                                       child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
+                                        padding: const EdgeInsets.only(
+                                          top: 16,
+                                          bottom: 24,
+                                          left: 16,
+                                          right: 16,
+                                        ),
                                         child: Text(
                                           Jiffy.now().hour > 5
                                               ? '🦥 Your favourites are lepaking 🦥'
@@ -191,9 +197,12 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
                                   color: AppColors.cardBg(context),
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: const ErrorText(),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8),
+                                  child: const ErrorText(),
+                                ),
                               );
                             } else if (snapshot.connectionState == ConnectionState.waiting) {
                               return ListView.separated(
@@ -211,7 +220,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                         height: 12,
                                       ),
                                   physics: const NeverScrollableScrollPhysics(),
-                                  padding: const EdgeInsets.only(bottom: 16),
+                                  padding: const EdgeInsets.only(bottom: 18),
                                   shrinkWrap: true,
                                   itemCount: widget.services.length);
                             } else {
@@ -230,7 +239,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
                 color: AppColors.cardBg(context),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
               ),
               child: const ErrorText(),
             );

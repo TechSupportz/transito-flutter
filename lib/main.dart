@@ -14,16 +14,15 @@ import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/settings_service.dart';
+import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
-import 'package:transito/widgets/android_stretch_behaviour.dart';
 
 import 'firebase_options.dart';
 
@@ -107,8 +106,6 @@ class _MyAppState extends State<MyApp> {
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
-          ColorScheme appColorScheme = Theme.of(context).colorScheme;
-
           return MaterialApp(
             title: "Transito",
             supportedLocales: const [Locale('en', 'US')],
@@ -133,28 +130,28 @@ class _MyAppState extends State<MyApp> {
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: BoxDecoration(
-                  color: appColorScheme.inverseSurface,
+                  color: AppColors.scheme(context).inverseSurface,
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
               checkboxTheme: CheckboxThemeData(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5),
+                  borderRadius: BorderRadius.circular(4),
                 ),
                 fillColor: WidgetStateProperty.resolveWith<Color>(
                   (Set<WidgetState> states) {
                     if (states.contains(WidgetState.selected)) {
-                      return appColorScheme.primary;
+                      return AppColors.scheme(context).primary;
                     }
-                    return appColorScheme.onSurface;
+                    return AppColors.scheme(context).onSurface;
                   },
                 ),
                 checkColor: WidgetStateProperty.resolveWith<Color>(
                   (Set<WidgetState> states) {
                     if (states.contains(WidgetState.selected)) {
-                      return appColorScheme.onPrimary;
+                      return AppColors.scheme(context).onPrimary;
                     }
-                    return appColorScheme.onSurface;
+                    return AppColors.scheme(context).onSurface;
                   },
                 ),
                 side: const BorderSide(
@@ -187,9 +184,8 @@ class _MyAppState extends State<MyApp> {
               // ),
               dialogTheme: DialogTheme(
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(28),
                 ),
-                backgroundColor: AppColors.cardBg(context),
               ),
               tabBarTheme: TabBarTheme(
                 labelColor: AppColors.accentColour,
@@ -199,7 +195,7 @@ class _MyAppState extends State<MyApp> {
                 backgroundColor: const Color(0xFF262626),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 contentTextStyle: const TextStyle(
                   fontFamily: 'Poppins',
@@ -211,19 +207,13 @@ class _MyAppState extends State<MyApp> {
               dividerColor: const Color(0xFF343434),
               inputDecorationTheme: InputDecorationTheme(
                 border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(
-                      color: AppColors.kindaGrey,
-                      width: 2,
-                    )),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide(
-                      width: 2,
-                      color: AppColors.cardBg(context),
-                    )),
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 fillColor: AppColors.inputFieldBg,
                 filled: true,
               ),
@@ -239,10 +229,10 @@ class _MyAppState extends State<MyApp> {
               return MediaQuery(
                 data: MediaQuery.of(context).copyWith(
                     textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
-                child: ScrollConfiguration(
-                  behavior:
-                      const AndroidStretchScrollBehavior(), //NOTE - This is a temporary solution till the app migrates to use Material 3
-                  child: SafeArea(child: child!),
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: child!,
                 ),
               );
             },

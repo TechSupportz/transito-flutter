@@ -121,7 +121,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                         margin: const EdgeInsets.only(right: 12),
                         decoration: BoxDecoration(
-                            color: AppColors.accentColour, borderRadius: BorderRadius.circular(5)),
+                            color: AppColors.accentColour, borderRadius: BorderRadius.circular(8)),
                         child: Text(widget.busStopCode, style: const TextStyle(fontSize: 16))),
                     Text(
                       widget.busStopAddress,

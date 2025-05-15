@@ -7,6 +7,7 @@ class AppColors with ChangeNotifier {
   Color primaryColor = const Color(0xFF7E6BFF);
 
   static Color accentColour = const Color(0xFF7E6BFF);
+  static ColorScheme scheme(BuildContext context) => Theme.of(context).colorScheme;
 
   static const Color veryPurple = Color(0xFF7E6BFF);
   static const Color kindaGrey = Color(0xFFD8DBE2);
@@ -22,6 +23,7 @@ class AppColors with ChangeNotifier {
 
   static Color cardBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainer;
   static Color drawerBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerLow;
+  static Color dialogBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerHigh;
   static const Color inputFieldBg = Color(0xff202020);
 
   // function that returns the correct colours for each bus operator

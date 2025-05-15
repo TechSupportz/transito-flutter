@@ -10,7 +10,7 @@ class CheckboxSkeleton extends StatelessWidget {
       leadingStyle: SkeletonAvatarStyle(
         width: 28,
         height: 28,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(4),
       ),
       titleStyle: SkeletonLineStyle(
           height: 20, padding: const EdgeInsets.only(left: 10), randomLength: true),

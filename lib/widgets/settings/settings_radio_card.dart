@@ -57,19 +57,19 @@ class SettingsRadioCard extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
         color: AppColors.cardBg(context),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: 8,
         children: [
           Text(
             title,
             style: titleStyle,
           ),
-          const SizedBox(height: 6),
           FormBuilderRadioGroup(
             name: 'radioGroup',
             controlAffinity: ControlAffinity.trailing,

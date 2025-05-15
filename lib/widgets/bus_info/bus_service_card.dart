@@ -31,12 +31,12 @@ class BusServiceCard extends StatelessWidget {
           );
         },
         customBorder: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Container(
           decoration: BoxDecoration(
-              color: AppColors.cardBg(context), borderRadius: BorderRadius.circular(10)),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              color: AppColors.cardBg(context), borderRadius: BorderRadius.circular(12)),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,7 +57,7 @@ class BusServiceCard extends StatelessWidget {
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
                     color: AppColors.getOperatorColor(busServiceInfo.operator),
-                    borderRadius: BorderRadius.circular(5)),
+                    borderRadius: BorderRadius.circular(8)),
                 child: Text(
                   busServiceInfo.operator.name,
                 ),

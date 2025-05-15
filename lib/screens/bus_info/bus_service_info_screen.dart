@@ -106,7 +106,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                     ),
                     SkeletonLine(
                       style: SkeletonLineStyle(
-                          height: 25, width: 64, borderRadius: BorderRadius.circular(5)),
+                          height: 25, width: 64, borderRadius: BorderRadius.circular(8)),
                     ),
                   ],
                 ),
@@ -116,7 +116,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                   style: SkeletonLineStyle(
                     height: double.maxFinite,
                     width: double.infinity,
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(24),
                   ),
                 ))
               ],
@@ -172,7 +172,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 margin: const EdgeInsets.only(right: 8),
                                 decoration: BoxDecoration(
                                     color: AppColors.getOperatorColor(busService.operator),
-                                    borderRadius: BorderRadius.circular(5)),
+                                    borderRadius: BorderRadius.circular(8)),
                                 child: Text(busService.operator.name,
                                     style: const TextStyle(fontWeight: FontWeight.w500)),
                               ),
@@ -248,7 +248,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                               width: 40,
                                               decoration: BoxDecoration(
                                                 color: AppColors.accentColour,
-                                                borderRadius: BorderRadius.circular(10),
+                                                borderRadius: BorderRadius.circular(12),
                                               ),
                                               child: AnimatedRotation(
                                                 turns: _destinationIndex == 0 ? 0 : -0.5,
@@ -309,7 +309,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
                             color: AppColors.drawerBg(context),
-                            borderRadius: BorderRadius.circular(20),
+                            borderRadius: BorderRadius.circular(24),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -332,7 +332,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                         height: 6,
                                         decoration: BoxDecoration(
                                           color: AppColors.kindaGrey.withOpacity(0.15),
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius: BorderRadius.circular(12),
                                         ),
                                       ),
                                     )),
@@ -408,7 +408,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                         itemBuilder: (context, _) => SkeletonLine(
                                           style: SkeletonLineStyle(
                                             height: 70,
-                                            borderRadius: BorderRadius.circular(10),
+                                            borderRadius: BorderRadius.circular(12),
                                             padding: const EdgeInsets.only(bottom: 12),
                                           ),
                                         ),

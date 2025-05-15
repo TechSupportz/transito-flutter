@@ -236,7 +236,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                 itemBuilder: (context, _) => SkeletonLine(
                   style: SkeletonLineStyle(
                       height: 79,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                       padding: const EdgeInsets.only(bottom: 16)),
                 ),
               ),
@@ -333,7 +333,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
               itemBuilder: (context, _) => SkeletonLine(
                 style: SkeletonLineStyle(
                     height: 79,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(12),
                     padding: const EdgeInsets.only(bottom: 16)),
               ),
             ),

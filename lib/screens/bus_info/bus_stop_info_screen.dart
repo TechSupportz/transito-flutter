@@ -196,213 +196,209 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                 ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
-        child: Stack(
-          children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.only(bottom: 128),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.name,
-                            overflow: TextOverflow.fade,
-                            maxLines: 1,
-                            softWrap: false,
-                            style: const TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w600,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.only(bottom: 160, left: 12, right: 12, top: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.name,
+                          overflow: TextOverflow.fade,
+                          maxLines: 1,
+                          softWrap: false,
+                          style: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              margin: const EdgeInsets.only(right: 8),
+                              decoration: BoxDecoration(
+                                  color: AppColors.accentColour,
+                                  borderRadius: BorderRadius.circular(8)),
+                              child: Text(widget.code,
+                                  style: const TextStyle(fontWeight: FontWeight.w500)),
                             ),
+                            Text(
+                              widget.address,
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: const TextStyle(
+                                  color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Bus Services',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
                           ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-                                margin: const EdgeInsets.only(right: 8),
-                                decoration: BoxDecoration(
-                                    color: AppColors.accentColour,
-                                    borderRadius: BorderRadius.circular(5)),
-                                child: Text(widget.code,
-                                    style: const TextStyle(fontWeight: FontWeight.w500)),
-                              ),
-                              Text(
-                                widget.address,
-                                overflow: TextOverflow.fade,
-                                maxLines: 1,
-                                softWrap: false,
-                                style: const TextStyle(
-                                    color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
-                              )
-                            ],
-                          )
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 21,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Bus Services',
-                            style: TextStyle(
-                              fontSize: 21,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          FutureBuilder(
-                              future: Future.wait([futureCurrOperatingServices, futureServices]),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<List<List<String>>> snapshot) {
-                                if (snapshot.hasData) {
-                                  final currOperatingServices = snapshot.data![0];
-                                  final services = snapshot.data![1];
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        FutureBuilder(
+                            future: Future.wait([futureCurrOperatingServices, futureServices]),
+                            builder:
+                                (BuildContext context, AsyncSnapshot<List<List<String>>> snapshot) {
+                              if (snapshot.hasData) {
+                                final currOperatingServices = snapshot.data![0];
+                                final services = snapshot.data![1];
 
-                                  return Wrap(
-                                    spacing: 8,
-                                    runSpacing: 8,
-                                    children:
-                                        services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
-                                            .map(
-                                              (service) => BusServiceChip(
-                                                busServiceNumber: service,
-                                                currentStopCode: widget.code,
-                                                isOperating:
-                                                    currOperatingServices.contains(service),
-                                              ),
-                                            )
-                                            .toList(),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  // return Text("${snapshot.error}");
-                                  debugPrint("<=== ERROR ${snapshot.error} ===>");
-                                  return const ErrorText();
-                                } else {
-                                  return Center(
-                                    child: SkeletonLine(
-                                      style: SkeletonLineStyle(
-                                        height: 50,
-                                        borderRadius: BorderRadius.circular(7.5),
+                                return Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children:
+                                      services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
+                                          .map(
+                                            (service) => BusServiceChip(
+                                              busServiceNumber: service,
+                                              currentStopCode: widget.code,
+                                              isOperating: currOperatingServices.contains(service),
+                                            ),
+                                          )
+                                          .toList(),
+                                );
+                              } else if (snapshot.hasError) {
+                                // return Text("${snapshot.error}");
+                                debugPrint("<=== ERROR ${snapshot.error} ===>");
+                                return const ErrorText();
+                              } else {
+                                return Center(
+                                  child: SkeletonLine(
+                                    style: SkeletonLineStyle(
+                                      height: 50,
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                );
+                              }
+                            }),
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 16,
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Location',
+                          style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        SizedBox(
+                          width: double.infinity,
+                          height: isTablet ? 800 : 400,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: FlutterMap(
+                              options: MapOptions(
+                                initialCenter: widget.busStopLocation,
+                                minZoom: 11,
+                                initialZoom: 17.5,
+                                maxZoom: 18,
+                                interactionOptions: const InteractionOptions(
+                                  flags: InteractiveFlag.all &
+                                      ~InteractiveFlag.pinchMove &
+                                      ~InteractiveFlag.rotate,
+                                ),
+                                backgroundColor: const Color(0xFF003653),
+                              ),
+                              children: [
+                                TileLayer(
+                                  urlTemplate:
+                                      "https://www.onemap.gov.sg/maps/tiles/Night_HD/{z}/{x}/{y}.png",
+                                  fallbackUrl:
+                                      "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png",
+                                  userAgentPackageName: 'com.tnitish.transito',
+                                  errorImage: const AssetImage('assets/images/mapError.png'),
+                                ),
+                                MarkerLayer(
+                                  markers: [
+                                    Marker(
+                                      point: widget.busStopLocation,
+                                      child: Icon(
+                                        Icons.place_rounded,
+                                        size: 35,
+                                        color: AppColors.accentColour,
                                       ),
                                     ),
-                                  );
-                                }
-                              }),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 21,
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Location',
-                            style: TextStyle(
-                              fontSize: 21,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          const SizedBox(
-                            height: 8,
-                          ),
-                          SizedBox(
-                            width: double.infinity,
-                            height: isTablet ? 800 : 400,
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: FlutterMap(
-                                options: MapOptions(
-                                  initialCenter: widget.busStopLocation,
-                                  minZoom: 11,
-                                  initialZoom: 17.5,
-                                  maxZoom: 18,
-                                  interactionOptions: const InteractionOptions(
-                                    flags: InteractiveFlag.all &
-                                        ~InteractiveFlag.pinchMove &
-                                        ~InteractiveFlag.rotate,
-                                  ),
-                                  backgroundColor: const Color(0xFF003653),
+                                  ],
                                 ),
-                                children: [
-                                  TileLayer(
-                                    urlTemplate:
-                                        "https://www.onemap.gov.sg/maps/tiles/Night_HD/{z}/{x}/{y}.png",
-                                    fallbackUrl:
-                                        "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png",
-                                    userAgentPackageName: 'com.tnitish.transito',
-                                    errorImage: const AssetImage('assets/images/mapError.png'),
-                                  ),
-                                  MarkerLayer(
-                                    markers: [
-                                      Marker(
-                                        point: widget.busStopLocation,
-                                        child: Icon(
-                                          Icons.place_rounded,
-                                          size: 35,
-                                          color: AppColors.accentColour,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
-                          )
-                        ],
-                      ),
-                    ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              padding: const EdgeInsets.only(bottom: 16, top: 16),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    Theme.of(context).colorScheme.surface,
+                    Colors.transparent,
+                  ],
+                  stops: [0.9, 1.0],
+                ),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                spacing: 8,
+                children: [
+                  FilledButton(
+                    onPressed: () => goToBusTimingScreen(),
+                    child: const Text('View Bus Timings'),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => openMaps(widget.busStopLocation),
+                    child: const Text("Take me there!"),
                   ),
                 ],
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                padding: const EdgeInsets.only(bottom: 16, top: 16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                    colors: [
-                      Theme.of(context).colorScheme.surface,
-                      Colors.transparent,
-                    ],
-                    stops: [0.9, 1.0],
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 8,
-                  children: [
-                    FilledButton(
-                      onPressed: () => goToBusTimingScreen(),
-                      child: const Text('View Bus Timings'),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => openMaps(widget.busStopLocation),
-                      child: const Text("Take me there!"),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

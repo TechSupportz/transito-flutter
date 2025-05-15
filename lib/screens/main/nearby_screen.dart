@@ -253,7 +253,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                       return Material(
                         color: AppColors.cardBg(context),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -342,10 +342,10 @@ class _NearbyScreenState extends State<NearbyScreen>
                 GridView renderGridView(List<Widget> children) {
                   return GridView.count(
                     childAspectRatio: userSettings.isNearbyGrid
-                        ? 2.5 / (isTablet ? 0.6 : 1)
+                        ? 2.35 / (isTablet ? 0.6 : 1)
                         : 5 / (isTablet ? 0.6 : 1),
                     crossAxisSpacing: 16,
-                    mainAxisSpacing: userSettings.isNearbyGrid ? 21 : 16,
+                    mainAxisSpacing: userSettings.isNearbyGrid ? 18 : 16,
                     crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -383,7 +383,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
                                   color: AppColors.cardBg(context),
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Center(
                                   child: Text("No bus stops nearby",
@@ -411,7 +411,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                               SkeletonLine(
                                 style: SkeletonLineStyle(
                                   height: 120,
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
                           ],
@@ -466,7 +466,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         color: AppColors.cardBg(context),
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Center(
                         child: Text(
@@ -507,7 +507,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                 return Skeleton(
                   isLoading: snapshot.connectionState == ConnectionState.waiting,
                   skeleton: SkeletonLine(
-                    style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(10)),
+                    style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(12)),
                   ),
                   child: _favouritesListWidget,
                 );

@@ -36,13 +36,13 @@ class BusServiceChip extends StatelessWidget {
       opacity: isOperating ? 1 : 0.5,
       child: InkWell(
         onTap: () => goToBusServiceInfoScreen(context),
-        borderRadius: BorderRadius.circular(7.5),
-        splashColor: AppColors.accentColour.withOpacity(0.75),
+        borderRadius: BorderRadius.circular(12),
+        splashColor: AppColors.accentColour.withAlpha(200),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
           decoration: BoxDecoration(
-            border: Border.all(color: AppColors.accentColour, width: 1.5),
-            borderRadius: BorderRadius.circular(7.5),
+            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5),
+            borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             busServiceNumber,

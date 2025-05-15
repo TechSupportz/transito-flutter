@@ -38,12 +38,12 @@ class BusRoutesList extends StatelessWidget {
                   child: Container(
                     decoration: BoxDecoration(
                       color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     clipBehavior: Clip.antiAlias,
                     child: SmoothHighlight(
                       useInitialHighLight: true,
-                      color: AppColors.accentColour.withOpacity(0.2),
+                      color: AppColors.accentColour.withAlpha(50),
                       child: Container(
                         height: 70.0,
                       ),

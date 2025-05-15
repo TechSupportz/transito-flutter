@@ -234,7 +234,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     labelText: 'Name',
                     suffixIcon: Container(
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(12),
                         color: AppColors.accentColour,
                       ),
                       child: AnimatedSwitcher(
@@ -393,12 +393,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         children: [
                           Container(
                             width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             decoration: BoxDecoration(
                               color: AppColors.cardBg(context),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
+                              spacing: 8,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
@@ -408,7 +409,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                const SizedBox(height: 6),
                                 FormBuilderColorPickerField(
                                   key: _accentColourFieldKey,
                                   name: "Accent Colour",
@@ -429,7 +429,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     }
                                   ]),
                                 ),
-                                const SizedBox(height: 6),
                                 Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
@@ -480,7 +479,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return Container(
                           decoration: BoxDecoration(
                             color: AppColors.cardBg(context),
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Padding(
                             padding: EdgeInsets.all(8.0),
@@ -528,7 +527,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           onTap: () => showAboutDialog(
                               context: context,
                               applicationIcon: ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(12),
                                 child: Image.asset(
                                   "assets/icons/Icon-1024x1024.png",
                                   width: 64,
@@ -558,7 +557,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           child: SkeletonLine(
                         style: SkeletonLineStyle(
                           height: 45,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                       ));
                     })
