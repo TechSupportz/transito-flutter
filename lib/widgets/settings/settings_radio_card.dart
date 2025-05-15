@@ -59,7 +59,7 @@ class SettingsRadioCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
-        color: AppColors.cardBg(context),
+        color: AppColors.cardBg,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -72,9 +72,20 @@ class SettingsRadioCard extends StatelessWidget {
           ),
           FormBuilderRadioGroup(
             name: 'radioGroup',
-            controlAffinity: ControlAffinity.trailing,
+            controlAffinity: ControlAffinity.leading,
             orientation: OptionsOrientation.vertical,
             activeColor: AppColors.accentColour,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(12),
+                ),
+                borderSide: BorderSide.none,
+              ),
+              contentPadding: EdgeInsets.symmetric(vertical: 8),
+              fillColor: AppColors.scheme.surfaceContainerHigh,
+            ),
             initialValue: initialValue,
             onChanged: (value) => updateSettings(value as bool),
             options: options

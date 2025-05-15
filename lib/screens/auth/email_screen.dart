@@ -220,7 +220,7 @@ class _EmailScreenState extends State<EmailScreen> {
                             child: SvgPicture.asset('assets/images/logo.svg', height: 200),
                           ),
                           const SizedBox(height: 20),
-                          const Text(
+                          Text(
                             'The last bus timing app you\'ll ever need.',
                             textAlign: TextAlign.center,
                             style: TextStyle(
@@ -257,7 +257,7 @@ class _EmailScreenState extends State<EmailScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: _isLogin
                                 ? [
-                                    const Text(
+                                    Text(
                                       'New Here?',
                                       style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
                                     ),
@@ -268,7 +268,7 @@ class _EmailScreenState extends State<EmailScreen> {
                                     ),
                                   ]
                                 : [
-                                    const Text(
+                                    Text(
                                       'Already have an account?',
                                       style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
                                     ),
@@ -465,7 +465,7 @@ class _EmailScreenState extends State<EmailScreen> {
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
+          Text(
               'Please enter your email address and we will send you a link to reset your password.',
               style: TextStyle(
                 fontSize: 16,

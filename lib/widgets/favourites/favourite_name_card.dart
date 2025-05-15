@@ -17,7 +17,7 @@ class FavouriteNameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.cardBg(context),
+      color: AppColors.cardBg,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -33,7 +33,7 @@ class FavouriteNameCard extends StatelessWidget {
                 overflow: TextOverflow.fade,
                 maxLines: 1,
                 softWrap: false,
-                style: const TextStyle(
+                style: TextStyle(
                     fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
               ),
             ),

@@ -119,7 +119,7 @@ class BusStopCard extends StatelessWidget {
           ),
           child: Ink(
             decoration:
-                BoxDecoration(color: AppColors.cardBg(context), borderRadius: BorderRadius.circular(12)),
+                BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
@@ -157,7 +157,7 @@ class BusStopCard extends StatelessWidget {
                               overflow: TextOverflow.fade,
                               maxLines: 1,
                               softWrap: false,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
                             ),
                           ),
@@ -192,7 +192,7 @@ class BusStopCard extends StatelessWidget {
             ? 2
             : 0;
 
-    const TextStyle titleStyle = TextStyle(
+    TextStyle titleStyle = TextStyle(
       fontWeight: FontWeight.w400,
       color: AppColors.kindaGrey,
       fontFamily: 'Poppins',
@@ -258,13 +258,13 @@ class BusStopCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(
+                      const Icon(
                         Icons.light_mode_rounded,
                         size: 24,
                       ),
-                      SizedBox(width: 6.0),
+                      const SizedBox(width: 6.0),
                       Text(
                         "First Bus",
                         style: titleStyle,
@@ -306,10 +306,10 @@ class BusStopCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Row(
+                  Row(
                     children: [
-                      Icon(Icons.nights_stay_rounded, size: 24),
-                      SizedBox(width: 6.0),
+                      const Icon(Icons.nights_stay_rounded, size: 24),
+                      const SizedBox(width: 6.0),
                       Text(
                         "Last Bus",
                         style: titleStyle,
@@ -342,7 +342,7 @@ class BusStopCard extends StatelessWidget {
                     )
                   else
                     const Text(
-                     "never o'clock",
+                      "never o'clock",
                       style: timeStyle,
                     ),
                 ],

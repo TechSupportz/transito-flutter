@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
 
 class AppColors with ChangeNotifier {
-  Color primaryColor = const Color(0xFF7E6BFF);
-
   static Color accentColour = const Color(0xFF7E6BFF);
-  static ColorScheme scheme(BuildContext context) => Theme.of(context).colorScheme;
+  static ColorScheme scheme = ColorScheme.fromSeed(
+    seedColor: accentColour,
+    brightness: Brightness.dark,
+  );
 
   static const Color veryPurple = Color(0xFF7E6BFF);
-  static const Color kindaGrey = Color(0xFFD8DBE2);
+  static Color kindaGrey = scheme.onSurface.withAlpha(220);
 
   static const Color prettyGreen = Color(0xFF5BDB7A);
   static const Color notReallyYellow = Color(0xFFF7A74D);
@@ -21,10 +22,9 @@ class AppColors with ChangeNotifier {
   static const Color TTS = Color(0xFF389643);
   static const Color GAS = Color(0xFFF4BD00);
 
-  static Color cardBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainer;
-  static Color drawerBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerLow;
-  static Color dialogBg(BuildContext context) => Theme.of(context).colorScheme.surfaceContainerHigh;
-  static const Color inputFieldBg = Color(0xff202020);
+  static Color cardBg = scheme.surfaceContainer;
+  static Color drawerBg = scheme.surfaceContainerLow;
+  static Color inputFieldBg = scheme.surfaceContainerHigh;
 
   // function that returns the correct colours for each bus operator
   static Color getOperatorColor(BusOperator operator) {

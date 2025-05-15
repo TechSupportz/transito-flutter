@@ -97,8 +97,8 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
         padding: const EdgeInsets.only(top: 12.0),
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -106,12 +106,12 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                     "Drag and drop to reorder your favourites",
                     style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     "Click the pencil icon to modify or delete your favourites",
                     style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                   ),
-                  SizedBox(height: 18),
+                  const SizedBox(height: 18),
                 ],
               ),
             ),

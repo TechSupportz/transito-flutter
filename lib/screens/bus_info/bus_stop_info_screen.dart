@@ -238,7 +238,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               overflow: TextOverflow.fade,
                               maxLines: 1,
                               softWrap: false,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
                             )
                           ],

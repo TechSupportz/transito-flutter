@@ -308,7 +308,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                         return Container(
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
-                            color: AppColors.drawerBg(context),
+                            color: AppColors.drawerBg,
                             borderRadius: BorderRadius.circular(24),
                           ),
                           padding: const EdgeInsets.symmetric(

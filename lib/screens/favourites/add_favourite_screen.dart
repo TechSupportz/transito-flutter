@@ -125,7 +125,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                         child: Text(widget.busStopCode, style: const TextStyle(fontSize: 16))),
                     Text(
                       widget.busStopAddress,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontSize: 16, color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
                     ),
                   ],
@@ -133,7 +133,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                 const SizedBox(
                   height: 16,
                 ),
-                const Text(
+                Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
                   style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
                 ),

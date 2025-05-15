@@ -119,18 +119,15 @@ class _MyAppState extends State<MyApp> {
               // useMaterial3: false,
               fontFamily: 'Poppins',
               canvasColor: Colors.transparent,
-              // scaffoldBackgroundColor: const Color(0xFF0C0C0C),
-              // cardColor: const Color(0xFF0C0C0C),
-              colorScheme: ColorScheme.fromSeed(
-                  seedColor: AppColors.accentColour, brightness: Brightness.dark),
+              colorScheme: AppColors.scheme,
               splashFactory: InkSparkle.splashFactory,
               tooltipTheme: TooltipThemeData(
-                textStyle: const TextStyle(
-                  color: AppColors.kindaGrey,
+                textStyle: TextStyle(
+                  color: AppColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.scheme(context).inverseSurface,
+                  color: AppColors.scheme.surfaceContainerHighest.withAlpha(130),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -138,89 +135,51 @@ class _MyAppState extends State<MyApp> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
-                fillColor: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return AppColors.scheme(context).primary;
-                    }
-                    return AppColors.scheme(context).onSurface;
-                  },
-                ),
-                checkColor: WidgetStateProperty.resolveWith<Color>(
-                  (Set<WidgetState> states) {
-                    if (states.contains(WidgetState.selected)) {
-                      return AppColors.scheme(context).onPrimary;
-                    }
-                    return AppColors.scheme(context).onSurface;
-                  },
-                ),
-                side: const BorderSide(
-                  color: AppColors.kindaGrey,
-                  width: 1.75,
-                ),
               ),
-              // elevatedButtonTheme: ElevatedButtonThemeData(
-              //   style: ElevatedButton.styleFrom(
-              //       shape: RoundedRectangleBorder(
-              //         borderRadius: BorderRadius.circular(7.5),
-              //       ),
-              //       minimumSize: const Size(15, 42)),
-              // ),
-              // outlinedButtonTheme: OutlinedButtonThemeData(
-              //   style: OutlinedButton.styleFrom(
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(7.5),
-              //     ),
-              //     side: BorderSide(color: AppColors.accentColour),
-              //     minimumSize: const Size(15, 42),
-              //   ),
-              // ),
-              // textButtonTheme: TextButtonThemeData(
-              //   style: TextButton.styleFrom(
-              //     shape: RoundedRectangleBorder(
-              //       borderRadius: BorderRadius.circular(7.5),
-              //     ),
-              //   ),
-              // ),
               dialogTheme: DialogTheme(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
               ),
-              tabBarTheme: TabBarTheme(
+              tabBarTheme: TabBarTheme( //TODO
                 labelColor: AppColors.accentColour,
                 unselectedLabelColor: AppColors.kindaGrey,
               ),
-              snackBarTheme: SnackBarThemeData(
+              snackBarTheme: SnackBarThemeData( //TODO
                 backgroundColor: const Color(0xFF262626),
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                contentTextStyle: const TextStyle(
+                contentTextStyle: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
                   color: AppColors.kindaGrey,
                 ),
                 actionTextColor: AppColors.accentColour,
               ),
-              dividerColor: const Color(0xFF343434),
+              dividerColor: const Color(0xFF343434), //TODO
               inputDecorationTheme: InputDecorationTheme(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(
+                    width: 1.75,
+                  ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
                 ),
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                floatingLabelStyle: TextStyle(
+                  fontWeight: FontWeight.w600,
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 fillColor: AppColors.inputFieldBg,
                 filled: true,
               ),
-              iconTheme: isTablet
-                  ? const IconThemeData(size: 30, color: AppColors.kindaGrey)
-                  : const IconThemeData(
-                      size: 24,
+              iconTheme: isTablet //TODO
+                  ? IconThemeData(size: 30, color: AppColors.kindaGrey)
+                  : IconThemeData(
                       color: AppColors.kindaGrey,
                     ),
             ),

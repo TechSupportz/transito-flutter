@@ -220,7 +220,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   "About you",
                   style: titleStyle,
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 16),
                 FormBuilderTextField(
                   key: _nameFieldKey,
                   name: 'name',
@@ -245,8 +245,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           duration: const Duration(milliseconds: 175),
                           child: _isNameFieldLoading
                               ? const SizedBox(
-                                  height: 16,
-                                  width: 16,
+                                  // height: 16,
+                                  // width: 16,
                                   child: Center(
                                     child: CircularProgressIndicator(
                                         strokeWidth: 2, color: Colors.white),
@@ -395,7 +395,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             decoration: BoxDecoration(
-                              color: AppColors.cardBg(context),
+                              color: AppColors.cardBg,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -412,6 +412,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 FormBuilderColorPickerField(
                                   key: _accentColourFieldKey,
                                   name: "Accent Colour",
+                                  colorPickerType: ColorPickerType.colorPicker,
+                                  colorPreviewBuilder: (p0) => Padding(
+                                    padding: const EdgeInsets.all(6.0),
+                                    child: Container(
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        color: p0,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                  ),
                                   initialValue: Color(int.parse(snapshot.data!.accentColour)),
                                   autovalidateMode: AutovalidateMode.onUserInteraction,
                                   keyboardType: TextInputType.none,
@@ -478,7 +489,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     } else if (snapshot.hasError) {
                       return Container(
                           decoration: BoxDecoration(
-                            color: AppColors.cardBg(context),
+                            color: AppColors.cardBg,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Padding(

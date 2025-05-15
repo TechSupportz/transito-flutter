@@ -117,7 +117,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 ),
                 Text(
                   '~ ${calculateDistanceAway()} away',
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
                 ),
               ],
@@ -198,7 +198,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
                 child: widget.accessible
-                    ? const Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
+                    ? Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
                     : const SizedBox(width: 16, height: 16),
               ),
               Column(

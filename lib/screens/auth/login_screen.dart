@@ -166,7 +166,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               child: SvgPicture.asset('assets/images/logo.svg', height: 200),
                             ),
                             const SizedBox(height: 20),
-                            const Text(
+                            Text(
                               'The last bus timing app you\'ll ever need.',
                               textAlign: TextAlign.center,
                               style: TextStyle(
@@ -237,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 FilledButton.tonalIcon(
                                   onPressed: () => onEmailBtnPress(),
-                                  icon: const Icon(Icons.email_rounded, color: AppColors.kindaGrey),
+                                  icon: Icon(Icons.email_rounded, color: AppColors.kindaGrey),
                                   label: const Text(
                                     'Continue with Email',
                                     style: TextStyle(color: Colors.white),
@@ -250,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 OutlinedButton.icon(
                                   onPressed: () => showGuestLoginDialog(),
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.person_rounded,
                                     color: AppColors.kindaGrey,
                                   ),

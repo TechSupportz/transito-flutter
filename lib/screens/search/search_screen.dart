@@ -172,7 +172,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             BusStopSearchApiResponse res = snapshot.data!;
 
             if (res.count == 0 && _textFieldController.text.isEmpty) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -185,7 +185,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       "You can search by the bus stop code, \n name or road name",
                       style: TextStyle(
@@ -201,7 +201,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
             }
 
             if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-              return const Center(
+              return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -214,7 +214,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    SizedBox(height: 8),
+                    const SizedBox(height: 8),
                     Text(
                       "Try checking search for typos or use a different search term",
                       style: TextStyle(
@@ -269,7 +269,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           BusServiceSearchApiResponse res = snapshot.data!;
 
           if (res.count == 0 && _textFieldController.text.isEmpty) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -282,7 +282,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     "Just enter in the bus service number",
                     style: TextStyle(
@@ -298,7 +298,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           }
 
           if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-            return const Center(
+            return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -311,7 +311,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Text(
                     "Are you sure you typed the correct bus service number?",
                     style: TextStyle(

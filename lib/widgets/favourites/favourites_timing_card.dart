@@ -102,7 +102,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Tooltip(
               preferBelow: false,
               decoration: BoxDecoration(
-                color: AppColors.cardBg(context),
+                color: AppColors.cardBg,
               ),
               textStyle: const TextStyle(
                 fontSize: 18,
@@ -124,7 +124,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardBg(context),
+                    color: AppColors.cardBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -138,7 +138,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                           overflow: TextOverflow.fade,
                           maxLines: 1,
                           softWrap: false,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w600,
                               color: AppColors.kindaGrey),
@@ -196,7 +196,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.cardBg(context),
+                                  color: AppColors.cardBg,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Padding(
@@ -238,7 +238,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.cardBg(context),
+                color: AppColors.cardBg,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const ErrorText(),
