@@ -222,7 +222,6 @@ class BusStopCard extends StatelessWidget {
                     selectedDay = 0;
                   });
                 },
-                selectedColor: AppColors.accentColour.withOpacity(0.5),
               ),
               ChoiceChip(
                 label: const Text("Saturday"),
@@ -232,7 +231,6 @@ class BusStopCard extends StatelessWidget {
                     selectedDay = 1;
                   });
                 },
-                selectedColor: AppColors.accentColour.withOpacity(0.5),
               ),
               ChoiceChip(
                 label: const Text("Sunday"),
@@ -242,7 +240,6 @@ class BusStopCard extends StatelessWidget {
                     selectedDay = 2;
                   });
                 },
-                selectedColor: AppColors.accentColour.withOpacity(0.5),
               ),
             ]),
           ],
