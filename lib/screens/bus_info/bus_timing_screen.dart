@@ -273,9 +273,14 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
         ),
         actions: [
           IconButton(
-            icon: sortByArrivalTime
-                ? SvgPicture.asset('assets/icons/ui/sort_by_number.svg')
-                : SvgPicture.asset('assets/icons/ui/sort_by_time.svg'),
+            icon: Row(
+              children: [
+                const Icon(Icons.arrow_downward_rounded),
+                sortByArrivalTime
+                    ? const Icon(Icons.onetwothree_rounded, size: 32,)
+                    : const Icon(Icons.access_time_rounded),
+              ],
+            ),
             onPressed: () {
               setState(() {
                 sortByArrivalTime = !sortByArrivalTime;
