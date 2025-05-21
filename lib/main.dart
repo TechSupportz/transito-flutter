@@ -116,9 +116,8 @@ class _MyAppState extends State<MyApp> {
             ],
             navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
             theme: ThemeData(
-              // useMaterial3: false,
+              // useMaterial3: false,Sn
               fontFamily: 'Poppins',
-              canvasColor: Colors.transparent,
               colorScheme: AppColors.scheme,
               splashFactory: InkSparkle.splashFactory,
               tooltipTheme: TooltipThemeData(
@@ -141,12 +140,9 @@ class _MyAppState extends State<MyApp> {
                   borderRadius: BorderRadius.circular(28),
                 ),
               ),
-              tabBarTheme: TabBarTheme( //TODO
-                labelColor: AppColors.accentColour,
-                unselectedLabelColor: AppColors.kindaGrey,
-              ),
-              snackBarTheme: SnackBarThemeData( //TODO
-                backgroundColor: const Color(0xFF262626),
+              snackBarTheme: SnackBarThemeData(
+                //FIXME - Animation is non-existant
+                backgroundColor: AppColors.scheme.surfaceContainerHighest,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -154,11 +150,8 @@ class _MyAppState extends State<MyApp> {
                 contentTextStyle: TextStyle(
                   fontFamily: 'Poppins',
                   fontWeight: FontWeight.w500,
-                  color: AppColors.kindaGrey,
                 ),
-                actionTextColor: AppColors.accentColour,
               ),
-              dividerColor: const Color(0xFF343434), //TODO
               inputDecorationTheme: InputDecorationTheme(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -177,11 +170,6 @@ class _MyAppState extends State<MyApp> {
                 fillColor: AppColors.inputFieldBg,
                 filled: true,
               ),
-              iconTheme: isTablet //TODO
-                  ? IconThemeData(size: 30, color: AppColors.kindaGrey)
-                  : IconThemeData(
-                      color: AppColors.kindaGrey,
-                    ),
             ),
             home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
             builder: (context, child) {
