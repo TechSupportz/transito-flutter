@@ -139,6 +139,11 @@ class _MyAppState extends State<MyApp> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
+                titleTextStyle: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 24,
+                ),
               ),
               snackBarTheme: SnackBarThemeData(
                 //FIXME - Animation is non-existant

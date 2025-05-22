@@ -15,23 +15,22 @@ class NavigatorScreen extends StatefulWidget {
 }
 
 class _NavigatorScreenState extends State<NavigatorScreen> {
+  late final PageController controller;
   int _pageIndex = 0;
-  final controller = PageController(
-    initialPage: 0,
-    keepPage: true,
-  );
-
-  // Screens to be displayed by the bottom navigation bar
-  List<StatefulWidget> widgetList = const [
+  final List<Widget> _pages = const [
     NearbyScreen(),
     FavouritesScreen(),
     RecentSearchScreen(),
   ];
 
   @override
-  Widget build(BuildContext context) {
-    bool isTablet = context.read<CommonProvider>().isTablet; //REVIEW - Check if this is still needed
+  void initState() {
+    super.initState();
+    controller = PageController(initialPage: _pageIndex, keepPage: true);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: UpgradeAlert(
         upgrader: Upgrader(
@@ -44,7 +43,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           onPageChanged: (index) {
             setState(() => _pageIndex = index);
           },
-          children: widgetList,
+          children: _pages,
         ),
       ),
       bottomNavigationBar: NavigationBar(
@@ -53,7 +52,6 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           NavigationDestination(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
           NavigationDestination(icon: Icon(Icons.search_rounded), label: "Search"),
         ],
-        
         selectedIndex: _pageIndex,
         height: 72,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
@@ -62,7 +60,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           setState(() {
             _pageIndex = index;
             controller.animateToPage(index,
-                duration: const Duration(milliseconds: 300), curve: Curves.ease);
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutCubicEmphasized);
           });
         },
       ),
