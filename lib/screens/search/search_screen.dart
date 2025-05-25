@@ -149,7 +149,6 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
         bottom: TabBar(
           controller: _tabController,
           tabs: searchTabs,
-          indicatorColor: AppColors.accentColour,
         ),
       ),
       body: TabBarView(

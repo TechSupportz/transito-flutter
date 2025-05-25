@@ -118,8 +118,8 @@ class BusStopCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: Ink(
-            decoration:
-                BoxDecoration(color: AppColors.cardBg, borderRadius: BorderRadius.circular(12)),
+            decoration: BoxDecoration(
+                color: AppColors.scheme.surfaceContainer, borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
@@ -145,9 +145,13 @@ class BusStopCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                                color: AppColors.accentColour,
+                                color: AppColors.scheme.primary,
                                 borderRadius: BorderRadius.circular(8)),
-                            child: Text(busStopInfo.code),
+                            child: Text(
+                              busStopInfo.code,
+                              style: TextStyle(
+                                  color: AppColors.scheme.onPrimary, fontWeight: FontWeight.w500),
+                            ),
                           ),
                           Expanded(
                             child: Text(

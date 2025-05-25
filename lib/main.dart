@@ -172,7 +172,6 @@ class _MyAppState extends State<MyApp> {
                   fontWeight: FontWeight.w600,
                 ),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                fillColor: AppColors.inputFieldBg,
                 filled: true,
               ),
             ),

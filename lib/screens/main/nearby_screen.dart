@@ -251,7 +251,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                     } else {
                       // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
                       return Material(
-                        color: AppColors.cardBg,
+                        color: AppColors.scheme.surfaceContainer,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -328,7 +328,7 @@ class _NearbyScreenState extends State<NearbyScreen>
       children: [
         const Text(
           "Nearby",
-          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         const SizedBox(
           height: 12,
@@ -382,7 +382,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.cardBg,
+                                  color: AppColors.scheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: const Center(
@@ -443,7 +443,7 @@ class _NearbyScreenState extends State<NearbyScreen>
       children: [
         const Text(
           "Nearby Favourites",
-          style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
         ),
         const SizedBox(
           height: 12,
@@ -465,7 +465,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                       width: double.infinity,
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: AppColors.cardBg,
+                        color: AppColors.scheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Center(

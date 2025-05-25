@@ -10,6 +10,15 @@ class AppColors with ChangeNotifier {
     brightness: Brightness.dark,
   );
 
+  void updateLocalAccentColour(Color newColor) {
+    accentColour = newColor;
+    scheme = ColorScheme.fromSeed(
+      seedColor: accentColour,
+      brightness: Brightness.dark,
+    );
+    notifyListeners();
+  }
+
   static const Color veryPurple = Color(0xFF7E6BFF);
   static Color kindaGrey = scheme.onSurface.withAlpha(220);
 
@@ -21,10 +30,6 @@ class AppColors with ChangeNotifier {
   static const Color SMRT = Color(0xFFDC1C27);
   static const Color TTS = Color(0xFF389643);
   static const Color GAS = Color(0xFFF4BD00);
-
-  static Color cardBg = scheme.surfaceContainer;
-  static Color drawerBg = scheme.surfaceContainerLow;
-  static Color inputFieldBg = scheme.surfaceContainerHigh;
 
   // function that returns the correct colours for each bus operator
   static Color getOperatorColor(BusOperator operator) {
@@ -38,7 +43,7 @@ class AppColors with ChangeNotifier {
       case BusOperator.GAS:
         return AppColors.GAS;
       default:
-        return AppColors.accentColour;
+        return AppColors.scheme.primary;
     }
   }
 }

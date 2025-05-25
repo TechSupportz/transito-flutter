@@ -210,11 +210,15 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 Row(
                   children: [
                     Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                        margin: const EdgeInsets.only(right: 12),
-                        decoration: BoxDecoration(
-                            color: AppColors.accentColour, borderRadius: BorderRadius.circular(8)),
-                        child: Text(widget.busStopCode, style: const TextStyle(fontSize: 16))),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                      margin: const EdgeInsets.only(right: 12),
+                      decoration: BoxDecoration(
+                          color: AppColors.scheme.primary, borderRadius: BorderRadius.circular(8)),
+                      child: Text(
+                        widget.busStopCode,
+                        style: TextStyle(fontSize: 16, color: AppColors.scheme.onPrimary),
+                      ),
+                    ),
                     Text(
                       widget.busStopAddress,
                       style: TextStyle(
@@ -287,8 +291,6 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                               parent: const Text("Bus Services", style: checkBoxFontStyle),
                               // initialParentValue: {'Bus Services': true},
                               initialChildrenValue: initialChildrenValue,
-                              parentCheckboxColor: AppColors.accentColour,
-                              childrenCheckboxColor: AppColors.accentColour,
                               parentCheckboxScale: 1.35,
                               childrenCheckboxScale: 1.35,
                               gap: 2,

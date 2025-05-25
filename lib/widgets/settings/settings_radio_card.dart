@@ -59,7 +59,7 @@ class SettingsRadioCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
-        color: AppColors.cardBg,
+        color: AppColors.scheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -74,7 +74,7 @@ class SettingsRadioCard extends StatelessWidget {
             name: 'radioGroup',
             controlAffinity: ControlAffinity.leading,
             orientation: OptionsOrientation.vertical,
-            activeColor: AppColors.accentColour,
+            activeColor: AppColors.scheme.primary,
             decoration: InputDecoration(
               border: InputBorder.none,
               enabledBorder: OutlineInputBorder(

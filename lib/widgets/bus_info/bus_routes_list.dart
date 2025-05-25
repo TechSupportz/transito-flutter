@@ -19,7 +19,7 @@ class BusRoutesList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.drawerBg,
+      color: AppColors.scheme.surfaceContainerLow,
       child: ListView.separated(
           shrinkWrap: true,
           controller: controller,
@@ -43,9 +43,9 @@ class BusRoutesList extends StatelessWidget {
                     clipBehavior: Clip.antiAlias,
                     child: SmoothHighlight(
                       useInitialHighLight: true,
-                      color: AppColors.accentColour.withAlpha(50),
+                      color: AppColors.scheme.primary.withAlpha(50),
                       child: Container(
-                        height: 70.0,
+                        height: 76.0,
                       ),
                     ),
                   ),

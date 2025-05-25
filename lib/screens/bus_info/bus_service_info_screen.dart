@@ -247,7 +247,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                               height: 40,
                                               width: 40,
                                               decoration: BoxDecoration(
-                                                color: AppColors.accentColour,
+                                                color: AppColors.scheme.primary,
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
                                               child: AnimatedRotation(
@@ -258,9 +258,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                                   iconSize: 30,
                                                   splashRadius: 20,
                                                   enableFeedback: true,
-                                                  icon: const Icon(
+                                                  icon: Icon(
                                                     Icons.swap_vert_rounded,
-                                                    color: Colors.white,
+                                                    color: AppColors.scheme.onPrimary,
                                                   ),
                                                   onPressed: () {
                                                     setState(
@@ -308,7 +308,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                         return Container(
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
-                            color: AppColors.drawerBg,
+                            color: AppColors.scheme.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(24),
                           ),
                           padding: const EdgeInsets.symmetric(

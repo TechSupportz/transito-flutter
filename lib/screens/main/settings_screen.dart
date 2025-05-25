@@ -235,7 +235,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     suffixIcon: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: AppColors.accentColour,
+                        color: AppColors.scheme.primary,
                       ),
                       child: AnimatedSwitcher(
                           transitionBuilder: (child, animation) => ScaleTransition(
@@ -244,12 +244,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                           duration: const Duration(milliseconds: 175),
                           child: _isNameFieldLoading
-                              ? const SizedBox(
+                              ? SizedBox(
                                   // height: 16,
                                   // width: 16,
                                   child: Center(
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2, color: Colors.white),
+                                      strokeWidth: 2,
+                                      color: AppColors.scheme.onPrimary,
+                                    ),
                                   ),
                                 )
                               : IconButton(
@@ -258,10 +260,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     HapticFeedback.mediumImpact();
                                     updateDisplayName(user);
                                   },
-                                  icon: const Icon(
+                                  icon: Icon(
                                     Icons.check_rounded,
                                     size: 21,
-                                    color: Colors.white,
+                                    color: AppColors.scheme.onPrimary,
                                   ),
                                 )),
                     ),
@@ -279,7 +281,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 onPressed: () => showResetPasswordDialog(user.email),
                                 child: Text(
                                   'Reset password',
-                                  style: TextStyle(fontSize: 14, color: AppColors.accentColour),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
@@ -395,7 +396,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             decoration: BoxDecoration(
-                              color: AppColors.cardBg,
+                              color: AppColors.scheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -489,7 +490,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     } else if (snapshot.hasError) {
                       return Container(
                           decoration: BoxDecoration(
-                            color: AppColors.cardBg,
+                            color: AppColors.scheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Padding(

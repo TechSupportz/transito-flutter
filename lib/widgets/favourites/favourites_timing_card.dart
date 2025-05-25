@@ -102,7 +102,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Tooltip(
               preferBelow: false,
               decoration: BoxDecoration(
-                color: AppColors.cardBg,
+                color: AppColors.scheme.surfaceContainer,
               ),
               textStyle: const TextStyle(
                 fontSize: 18,
@@ -124,7 +124,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.cardBg,
+                    color: AppColors.scheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -196,7 +196,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.cardBg,
+                                  color: AppColors.scheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Padding(
@@ -238,7 +238,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.cardBg,
+                color: AppColors.scheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const ErrorText(),

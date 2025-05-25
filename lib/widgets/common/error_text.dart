@@ -38,7 +38,7 @@ class ErrorText extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: AppColors.cardBg,
+            color: AppColors.scheme.surfaceContainer,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Center(

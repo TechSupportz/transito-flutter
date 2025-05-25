@@ -11,7 +11,7 @@ class SettingsService {
       return _settingsCollection.doc(userId).snapshots().map((snapshot) {
         if (snapshot.exists) {
           UserSettings userSettings = UserSettings.fromFirestore(snapshot);
-          AppColors.accentColour = Color(int.parse(userSettings.accentColour));
+          AppColors().updateLocalAccentColour(Color(int.parse(userSettings.accentColour)));
 
           if (userSettings.showNearbyDistance == null) {
             updateShowNearbyDistance(newValue: true, userId: userId);

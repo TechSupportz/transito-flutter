@@ -228,10 +228,13 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                  color: AppColors.accentColour,
+                                  color: AppColors.scheme.primary,
                                   borderRadius: BorderRadius.circular(8)),
-                              child: Text(widget.code,
-                                  style: const TextStyle(fontWeight: FontWeight.w500)),
+                              child: Text(
+                                widget.code,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w500, color: AppColors.scheme.onPrimary),
+                              ),
                             ),
                             Text(
                               widget.address,
@@ -350,7 +353,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                       child: Icon(
                                         Icons.place_rounded,
                                         size: 35,
-                                        color: AppColors.accentColour,
+                                        color: AppColors.scheme.primary,
                                       ),
                                     ),
                                   ],
