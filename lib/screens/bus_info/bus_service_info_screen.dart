@@ -171,10 +171,14 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                                 margin: const EdgeInsets.only(right: 8),
                                 decoration: BoxDecoration(
-                                    color: AppColors.getOperatorColor(busService.operator),
+                                    color: AppColors.getOperatorColor(busService.operator).$1,
                                     borderRadius: BorderRadius.circular(8)),
-                                child: Text(busService.operator.name,
-                                    style: const TextStyle(fontWeight: FontWeight.w500)),
+                                child: Text(
+                                  busService.operator.name,
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: AppColors.getOperatorColor(busService.operator).$2),
+                                ),
                               ),
                             ],
                           ),

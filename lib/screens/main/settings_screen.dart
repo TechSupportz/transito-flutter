@@ -371,8 +371,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ],
                                 )),
                         style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(AppColors.sortaRed)),
-                        child: const Text("Delete account"),
+                            backgroundColor: WidgetStateProperty.all(AppColors.scheme.error)),
+                        child: Text(
+                          "Delete account",
+                          style: TextStyle(color: AppColors.scheme.onError),
+                        ),
                       )
                     ])),
               ],

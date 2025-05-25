@@ -56,10 +56,14 @@ class BusServiceCard extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 1),
                 margin: const EdgeInsets.only(right: 8),
                 decoration: BoxDecoration(
-                    color: AppColors.getOperatorColor(busServiceInfo.operator),
+                    color: AppColors.getOperatorColor(busServiceInfo.operator).$1,
                     borderRadius: BorderRadius.circular(8)),
                 child: Text(
                   busServiceInfo.operator.name,
+                  style: TextStyle(
+                    color: AppColors.getOperatorColor(busServiceInfo.operator).$2,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],

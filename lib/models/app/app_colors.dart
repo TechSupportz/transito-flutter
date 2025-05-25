@@ -22,28 +22,28 @@ class AppColors with ChangeNotifier {
   static const Color veryPurple = Color(0xFF7E6BFF);
   static Color kindaGrey = scheme.onSurface.withAlpha(220);
 
-  static const Color prettyGreen = Color(0xFF5BDB7A);
-  static const Color notReallyYellow = Color(0xFFF7A74D);
-  static const Color sortaRed = Color(0xFFF46A49);
+  static const Color prettyGreen = Color(0xFF96E2B6);
+  static const Color notReallyYellow = Color(0xFFFFCEA6);
+  static const Color sortaRed = Color(0xFFFFAA8F);
 
-  static const Color SBST = Color(0xFF8A2890);
-  static const Color SMRT = Color(0xFFDC1C27);
-  static const Color TTS = Color(0xFF389643);
-  static const Color GAS = Color(0xFFF4BD00);
+  static const Color SBST = Color(0xFF9C40A6);
+  static const Color SMRT = Color(0xFFE23C46);
+  static const Color TTS = Color(0xFF47A854);
+  static const Color GAS = Color(0xFFF6C322);
 
   // function that returns the correct colours for each bus operator
-  static Color getOperatorColor(BusOperator operator) {
+  static (Color, Color) getOperatorColor(BusOperator operator) {
     switch (operator) {
       case BusOperator.SBST:
-        return AppColors.SBST;
+        return (AppColors.SBST, Colors.white);
       case BusOperator.SMRT:
-        return AppColors.SMRT;
+        return (AppColors.SMRT, Colors.white);
       case BusOperator.TTS:
-        return AppColors.TTS;
+        return (AppColors.TTS, Colors.black);
       case BusOperator.GAS:
-        return AppColors.GAS;
+        return (AppColors.GAS, Colors.black);
       default:
-        return AppColors.scheme.primary;
+        return (AppColors.scheme.primary, AppColors.scheme.onPrimary);
     }
   }
 }
