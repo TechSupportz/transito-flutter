@@ -407,7 +407,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  "Accent Colour",
+                                  "Base Colour",
                                   style: TextStyle(
                                     fontSize: 21,
                                     fontWeight: FontWeight.w500,
@@ -433,7 +433,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   validator: FormBuilderValidators.compose([
                                     FormBuilderValidators.required(),
                                     (val) {
-                                      if (val?.alpha != 255) {
+                                      if (val?.a != 255) {
                                         return "Please select a fully opaque colour";
                                       }
                                       if ('0x${val.toString().substring(8, 16).toUpperCase()}' ==
