@@ -130,6 +130,10 @@ class _MyAppState extends State<MyApp> {
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
+              appBarTheme: AppBarTheme(
+                shape:
+                    const RoundedRectangleBorder(), //NOTE - This is a workaround to make tint elevation animate.
+              ),
               checkboxTheme: CheckboxThemeData(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
