@@ -1,9 +1,9 @@
-class SettingsCardOption {
-  bool value;
-  String text;
+class SettingsCardOption<T> {
+  final String label;
+  final T value;
 
-  SettingsCardOption({
+  const SettingsCardOption({
+    required this.label,
     required this.value,
-    required this.text,
   });
 }

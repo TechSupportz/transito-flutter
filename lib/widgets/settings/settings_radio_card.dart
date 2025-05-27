@@ -7,7 +7,7 @@ import 'package:transito/models/app/settings_card_options.dart';
 
 import '../../global/services/settings_service.dart';
 
-class SettingsRadioCard extends StatelessWidget {
+class SettingsRadioCard<T> extends StatelessWidget {
   const SettingsRadioCard(
       {super.key,
       required this.title,
@@ -16,9 +16,9 @@ class SettingsRadioCard extends StatelessWidget {
       required this.options});
 
   final String title;
-  final bool initialValue;
+  final T initialValue;
   final String firebaseFieldName;
-  final List<SettingsCardOption> options;
+  final List<SettingsCardOption<T>> options;
 
   final TextStyle titleStyle = const TextStyle(
     fontSize: 21,
@@ -33,25 +33,30 @@ class SettingsRadioCard extends StatelessWidget {
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
 
-    void updateSettings(bool newValue) {
+    void updateSettings(T newValue) {
       switch (firebaseFieldName) {
         case 'isETAminutes':
           SettingsService().updateIsETAminutes(
             userId: user?.uid,
-            newValue: newValue,
+            newValue: newValue as bool,
           );
           break;
         case 'isNearbyGrid':
           SettingsService().updateIsNearbyGrid(
             userId: user?.uid,
-            newValue: newValue,
+            newValue: newValue as bool,
           );
           break;
         case 'showNearbyDistance':
           SettingsService().updateShowNearbyDistance(
             userId: user?.uid,
-            newValue: newValue,
+            newValue: newValue as bool,
           );
+          break;
+        // Add more cases as needed for other field types
+        default:
+          // Handle generic case or throw error
+          break;
       }
     }
 
@@ -66,14 +71,16 @@ class SettingsRadioCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
-          Text(
-            title,
-            style: titleStyle,
-          ),
-          FormBuilderRadioGroup(
-            name: 'radioGroup',
-            controlAffinity: ControlAffinity.leading,
+          Text(title, style: titleStyle),
+          FormBuilderRadioGroup<T>(
+            name: firebaseFieldName,
+            initialValue: initialValue,
             orientation: OptionsOrientation.vertical,
+            onChanged: (T? value) {
+              if (value != null) {
+                updateSettings(value);
+              }
+            },
             activeColor: AppColors.scheme.primary,
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -86,18 +93,10 @@ class SettingsRadioCard extends StatelessWidget {
               contentPadding: EdgeInsets.symmetric(vertical: 8),
               fillColor: AppColors.scheme.surfaceContainerHigh,
             ),
-            initialValue: initialValue,
-            onChanged: (value) => updateSettings(value as bool),
             options: options
                 .map((option) => FormBuilderFieldOption(
                       value: option.value,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Text(
-                          option.text,
-                          style: optionTextStyle,
-                        ),
-                      ),
+                      child: Text(option.label, style: optionTextStyle),
                     ))
                 .toList(),
           ),

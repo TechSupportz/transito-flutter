@@ -460,33 +460,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          SettingsRadioCard(
+                          SettingsRadioCard<bool>(
                             title: "ETA Format",
                             initialValue: snapshot.data!.isETAminutes,
                             firebaseFieldName: 'isETAminutes',
                             options: [
-                              SettingsCardOption(value: true, text: "Minutes to arrival (2 mins)"),
-                              SettingsCardOption(value: false, text: "Time of arrival (18:21)")
+                              SettingsCardOption(value: true, label: "Minutes to arrival (2 mins)"),
+                              SettingsCardOption(value: false, label: "Time of arrival (18:21)")
                             ],
                           ),
                           const SizedBox(height: 16),
-                          SettingsRadioCard(
+                          SettingsRadioCard<bool>(
                             title: "Nearby Layout",
                             initialValue: snapshot.data!.isNearbyGrid,
                             firebaseFieldName: 'isNearbyGrid',
                             options: [
-                              SettingsCardOption(value: true, text: "Grid layout"),
-                              SettingsCardOption(value: false, text: "Column layout")
+                              SettingsCardOption(value: true, label: "Grid layout"),
+                              SettingsCardOption(value: false, label: "Column layout")
                             ],
                           ),
                           const SizedBox(height: 16),
-                          SettingsRadioCard(
+                          SettingsRadioCard<bool>(
                               title: "Nearby Detail",
                               initialValue: snapshot.data!.showNearbyDistance ?? true,
                               firebaseFieldName: 'showNearbyDistance',
                               options: [
-                                SettingsCardOption(value: true, text: "Distance to bus stops"),
-                                SettingsCardOption(value: false, text: "Road name of bus stops")
+                                SettingsCardOption(value: true, label: "Distance to bus stops"),
+                                SettingsCardOption(value: false, label: "Road name of bus stops")
                               ]),
                         ],
                       );

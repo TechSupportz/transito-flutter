@@ -116,7 +116,6 @@ class _MyAppState extends State<MyApp> {
             ],
             navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
             theme: ThemeData(
-              // useMaterial3: false,Sn
               fontFamily: 'Poppins',
               colorScheme: AppColors.scheme,
               splashFactory: InkSparkle.splashFactory,
