@@ -126,7 +126,7 @@ class _MyAppState extends State<MyApp> {
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.scheme.surfaceContainerHighest.withAlpha(130),
+                  color: AppColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),

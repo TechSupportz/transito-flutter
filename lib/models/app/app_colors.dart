@@ -20,7 +20,7 @@ class AppColors with ChangeNotifier {
   }
 
   static const Color veryPurple = Color(0xFF7E6BFF);
-  static Color kindaGrey = scheme.onSurface.withAlpha(220);
+  static Color kindaGrey = scheme.onSurface.withValues(alpha: 0.8);
 
   static const Color prettyGreen = Color(0xFF96E2B6);
   static const Color notReallyYellow = Color(0xFFFFCEA6);

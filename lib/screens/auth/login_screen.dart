@@ -150,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
                             gradient: RadialGradient(
-                              colors: [Color(0xAA3C18BF), Color(0xAA3C18BF).withAlpha(0)],
+                              colors: [Color(0xAA3C18BF), Color(0xAA3C18BF).withValues(alpha: 0)],
                               stops: [0, 1],
                             ),
                             shape: BoxShape.circle,
