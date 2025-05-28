@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
+import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
@@ -128,6 +129,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = context.read<AppColors>();
+
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Padding(
@@ -168,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 18,
-                                color: AppColors.kindaGrey,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.w200,
                               ),
                             ),
@@ -234,7 +237,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 FilledButton.tonalIcon(
                                   onPressed: () => onEmailBtnPress(),
-                                  icon: Icon(Icons.email_rounded, color: AppColors.kindaGrey),
+                                  icon: Icon(Icons.email_rounded,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   label: const Text(
                                     'Continue with Email',
                                     style: TextStyle(color: Colors.white),
@@ -249,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   onPressed: () => showGuestLoginDialog(),
                                   icon: Icon(
                                     Icons.person_rounded,
-                                    color: AppColors.kindaGrey,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   label: const Text(
                                     'Continue as a Guest',

@@ -96,6 +96,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     String? userId = context.read<User?>()?.uid;
+    AppColors appColors = context.read<AppColors>();
 
     Future<void> deleteFavorites() async {
       // retrieve the list of services that the user initially had in their favourites
@@ -213,16 +214,20 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       margin: const EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
-                          color: AppColors.scheme.primary, borderRadius: BorderRadius.circular(8)),
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8)),
                       child: Text(
                         widget.busStopCode,
-                        style: TextStyle(fontSize: 16, color: AppColors.scheme.onPrimary),
+                        style:
+                            TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onPrimary),
                       ),
                     ),
                     Text(
                       widget.busStopAddress,
                       style: TextStyle(
-                          fontSize: 16, color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic),
                     ),
                   ],
                 ),
@@ -231,14 +236,16 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 ),
                 Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
-                  style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                  style: TextStyle(
+                      fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(
                   height: 8,
                 ),
                 Text(
                   "Unselecting all the bus services will remove this bus stop from your favourites",
-                  style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                  style: TextStyle(
+                      fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(
                   height: 8,

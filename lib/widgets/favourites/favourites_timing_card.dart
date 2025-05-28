@@ -102,7 +102,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Tooltip(
               preferBelow: false,
               decoration: BoxDecoration(
-                color: AppColors.scheme.surfaceContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
               ),
               textStyle: const TextStyle(
                 fontSize: 18,
@@ -124,7 +124,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: AppColors.scheme.surfaceContainer,
+                    color: Theme.of(context).colorScheme.surfaceContainer,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(
@@ -141,7 +141,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                           style: TextStyle(
                               fontSize: 28,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.kindaGrey),
+                              color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       ),
                       FutureBuilder(
@@ -196,7 +196,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                               return Container(
                                 padding: const EdgeInsets.symmetric(vertical: 12),
                                 decoration: BoxDecoration(
-                                  color: AppColors.scheme.surfaceContainer,
+                                  color: Theme.of(context).colorScheme.surfaceContainer,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Padding(
@@ -238,7 +238,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             return Container(
               padding: const EdgeInsets.symmetric(vertical: 12),
               decoration: BoxDecoration(
-                color: AppColors.scheme.surfaceContainer,
+                color: Theme.of(context).colorScheme.surfaceContainer,
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const ErrorText(),

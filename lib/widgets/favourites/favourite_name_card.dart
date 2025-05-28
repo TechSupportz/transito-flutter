@@ -17,7 +17,7 @@ class FavouriteNameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.scheme.surfaceContainer,
+      color: Theme.of(context).colorScheme.surfaceContainer,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
@@ -34,7 +34,9 @@ class FavouriteNameCard extends StatelessWidget {
                 maxLines: 1,
                 softWrap: false,
                 style: TextStyle(
-                    fontSize: 28, fontWeight: FontWeight.w600, color: AppColors.kindaGrey),
+                    fontSize: 28,
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant),
               ),
             ),
             IconButton(

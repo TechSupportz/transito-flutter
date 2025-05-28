@@ -36,7 +36,9 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
                 Navigator.pop(context);
               },
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all(AppColors.sortaRed),
+                backgroundColor: WidgetStateProperty.all(
+                  Theme.of(context).colorScheme.errorContainer,
+                ),
               ),
               child: const Text('Clear'),
             )

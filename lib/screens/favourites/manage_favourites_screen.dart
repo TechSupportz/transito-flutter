@@ -88,6 +88,8 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = context.read<AppColors>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manage Favourites'),
@@ -104,12 +106,14 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                 children: [
                   Text(
                     "Drag and drop to reorder your favourites",
-                    style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                    style: TextStyle(
+                        fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "Click the pencil icon to modify or delete your favourites",
-                    style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                    style: TextStyle(
+                        fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                   ),
                   const SizedBox(height: 18),
                 ],

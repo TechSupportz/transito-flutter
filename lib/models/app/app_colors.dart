@@ -4,46 +4,70 @@ import 'package:flutter/material.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
 
 class AppColors with ChangeNotifier {
-  static Color accentColour = const Color(0xFF7E6BFF);
-  static ColorScheme scheme = ColorScheme.fromSeed(
-    seedColor: accentColour,
-    brightness: Brightness.dark,
+  // Instance variables for dynamic colors
+  Color _accentColour = const Color(0xFF7E6BFF);
+  Brightness _brightness = Brightness.dark;
+  late ColorScheme _scheme = ColorScheme.fromSeed(
+    seedColor: _accentColour,
+    brightness: _brightness,
   );
 
+  // Public getters for instance variables
+  Color get accentColour => _accentColour;
+  ColorScheme get scheme => _scheme;
+
+  // Method to update dynamic colors
   void updateLocalAccentColour(Color newColor) {
-    accentColour = newColor;
-    scheme = ColorScheme.fromSeed(
-      seedColor: accentColour,
-      brightness: Brightness.dark,
+    _accentColour = newColor;
+    _scheme = ColorScheme.fromSeed(
+      seedColor: _accentColour,
+      brightness: _brightness,
     );
     notifyListeners();
   }
 
-  static const Color veryPurple = Color(0xFF7E6BFF);
-  static Color kindaGrey = scheme.onSurface.withValues(alpha: 0.8);
+  void updateLocalBrightness(Brightness newBrightness) {
+    _brightness = newBrightness;
+    _scheme = ColorScheme.fromSeed(
+      seedColor: _accentColour,
+      brightness: _brightness,
+    );
+    notifyListeners();
+  }
 
-  static const Color prettyGreen = Color(0xFF96E2B6);
-  static const Color notReallyYellow = Color(0xFFFFCEA6);
-  static const Color sortaRed = Color(0xFFFFAA8F);
+  void updateLocalColorScheme(ColorScheme newScheme) {
+    _scheme = newScheme;
+    _brightness = newScheme.brightness;
+    notifyListeners();
+  }
+
+  // Static getters for constant colors
+  static Color get veryPurple => const Color(0xFF7E6BFF);
+
+  Color get prettyGreen => _brightness == Brightness.dark ? Color(0xFF96E2B6) : Color(0xFF52AD7D);
+  Color get notReallyYellow =>
+      _brightness == Brightness.dark ? Color(0xFFFFCEA6) : Color(0xFFF5A650);
+  Color get sortaRed => _brightness == Brightness.dark ? Color(0xFFFFAA8F) : Color(0xFFF07251);
 
   static const Color SBST = Color(0xFF9C40A6);
   static const Color SMRT = Color(0xFFE23C46);
   static const Color TTS = Color(0xFF47A854);
   static const Color GAS = Color(0xFFF6C322);
 
-  // function that returns the correct colours for each bus operator
-  static (Color, Color) getOperatorColor(BusOperator operator) {
+  // Instance method for operator colors, as it depends on the instance's scheme for the default case
+  (Color, Color) getOperatorColor(BusOperator operator) {
     switch (operator) {
       case BusOperator.SBST:
-        return (AppColors.SBST, Colors.white);
+        return (AppColors.SBST, Colors.white); // Accessing static getter
       case BusOperator.SMRT:
-        return (AppColors.SMRT, Colors.white);
+        return (AppColors.SMRT, Colors.white); // Accessing static getter
       case BusOperator.TTS:
-        return (AppColors.TTS, Colors.black);
+        return (AppColors.TTS, Colors.black); // Accessing static getter
       case BusOperator.GAS:
-        return (AppColors.GAS, Colors.black);
+        return (AppColors.GAS, Colors.black); // Accessing static getter
       default:
-        return (AppColors.scheme.primary, AppColors.scheme.onPrimary);
+        // Accessing instance's scheme
+        return (_scheme.primary, _scheme.onPrimary);
     }
   }
 }

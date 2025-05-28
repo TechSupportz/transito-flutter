@@ -119,7 +119,7 @@ class BusStopCard extends StatelessWidget {
           ),
           child: Ink(
             decoration: BoxDecoration(
-                color: AppColors.scheme.surfaceContainer, borderRadius: BorderRadius.circular(12)),
+                color: Theme.of(context).colorScheme.surfaceContainer, borderRadius: BorderRadius.circular(12)),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
@@ -145,12 +145,12 @@ class BusStopCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
                             margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
-                                color: AppColors.scheme.primary,
+                                color: Theme.of(context).colorScheme.primary,
                                 borderRadius: BorderRadius.circular(8)),
                             child: Text(
                               busStopInfo.code,
                               style: TextStyle(
-                                  color: AppColors.scheme.onPrimary, fontWeight: FontWeight.w500),
+                                  color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
@@ -162,7 +162,8 @@ class BusStopCard extends StatelessWidget {
                               maxLines: 1,
                               softWrap: false,
                               style: TextStyle(
-                                  color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontStyle: FontStyle.italic),
                             ),
                           ),
                         ],
@@ -198,7 +199,7 @@ class BusStopCard extends StatelessWidget {
 
     TextStyle titleStyle = TextStyle(
       fontWeight: FontWeight.w400,
-      color: AppColors.kindaGrey,
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
       fontFamily: 'Poppins',
       fontSize: 18.0,
     );

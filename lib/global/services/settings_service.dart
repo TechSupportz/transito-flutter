@@ -44,8 +44,8 @@ class SettingsService {
         'accentColour': newValue,
       }).then(
         (_) {
+          AppColors().updateLocalAccentColour(Color(int.parse(newValue)));
           debugPrint('✔️ Updated accentColour to $newValue');
-          AppColors.accentColour = Color(int.parse(newValue));
         },
       ).catchError(
         (error) {
@@ -103,7 +103,8 @@ class SettingsService {
     }
   }
 
-  Future<void> updateThemeMode({String? userId, required AppThemeMode newValue}) async {
+  Future<void> updateThemeMode(
+      {String? userId, required AppThemeMode newValue, required BuildContext context}) async {
     if (userId != null) {
       _settingsCollection
           .doc(userId)
@@ -111,7 +112,18 @@ class SettingsService {
             'themeMode': newValue.name,
           })
           .then(
-            (_) => debugPrint('✔️ Updated themeMode to $newValue'),
+            (_) => {
+              AppColors().updateLocalBrightness(
+                newValue == AppThemeMode.DARK
+                    ? Brightness.dark
+                    : newValue == AppThemeMode.LIGHT
+                        ? Brightness.light
+                        : context.mounted
+                            ? MediaQuery.platformBrightnessOf(context)
+                            : Brightness.dark,
+              ),
+              debugPrint('✔️ Updated themeMode to $newValue')
+            },
           )
           .catchError(
             (error) => debugPrint('❌ Error updating themeMode in Firestore: $error'),

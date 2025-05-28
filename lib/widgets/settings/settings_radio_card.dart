@@ -58,6 +58,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
           SettingsService().updateThemeMode(
             userId: user?.uid,
             newValue: newValue as AppThemeMode,
+            context: context,
           );
         // Add more cases as needed for other field types
         default:
@@ -70,7 +71,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
       decoration: BoxDecoration(
-        color: AppColors.scheme.surfaceContainer,
+        color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -87,7 +88,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
                 updateSettings(value);
               }
             },
-            activeColor: AppColors.scheme.primary,
+            activeColor: Theme.of(context).colorScheme.primary,
             decoration: InputDecoration(
               border: InputBorder.none,
               enabledBorder: OutlineInputBorder(
@@ -97,7 +98,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
                 borderSide: BorderSide.none,
               ),
               contentPadding: EdgeInsets.symmetric(vertical: 8),
-              fillColor: AppColors.scheme.surfaceContainerHigh,
+              fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
             ),
             options: options
                 .map((option) => FormBuilderFieldOption(

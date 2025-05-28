@@ -195,6 +195,8 @@ class _EmailScreenState extends State<EmailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = context.read<AppColors>();
+
     return Scaffold(
       appBar: AppBar(),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
@@ -225,7 +227,7 @@ class _EmailScreenState extends State<EmailScreen> {
                             textAlign: TextAlign.center,
                             style: TextStyle(
                               fontSize: 18,
-                              color: AppColors.kindaGrey,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                               fontWeight: FontWeight.w200,
                             ),
                           ),
@@ -259,23 +261,27 @@ class _EmailScreenState extends State<EmailScreen> {
                                 ? [
                                     Text(
                                       'New Here?',
-                                      style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     ),
                                     const SizedBox(width: 3),
                                     Text(
                                       'Register!',
-                                      style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                      style: TextStyle(fontSize: 14, color: appColors.accentColour),
                                     ),
                                   ]
                                 : [
                                     Text(
                                       'Already have an account?',
-                                      style: TextStyle(fontSize: 14, color: AppColors.kindaGrey),
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant),
                                     ),
                                     const SizedBox(width: 3),
                                     Text(
                                       'Login!',
-                                      style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+                                      style: TextStyle(fontSize: 14, color: appColors.accentColour),
                                     ),
                                   ],
                           ),
@@ -450,7 +456,7 @@ class _EmailScreenState extends State<EmailScreen> {
             onTap: () => showForgetPasswordDialog(),
             child: Text(
               'Forgot password?',
-              style: TextStyle(fontSize: 14, color: AppColors.accentColour),
+              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
               textAlign: TextAlign.center,
             ),
           ),
@@ -460,6 +466,8 @@ class _EmailScreenState extends State<EmailScreen> {
   }
 
   AlertDialog forgetPasswordDialog(BuildContext context) {
+    AppColors appColors = context.read<AppColors>();
+
     return AlertDialog(
       title: const Text('Forgot Password'),
       content: Column(
@@ -469,7 +477,7 @@ class _EmailScreenState extends State<EmailScreen> {
               'Please enter your email address and we will send you a link to reset your password.',
               style: TextStyle(
                 fontSize: 16,
-                color: AppColors.kindaGrey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
               )),
           const SizedBox(height: 16),
           FormBuilderTextField(

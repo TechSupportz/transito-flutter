@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_type_enum.dart';
@@ -118,7 +119,9 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 Text(
                   '~ ${calculateDistanceAway()} away',
                   style: TextStyle(
-                      fontSize: 14, fontStyle: FontStyle.italic, color: AppColors.kindaGrey),
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
               ],
             ),
@@ -190,6 +193,8 @@ class ArrivalCard extends StatefulWidget {
 class _ArrivalCardState extends State<ArrivalCard> {
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = context.read<AppColors>();
+    
     return widget.eta != '-'
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -198,7 +203,8 @@ class _ArrivalCardState extends State<ArrivalCard> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
                 child: widget.accessible
-                    ? Icon(Icons.accessible_rounded, size: 16, color: AppColors.kindaGrey)
+                    ? Icon(Icons.accessible_rounded,
+                        size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant)
                     : const SizedBox(width: 16, height: 16),
               ),
               Column(
@@ -214,13 +220,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
                       color: (() {
                         switch (widget.crowdLvl) {
                           case CrowdLvl.SEA:
-                            return AppColors.prettyGreen;
+                            return appColors.prettyGreen;
                           case CrowdLvl.SDA:
-                            return AppColors.notReallyYellow;
+                            return appColors.notReallyYellow;
                           case CrowdLvl.LSD:
-                            return AppColors.sortaRed;
+                            return appColors.sortaRed;
                           case CrowdLvl.NA:
-                            return AppColors.scheme.onSurface;
+                            return Theme.of(context).colorScheme.onSurface;
                         }
                       })(),
                     ),
@@ -228,7 +234,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
                     decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.kindaGrey),
+                        border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
                         borderRadius: const BorderRadius.all(Radius.circular(5))),
                     // displays different text based on bus type
                     child: Text(
@@ -246,7 +252,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                       })(),
                       style: TextStyle(
                         fontSize: widget.isETAminutes ? 11.5 : 10,
-                        color: AppColors.kindaGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),

@@ -77,13 +77,13 @@ class IndivArrivalInfo {
   @JsonKey(fromJson: stringToInt)
   int? visitNumber;
 
-  @JsonKey(name: 'Load', defaultValue: CrowdLvl.NA, unknownEnumValue: CrowdLvl.NA)
+  @JsonKey(name: 'Load', fromJson: decodeCrowdLvl)
   CrowdLvl crowdLvl;
 
   @JsonKey(name: 'Feature', fromJson: decodeIsAccessible)
   bool isAccessible;
 
-  @JsonKey(name: 'Type', defaultValue: BusType.NA, unknownEnumValue: BusType.NA)
+  @JsonKey(name: 'Type', fromJson: decodeBusType)
   BusType busType;
 
   static double stringToDouble(String stringToConvert) {
@@ -108,6 +108,32 @@ class IndivArrivalInfo {
 
   static bool intToBool(int value) {
     return value == 1;
+  }
+
+    static CrowdLvl decodeCrowdLvl(String crowdLvl) {
+    switch (crowdLvl) {
+      case "SEA":
+        return CrowdLvl.SEA;
+      case "SDA":
+        return CrowdLvl.SDA;
+      case "LSD":
+        return CrowdLvl.LSD;
+      default:
+        return CrowdLvl.NA;
+    }
+  }
+
+  static BusType decodeBusType(busTypeString) {
+    switch (busTypeString) {
+      case "SD":
+        return BusType.SD;
+      case "DD":
+        return BusType.DD;
+      case "BD":
+        return BusType.BD;
+      default:
+        return BusType.NA;
+    }
   }
 
   IndivArrivalInfo(

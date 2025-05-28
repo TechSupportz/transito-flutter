@@ -45,11 +45,12 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    var userId = context.read<User?>()?.uid;
+    String? userId = context.read<User?>()?.uid;
+    AppColors appColors = context.read<AppColors>();
 
     // access favourites provider
-    var favourites = context.read<FavouritesProvider>();
-    var favouritesList = favourites.favouritesList;
+    FavouritesProvider favourites = context.read<FavouritesProvider>();
+    List<Favourite> favouritesList = favourites.favouritesList;
 
     void addToFavorites() {
       // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
@@ -121,16 +122,20 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       margin: const EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
-                          color: AppColors.scheme.primary, borderRadius: BorderRadius.circular(8)),
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8)),
                       child: Text(
                         widget.busStopCode,
-                        style: TextStyle(fontSize: 16, color: AppColors.scheme.onPrimary),
+                        style:
+                            TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onPrimary),
                       ),
                     ),
                     Text(
                       widget.busStopAddress,
                       style: TextStyle(
-                          fontSize: 16, color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic),
                     ),
                   ],
                 ),
@@ -139,7 +144,8 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                 ),
                 Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
-                  style: TextStyle(fontSize: 16, color: AppColors.kindaGrey),
+                  style: TextStyle(
+                      fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
                 ),
                 const SizedBox(
                   height: 8,

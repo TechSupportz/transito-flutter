@@ -19,6 +19,7 @@ import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/enums/app_theme_mode.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
@@ -73,6 +74,7 @@ void main() async {
           value: FirebaseAuth.instance.userChanges(),
           initialData: null,
         ),
+        ChangeNotifierProvider(create: (context) => AppColors()),
         ChangeNotifierProvider(create: (context) => CommonProvider()),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
@@ -92,20 +94,39 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  Color primaryColour = AppColors.accentColour;
-
   @override
   Widget build(BuildContext context) {
-    var user = context.watch<User?>();
+    User? user = context.watch<User?>();
     debugPrint("$user");
 
     bool isTablet = context.read<CommonProvider>().isTablet;
     bool isLoggedIn =
         (user != null && user.emailVerified == true) || (user != null && user.isAnonymous == true);
 
+    AppColors appColors = context.watch<AppColors>();
+
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            UserSettings userSettings = snapshot.data!;
+            Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
+                ? Brightness.dark
+                : userSettings.themeMode == AppThemeMode.LIGHT
+                    ? Brightness.light
+                    : MediaQuery.platformBrightnessOf(context);
+            Color seedColor = Color(int.parse(userSettings.accentColour));
+
+            appColors.updateLocalColorScheme(
+              ColorScheme.fromSeed(
+                seedColor: seedColor,
+                brightness: brightness,
+              ),
+            );
+          } else if (snapshot.hasError) {
+            debugPrint("Error fetching user settings: ${snapshot.error}");
+          }
+
           return MaterialApp(
             title: "Transito",
             supportedLocales: const [Locale('en', 'US')],
@@ -117,15 +138,15 @@ class _MyAppState extends State<MyApp> {
             navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
             theme: ThemeData(
               fontFamily: 'Poppins',
-              colorScheme: AppColors.scheme,
+              colorScheme: appColors.scheme,
               splashFactory: InkSparkle.splashFactory,
               tooltipTheme: TooltipThemeData(
                 textStyle: TextStyle(
-                  color: AppColors.scheme.onSurface,
+                  color: appColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
@@ -150,7 +171,7 @@ class _MyAppState extends State<MyApp> {
               ),
               snackBarTheme: SnackBarThemeData(
                 //FIXME - Animation is non-existant
-                backgroundColor: AppColors.scheme.surfaceContainerHighest,
+                backgroundColor: appColors.scheme.surfaceContainerHighest,
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),

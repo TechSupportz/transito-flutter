@@ -180,6 +180,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   @override
   Widget build(BuildContext context) {
     bool isTablet = context.read<CommonProvider>().isTablet;
+    AppColors appColors = context.read<AppColors>();
 
     return Scaffold(
       appBar: AppBar(
@@ -228,12 +229,13 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                  color: AppColors.scheme.primary,
+                                  color: Theme.of(context).colorScheme.primary,
                                   borderRadius: BorderRadius.circular(8)),
                               child: Text(
                                 widget.code,
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w500, color: AppColors.scheme.onPrimary),
+                                    fontWeight: FontWeight.w500,
+                                    color: Theme.of(context).colorScheme.onPrimary),
                               ),
                             ),
                             Text(
@@ -242,7 +244,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               maxLines: 1,
                               softWrap: false,
                               style: TextStyle(
-                                  color: AppColors.kindaGrey, fontStyle: FontStyle.italic),
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  fontStyle: FontStyle.italic),
                             )
                           ],
                         )
@@ -353,7 +356,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                       child: Icon(
                                         Icons.place_rounded,
                                         size: 35,
-                                        color: AppColors.scheme.primary,
+                                        color: Theme.of(context).colorScheme.primary,
                                       ),
                                     ),
                                   ],

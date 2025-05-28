@@ -205,6 +205,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
+    AppColors appColors = context.watch<AppColors>();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
@@ -236,7 +238,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     suffixIcon: Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12),
-                        color: AppColors.scheme.primary,
+                        color: appColors.scheme.primary,
                       ),
                       child: AnimatedSwitcher(
                           transitionBuilder: (child, animation) => ScaleTransition(
@@ -251,7 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   child: Center(
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: AppColors.scheme.onPrimary,
+                                      color: appColors.scheme.onPrimary,
                                     ),
                                   ),
                                 )
@@ -264,7 +266,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   icon: Icon(
                                     Icons.check_rounded,
                                     size: 21,
-                                    color: AppColors.scheme.onPrimary,
+                                    color: appColors.scheme.onPrimary,
                                   ),
                                 )),
                     ),
@@ -333,20 +335,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             context: context,
                             builder: (context) => AlertDialog(
                                   title: const Text('Delete account'),
-                                  content: const Column(
+                                  content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text(
+                                      const Text(
                                           'Are you sure you want to delete your account and all the data related to it?'),
-                                      SizedBox(height: 12),
+                                      const SizedBox(height: 12),
                                       Text.rich(TextSpan(text: 'This action is ', children: [
                                         TextSpan(
                                           text: 'PERMANENT',
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold,
-                                              color: AppColors.sortaRed),
+                                              color: Theme.of(context).colorScheme.error),
                                         ),
-                                        TextSpan(text: ' and cannot be undone.')
+                                        const TextSpan(text: ' and cannot be undone.')
                                       ])),
                                     ],
                                   ),
@@ -372,10 +374,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   ],
                                 )),
                         style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(AppColors.scheme.error)),
+                            backgroundColor: WidgetStateProperty.all(appColors.scheme.error)),
                         child: Text(
                           "Delete account",
-                          style: TextStyle(color: AppColors.scheme.onError),
+                          style: TextStyle(color: appColors.scheme.onError),
                         ),
                       )
                     ])),
@@ -412,7 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             decoration: BoxDecoration(
-                              color: AppColors.scheme.surfaceContainer,
+                              color: appColors.scheme.surfaceContainer,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Column(
@@ -446,7 +448,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   validator: FormBuilderValidators.compose([
                                     FormBuilderValidators.required(),
                                     (val) {
-                                      if (val?.a != 255) {
+                                      if (val?.a != 1) {
                                         return "Please select a fully opaque colour";
                                       }
                                       if ('0x${val.toString().substring(8, 16).toUpperCase()}' ==
@@ -503,7 +505,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     } else if (snapshot.hasError) {
                       return Container(
                           decoration: BoxDecoration(
-                            color: AppColors.scheme.surfaceContainer,
+                            color: appColors.scheme.surfaceContainer,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: const Padding(

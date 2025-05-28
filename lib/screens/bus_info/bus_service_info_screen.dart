@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:measure_size/measure_size.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
@@ -76,6 +77,8 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   @override
   Widget build(BuildContext context) {
+    AppColors appColors = context.read<AppColors>();
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
@@ -171,13 +174,13 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                                 margin: const EdgeInsets.only(right: 8),
                                 decoration: BoxDecoration(
-                                    color: AppColors.getOperatorColor(busService.operator).$1,
+                                    color: appColors.getOperatorColor(busService.operator).$1,
                                     borderRadius: BorderRadius.circular(8)),
                                 child: Text(
                                   busService.operator.name,
                                   style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      color: AppColors.getOperatorColor(busService.operator).$2),
+                                      color: appColors.getOperatorColor(busService.operator).$2),
                                 ),
                               ),
                             ],
@@ -222,18 +225,18 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                         if (busService.isLoopService) ...[
                                           Transform.rotate(
                                             angle: 45,
-                                            child: const Icon(
+                                            child: Icon(
                                               Icons.loop_rounded,
-                                              color: AppColors.notReallyYellow,
+                                              color: appColors.notReallyYellow,
                                               size: 28,
                                             ),
                                           ),
                                         ] else ...[
-                                          const Padding(
-                                            padding: EdgeInsets.only(bottom: 20),
+                                          Padding(
+                                            padding: const EdgeInsets.only(bottom: 20),
                                             child: Icon(
                                               Icons.radio_button_unchecked_rounded,
-                                              color: AppColors.prettyGreen,
+                                              color: appColors.prettyGreen,
                                               size: 28,
                                             ),
                                           ),
@@ -251,7 +254,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                               height: 40,
                                               width: 40,
                                               decoration: BoxDecoration(
-                                                color: AppColors.scheme.primary,
+                                                color: Theme.of(context).colorScheme.primary,
                                                 borderRadius: BorderRadius.circular(12),
                                               ),
                                               child: AnimatedRotation(
@@ -264,7 +267,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                                   enableFeedback: true,
                                                   icon: Icon(
                                                     Icons.swap_vert_rounded,
-                                                    color: AppColors.scheme.onPrimary,
+                                                    color: Theme.of(context).colorScheme.onPrimary,
                                                   ),
                                                   onPressed: () {
                                                     setState(
@@ -276,11 +279,11 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                               ),
                                             ),
                                           ],
-                                          const Padding(
-                                            padding: EdgeInsets.only(top: 20),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 20),
                                             child: Icon(
                                               Icons.place_rounded,
-                                              color: AppColors.sortaRed,
+                                              color: appColors.sortaRed,
                                               size: 28,
                                             ),
                                           ),
@@ -312,7 +315,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                         return Container(
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
-                            color: AppColors.scheme.surfaceContainerLow,
+                            color: Theme.of(context).colorScheme.surfaceContainerLow,
                             borderRadius: BorderRadius.circular(24),
                           ),
                           padding: const EdgeInsets.symmetric(
@@ -335,7 +338,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                       child: Container(
                                         height: 6,
                                         decoration: BoxDecoration(
-                                          color: AppColors.kindaGrey.withOpacity(0.15),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant
+                                              .withValues(alpha: 0.15),
                                           borderRadius: BorderRadius.circular(12),
                                         ),
                                       ),

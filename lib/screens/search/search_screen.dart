@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+import 'package:provider/provider.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
@@ -166,6 +167,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     return FutureBuilder(
         future: _futureBusStopSearchResults,
         builder: (BuildContext context, AsyncSnapshot<BusStopSearchApiResponse> snapshot) {
+          AppColors appColors = context.read<AppColors>();
           // if the bus stop list is not yet loaded, show a loading indicator
           if (snapshot.hasData) {
             BusStopSearchApiResponse res = snapshot.data!;
@@ -178,7 +180,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                     Text(
                       "🔍 Start typing to find a bus stop 🚏",
                       style: TextStyle(
-                        color: AppColors.kindaGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
                         fontSize: 20,
                       ),
@@ -188,7 +190,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                     Text(
                       "You can search by the bus stop code, \n name or road name",
                       style: TextStyle(
-                        color: AppColors.kindaGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
                       ),
@@ -207,7 +209,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                     Text(
                       "🔍 We couldn't find any bus stops 🤔",
                       style: TextStyle(
-                        color: AppColors.kindaGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w600,
                         fontSize: 20,
                       ),
@@ -217,7 +219,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                     Text(
                       "Try checking search for typos or use a different search term",
                       style: TextStyle(
-                        color: AppColors.kindaGrey,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
                       ),
@@ -263,6 +265,8 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     return FutureBuilder(
       future: _futureBusServiceSearchResults,
       builder: (BuildContext context, AsyncSnapshot<BusServiceSearchApiResponse> snapshot) {
+        AppColors appColors = context.read<AppColors>();
+
         // if the bus service list is not yet loaded, show a loading indicator
         if (snapshot.hasData) {
           BusServiceSearchApiResponse res = snapshot.data!;
@@ -275,7 +279,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                   Text(
                     "🔍 Start typing to find a bus service 🚍",
                     style: TextStyle(
-                      color: AppColors.kindaGrey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                       fontSize: 20,
                     ),
@@ -285,7 +289,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                   Text(
                     "Just enter in the bus service number",
                     style: TextStyle(
-                      color: AppColors.kindaGrey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                       fontSize: 16,
                     ),
@@ -304,7 +308,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                   Text(
                     "🔍 We couldn't find any bus services 🤔",
                     style: TextStyle(
-                      color: AppColors.kindaGrey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w600,
                       fontSize: 20,
                     ),
@@ -314,7 +318,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
                   Text(
                     "Are you sure you typed the correct bus service number?",
                     style: TextStyle(
-                      color: AppColors.kindaGrey,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
                       fontWeight: FontWeight.w500,
                       fontSize: 16,
                     ),
