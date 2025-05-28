@@ -40,7 +40,8 @@ BusServiceDetailsApiResponse _$BusServiceDetailsApiResponseFromJson(
 
 BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
       serviceNo: json['serviceNo'] as String,
-      operator: $enumDecodeNullable(_$BusOperatorEnumMap, json['operator']) ??
+      operator: $enumDecodeNullable(_$BusOperatorEnumMap, json['operator'],
+              unknownValue: BusOperator.NA) ??
           BusOperator.NA,
       isLoopService: json['isLoopService'] as bool,
       isSingleRoute: json['isSingleRoute'] as bool,

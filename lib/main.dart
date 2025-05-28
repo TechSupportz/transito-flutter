@@ -97,7 +97,6 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
-    debugPrint("$user");
 
     bool isTablet = context.read<CommonProvider>().isTablet;
     bool isLoggedIn =
@@ -105,28 +104,25 @@ class _MyAppState extends State<MyApp> {
 
     AppColors appColors = context.watch<AppColors>();
 
+    SettingsService().streamSettings(user?.uid).listen((UserSettings userSettings) {
+      Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
+          ? Brightness.dark
+          : userSettings.themeMode == AppThemeMode.LIGHT
+              ? Brightness.light
+              : MediaQuery.platformBrightnessOf(context);
+      Color seedColor = Color(int.parse(userSettings.accentColour));
+
+      appColors.updateLocalColorScheme(
+        ColorScheme.fromSeed(
+          seedColor: seedColor,
+          brightness: brightness,
+        ),
+      );
+    });
+
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            UserSettings userSettings = snapshot.data!;
-            Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
-                ? Brightness.dark
-                : userSettings.themeMode == AppThemeMode.LIGHT
-                    ? Brightness.light
-                    : MediaQuery.platformBrightnessOf(context);
-            Color seedColor = Color(int.parse(userSettings.accentColour));
-
-            appColors.updateLocalColorScheme(
-              ColorScheme.fromSeed(
-                seedColor: seedColor,
-                brightness: brightness,
-              ),
-            );
-          } else if (snapshot.hasError) {
-            debugPrint("Error fetching user settings: ${snapshot.error}");
-          }
-
           return MaterialApp(
             title: "Transito",
             supportedLocales: const [Locale('en', 'US')],
@@ -165,6 +161,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 titleTextStyle: TextStyle(
                   fontFamily: 'Poppins',
+                  color: appColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                   fontSize: 24,
                 ),
@@ -178,6 +175,7 @@ class _MyAppState extends State<MyApp> {
                 ),
                 contentTextStyle: TextStyle(
                   fontFamily: 'Poppins',
+                  color: appColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
               ),

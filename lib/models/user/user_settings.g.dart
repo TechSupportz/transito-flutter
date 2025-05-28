@@ -11,9 +11,9 @@ UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
       isETAminutes: json['isETAminutes'] as bool,
       isNearbyGrid: json['isNearbyGrid'] as bool,
       showNearbyDistance: json['showNearbyDistance'] as bool? ?? true,
-      themeMode:
-          $enumDecodeNullable(_$AppThemeModeEnumMap, json['themeMode']) ??
-              AppThemeMode.SYSTEM,
+      themeMode: $enumDecodeNullable(_$AppThemeModeEnumMap, json['themeMode'],
+              unknownValue: AppThemeMode.SYSTEM) ??
+          AppThemeMode.SYSTEM,
     );
 
 Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
