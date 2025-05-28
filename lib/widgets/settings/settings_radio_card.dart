@@ -53,6 +53,11 @@ class SettingsRadioCard<T> extends StatelessWidget {
             newValue: newValue as bool,
           );
           break;
+        case 'themeMode':
+          SettingsService().updateThemeMode(
+            userId: user?.uid,
+            newValue: newValue as ThemeMode,
+          );
         // Add more cases as needed for other field types
         default:
           // Handle generic case or throw error

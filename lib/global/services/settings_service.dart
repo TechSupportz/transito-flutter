@@ -13,10 +13,6 @@ class SettingsService {
           UserSettings userSettings = UserSettings.fromFirestore(snapshot);
           AppColors().updateLocalAccentColour(Color(int.parse(userSettings.accentColour)));
 
-          if (userSettings.showNearbyDistance == null) {
-            updateShowNearbyDistance(newValue: true, userId: userId);
-          }
-
           return userSettings;
         } else {
           return UserSettings(
@@ -24,6 +20,7 @@ class SettingsService {
             isETAminutes: true,
             isNearbyGrid: true,
             showNearbyDistance: true,
+            themeMode: ThemeMode.system,
           );
         }
       });
@@ -34,6 +31,7 @@ class SettingsService {
           isETAminutes: true,
           isNearbyGrid: true,
           showNearbyDistance: true,
+          themeMode: ThemeMode.system,
         ),
       );
     }
@@ -100,6 +98,22 @@ class SettingsService {
           )
           .catchError(
             (error) => debugPrint('❌ Error updating showNearbyDistance in Firestore: $error'),
+          );
+    }
+  }
+
+  Future<void> updateThemeMode({String? userId, required ThemeMode newValue}) async {
+    if (userId != null) {
+      _settingsCollection
+          .doc(userId)
+          .update({
+            'themeMode': newValue.name,
+          })
+          .then(
+            (_) => debugPrint('✔️ Updated themeMode to $newValue'),
+          )
+          .catchError(
+            (error) => debugPrint('❌ Error updating themeMode in Firestore: $error'),
           );
     }
   }

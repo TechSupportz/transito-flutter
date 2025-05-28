@@ -35,7 +35,21 @@ IndivArrivalInfo _$IndivArrivalInfoFromJson(Map<String, dynamic> json) =>
       IndivArrivalInfo.stringToDouble(json['Latitude'] as String),
       IndivArrivalInfo.stringToDouble(json['Longitude'] as String),
       IndivArrivalInfo.stringToInt(json['VisitNumber'] as String),
-      IndivArrivalInfo.decodeCrowdLvl(json['Load'] as String),
+      $enumDecodeNullable(_$CrowdLvlEnumMap, json['Load']) ?? CrowdLvl.NA,
       IndivArrivalInfo.decodeIsAccessible(json['Feature'] as String),
-      IndivArrivalInfo.decodeBusType(json['Type']),
+      $enumDecodeNullable(_$BusTypeEnumMap, json['Type']) ?? BusType.NA,
     );
+
+const _$CrowdLvlEnumMap = {
+  CrowdLvl.SEA: 'SEA',
+  CrowdLvl.SDA: 'SDA',
+  CrowdLvl.LSD: 'LSD',
+  CrowdLvl.NA: 'NA',
+};
+
+const _$BusTypeEnumMap = {
+  BusType.SD: 'SD',
+  BusType.DD: 'DD',
+  BusType.BD: 'BD',
+  BusType.NA: 'NA',
+};

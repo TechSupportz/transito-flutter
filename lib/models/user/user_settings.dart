@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_settings.g.dart';
@@ -8,13 +9,19 @@ class UserSettings {
   final String accentColour;
   final bool isETAminutes;
   final bool isNearbyGrid;
-  final bool? showNearbyDistance;
+
+  @JsonKey(defaultValue: true)
+  final bool showNearbyDistance;
+
+  @JsonKey(defaultValue: ThemeMode.system)
+  final ThemeMode themeMode;
 
   UserSettings({
     required this.accentColour,
     required this.isETAminutes,
     required this.isNearbyGrid,
     required this.showNearbyDistance,
+    required this.themeMode,
   });
 
   factory UserSettings.fromFirestore(DocumentSnapshot doc) =>

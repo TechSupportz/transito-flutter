@@ -394,7 +394,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   builder: (context, AsyncSnapshot<UserSettings> snapshot) {
                     if (snapshot.hasData) {
                       return Column(
+                        spacing: 16,
                         children: [
+                          SettingsRadioCard<ThemeMode>(
+                            title: "Theme",
+                            initialValue: snapshot.data!.themeMode,
+                            firebaseFieldName: 'themeMode',
+                            options: [
+                              SettingsCardOption(value: ThemeMode.light, label: "Light"),
+                              SettingsCardOption(value: ThemeMode.dark, label: "Dark"),
+                              SettingsCardOption(value: ThemeMode.system, label: "Follow System"),
+                            ],
+                          ),
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
@@ -459,7 +470,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 16),
                           SettingsRadioCard<bool>(
                             title: "ETA Format",
                             initialValue: snapshot.data!.isETAminutes,
@@ -469,7 +479,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: false, label: "Time of arrival (18:21)")
                             ],
                           ),
-                          const SizedBox(height: 16),
                           SettingsRadioCard<bool>(
                             title: "Nearby Layout",
                             initialValue: snapshot.data!.isNearbyGrid,
@@ -479,10 +488,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: false, label: "Column layout")
                             ],
                           ),
-                          const SizedBox(height: 16),
                           SettingsRadioCard<bool>(
                               title: "Nearby Detail",
-                              initialValue: snapshot.data!.showNearbyDistance ?? true,
+                              initialValue: snapshot.data!.showNearbyDistance,
                               firebaseFieldName: 'showNearbyDistance',
                               options: [
                                 SettingsCardOption(value: true, label: "Distance to bus stops"),

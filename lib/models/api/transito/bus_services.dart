@@ -69,28 +69,13 @@ class BusServiceDetailsApiResponse {
 class BusService {
   String serviceNo;
 
-  @JsonKey(fromJson: decodeBusOperator)
+  @JsonKey(defaultValue: BusOperator.NA)
   BusOperator operator;
-
+  
   bool isLoopService;
   bool isSingleRoute;
   List<BusStop> interchanges;
   List<List<BusRouteInfo>>? routes;
-
-  static BusOperator decodeBusOperator(String busOperator) {
-    switch (busOperator) {
-      case "SBST":
-        return BusOperator.SBST;
-      case "SMRT":
-        return BusOperator.SMRT;
-      case "TTS":
-        return BusOperator.TTS;
-      case "GAS":
-        return BusOperator.GAS;
-      default:
-        return BusOperator.NA;
-    }
-  }
 
   BusService({
     required this.serviceNo,
