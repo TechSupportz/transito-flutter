@@ -153,14 +153,14 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
             Expanded(
               child: ShaderMask(
                 shaderCallback: (Rect bounds) {
-                  return const LinearGradient(
+                  return LinearGradient(
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                     colors: [
-                      Color(0xFF0c0c0c),
-                      Colors.transparent,
-                      Colors.transparent,
-                      Color(0xFF0c0c0c)
+                      Theme.of(context).colorScheme.surface,
+                      Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                      Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                      Theme.of(context).colorScheme.surface,
                     ],
                     stops: [0.0, 0.05, 0.95, 1.0],
                   ).createShader(bounds);

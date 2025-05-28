@@ -380,7 +380,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                   end: Alignment.topCenter,
                   colors: [
                     Theme.of(context).colorScheme.surface,
-                    Colors.transparent,
+                    Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
                   ],
                   stops: [0.9, 1.0],
                 ),

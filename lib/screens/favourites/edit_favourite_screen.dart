@@ -94,7 +94,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    String? userId = context.read<User?>()?.uid;
+    var userId = context.read<User?>()?.uid;
 
     Future<void> deleteFavorites() async {
       // retrieve the list of services that the user initially had in their favourites
@@ -273,14 +273,14 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
                   servicesChecklist = ShaderMask(
                     shaderCallback: (Rect bounds) {
-                      return const LinearGradient(
+                      return LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
                         colors: [
-                          Color(0xFF0c0c0c),
-                          Colors.transparent,
-                          Colors.transparent,
-                          Color(0xFF0c0c0c)
+                          Theme.of(context).colorScheme.surface,
+                          Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                          Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                          Theme.of(context).colorScheme.surface,
                         ],
                         stops: [0.0, 0.05, 0.95, 1.0],
                       ).createShader(bounds);
