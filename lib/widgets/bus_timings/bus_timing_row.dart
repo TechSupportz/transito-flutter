@@ -220,7 +220,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                           case CrowdLvl.LSD:
                             return AppColors.sortaRed;
                           case CrowdLvl.NA:
-                            return Colors.white;
+                            return AppColors.scheme.onSurface;
                         }
                       })(),
                     ),

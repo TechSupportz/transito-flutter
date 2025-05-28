@@ -13,7 +13,7 @@ class UserSettings {
   @JsonKey(defaultValue: true)
   final bool showNearbyDistance;
 
-  @JsonKey(defaultValue: AppThemeMode.SYSTEM)
+  @JsonKey(defaultValue: AppThemeMode.SYSTEM, unknownEnumValue: AppThemeMode.SYSTEM)
   final AppThemeMode themeMode;
 
   UserSettings({

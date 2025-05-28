@@ -69,7 +69,7 @@ class BusServiceDetailsApiResponse {
 class BusService {
   String serviceNo;
 
-  @JsonKey(defaultValue: BusOperator.NA)
+  @JsonKey(defaultValue: BusOperator.NA, unknownEnumValue: BusOperator.NA)
   BusOperator operator;
   
   bool isLoopService;

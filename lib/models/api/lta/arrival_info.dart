@@ -77,13 +77,13 @@ class IndivArrivalInfo {
   @JsonKey(fromJson: stringToInt)
   int? visitNumber;
 
-  @JsonKey(name: 'Load', defaultValue: CrowdLvl.NA)
+  @JsonKey(name: 'Load', defaultValue: CrowdLvl.NA, unknownEnumValue: CrowdLvl.NA)
   CrowdLvl crowdLvl;
 
   @JsonKey(name: 'Feature', fromJson: decodeIsAccessible)
   bool isAccessible;
 
-  @JsonKey(name: 'Type', defaultValue: BusType.NA)
+  @JsonKey(name: 'Type', defaultValue: BusType.NA, unknownEnumValue: BusType.NA)
   BusType busType;
 
   static double stringToDouble(String stringToConvert) {
