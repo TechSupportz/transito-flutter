@@ -181,7 +181,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<PackageInfo> getAppInfo() async {
-    print("Fetching App Info...");
+    debugPrint("Fetching App Info...");
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     return packageInfo;
   }
@@ -547,7 +547,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     future: _appInfo,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        print(snapshot.data);
                         return SettingsOthersCard(
                           title: "About",
                           icon: Icons.info_outline_rounded,
@@ -578,7 +577,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ]),
                         );
                       } else if (snapshot.hasError) {
-                        print(snapshot.error);
+                        debugPrint("Error fetching app info: ${snapshot.error}");
                       }
                       return SkeletonItem(
                           child: SkeletonLine(

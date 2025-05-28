@@ -4,6 +4,7 @@ void scrollToSelectedContent(GlobalKey expansionTileKey) {
   final keyContext = expansionTileKey.currentContext;
   if (keyContext != null) {
     Future.delayed(const Duration(milliseconds: 200)).then((value) {
+      if (!keyContext.mounted) return;
       Scrollable.ensureVisible(keyContext,
           curve: Curves.easeInOut, duration: const Duration(milliseconds: 250));
     });
