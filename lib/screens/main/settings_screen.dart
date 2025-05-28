@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
+import 'package:transito/models/enums/app_theme_mode.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/global/services/authentication_service.dart';
 import 'package:transito/global/services/settings_service.dart';
@@ -396,14 +397,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       return Column(
                         spacing: 16,
                         children: [
-                          SettingsRadioCard<ThemeMode>(
+                          SettingsRadioCard<AppThemeMode>(
                             title: "Theme",
                             initialValue: snapshot.data!.themeMode,
                             firebaseFieldName: 'themeMode',
                             options: [
-                              SettingsCardOption(value: ThemeMode.light, label: "Light"),
-                              SettingsCardOption(value: ThemeMode.dark, label: "Dark"),
-                              SettingsCardOption(value: ThemeMode.system, label: "Follow System"),
+                              SettingsCardOption(value: AppThemeMode.LIGHT, label: "Light"),
+                              SettingsCardOption(value: AppThemeMode.DARK, label: "Dark"),
+                              SettingsCardOption(
+                                  value: AppThemeMode.SYSTEM, label: "Follow System"),
                             ],
                           ),
                           Container(

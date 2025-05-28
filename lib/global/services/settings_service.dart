@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/user/user_settings.dart';
+import 'package:transito/models/enums/app_theme_mode.dart';
 
 class SettingsService {
   final CollectionReference _settingsCollection = FirebaseFirestore.instance.collection('settings');
@@ -20,7 +21,7 @@ class SettingsService {
             isETAminutes: true,
             isNearbyGrid: true,
             showNearbyDistance: true,
-            themeMode: ThemeMode.system,
+            themeMode: AppThemeMode.SYSTEM,
           );
         }
       });
@@ -31,7 +32,7 @@ class SettingsService {
           isETAminutes: true,
           isNearbyGrid: true,
           showNearbyDistance: true,
-          themeMode: ThemeMode.system,
+          themeMode: AppThemeMode.SYSTEM,
         ),
       );
     }
@@ -102,7 +103,7 @@ class SettingsService {
     }
   }
 
-  Future<void> updateThemeMode({String? userId, required ThemeMode newValue}) async {
+  Future<void> updateThemeMode({String? userId, required AppThemeMode newValue}) async {
     if (userId != null) {
       _settingsCollection
           .doc(userId)

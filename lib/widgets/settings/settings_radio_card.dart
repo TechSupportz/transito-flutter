@@ -4,6 +4,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
+import 'package:transito/models/enums/app_theme_mode.dart';
 
 import '../../global/services/settings_service.dart';
 
@@ -56,7 +57,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
         case 'themeMode':
           SettingsService().updateThemeMode(
             userId: user?.uid,
-            newValue: newValue as ThemeMode,
+            newValue: newValue as AppThemeMode,
           );
         // Add more cases as needed for other field types
         default:

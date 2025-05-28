@@ -370,7 +370,7 @@ class _NearbyScreenState extends State<NearbyScreen>
                                 BusStopCard(
                                   busStopInfo: data.busStop,
                                   distanceFromUser: data.distanceAway,
-                                  showDistanceFromUser: userSettings.showNearbyDistance ?? true,
+                                  showDistanceFromUser: userSettings.showNearbyDistance,
                                 ),
                             ],
                           );

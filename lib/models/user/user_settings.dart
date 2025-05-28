@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
+import 'package:transito/models/enums/app_theme_mode.dart';
 
 part 'user_settings.g.dart';
 
@@ -13,8 +13,8 @@ class UserSettings {
   @JsonKey(defaultValue: true)
   final bool showNearbyDistance;
 
-  @JsonKey(defaultValue: ThemeMode.system)
-  final ThemeMode themeMode;
+  @JsonKey(defaultValue: AppThemeMode.SYSTEM)
+  final AppThemeMode themeMode;
 
   UserSettings({
     required this.accentColour,
