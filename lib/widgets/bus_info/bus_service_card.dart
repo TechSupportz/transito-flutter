@@ -12,8 +12,8 @@ class BusServiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final searchProvider = context.read()<SearchProvider>();
-    final appColors = context.read<AppColors>();
+    final searchProvider = Provider.of<SearchProvider>(context, listen: false);
+    final appColors = Provider.of<AppColors>(context, listen: false);
 
     return Material(
       color: Colors.transparent,
