@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
 import 'package:transito/models/enums/app_theme_mode.dart';
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:transito/models/app/app_colors.dart';
 
 class ErrorText extends StatelessWidget {
   const ErrorText({super.key, this.enableBackground = false});

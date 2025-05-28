@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/navigator_screen.dart';
@@ -96,7 +95,6 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     String? userId = context.read<User?>()?.uid;
-    AppColors appColors = context.read<AppColors>();
 
     Future<void> deleteFavorites() async {
       // retrieve the list of services that the user initially had in their favourites

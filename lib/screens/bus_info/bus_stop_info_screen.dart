@@ -7,12 +7,11 @@ import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/api/lta/arrival_info.dart';
-import 'package:transito/models/api/transito/bus_services.dart';
-import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
+import 'package:transito/models/secret.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
@@ -180,7 +179,6 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   @override
   Widget build(BuildContext context) {
     bool isTablet = context.read<CommonProvider>().isTablet;
-    AppColors appColors = context.read<AppColors>();
 
     return Scaffold(
       appBar: AppBar(

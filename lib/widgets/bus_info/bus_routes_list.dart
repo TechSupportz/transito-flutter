@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smooth_highlight/smooth_highlight.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 
 class BusRoutesList extends StatelessWidget {

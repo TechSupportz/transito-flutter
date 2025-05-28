@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/models/enums/app_theme_mode.dart';
+import 'package:transito/models/user/user_settings.dart';
 
 class SettingsService {
   final CollectionReference _settingsCollection = FirebaseFirestore.instance.collection('settings');
@@ -34,6 +34,35 @@ class SettingsService {
           showNearbyDistance: true,
           themeMode: AppThemeMode.SYSTEM,
         ),
+      );
+    }
+  }
+
+  Future<void> updateThemeMode({
+    String? userId,
+    required AppThemeMode newValue,
+    required BuildContext context,
+  }) async {
+    if (userId != null) {
+      _settingsCollection.doc(userId).update({
+        'themeMode': newValue.name,
+      }).then(
+        (_) {
+          AppColors().updateLocalBrightness(
+            newValue == AppThemeMode.DARK
+                ? Brightness.dark
+                : newValue == AppThemeMode.LIGHT
+                    ? Brightness.light
+                    : context.mounted
+                        ? MediaQuery.platformBrightnessOf(context)
+                        : Brightness.dark,
+          );
+          debugPrint('✔️ Updated themeMode to $newValue');
+        },
+      ).catchError(
+        (error) {
+          debugPrint('❌ Error updating themeMode in Firestore: $error');
+        },
       );
     }
   }
@@ -99,34 +128,6 @@ class SettingsService {
           )
           .catchError(
             (error) => debugPrint('❌ Error updating showNearbyDistance in Firestore: $error'),
-          );
-    }
-  }
-
-  Future<void> updateThemeMode(
-      {String? userId, required AppThemeMode newValue, required BuildContext context}) async {
-    if (userId != null) {
-      _settingsCollection
-          .doc(userId)
-          .update({
-            'themeMode': newValue.name,
-          })
-          .then(
-            (_) => {
-              AppColors().updateLocalBrightness(
-                newValue == AppThemeMode.DARK
-                    ? Brightness.dark
-                    : newValue == AppThemeMode.LIGHT
-                        ? Brightness.light
-                        : context.mounted
-                            ? MediaQuery.platformBrightnessOf(context)
-                            : Brightness.dark,
-              ),
-              debugPrint('✔️ Updated themeMode to $newValue')
-            },
-          )
-          .catchError(
-            (error) => debugPrint('❌ Error updating themeMode in Firestore: $error'),
           );
     }
   }

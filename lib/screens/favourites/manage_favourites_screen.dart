@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/favourites/favourite_name_card.dart';
@@ -88,8 +87,6 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppColors appColors = context.read<AppColors>();
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Manage Favourites'),

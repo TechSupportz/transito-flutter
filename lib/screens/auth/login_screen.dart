@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
-import 'package:provider/provider.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 
 import '../../global/services/authentication_service.dart';
@@ -129,8 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppColors appColors = context.read<AppColors>();
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       body: Padding(

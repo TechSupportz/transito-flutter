@@ -16,7 +16,6 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';

@@ -8,8 +8,8 @@ import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/app/app_colors.dart';
 import '../../global/services/authentication_service.dart';
+import '../../models/app/app_colors.dart';
 import '../../widgets/auth/email_verification_dialog.dart';
 import '../onboarding/location_access_screen.dart';
 import 'login_screen.dart';
@@ -466,8 +466,6 @@ class _EmailScreenState extends State<EmailScreen> {
   }
 
   AlertDialog forgetPasswordDialog(BuildContext context) {
-    AppColors appColors = context.read<AppColors>();
-
     return AlertDialog(
       title: const Text('Forgot Password'),
       content: Column(

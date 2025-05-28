@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
 
 class AddFavouritesScreen extends StatefulWidget {
@@ -46,7 +45,6 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     String? userId = context.read<User?>()?.uid;
-    AppColors appColors = context.read<AppColors>();
 
     // access favourites provider
     FavouritesProvider favourites = context.read<FavouritesProvider>();
