@@ -11,6 +11,7 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
@@ -179,6 +180,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   @override
   Widget build(BuildContext context) {
     bool isTablet = context.read<CommonProvider>().isTablet;
+    AppColors appColors = context.read<AppColors>();
 
     return Scaffold(
       appBar: AppBar(
@@ -336,25 +338,38 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                       ~InteractiveFlag.pinchMove &
                                       ~InteractiveFlag.rotate,
                                 ),
-                                backgroundColor: const Color(0xFF003653),
+                                backgroundColor: appColors.brightness == Brightness.dark
+                                    ? Color(0xFF003653)
+                                    : Color(0xFF6DA7E3),
                               ),
                               children: [
                                 TileLayer(
                                   urlTemplate:
-                                      "https://www.onemap.gov.sg/maps/tiles/Night_HD/{z}/{x}/{y}.png",
+                                      "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
                                   fallbackUrl:
-                                      "https://www.onemap.gov.sg/maps/tiles/Night/{z}/{x}/{y}.png",
+                                      "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
                                   userAgentPackageName: 'com.tnitish.transito',
                                   errorImage: const AssetImage('assets/images/mapError.png'),
                                 ),
                                 MarkerLayer(
                                   markers: [
                                     Marker(
+                                      key: const Key('bus-stop-marker'),
+                                      alignment: Alignment.topCenter,
+                                      width: 48,
+                                      height: 48,
                                       point: widget.busStopLocation,
                                       child: Icon(
                                         Icons.place_rounded,
-                                        size: 35,
+                                        size: 48,
                                         color: Theme.of(context).colorScheme.primary,
+                                        shadows: [
+                                          Shadow(
+                                            color: Theme.of(context).colorScheme.onPrimary,
+                                            blurRadius: 48,
+                                            offset: const Offset(0, 0),
+                                          ),
+                                        ],
                                       ),
                                     ),
                                   ],
@@ -373,7 +388,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              padding: const EdgeInsets.only(bottom: 16, top: 16),
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.bottomCenter,

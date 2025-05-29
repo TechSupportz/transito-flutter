@@ -117,6 +117,11 @@ class _MyAppState extends State<MyApp> {
       }
     });
 
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      systemNavigationBarColor: Theme.of(context).colorScheme.primary.withAlpha(0),
+    ));
+
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {

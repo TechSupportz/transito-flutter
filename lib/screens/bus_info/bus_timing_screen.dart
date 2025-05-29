@@ -394,7 +394,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                             opacity: 0.65,
                                             child: Column(
                                               children: [
-                                                const Divider(),
                                                 Theme(
                                                   data: Theme.of(context).copyWith(
                                                     splashFactory: NoSplash.splashFactory,

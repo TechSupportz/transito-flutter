@@ -22,7 +22,7 @@ class BusRoutesList extends StatelessWidget {
       child: ListView.separated(
           shrinkWrap: true,
           controller: controller,
-          padding: const EdgeInsets.only(bottom: 16),
+          padding: const EdgeInsets.only(bottom: 24),
           itemCount: routes.length,
           separatorBuilder: (context, _) => const SizedBox(height: 12),
           itemBuilder: (context, index) {

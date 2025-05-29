@@ -76,6 +76,12 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   }
 
   @override
+  void dispose() {
+    drawerScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     AppColors appColors = context.read<AppColors>();
 
@@ -85,7 +91,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         title: const Text('Bus Service Information'),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.only(top:12.0, left: 12, right: 12),
         child: FutureBuilder(
           future: futureBusServiceInfo,
           builder: (context, snapshot) {
@@ -316,7 +322,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                           clipBehavior: Clip.antiAlias,
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surfaceContainerLow,
-                            borderRadius: BorderRadius.circular(24),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(24),
+                              topRight: Radius.circular(24),
+                            ),
                           ),
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -328,7 +337,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                   drawerScrollController.animateTo(
                                     drawerScrollController.size < 0.885 ? 0.885 : sheetHeight,
                                     duration: const Duration(milliseconds: 350),
-                                    curve: Curves.ease,
+                                    curve: Curves.easeInOutCubicEmphasized,
                                   );
                                 },
                                 child: Padding(
@@ -378,8 +387,8 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                           textDirection: TextDirection.ltr,
                                           child: child,
                                         ),
-                                        switchInCurve: Curves.ease,
-                                        switchOutCurve: Curves.ease,
+                                        switchInCurve: Curves.easeInOutCubicEmphasized,
+                                        switchOutCurve: Curves.easeInOutCubicEmphasized,
                                         duration: const Duration(milliseconds: 350),
                                         child: _destinationIndex == 0
                                             ? BusRoutesList(
@@ -402,7 +411,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                           scrollController.animateTo(
                                             currentStopIndex * 82.0,
                                             duration: const Duration(seconds: 1),
-                                            curve: Curves.ease,
+                                            curve: Curves.easeInOutCubicEmphasized,
                                           );
                                         },
                                       );

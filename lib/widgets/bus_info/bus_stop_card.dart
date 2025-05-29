@@ -118,7 +118,9 @@ class BusStopCard extends StatelessWidget {
           ),
           child: Ink(
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainer, borderRadius: BorderRadius.circular(12)),
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              borderRadius: BorderRadius.circular(12),
+            ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
@@ -149,7 +151,8 @@ class BusStopCard extends StatelessWidget {
                             child: Text(
                               busStopInfo.code,
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimary, fontWeight: FontWeight.w500),
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                  fontWeight: FontWeight.w500),
                             ),
                           ),
                           Expanded(
@@ -203,8 +206,9 @@ class BusStopCard extends StatelessWidget {
       fontSize: 18.0,
     );
 
-    const TextStyle timeStyle = TextStyle(
+    TextStyle timeStyle = TextStyle(
       fontWeight: FontWeight.w600,
+      color: Theme.of(context).colorScheme.onSurface,
       fontFamily: 'Poppins',
       fontSize: 30.0,
     );
@@ -297,7 +301,7 @@ class BusStopCard extends StatelessWidget {
                       style: timeStyle,
                     )
                   else
-                    const Text(
+                    Text(
                       "never o'clock",
                       style: timeStyle,
                     ),
@@ -342,7 +346,7 @@ class BusStopCard extends StatelessWidget {
                       style: timeStyle,
                     )
                   else
-                    const Text(
+                    Text(
                       "never o'clock",
                       style: timeStyle,
                     ),

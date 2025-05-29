@@ -451,7 +451,7 @@ class _NearbyScreenState extends State<NearbyScreen>
           padding: const EdgeInsets.only(bottom: 16.0),
           child: AnimatedSize(
             duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
+            curve: Curves.ease,
             child: FutureBuilder(
               future: nearbyFavourites,
               builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
