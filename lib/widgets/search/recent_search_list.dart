@@ -24,17 +24,19 @@ class RecentSearchList extends StatelessWidget {
 
   // widget to display users recent searches
   ListView _recentSearches(SearchProvider value) {
+    List<dynamic> recentSearches = value.recentSearches.reversed.toList();
+
     return ListView.separated(
       padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-      itemCount: value.recentSearches.length,
+      itemCount: recentSearches.length,
       itemBuilder: (context, index) {
         // determines which widget to show depending on if the recent search is a bus stop or a bus service
-        if (value.recentSearches[index] is BusStop) {
-          return BusStopCard(busStopInfo: value.recentSearches[index], searchMode: true);
+        if (recentSearches[index] is BusStop) {
+          return BusStopCard(busStopInfo: recentSearches[index], searchMode: true);
         }
 
-        if (value.recentSearches[index] is BusService) {
-          return BusServiceCard(busServiceInfo: value.recentSearches[index]);
+        if (recentSearches[index] is BusService) {
+          return BusServiceCard(busServiceInfo: recentSearches[index]);
         }
 
         return null;
