@@ -112,12 +112,9 @@ class _MyAppState extends State<MyApp> {
               : MediaQuery.platformBrightnessOf(context);
       Color seedColor = Color(int.parse(userSettings.accentColour));
 
-      appColors.updateLocalColorScheme(
-        ColorScheme.fromSeed(
-          seedColor: seedColor,
-          brightness: brightness,
-        ),
-      );
+      if (seedColor != appColors.accentColour || brightness != appColors.brightness) {
+        appColors.updateLocalColorScheme(seedColor, brightness);
+      }
     });
 
     return StreamBuilder<UserSettings>(

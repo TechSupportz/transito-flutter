@@ -14,30 +14,35 @@ class AppColors with ChangeNotifier {
 
   // Public getters for instance variables
   Color get accentColour => _accentColour;
+  Brightness get brightness => _brightness;
   ColorScheme get scheme => _scheme;
 
   // Method to update dynamic colors
   void updateLocalAccentColour(Color newColor) {
-    _accentColour = newColor;
     _scheme = ColorScheme.fromSeed(
       seedColor: _accentColour,
       brightness: _brightness,
     );
+    _accentColour = newColor;
     notifyListeners();
   }
 
   void updateLocalBrightness(Brightness newBrightness) {
-    _brightness = newBrightness;
     _scheme = ColorScheme.fromSeed(
       seedColor: _accentColour,
       brightness: _brightness,
     );
+    _brightness = newBrightness;
     notifyListeners();
   }
 
-  void updateLocalColorScheme(ColorScheme newScheme) {
-    _scheme = newScheme;
-    _brightness = newScheme.brightness;
+  void updateLocalColorScheme(Color newAccentColour, Brightness newBrightness) {
+    _scheme = ColorScheme.fromSeed(
+      seedColor: newAccentColour,
+      brightness: newBrightness,
+    );
+    _accentColour = newAccentColour;
+    _brightness = newBrightness;
     notifyListeners();
   }
 
