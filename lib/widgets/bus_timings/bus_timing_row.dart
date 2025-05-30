@@ -194,7 +194,6 @@ class _ArrivalCardState extends State<ArrivalCard> {
   @override
   Widget build(BuildContext context) {
     AppColors appColors = context.read<AppColors>();
-    
     return widget.eta != '-'
         ? Row(
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -261,10 +260,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
             ],
           )
         // if there is no bus arrival time available it displays '-'
-        : const Center(
+        : Center(
             child: Text(
             '    -  ',
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500, color: Colors.white),
+            style: TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurfaceVariant),
           ));
   }
 }
