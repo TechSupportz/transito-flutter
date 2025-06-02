@@ -34,6 +34,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _nameFieldKey = GlobalKey<FormBuilderFieldState>();
   final _accentColourFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
+  bool _isSettingsLoading = true;
   final TextStyle titleStyle = const TextStyle(fontSize: 30, fontWeight: FontWeight.w700);
   late Future<PackageInfo> _appInfo;
 
@@ -392,11 +393,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: titleStyle,
                 ),
                 const SizedBox(height: 16),
-                StreamBuilder(
+                StreamBuilder<UserSettings>(
                   stream: SettingsService().streamSettings(user?.uid),
                   builder: (context, AsyncSnapshot<UserSettings> snapshot) {
+                    Widget? settingsContentWidget;
+
                     if (snapshot.hasData) {
-                      return Column(
+                      settingsContentWidget = Column(
+                        key: const ValueKey(1),
                         spacing: 16,
                         children: [
                           SettingsRadioCard<AppThemeMode>(
@@ -410,6 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   value: AppThemeMode.SYSTEM, label: "Follow System"),
                             ],
                           ),
+                          // Removed SizedBox(height: 16)
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
@@ -502,19 +507,51 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ]),
                         ],
                       );
-                    } else if (snapshot.hasError) {
-                      return Container(
-                          decoration: BoxDecoration(
-                            color: appColors.scheme.surfaceContainer,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: ErrorText(),
-                          ));
-                    } else {
-                      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _isSettingsLoading = false;
+                        });
+                      });
                     }
+
+                    if (snapshot.hasError) {
+                      debugPrint("<=== ERROR ${snapshot.error} ===>");
+                      settingsContentWidget = const ErrorText(
+                        enableBackground: true,
+                      );
+                      WidgetsBinding.instance.addPostFrameCallback((_) {
+                        setState(() {
+                          _isSettingsLoading = false;
+                        });
+                      });
+                    }
+
+                    return Skeleton(
+                      isLoading: _isSettingsLoading || settingsContentWidget == null,
+                      skeleton: Column(
+                        key: const ValueKey(0),
+                        spacing: 16,
+                        children: [
+                          SkeletonLine(
+                              style: SkeletonLineStyle(
+                                  height: 234, borderRadius: BorderRadius.circular(12))),
+                          SkeletonLine(
+                              style: SkeletonLineStyle(
+                                  height: 178, borderRadius: BorderRadius.circular(12))),
+                          SkeletonLine(
+                              style: SkeletonLineStyle(
+                                  height: 186, borderRadius: BorderRadius.circular(12))),
+                          SkeletonLine(
+                              style: SkeletonLineStyle(
+                                  height: 186, borderRadius: BorderRadius.circular(12))),
+                          SkeletonLine(
+                              style: SkeletonLineStyle(
+                                  height: 186, borderRadius: BorderRadius.circular(12))),
+                        ],
+                      ),
+                      child: settingsContentWidget ?? const SizedBox.shrink(),
+                    );
                   },
                 )
               ],
