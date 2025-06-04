@@ -249,8 +249,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           duration: const Duration(milliseconds: 175),
                           child: _isNameFieldLoading
                               ? SizedBox(
-                                  // height: 16,
-                                  // width: 16,
+                                  height: 16,
+                                  width: 16,
                                   child: Center(
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
