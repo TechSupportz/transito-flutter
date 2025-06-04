@@ -3,18 +3,18 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
-import 'package:form_builder_extra_fields/form_builder_extra_fields.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+import 'package:transito/global/services/authentication_service.dart';
+import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
 import 'package:transito/models/enums/app_theme_mode.dart';
 import 'package:transito/models/user/user_settings.dart';
-import 'package:transito/global/services/authentication_service.dart';
-import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
@@ -414,7 +414,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   value: AppThemeMode.SYSTEM, label: "Follow System"),
                             ],
                           ),
-                          // Removed SizedBox(height: 16)
                           Container(
                             width: double.infinity,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
@@ -433,49 +432,83 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                                FormBuilderColorPickerField(
-                                  key: _accentColourFieldKey,
-                                  name: "Accent Colour",
-                                  colorPickerType: ColorPickerType.colorPicker,
-                                  colorPreviewBuilder: (p0) => Padding(
-                                    padding: const EdgeInsets.all(6.0),
-                                    child: Container(
-                                      width: 40,
-                                      decoration: BoxDecoration(
-                                        color: p0,
-                                        shape: BoxShape.circle,
+                                GestureDetector(
+                                  onTap: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        content: SingleChildScrollView(
+                                          child: FormBuilderField(
+                                            key: _accentColourFieldKey,
+                                            name: "Accent Colour",
+                                            initialValue:
+                                                Color(int.parse(snapshot.data!.accentColour)),
+                                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                                            builder: (field) => ColorPicker(
+                                                paletteType: PaletteType.hueWheel,
+                                                displayThumbColor: true,
+                                                enableAlpha: false,
+                                                hexInputBar: true,
+                                                labelTypes: [],
+                                                colorPickerWidth: 300,
+                                                pickerColor: field.value ??
+                                                    Color(int.parse(snapshot.data!.accentColour)),
+                                                onColorChanged: (color) {
+                                                  field.didChange(color);
+                                                }),
+                                          ),
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.of(context).pop(),
+                                            child: const Text("Close"),
+                                          ),
+                                          FilledButton(
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                                updateAccentColour(user);
+                                              },
+                                              child: const Text("Apply"))
+                                        ],
                                       ),
+                                    );
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                        top: 8, bottom: 8, left: 16, right: 8),
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: appColors.scheme.surfaceContainerHighest,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          colorToHex(
+                                            Color(int.parse(snapshot.data!.accentColour)),
+                                            includeHashSign: true,
+                                            enableAlpha: false,
+                                          ),
+                                          style: const TextStyle(fontSize: 18),
+                                        ),
+                                        Icon(
+                                          Icons.circle_rounded,
+                                          color: Color(int.parse(snapshot.data!.accentColour)),
+                                          size: 40,
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  initialValue: Color(int.parse(snapshot.data!.accentColour)),
-                                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                                  keyboardType: TextInputType.none,
-                                  validator: FormBuilderValidators.compose([
-                                    FormBuilderValidators.required(),
-                                    (val) {
-                                      if (val?.a != 1) {
-                                        return "Please select a fully opaque colour";
-                                      }
-                                      if ('0x${val.toString().substring(8, 16).toUpperCase()}' ==
-                                          snapshot.data!.accentColour) {
-                                        return "This is already your accent colour";
-                                      }
-                                      return null;
-                                    }
-                                  ]),
                                 ),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     FilledButton.tonal(
-                                        onPressed: () => resetAccentColour(user),
-                                        child: const Text("Reset to default")),
-                                    const SizedBox(width: 8),
-                                    FilledButton(
-                                        onPressed: () => updateAccentColour(user),
-                                        child: const Text("Apply"))
+                                      onPressed: () => resetAccentColour(user),
+                                      child: const Text("Reset to default"),
+                                    ),
                                   ],
-                                )
+                                ),
                               ],
                             ),
                           ),
@@ -498,13 +531,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ],
                           ),
                           SettingsRadioCard<bool>(
-                              title: "Nearby Detail",
-                              initialValue: snapshot.data!.showNearbyDistance,
-                              firebaseFieldName: 'showNearbyDistance',
-                              options: [
-                                SettingsCardOption(value: true, label: "Distance to bus stops"),
-                                SettingsCardOption(value: false, label: "Road name of bus stops")
-                              ]),
+                            title: "Nearby Detail",
+                            initialValue: snapshot.data!.showNearbyDistance,
+                            firebaseFieldName: 'showNearbyDistance',
+                            options: [
+                              SettingsCardOption(value: true, label: "Distance to bus stops"),
+                              SettingsCardOption(value: false, label: "Road name of bus stops")
+                            ],
+                          ),
                         ],
                       );
 
