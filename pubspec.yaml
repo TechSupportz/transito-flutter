@@ -51,6 +51,7 @@ dependencies:
     collection: ^1.18.0
     smooth_highlight: ^0.1.1
     flutter_colorpicker: ^1.1.0
+    animations: ^2.0.11
 
 dev_dependencies:
     flutter_test:

@@ -1,4 +1,4 @@
-import 'package:flutter/gestures.dart';
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
@@ -13,7 +13,6 @@ class NavigatorScreen extends StatefulWidget {
 }
 
 class _NavigatorScreenState extends State<NavigatorScreen> {
-  late final PageController controller;
   int _pageIndex = 0;
   final List<Widget> _pages = const [
     NearbyScreen(),
@@ -24,26 +23,29 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   @override
   void initState() {
     super.initState();
-    controller = PageController(initialPage: _pageIndex, keepPage: true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: UpgradeAlert(
-        upgrader: Upgrader(
-          countryCode: "SG",
-        ),
-        child: PageView(
-          controller: controller,
-          pageSnapping: true,
-          dragStartBehavior: DragStartBehavior.start,
-          onPageChanged: (index) {
-            setState(() => _pageIndex = index);
-          },
-          children: _pages,
-        ),
-      ),
+          upgrader: Upgrader(
+            countryCode: "SG",
+          ),
+          child: PageTransitionSwitcher(
+            transitionBuilder: (
+              Widget child,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+            ) {
+              return FadeThroughTransition(
+                animation: animation,
+                secondaryAnimation: secondaryAnimation,
+                child: child,
+              );
+            },
+            child: _pages[_pageIndex],
+          )),
       bottomNavigationBar: NavigationBar(
         destinations: const <NavigationDestination>[
           NavigationDestination(icon: Icon(Icons.explore_rounded), label: "Nearby"),
@@ -57,9 +59,6 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           // updates _pageIndex and animates the page transition
           setState(() {
             _pageIndex = index;
-            controller.animateToPage(index,
-                duration: const Duration(milliseconds: 300),
-                curve: Curves.easeInOutCubicEmphasized);
           });
         },
       ),
