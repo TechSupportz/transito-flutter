@@ -149,7 +149,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
                             gradient: RadialGradient(
-                              colors: [Color(0xAA3C18BF), Color(0xAA3C18BF).withValues(alpha: 0)],
+                              colors: Theme.of(context).brightness == Brightness.dark
+                                  ? [Color(0xAA3C18BF), Color(0xAA3C18BF).withValues(alpha: 0)]
+                                  : [Color(0xAAA680FF), Color(0xAA9466FF).withValues(alpha: 0)],
                               stops: [0, 1],
                             ),
                             shape: BoxShape.circle,
@@ -178,10 +180,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Spacer(),
                     Container(
                       decoration: BoxDecoration(
-                        color: const Color(0xFF151515),
+                        color: Theme.of(context).colorScheme.surfaceContainer,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 24),
                       margin: const EdgeInsets.only(bottom: 48),
                       child: Column(
                         children: [
@@ -207,7 +209,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       const EdgeInsets.symmetric(vertical: 12),
                                     ),
                                     backgroundColor: WidgetStateProperty.all<Color>(
-                                      Color(0xFFF2F2F2),
+                                      Colors.white,
                                     ),
                                   ),
                                 ),
@@ -233,11 +235,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 FilledButton.tonalIcon(
                                   onPressed: () => onEmailBtnPress(),
-                                  icon: Icon(Icons.email_rounded,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                  icon: Icon(
+                                    Icons.email_rounded,
+                                  ),
                                   label: const Text(
                                     'Continue with Email',
-                                    style: TextStyle(color: Colors.white),
                                   ),
                                   style: ButtonStyle(
                                     padding: WidgetStateProperty.all<EdgeInsets>(
@@ -245,19 +247,29 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                   ),
                                 ),
-                                OutlinedButton.icon(
+                                FilledButton.tonalIcon(
                                   onPressed: () => showGuestLoginDialog(),
                                   icon: Icon(
                                     Icons.person_rounded,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   label: const Text(
                                     'Continue as a Guest',
-                                    style: TextStyle(color: Colors.white),
                                   ),
                                   style: ButtonStyle(
                                     padding: WidgetStateProperty.all<EdgeInsets>(
                                       const EdgeInsets.symmetric(vertical: 12),
+                                    ),
+                                    iconColor: WidgetStateColor.fromMap(
+                                      {
+                                        WidgetState.any:
+                                            Theme.of(context).colorScheme.onTertiaryContainer,
+                                      },
+                                    ),
+                                    foregroundColor: WidgetStateProperty.all<Color>(
+                                      Theme.of(context).colorScheme.onTertiaryContainer,
+                                    ),
+                                    backgroundColor: WidgetStateProperty.all<Color>(
+                                      Theme.of(context).colorScheme.tertiaryContainer,
                                     ),
                                   ),
                                 ),

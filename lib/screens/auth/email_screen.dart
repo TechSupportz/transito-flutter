@@ -199,99 +199,104 @@ class _EmailScreenState extends State<EmailScreen> {
 
     return Scaffold(
       appBar: AppBar(),
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: const SystemUiOverlayStyle(
-          statusBarColor: Color(0xff0C0C0C),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-          child: ScrollConfiguration(
-            behavior: const ScrollBehavior().copyWith(overscroll: false),
-            child: CustomScrollView(
-              physics: const NeverScrollableScrollPhysics(),
-              slivers: [
-                SliverFillRemaining(
-                  hasScrollBody: false,
-                  child: Column(
-                    children: [
-                      const Spacer(flex: 1),
-                      Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 12.0),
-                            child: SvgPicture.asset('assets/images/logo.svg', height: 200),
-                          ),
-                          const SizedBox(height: 20),
-                          Text(
-                            'The last bus timing app you\'ll ever need.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              fontWeight: FontWeight.w200,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Spacer(flex: 1),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Container(
-                          constraints: const BoxConstraints(minHeight: 264),
-                          child: AnimatedSwitcher(
-                            transitionBuilder: (child, animation) => ScaleTransition(
-                              scale: animation,
-                              child: child,
-                            ),
-                            duration: const Duration(milliseconds: 185),
-                            child: _isLogin ? renderLoginForm() : renderRegisterForm(),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+        child: ScrollConfiguration(
+          behavior: const ScrollBehavior().copyWith(overscroll: false),
+          child: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  children: [
+                    const Spacer(flex: 1),
+                    Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 12.0),
+                          child: SvgPicture.asset('assets/images/logo.svg', height: 200),
+                        ),
+                        const SizedBox(height: 20),
+                        Text(
+                          'The last bus timing app you\'ll ever need.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontWeight: FontWeight.w200,
                           ),
                         ),
-                      ),
-                      const Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16.0),
-                        child: GestureDetector(
-                          onTap: () => setState(() {
-                            _isLogin = !_isLogin;
-                          }),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: _isLogin
-                                ? [
-                                    Text(
-                                      'New Here?',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                    ),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      'Register!',
-                                      style: TextStyle(fontSize: 14, color: appColors.accentColour),
-                                    ),
-                                  ]
-                                : [
-                                    Text(
-                                      'Already have an account?',
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                    ),
-                                    const SizedBox(width: 3),
-                                    Text(
-                                      'Login!',
-                                      style: TextStyle(fontSize: 14, color: appColors.accentColour),
-                                    ),
-                                  ],
+                      ],
+                    ),
+                    const Spacer(flex: 1),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: 264),
+                        child: AnimatedSwitcher(
+                          transitionBuilder: (child, animation) => ScaleTransition(
+                            scale: animation,
+                            child: child,
                           ),
+                          duration: const Duration(milliseconds: 185),
+                          child: _isLogin ? renderLoginForm() : renderRegisterForm(),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                    const Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0, bottom: 32.0),
+                      child: GestureDetector(
+                        onTap: () => setState(() {
+                          _isLogin = !_isLogin;
+                        }),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: _isLogin
+                              ? [
+                                  Text(
+                                    'New Here?',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    'Register!',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                ]
+                              : [
+                                  Text(
+                                    'Already have an account?',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 3),
+                                  Text(
+                                    'Login!',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: Theme.of(context).colorScheme.primary,
+                                    ),
+                                  ),
+                                ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -422,7 +427,6 @@ class _EmailScreenState extends State<EmailScreen> {
                     : Icons.visibility_rounded),
                 iconSize: 24,
                 splashRadius: 1,
-                color: Colors.white70,
                 onPressed: () {
                   setState(() {
                     _isLoginPasswordVisible = !_isLoginPasswordVisible;
