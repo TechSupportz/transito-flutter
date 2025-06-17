@@ -36,7 +36,7 @@ class _RecentSearchScreenState extends State<RecentSearchScreen> {
               },
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
-                  Theme.of(context).colorScheme.errorContainer,
+                  Theme.of(context).colorScheme.error,
                 ),
               ),
               child: const Text('Clear'),

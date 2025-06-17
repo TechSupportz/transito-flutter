@@ -216,12 +216,14 @@ class BusStopCard extends StatelessWidget {
     return StatefulBuilder(
       builder: (context, setState) => AlertDialog(
         title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const Text('Bus Schedule'),
             const SizedBox(height: 4.0),
-            Wrap(spacing: 6.0, children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
               ChoiceChip(
                 label: const Text("Weekday"),
                 selected: selectedDay == 0,
