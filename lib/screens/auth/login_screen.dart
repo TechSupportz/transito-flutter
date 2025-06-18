@@ -18,6 +18,8 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   Widget _defaultHome = const LocationAccessScreen();
+  final Color _darkModeGradientColor = const Color(0xAA3C18BF);
+  final Color _lightModeGradientColor = const Color(0xAA9466FF);
 
   void onGoogleBtnPress() async {
     AuthenticationService().signInWithGoogle().then(
@@ -149,12 +151,24 @@ class _LoginScreenState extends State<LoginScreen> {
                           height: MediaQuery.of(context).size.width,
                           decoration: BoxDecoration(
                             gradient: RadialGradient(
+                              radius: 0.55,
+                              center: Alignment.center,
                               colors: Theme.of(context).brightness == Brightness.dark
-                                  ? [Color(0xAA3C18BF), Color(0xAA3C18BF).withValues(alpha: 0)]
-                                  : [Color(0xAAA680FF), Color(0xAA9466FF).withValues(alpha: 0)],
-                              stops: [0, 1],
+                                  ? [
+                                      // Dark Mode Gradient
+                                      _darkModeGradientColor.withValues(alpha: 0.7),
+                                      _darkModeGradientColor.withValues(alpha: 0.0),
+                                    ]
+                                  : [
+                                      // Light Mode Gradient
+                                      _lightModeGradientColor.withValues(alpha: 0.6),
+                                      _lightModeGradientColor.withValues(alpha: 0.0),
+                                    ],
+                              stops: [
+                                0.0,
+                                1.0,
+                              ],
                             ),
-                            shape: BoxShape.circle,
                           ),
                         ),
                         Column(
