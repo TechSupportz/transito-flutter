@@ -194,10 +194,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const Spacer(),
                     Container(
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
+                        color: Theme.of(context).colorScheme.surfaceContainerLow,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      padding: const EdgeInsets.symmetric(vertical: 24),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       margin: const EdgeInsets.only(bottom: 48),
                       child: Column(
                         children: [
