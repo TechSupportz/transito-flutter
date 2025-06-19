@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/recent_search_screen.dart';
+import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           upgrader: Upgrader(
             countryCode: "SG",
           ),
-          child: PageTransitionSwitcher(
+          child: AnimatedIndexedStack(
             transitionBuilder: (
               Widget child,
               Animation<double> animation,
@@ -44,7 +45,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
                 child: child,
               );
             },
-            child: _pages[_pageIndex],
+            index: _pageIndex,
+            children: _pages,
           )),
       bottomNavigationBar: NavigationBar(
         destinations: const <NavigationDestination>[

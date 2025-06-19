@@ -35,8 +35,7 @@ class NearbyScreen extends StatefulWidget {
 
 const distance = Distance();
 
-class _NearbyScreenState extends State<NearbyScreen>
-    with AutomaticKeepAliveClientMixin<NearbyScreen> {
+class _NearbyScreenState extends State<NearbyScreen> {
   late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
@@ -175,9 +174,6 @@ class _NearbyScreenState extends State<NearbyScreen>
   }
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   void initState() {
     super.initState();
     debugPrint("Initializing bus stops");
@@ -189,7 +185,6 @@ class _NearbyScreenState extends State<NearbyScreen>
 
   @override
   Widget build(BuildContext context) {
-    super.build(context);
     var user = context.watch<User?>();
 
     return Scaffold(

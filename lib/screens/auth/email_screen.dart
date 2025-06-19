@@ -2,14 +2,12 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 
 import '../../global/services/authentication_service.dart';
-import '../../models/app/app_colors.dart';
 import '../../widgets/auth/email_verification_dialog.dart';
 import '../onboarding/location_access_screen.dart';
 import 'login_screen.dart';
@@ -195,8 +193,6 @@ class _EmailScreenState extends State<EmailScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppColors appColors = context.read<AppColors>();
-
     return Scaffold(
       appBar: AppBar(),
       body: Padding(

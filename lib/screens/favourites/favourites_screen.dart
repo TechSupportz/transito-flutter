@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
@@ -14,8 +14,7 @@ class FavouritesScreen extends StatefulWidget {
   State<FavouritesScreen> createState() => _FavouritesScreenState();
 }
 
-class _FavouritesScreenState extends State<FavouritesScreen>
-    with AutomaticKeepAliveClientMixin<FavouritesScreen> {
+class _FavouritesScreenState extends State<FavouritesScreen> {
   bool isFabVisible = true;
 
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
@@ -33,9 +32,8 @@ class _FavouritesScreenState extends State<FavouritesScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ManageFavouritesScreen(),
-        settings: const RouteSettings(name: 'ManageFavouritesScreen')
-      ),
+          builder: (context) => const ManageFavouritesScreen(),
+          settings: const RouteSettings(name: 'ManageFavouritesScreen')),
     );
   }
 
@@ -48,11 +46,7 @@ class _FavouritesScreenState extends State<FavouritesScreen>
   // }
 
   @override
-  bool get wantKeepAlive => true;
-
-  @override
   Widget build(BuildContext context) {
-    super.build(context);
     String userId = context.watch<User>().uid;
 
     return Scaffold(
