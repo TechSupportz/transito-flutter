@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -231,11 +232,12 @@ class _EmailScreenState extends State<EmailScreen> {
                       child: Container(
                         constraints: const BoxConstraints(minHeight: 264),
                         child: AnimatedSwitcher(
-                          transitionBuilder: (child, animation) => ScaleTransition(
-                            scale: animation,
+                          duration: const Duration(milliseconds: 185),
+                          switchInCurve: Curves.easeInExpo,
+                          transitionBuilder: (child, animation) => FadeScaleTransition(
+                            animation: animation,
                             child: child,
                           ),
-                          duration: const Duration(milliseconds: 185),
                           child: _isLogin ? renderLoginForm() : renderRegisterForm(),
                         ),
                       ),
@@ -247,45 +249,57 @@ class _EmailScreenState extends State<EmailScreen> {
                         onTap: () => setState(() {
                           _isLogin = !_isLogin;
                         }),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: _isLogin
-                              ? [
-                                  Text(
-                                    'New Here?',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          transitionBuilder: (child, animation) => FadeScaleTransition(
+                            animation: animation,
+                            child: child,
+                          ),
+                          child: _isLogin
+                              ? Row(
+                                  key: const ValueKey<bool>(true),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  spacing: 4,
+                                  children: [
+                                    Text(
+                                      'New Here?',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    'Register!',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).colorScheme.primary,
+                                    Text(
+                                      'Register!',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
                                     ),
-                                  ),
-                                ]
-                              : [
-                                  Text(
-                                    'Already have an account?',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ],
+                                )
+                              : Row(
+                                  key: const ValueKey<bool>(false),
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  spacing: 4,
+                                  children: [
+                                    Text(
+                                      'Already have an account?',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      ),
                                     ),
-                                  ),
-                                  const SizedBox(width: 3),
-                                  Text(
-                                    'Login!',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
-                                      color: Theme.of(context).colorScheme.primary,
+                                    Text(
+                                      'Login!',
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: Theme.of(context).colorScheme.primary,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                         ),
                       ),
                     ),
