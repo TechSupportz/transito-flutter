@@ -24,7 +24,7 @@ class RecentSearchList extends StatelessWidget {
 
   // widget to display users recent searches
   ListView _recentSearches(SearchProvider value) {
-    List<dynamic> recentSearches = value.recentSearches.reversed.toList();
+    List<dynamic> recentSearches = value.recentSearches;
 
     return ListView.separated(
       padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
