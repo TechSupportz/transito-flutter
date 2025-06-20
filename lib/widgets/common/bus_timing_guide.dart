@@ -10,25 +10,35 @@ class BusTimingGuide extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        SvgPicture.asset(
-          "assets/images/diagram.svg",
-          placeholderBuilder: (context) => const CircularProgressIndicator(strokeWidth: 3),
-        ),
+        Theme.of(context).brightness == Brightness.light
+            ? SvgPicture.asset(
+                'assets/images/quick_start_light.svg',
+                placeholderBuilder: (context) => const CircularProgressIndicator(strokeWidth: 3),
+              )
+            : SvgPicture.asset(
+                'assets/images/quick_start_dark.svg',
+                placeholderBuilder: (context) => const CircularProgressIndicator(strokeWidth: 3),
+              ),
         const SizedBox(
           height: 16,
         ),
         RichText(
-            text: const TextSpan(
-          children: [
-            TextSpan(text: 'Timings in '),
-            TextSpan(
-              text: 'italics ',
-              style: TextStyle(fontStyle: FontStyle.italic),
-            ),
-            TextSpan(text: 'are a rough estimate based on the bus\'s schedule'),
-          ],
-          style: TextStyle(fontFamily: 'Itim', fontSize: 18, fontWeight: FontWeight.w500),
-        )),
+          text: TextSpan(
+            children: [
+              TextSpan(text: 'Timings in '),
+              TextSpan(
+                text: 'italics ',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              TextSpan(text: 'are a rough estimate based on the bus\'s schedule'),
+            ],
+            style: TextStyle(
+                fontFamily: 'Itim',
+                fontSize: 18,
+                fontWeight: FontWeight.w500,
+                color: Theme.of(context).colorScheme.onSurface),
+          ),
+        ),
         const SizedBox(
           height: 16,
         ),
