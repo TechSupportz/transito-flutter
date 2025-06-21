@@ -2,7 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
-import 'package:transito/screens/search/recent_search_screen.dart';
+import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:upgrader/upgrader.dart';
 
@@ -18,7 +18,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   final List<Widget> _pages = const [
     NearbyScreen(),
     FavouritesScreen(),
-    RecentSearchScreen(),
+    MapSearchScreen(),
   ];
 
   @override
