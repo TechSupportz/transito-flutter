@@ -11,37 +11,54 @@ class QuickStartScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Almost there...'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const Text(
-              'How to I decipher the details?',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w600,
-                height: 1.25,
-              ),
-            ),
-            const BusTimingGuide(),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: FilledButton(
-                onPressed: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NavigatorScreen(),
-                  ),
-                  (Route<dynamic> route) => false,
+      body: Stack(children: [
+        SingleChildScrollView(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'How to I decipher the details?',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
                 ),
-                child: const Text("Take me to the home screen!"),
+              ),
+              const BusTimingGuide(),
+            ],
+          ),
+        ),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
+                colors: [
+                  Theme.of(context).colorScheme.surface,
+                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                ],
+                stops: [0.9, 1.0],
               ),
             ),
-          ],
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NavigatorScreen(),
+                ),
+                (Route<dynamic> route) => false,
+              ),
+              child: const Text("Take me to the home screen!"),
+            ),
+          ),
         ),
-      ),
+      ]),
     );
   }
 }
