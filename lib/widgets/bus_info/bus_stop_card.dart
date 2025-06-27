@@ -113,9 +113,7 @@ class BusStopCard extends StatelessWidget {
               );
             }
           },
-          customBorder: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+          customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Ink(
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surfaceContainer,
@@ -123,11 +121,12 @@ class BusStopCard extends StatelessWidget {
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         busStopInfo.name,
@@ -139,33 +138,33 @@ class BusStopCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(height: searchMode ? 4 : 0),
+                      SizedBox(height: 4),
                       Row(
+                        spacing: 8,
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
-                            margin: const EdgeInsets.only(right: 8),
                             decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.primary,
                                 borderRadius: BorderRadius.circular(8)),
                             child: Text(
                               busStopInfo.code,
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onPrimary,
-                                  fontWeight: FontWeight.w500),
+                                color: Theme.of(context).colorScheme.onPrimary,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                          Expanded(
-                            child: Text(
-                              (searchMode || !showDistanceFromUser)
-                                  ? busStopInfo.roadName
-                                  : '${transformDistanceFromUser(distanceFromUser!)} away',
-                              overflow: TextOverflow.fade,
-                              maxLines: 1,
-                              softWrap: false,
-                              style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontStyle: FontStyle.italic),
+                          Text(
+                            (searchMode || !showDistanceFromUser)
+                                ? busStopInfo.roadName
+                                : '${transformDistanceFromUser(distanceFromUser!)} away',
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontStyle: FontStyle.italic,
                             ),
                           ),
                         ],
@@ -175,7 +174,6 @@ class BusStopCard extends StatelessWidget {
                 ),
                 if (routeMode && busSchedule != null) ...[
                   IconButton(
-                    splashRadius: 20,
                     onPressed: () => showDialog(
                       context: context,
                       builder: (context) => busScheduleDialog(context),
@@ -219,11 +217,9 @@ class BusStopCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text('Bus Schedule'),
+            const Text('chedule'),
             const SizedBox(height: 4.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               ChoiceChip(
                 label: const Text("Weekday"),
                 selected: selectedDay == 0,
