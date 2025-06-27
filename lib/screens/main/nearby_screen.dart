@@ -338,7 +338,9 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     crossAxisSpacing: 16,
                     mainAxisSpacing: userSettings.isNearbyGrid ? 18 : 16,
                     crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
-                    childAspectRatio: userSettings.isNearbyGrid ? 2.25 : 4.5,
+                    childAspectRatio: isTablet
+                        ? (userSettings.isNearbyGrid ? 3.5 : 7)
+                        : (userSettings.isNearbyGrid ? 2.25 : 4.5),
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
                     children: children,
