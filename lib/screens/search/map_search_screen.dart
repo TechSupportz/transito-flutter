@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -7,8 +9,8 @@ import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/utils/unpack_polyline.dart';
 import 'package:transito/models/app/app_colors.dart';
-
-import 'search_screen.dart';
+import 'package:transito/screens/search/search_screen.dart';
+import 'package:transito/widgets/search/search_dialog.dart';
 
 class MapSearchScreen extends StatefulWidget {
   const MapSearchScreen({super.key});
@@ -18,8 +20,6 @@ class MapSearchScreen extends StatefulWidget {
 }
 
 class _MapSearchScreenState extends State<MapSearchScreen> {
-  TextEditingController textFieldController = TextEditingController();
-
   showClearAlertDialog(BuildContext context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -64,61 +64,110 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppColors appColors = context.read<AppColors>();
+    AppColors appColors = context.watch<AppColors>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Recent Searches'), actions: [
-        // button to open the search interface
-        IconButton(
-          icon: const Icon(Icons.delete_rounded),
-          onPressed: () => showClearAlertDialog(context),
-        ),
-      ]),
+      backgroundColor: appColors.scheme.surfaceContainer,
+
       // displays the recent search list widget
       body: FutureBuilder(
           future: getUserLocation(),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
               return const Center(
-                  child: CircularProgressIndicator()); // TODO: replace with skeleton
+                child: CircularProgressIndicator(),
+              ); // TODO: replace with skeleton
             }
-
-            return FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(1.32119, 103.84407),
-                minZoom: 10,
-                initialZoom: 17.5,
-                maxZoom: 18,
-                interactionOptions: const InteractionOptions(
-                  flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove & ~InteractiveFlag.rotate,
-                ),
-                backgroundColor:
-                    appColors.brightness == Brightness.dark ? Color(0xFF003653) : Color(0xFF6DA7E3),
-              ),
+            return Stack(
               children: [
-                TileLayer(
-                  urlTemplate:
-                      "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
-                  fallbackUrl:
-                      "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
-                  userAgentPackageName: 'com.tnitish.transito',
-                  errorImage: const AssetImage('assets/images/mapError.png'),
-                ),
-                PolylineLayer(
-                  simplificationTolerance: 0.6,
-                  polylines: [
-                    Polyline(
-                      points: decodePolyline(
-                              "s~`GmayxRa@a@VSDE@CFEHIPOBC@CA?@A\\Y@CnAmAHIBCDEDEDCDCJGFCJCFAHALAh@El@GXCXCF?TCAGC[?EB?JCPA@A@A?AEa@UaAAMB???")
-                          .unpackPolyline(),
-                      color: Colors.blue,
-                      borderColor: Colors.white,
-                      borderStrokeWidth: 5,
-                      strokeWidth: 10,
-
-                    )
+                FlutterMap(
+                  options: MapOptions(
+                    initialCenter: LatLng(1.32119, 103.84407),
+                    minZoom: 10,
+                    initialZoom: 17.5,
+                    maxZoom: 18,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all &
+                          ~InteractiveFlag.pinchMove &
+                          ~InteractiveFlag.rotate,
+                    ),
+                    backgroundColor: appColors.brightness == Brightness.dark
+                        ? Color(0xFF003653)
+                        : Color(0xFF6DA7E3),
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
+                      fallbackUrl:
+                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
+                      userAgentPackageName: 'com.tnitish.transito',
+                      errorImage: const AssetImage('assets/images/mapError.png'),
+                    ),
+                    PolylineLayer(
+                      simplificationTolerance: 0.6,
+                      polylines: [
+                        Polyline(
+                          points: decodePolyline(
+                                  "s~`GmayxRa@a@VSDE@CFEHIPOBC@CA?@A\\Y@CnAmAHIBCDEDEDCDCJGFCJCFAHALAh@El@GXCXCF?TCAGC[?EB?JCPA@A@A?AEa@UaAAMB???")
+                              .unpackPolyline(),
+                          color: Colors.blue,
+                          borderColor: Colors.white,
+                          borderStrokeWidth: 3,
+                          strokeWidth: 6,
+                          strokeJoin: StrokeJoin.round,
+                        )
+                      ],
+                    ),
                   ],
                 ),
+                SafeArea(
+                  left: false,
+                  right: false,
+                  bottom: false,
+                  child: Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            useSafeArea: false,
+                            builder: (context) => SearchDialog(),
+                          );
+                          HapticFeedback.selectionClick();
+                        },
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          hintText: 'Search for places...',
+                          prefixIcon: const Icon(Icons.search_rounded),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.all(16),
+                          fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                IgnorePointer(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Theme.of(context).colorScheme.surfaceContainer,
+                            Theme.of(context).colorScheme.surfaceContainer.withValues(alpha: 0.0),
+                          ],
+                          stops: [0, 0.01],
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               ],
             );
           }),
