@@ -8,7 +8,9 @@ import 'package:transito/models/api/transito/onemap/onemap_search.dart';
 import 'package:transito/models/secret.dart';
 
 class SearchDialog extends StatefulWidget {
-  const SearchDialog({super.key});
+  const SearchDialog({super.key, required this.onSearchSelected});
+
+  final ValueSetter<OneMapSearchData> onSearchSelected;
 
   @override
   State<SearchDialog> createState() => _SearchDialogState();
@@ -102,6 +104,7 @@ class _SearchDialogState extends State<SearchDialog> {
             if (snapshot.hasData) {
               OneMapSearch res = snapshot.data!;
 
+              // This should probably be ur recent searches widget
               if (res.count == 0 && _textFieldController.text.isEmpty) {
                 return Center(
                   child: Column(
@@ -187,7 +190,8 @@ class _SearchDialogState extends State<SearchDialog> {
                       title: Text(result.name),
                       subtitle: Text(result.address),
                       onTap: () {
-                        // Handle the tap on the result
+                        widget.onSearchSelected(result);
+                        Navigator.pop(context);
                       },
                     );
                   },

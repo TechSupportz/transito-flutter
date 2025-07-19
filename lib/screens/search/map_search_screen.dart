@@ -3,11 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
-import 'package:transito/global/utils/unpack_polyline.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/search/search_screen.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
@@ -19,7 +20,9 @@ class MapSearchScreen extends StatefulWidget {
   State<MapSearchScreen> createState() => _MapSearchScreenState();
 }
 
-class _MapSearchScreenState extends State<MapSearchScreen> {
+class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderStateMixin {
+  late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
+
   showClearAlertDialog(BuildContext context) => showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -81,8 +84,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
             return Stack(
               children: [
                 FlutterMap(
+                  mapController: _animatedMapController.mapController,
                   options: MapOptions(
-                    initialCenter: LatLng(1.32119, 103.84407),
+                    initialCenter: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
                     minZoom: 10,
                     initialZoom: 17.5,
                     maxZoom: 18,
@@ -104,21 +108,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
                       userAgentPackageName: 'com.tnitish.transito',
                       errorImage: const AssetImage('assets/images/mapError.png'),
                     ),
-                    PolylineLayer(
-                      simplificationTolerance: 0.6,
-                      polylines: [
-                        Polyline(
-                          points: decodePolyline(
-                                  "s~`GmayxRa@a@VSDE@CFEHIPOBC@CA?@A\\Y@CnAmAHIBCDEDEDCDCJGFCJCFAHALAh@El@GXCXCF?TCAGC[?EB?JCPA@A@A?AEa@UaAAMB???")
-                              .unpackPolyline(),
-                          color: Colors.blue,
-                          borderColor: Colors.white,
-                          borderStrokeWidth: 3,
-                          strokeWidth: 6,
-                          strokeJoin: StrokeJoin.round,
-                        )
-                      ],
-                    ),
+                    CurrentLocationLayer(
+                      style: LocationMarkerStyle(headingSectorRadius: 80),
+                    )
                   ],
                 ),
                 SafeArea(
@@ -128,26 +120,52 @@ class _MapSearchScreenState extends State<MapSearchScreen> {
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextField(
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            useSafeArea: false,
-                            builder: (context) => SearchDialog(),
-                          );
-                          HapticFeedback.selectionClick();
-                        },
-                        readOnly: true,
-                        decoration: InputDecoration(
-                          hintText: 'Search for places...',
-                          prefixIcon: const Icon(Icons.search_rounded),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(16),
-                          fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
-                        ),
-                      ),
-                    ),
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              useSafeArea: false,
+                              builder: (context) => SearchDialog(
+                                onSearchSelected: (value) => {
+                                  _animatedMapController.animateTo(
+                                    dest: LatLng(value.latitude, value.longitude),
+                                  ),
+                                },
+                              ),
+                            );
+                            HapticFeedback.selectionClick();
+                          },
+                          child: Material(
+                            borderRadius: BorderRadius.circular(64),
+                            elevation: 4,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(64),
+                              ),
+                              height: 56,
+                              padding: const EdgeInsets.symmetric(horizontal: 24),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.search_rounded,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    'Search for places...',
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        )),
                   ),
                 ),
                 IgnorePointer(
