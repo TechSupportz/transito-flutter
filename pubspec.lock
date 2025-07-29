@@ -41,6 +41,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.3.0"
+  animated_stack_widget:
+    dependency: transitive
+    description:
+      name: animated_stack_widget
+      sha256: ce4788dd158768c9d4388354b6fb72600b78e041a37afc4c279c63ecafcb9408
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.4"
   animations:
     dependency: "direct main"
     description:
@@ -427,6 +435,24 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.1.0"
+  flutter_map_marker_cluster:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: f45d4aa97944fb8175894c747ee292a10fbd7369
+      url: "https://github.com/matteomrz/flutter_map_marker_cluster"
+    source: git
+    version: "8.1.0"
+  flutter_map_marker_popup:
+    dependency: transitive
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "85863dcf0d480431516c022cedbf8cbc13a65428"
+      url: "https://github.com/matteomrz/flutter_map_marker_popup.git"
+    source: git
+    version: "7.0.0"
   flutter_native_splash:
     dependency: "direct main"
     description:

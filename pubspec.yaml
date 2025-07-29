@@ -55,6 +55,9 @@ dependencies:
     google_polyline_algorithm: ^3.1.0
     flutter_map_animations: ^0.9.0
     flutter_map_location_marker: ^10.1.0
+    flutter_map_marker_cluster:
+        git:
+            url: "https://github.com/matteomrz/flutter_map_marker_cluster"
 
 dev_dependencies:
     flutter_test:
