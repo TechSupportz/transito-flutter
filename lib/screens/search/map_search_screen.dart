@@ -116,6 +116,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Position position = await getUserLocation();
+      _onMapPositionChanged(LatLng(position.latitude, position.longitude));
+    });
   }
 
   @override
