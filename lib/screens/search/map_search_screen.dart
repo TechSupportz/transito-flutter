@@ -12,10 +12,11 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
-import 'package:transito/screens/search/search_screen.dart';
+import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
 
 class MapSearchScreen extends StatefulWidget {
@@ -29,6 +30,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
   Timer? _debounce;
   final ValueNotifier<List<Marker>> busStopMarkers = ValueNotifier<List<Marker>>([]);
+  final ValueNotifier<bool> _isMarkersLoading = ValueNotifier<bool>(true);
 
   Future<List<NearbyBusStop>> fetchNearbyBusStops(LatLng position) async {
     final response = await http.get(Uri.parse(
@@ -46,26 +48,45 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   void _onMapPositionChanged(LatLng position) async {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 200), () async {
+      _isMarkersLoading.value = true;
       List<NearbyBusStop> nearbyBusStops = await fetchNearbyBusStops(position);
 
       List<Marker> _newBusStopMarkers = nearbyBusStops.map((busStop) {
+        BusStop busStopInfo = busStop.busStop;
+
         return Marker(
-          key: ValueKey(busStop.busStop.code),
+          key: ValueKey(busStopInfo.code),
           width: 40,
           height: 40,
-          child: Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.tertiary,
-              shape: BoxShape.circle,
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BusStopInfoScreen(
+                    code: busStopInfo.code,
+                    name: busStopInfo.name,
+                    address: busStopInfo.roadName,
+                    busStopLocation: LatLng(busStopInfo.latitude, busStopInfo.longitude),
+                  ),
+                ),
+              );
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.tertiary,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.directions_bus_rounded,
+                  color: Theme.of(context).colorScheme.onTertiary),
             ),
-            child:
-                Icon(Icons.directions_bus_rounded, color: Theme.of(context).colorScheme.onTertiary),
           ),
           point: LatLng(busStop.busStop.latitude, busStop.busStop.longitude),
         );
       }).toList();
 
       busStopMarkers.value = _newBusStopMarkers;
+      _isMarkersLoading.value = false;
     });
   }
 
@@ -111,6 +132,14 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     );
 
     return position;
+  }
+
+  Future<void> animateToUserLocation() async {
+    Position position = await getUserLocation();
+    _animatedMapController.animateTo(
+      dest: LatLng(position.latitude, position.longitude),
+      zoom: 17.5,
+    );
   }
 
   @override
@@ -252,20 +281,40 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                               height: 56,
                               padding: const EdgeInsets.symmetric(horizontal: 24),
                               child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Icon(
-                                    Icons.search_rounded,
-                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.search_rounded,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      ),
+                                      const SizedBox(width: 16),
+                                      Text(
+                                        'Search for places...',
+                                        style: TextStyle(
+                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                          fontSize: 16,
+                                        ),
+                                      )
+                                    ],
                                   ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    'Search for places...',
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      fontSize: 16,
-                                    ),
-                                  )
+                                  ValueListenableBuilder<bool>(
+                                    valueListenable: _isMarkersLoading,
+                                    builder: (context, isLoading, child) {
+                                      return SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          value: isLoading ? null : 0.0,
+                                          color: Theme.of(context).colorScheme.primary,
+                                          strokeWidth: 2.0,
+                                          strokeCap: StrokeCap.round,
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ],
                               ),
                             ),
@@ -297,17 +346,11 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       // floating action button to clear the recent searches list by calling a function in the search provider
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const SearchScreen(),
-              settings: const RouteSettings(name: 'SearchScreen'),
-            ),
-          );
-          HapticFeedback.selectionClick();
+          animateToUserLocation();
+          HapticFeedback.lightImpact();
         },
         heroTag: 'searchIcon',
-        child: const Icon(Icons.search_rounded),
+        child: const Icon(Icons.near_me_rounded),
       ),
     );
   }
