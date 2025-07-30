@@ -374,6 +374,40 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                     ),
                                   ],
                                 ),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceContainerLowest
+                                          .withValues(alpha: 0.8),
+                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8)),
+                                    ),
+                                    padding: const EdgeInsets.all(4),
+                                    child: Row(
+                                      spacing: 4,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(4),
+                                          child: Image.network(
+                                            "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
+                                            height: 16,
+                                            opacity: AlwaysStoppedAnimation(0.65),
+                                          ),
+                                        ),
+                                        Text(
+                                          "OneMap © contributors",
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
                               ],
                             ),
                           ),

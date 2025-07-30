@@ -18,6 +18,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MapSearchScreen extends StatefulWidget {
   const MapSearchScreen({super.key});
@@ -244,6 +245,37 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                           ),
                         );
                       },
+                    ),
+                    RichAttributionWidget(
+                      showFlutterMapAttribution: false,
+                      popupBorderRadius: BorderRadius.circular(8),
+                      attributions: [
+                        LogoSourceAttribution(
+                          Image.network(
+                            "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
+                          ),
+                        ),
+                        TextSourceAttribution(
+                          "OneMap © contributors",
+                          prependCopyright: false,
+                          onTap: () => launchUrl(Uri.parse("https://www.onemap.gov.sg/")),
+                        ),
+                        TextSourceAttribution(
+                          "Singapore Land Authority",
+                          prependCopyright: false,
+                          onTap: () => launchUrl(Uri.parse("https://www.sla.gov.sg/")),
+                        ),
+                        TextSourceAttribution(
+                          "Powered by 'flutter_map'",
+                          textStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12,
+                          ),
+                          prependCopyright: false,
+                        ),
+                      ],
+                      alignment: AttributionAlignment.bottomLeft,
                     )
                   ],
                 ),
