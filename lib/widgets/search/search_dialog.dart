@@ -156,7 +156,7 @@ class _SearchDialogState extends State<SearchDialog> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "🔍 We couldn't find any locations 🤔",
+                        "We can't find that place 🤔",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w600,
@@ -166,7 +166,7 @@ class _SearchDialogState extends State<SearchDialog> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        "Try checking your search for typos or use a different search term",
+                        "Try checking for typos or searching for a landmark or address nearby instead.",
                         style: TextStyle(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                           fontWeight: FontWeight.w500,
@@ -183,18 +183,12 @@ class _SearchDialogState extends State<SearchDialog> {
                 isLoading: snapshot.connectionState == ConnectionState.waiting,
                 skeleton: SkeletonListView(
                   padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-                  itemBuilder: (context, _) => SkeletonListTile(
-                    titleStyle: SkeletonLineStyle(
-                      height: 24,
-                      padding: const EdgeInsets.only(bottom: 8),
+                  itemBuilder: (context, _) => SkeletonLine(
+                    style: SkeletonLineStyle(
+                      height: 88,
+                      borderRadius: BorderRadius.circular(12),
+                      padding: const EdgeInsets.only(bottom: 16),
                     ),
-                    subtitleStyle: SkeletonLineStyle(
-                      height: 32,
-                      randomLength: true,
-                    ),
-                    hasLeading: false,
-                    hasSubtitle: true,
-                    padding: const EdgeInsets.only(bottom: 16),
                   ),
                 ),
                 child: ListView.separated(
