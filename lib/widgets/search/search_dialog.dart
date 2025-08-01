@@ -4,8 +4,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/onemap/onemap_search.dart';
 import 'package:transito/models/secret.dart';
+import 'package:transito/widgets/search/recent_search_list.dart';
+import 'package:transito/widgets/search/search_result_card.dart';
 
 class SearchDialog extends StatefulWidget {
   const SearchDialog({super.key, required this.onSearchSelected});
@@ -72,6 +76,8 @@ class _SearchDialogState extends State<SearchDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final searchProvider = Provider.of<SearchProvider>(context);
+
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
@@ -106,31 +112,41 @@ class _SearchDialogState extends State<SearchDialog> {
 
               // This should probably be ur recent searches widget
               if (res.count == 0 && _textFieldController.text.isEmpty) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "🔍 Start typing to search for a location 📍",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20,
-                        ),
-                        textAlign: TextAlign.center,
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16.0, right: 12.0, top: 8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Recent searches",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: searchProvider.recentSearches.isEmpty
+                                ? null
+                                : () => searchProvider.clearAllRecentSearches(),
+                            child: Text(
+                              "Clear all",
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Enter a location name or address to find it on the map",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                    ),
+                    const RecentSearchList(),
+                  ],
                 );
               }
 
@@ -181,14 +197,14 @@ class _SearchDialogState extends State<SearchDialog> {
                     padding: const EdgeInsets.only(bottom: 16),
                   ),
                 ),
-                child: ListView.builder(
+                child: ListView.separated(
                   itemCount: res.count,
                   padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+                  separatorBuilder: (context, index) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
                     final result = res.data[index];
-                    return ListTile(
-                      title: Text(result.name),
-                      subtitle: Text(result.address),
+                    return SearchResultCard(
+                      searchData: result,
                       onTap: () {
                         widget.onSearchSelected(result);
                         Navigator.pop(context);

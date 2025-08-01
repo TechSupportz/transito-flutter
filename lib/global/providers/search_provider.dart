@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
+import 'package:transito/models/api/transito/onemap/onemap_search.dart';
 
 class SearchProvider extends ChangeNotifier {
   // stores both the bus services and bus stops hence its a dynamic list
@@ -81,6 +82,19 @@ class SearchProvider extends ChangeNotifier {
             (element) => element is BusService && element.serviceNo == search.serviceNo);
         _recentSearches.insert(0, search);
         debugPrint('Moved recent search to top: ${search.serviceNo}');
+      }
+    } else if (search.runtimeType == OneMapSearchData) {
+      // if the recent search is a OneMapSearchData, then the list is filtered to only include OneMapSearchData
+      List<OneMapSearchData> oneMapRecents = _recentSearches.whereType<OneMapSearchData>().toList();
+
+      if (oneMapRecents.every((element) => element.name != search.name)) {
+        _recentSearches.insert(0, search);
+        debugPrint('Added recent search: ${search.name}');
+      } else {
+        _recentSearches
+            .removeWhere((element) => element is OneMapSearchData && element.name == search.name);
+        _recentSearches.insert(0, search);
+        debugPrint('Moved recent search to top: ${search.name}');
       }
     } else {
       debugPrint("Already added in recent");
