@@ -115,8 +115,19 @@ class _SearchDialogState extends State<SearchDialog> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
+                    Container(
                       padding: const EdgeInsets.only(left: 16.0, right: 12.0, top: 8.0),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Theme.of(context).colorScheme.surface,
+                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                          ],
+                          stops: [0.85, 1.0],
+                        ),
+                      ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
@@ -145,7 +156,12 @@ class _SearchDialogState extends State<SearchDialog> {
                         ],
                       ),
                     ),
-                    const RecentSearchList(),
+                    RecentSearchList(
+                      onSearchCardSelected: (value) {
+                        widget.onSearchSelected(value);
+                        Navigator.pop(context);
+                      },
+                    ),
                   ],
                 );
               }

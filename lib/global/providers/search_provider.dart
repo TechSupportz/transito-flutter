@@ -29,8 +29,10 @@ class SearchProvider extends ChangeNotifier {
 
         if (json['serviceNo'] != null) {
           return BusService.fromJson(json);
-        } else {
+        } else if (json['roadName'] != null) {
           return BusStop.fromJson(json);
+        } else {
+          return OneMapSearchData.fromJson(json);
         }
       }).toList();
     }

@@ -29,9 +29,13 @@ class MapSearchScreen extends StatefulWidget {
 
 class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderStateMixin {
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
-  Timer? _debounce;
+
   final ValueNotifier<List<Marker>> busStopMarkers = ValueNotifier<List<Marker>>([]);
   final ValueNotifier<bool> _isMarkersLoading = ValueNotifier<bool>(true);
+
+  final ValueNotifier<String?> searchQuery = ValueNotifier<String?>(null);
+  final ValueNotifier<Marker?> searchLocationPin = ValueNotifier<Marker?>(null);
+  Timer? _debounce;
 
   Future<List<NearbyBusStop>> fetchNearbyBusStops(LatLng position) async {
     final response = await http.get(Uri.parse(
@@ -155,6 +159,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   @override
   void dispose() {
     busStopMarkers.dispose();
+    searchQuery.dispose();
+    searchLocationPin.dispose();
+    _isMarkersLoading.dispose();
+    _animatedMapController.dispose();
     _debounce?.cancel();
     super.dispose();
   }
@@ -246,6 +254,18 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                         );
                       },
                     ),
+                    ValueListenableBuilder<Marker?>(
+                      valueListenable: searchLocationPin,
+                      builder: (context, pin, child) {
+                        return MarkerLayer(
+                          markers: pin != null
+                              ? [
+                                  pin,
+                                ]
+                              : [],
+                        );
+                      },
+                    ),
                     RichAttributionWidget(
                       showFlutterMapAttribution: false,
                       popupBorderRadius: BorderRadius.circular(8),
@@ -293,10 +313,28 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                               context: context,
                               useSafeArea: false,
                               builder: (context) => SearchDialog(
-                                onSearchSelected: (value) => {
+                                onSearchSelected: (value) {
+                                  searchLocationPin.value = Marker(
+                                    point: LatLng(value.latitude, value.longitude),
+                                    width: 40,
+                                    height: 40,
+                                    child: Icon(
+                                      Icons.location_pin,
+                                      size: 48,
+                                      color: Theme.of(context).colorScheme.primaryFixed,
+                                      shadows: [
+                                        Shadow(
+                                          color: Theme.of(context).colorScheme.onPrimaryFixed,
+                                          blurRadius: 32,
+                                          offset: const Offset(0, 0),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                  searchQuery.value = value.name;
                                   _animatedMapController.animateTo(
                                     dest: LatLng(value.latitude, value.longitude),
-                                  ),
+                                  );
                                 },
                               ),
                             );
@@ -313,24 +351,52 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                               height: 56,
                               padding: const EdgeInsets.symmetric(horizontal: 24),
                               child: Row(
+                                spacing: 8,
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.search_rounded,
-                                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      ),
-                                      const SizedBox(width: 16),
-                                      Text(
-                                        'Search for places...',
-                                        style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                          fontSize: 16,
+                                  ValueListenableBuilder<String?>(
+                                    valueListenable: searchQuery,
+                                    builder: (context, query, child) {
+                                      return Flexible(
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            IconButton(
+                                              icon: Icon(
+                                                query == null
+                                                    ? Icons.search_rounded
+                                                    : Icons.clear_rounded,
+                                                color:
+                                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                              ),
+                                              style: ButtonStyle(
+                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap),
+                                              onPressed: () {
+                                                searchQuery.value = null;
+                                                searchLocationPin.value = null;
+                                              },
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Text(
+                                                query ?? 'Search for places...',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.fade,
+                                                softWrap: false,
+                                                style: TextStyle(
+                                                  color: query == null
+                                                      ? Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurfaceVariant
+                                                      : Theme.of(context).colorScheme.onSurface,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      )
-                                    ],
+                                      );
+                                    },
                                   ),
                                   ValueListenableBuilder<bool>(
                                     valueListenable: _isMarkersLoading,

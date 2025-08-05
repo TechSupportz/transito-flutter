@@ -9,7 +9,9 @@ import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/search/search_result_card.dart';
 
 class RecentSearchList extends StatelessWidget {
-  const RecentSearchList({super.key});
+  const RecentSearchList({super.key, required this.onSearchCardSelected});
+
+  final ValueSetter<OneMapSearchData> onSearchCardSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -45,8 +47,13 @@ class RecentSearchList extends StatelessWidget {
         }
 
         if (recentSearches[index] is OneMapSearchData) {
+          OneMapSearchData searchData = recentSearches[index];
+
           return SearchResultCard(
-            searchData: recentSearches[index],
+            searchData: searchData,
+            onTap: () {
+              onSearchCardSelected(searchData);
+            },
           );
         }
 
