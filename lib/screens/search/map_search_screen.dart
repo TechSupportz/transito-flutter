@@ -313,6 +313,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                               context: context,
                               useSafeArea: false,
                               builder: (context) => SearchDialog(
+                                initialQuery: searchQuery.value,
+                                onSearchCleared: () => searchQuery.value = null,
                                 onSearchSelected: (value) {
                                   searchLocationPin.value = Marker(
                                     point: LatLng(value.latitude, value.longitude),
@@ -362,13 +364,25 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                           crossAxisAlignment: CrossAxisAlignment.center,
                                           children: [
                                             IconButton(
-                                              icon: Icon(
-                                                query == null
-                                                    ? Icons.search_rounded
-                                                    : Icons.clear_rounded,
-                                                color:
-                                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                              icon: AnimatedSwitcher(
+                                                duration: const Duration(milliseconds: 100),
+                                                child: query == null
+                                                    ? Icon(
+                                                        key: const ValueKey('searchIcon'),
+                                                        Icons.search_rounded,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurfaceVariant,
+                                                      )
+                                                    : Icon(
+                                                        key: const ValueKey('clearSearchIcon'),
+                                                        Icons.clear_rounded,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurfaceVariant,
+                                                      ),
                                               ),
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
                                               style: ButtonStyle(
                                                   tapTargetSize: MaterialTapTargetSize.shrinkWrap),
                                               onPressed: () {

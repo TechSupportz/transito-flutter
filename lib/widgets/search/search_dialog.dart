@@ -12,9 +12,16 @@ import 'package:transito/widgets/search/recent_search_list.dart';
 import 'package:transito/widgets/search/search_result_card.dart';
 
 class SearchDialog extends StatefulWidget {
-  const SearchDialog({super.key, required this.onSearchSelected});
+  const SearchDialog({
+    super.key,
+    required this.onSearchSelected,
+    required this.onSearchCleared,
+    this.initialQuery,
+  });
 
   final ValueSetter<OneMapSearchData> onSearchSelected;
+  final VoidCallback onSearchCleared;
+  final String? initialQuery;
 
   @override
   State<SearchDialog> createState() => _SearchDialogState();
@@ -36,11 +43,8 @@ class _SearchDialogState extends State<SearchDialog> {
         await http.get(Uri.parse('${Secret.API_URL}/onemap/search?query=$query&page=$page'));
 
     if (response.statusCode == 200) {
-      // debugPrint('Search results: ${response.body}'); //NOTE - remove output in production
       return OneMapSearch.fromJson(json.decode(response.body));
     } else {
-      debugPrint(
-          'Failed to load search results: ${response.statusCode}'); //NOTE - remove output in production
       throw Exception('Failed to load search results');
     }
   }
@@ -55,6 +59,20 @@ class _SearchDialogState extends State<SearchDialog> {
     });
   }
 
+  void clearSearch() {
+    _textFieldController.clear();
+    setState(() {
+      _searchResults = Future.value(OneMapSearch(
+        totalCount: 0,
+        count: 0,
+        totalPages: 0,
+        page: 1,
+        data: [],
+      ));
+    });
+    widget.onSearchCleared();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -65,6 +83,10 @@ class _SearchDialogState extends State<SearchDialog> {
       page: 1,
       data: [],
     ));
+    if (widget.initialQuery != null) {
+      _textFieldController.text = widget.initialQuery!;
+      _onSearchChanged(widget.initialQuery!, 1);
+    }
   }
 
   @override
@@ -96,11 +118,14 @@ class _SearchDialogState extends State<SearchDialog> {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.clear_rounded),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+            AnimatedOpacity(
+              duration: const Duration(milliseconds: 200),
+              curve: Easing.standard,
+              opacity: _textFieldController.text.isNotEmpty ? 1.0 : 0.0,
+              child: IconButton(
+                icon: const Icon(Icons.clear_rounded),
+                onPressed: () => clearSearch(),
+              ),
             ),
           ],
         ),
