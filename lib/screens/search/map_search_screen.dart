@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
@@ -29,6 +30,8 @@ class MapSearchScreen extends StatefulWidget {
 
 class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderStateMixin {
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
+  final ValueNotifier<double> mapRotation = ValueNotifier<double>(0.0);
+  final ValueNotifier<bool> _isUserCenter = ValueNotifier<bool>(false);
 
   final ValueNotifier<List<Marker>> busStopMarkers = ValueNotifier<List<Marker>>([]);
   final ValueNotifier<bool> _isMarkersLoading = ValueNotifier<bool>(true);
@@ -54,13 +57,14 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 200), () async {
       _isMarkersLoading.value = true;
-      List<NearbyBusStop> nearbyBusStops = await fetchNearbyBusStops(position);
 
+      List<NearbyBusStop> nearbyBusStops = await fetchNearbyBusStops(position);
       List<Marker> _newBusStopMarkers = nearbyBusStops.map((busStop) {
         BusStop busStopInfo = busStop.busStop;
 
         return Marker(
           key: ValueKey(busStopInfo.code),
+          rotate: true,
           width: 40,
           height: 40,
           child: InkWell(
@@ -93,6 +97,17 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       busStopMarkers.value = _newBusStopMarkers;
       _isMarkersLoading.value = false;
     });
+
+    Position userPosition = await getUserLocation();
+    if (userPosition.latitude == position.latitude &&
+        userPosition.longitude == position.longitude &&
+        !_isUserCenter.value) {
+      _isUserCenter.value = true;
+    } else if ((userPosition.latitude != position.latitude ||
+            userPosition.longitude != position.longitude) &&
+        _isUserCenter.value) {
+      _isUserCenter.value = false;
+    }
   }
 
   showClearAlertDialog(BuildContext context) {
@@ -144,6 +159,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     _animatedMapController.animateTo(
       dest: LatLng(position.latitude, position.longitude),
       zoom: 17.5,
+      rotation: 0,
     );
   }
 
@@ -189,18 +205,19 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                   mapController: _animatedMapController.mapController,
                   options: MapOptions(
                     initialCenter: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
-                    minZoom: 16.5,
+                    minZoom: 12,
                     initialZoom: 17.5,
                     maxZoom: 19,
                     interactionOptions: const InteractionOptions(
-                      flags: InteractiveFlag.all &
-                          ~InteractiveFlag.pinchMove &
-                          ~InteractiveFlag.rotate,
+                      flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove,
                     ),
                     backgroundColor: appColors.brightness == Brightness.dark
                         ? Color(0xFF003653)
                         : Color(0xFF6DA7E3),
-                    onPositionChanged: (camera, hasGesture) => _onMapPositionChanged(camera.center),
+                    onPositionChanged: (camera, hasGesture) {
+                      _onMapPositionChanged(camera.center);
+                      mapRotation.value = camera.rotation;
+                    },
                   ),
                   children: [
                     TileLayer(
@@ -219,6 +236,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                       builder: (context, markers, child) {
                         return MarkerClusterLayerWidget(
                           options: MarkerClusterLayerOptions(
+                            rotate: true,
                             maxClusterRadius: 120,
                             disableClusteringAtZoom: 17,
                             spiderfyCluster: false,
@@ -306,132 +324,181 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                   child: Align(
                     alignment: Alignment.topCenter,
                     child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: GestureDetector(
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              useSafeArea: false,
-                              builder: (context) => SearchDialog(
-                                initialQuery: searchQuery.value,
-                                onSearchCleared: () => searchQuery.value = null,
-                                onSearchSelected: (value) {
-                                  searchLocationPin.value = Marker(
-                                    point: LatLng(value.latitude, value.longitude),
-                                    width: 40,
-                                    height: 40,
-                                    child: Icon(
-                                      Icons.location_pin,
-                                      size: 48,
-                                      color: Theme.of(context).colorScheme.primaryFixed,
-                                      shadows: [
-                                        Shadow(
-                                          color: Theme.of(context).colorScheme.onPrimaryFixed,
-                                          blurRadius: 32,
-                                          offset: const Offset(0, 0),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                  searchQuery.value = value.name;
-                                  _animatedMapController.animateTo(
-                                    dest: LatLng(value.latitude, value.longitude),
-                                  );
-                                },
-                              ),
-                            );
-                            HapticFeedback.selectionClick();
-                          },
-                          child: Material(
-                            borderRadius: BorderRadius.circular(64),
-                            elevation: 4,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                                borderRadius: BorderRadius.circular(64),
-                              ),
-                              height: 56,
-                              padding: const EdgeInsets.symmetric(horizontal: 24),
-                              child: Row(
-                                spacing: 8,
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  ValueListenableBuilder<String?>(
-                                    valueListenable: searchQuery,
-                                    builder: (context, query, child) {
-                                      return Flexible(
-                                        child: Row(
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            IconButton(
-                                              icon: AnimatedSwitcher(
-                                                duration: const Duration(milliseconds: 100),
-                                                child: query == null
-                                                    ? Icon(
-                                                        key: const ValueKey('searchIcon'),
-                                                        Icons.search_rounded,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSurfaceVariant,
-                                                      )
-                                                    : Icon(
-                                                        key: const ValueKey('clearSearchIcon'),
-                                                        Icons.clear_rounded,
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .onSurfaceVariant,
-                                                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Column(
+                        spacing: 16,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                useSafeArea: false,
+                                builder: (context) => SearchDialog(
+                                  initialQuery: searchQuery.value,
+                                  onSearchCleared: () => searchQuery.value = null,
+                                  onSearchSelected: (value) {
+                                    searchLocationPin.value = Marker(
+                                      rotate: true,
+                                      point: LatLng(value.latitude, value.longitude),
+                                      alignment: Alignment.topCenter,
+                                      width: 40,
+                                      height: 40,
+                                      child: Icon(
+                                        Icons.location_pin,
+                                        size: 48,
+                                        color: Theme.of(context).colorScheme.primaryFixed,
+                                        shadows: [
+                                          Shadow(
+                                            color: Theme.of(context).colorScheme.onPrimaryFixed,
+                                            blurRadius: 32,
+                                            offset: const Offset(0, 0),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                    searchQuery.value = value.name;
+                                    _animatedMapController.animateTo(
+                                      dest: LatLng(value.latitude, value.longitude),
+                                    );
+                                  },
+                                ),
+                              );
+                              HapticFeedback.selectionClick();
+                            },
+                            child: Material(
+                              borderRadius: BorderRadius.circular(64),
+                              elevation: 4,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                                  borderRadius: BorderRadius.circular(64),
+                                ),
+                                height: 56,
+                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                child: Row(
+                                  spacing: 8,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ValueListenableBuilder<String?>(
+                                      valueListenable: searchQuery,
+                                      builder: (context, query, child) {
+                                        return Flexible(
+                                          child: Row(
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: [
+                                              IconButton(
+                                                icon: AnimatedSwitcher(
+                                                  duration: const Duration(milliseconds: 100),
+                                                  child: query == null
+                                                      ? Icon(
+                                                          key: const ValueKey('searchIcon'),
+                                                          Icons.search_rounded,
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .onSurfaceVariant,
+                                                        )
+                                                      : Icon(
+                                                          key: const ValueKey('clearSearchIcon'),
+                                                          Icons.clear_rounded,
+                                                          color: Theme.of(context)
+                                                              .colorScheme
+                                                              .onSurfaceVariant,
+                                                        ),
+                                                ),
+                                                color:
+                                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                                style: ButtonStyle(
+                                                    tapTargetSize:
+                                                        MaterialTapTargetSize.shrinkWrap),
+                                                onPressed: () {
+                                                  searchQuery.value = null;
+                                                  searchLocationPin.value = null;
+                                                },
                                               ),
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                              style: ButtonStyle(
-                                                  tapTargetSize: MaterialTapTargetSize.shrinkWrap),
-                                              onPressed: () {
-                                                searchQuery.value = null;
-                                                searchLocationPin.value = null;
-                                              },
-                                            ),
-                                            const SizedBox(width: 16),
-                                            Expanded(
-                                              child: Text(
-                                                query ?? 'Search for places...',
-                                                maxLines: 1,
-                                                overflow: TextOverflow.fade,
-                                                softWrap: false,
-                                                style: TextStyle(
-                                                  color: query == null
-                                                      ? Theme.of(context)
-                                                          .colorScheme
-                                                          .onSurfaceVariant
-                                                      : Theme.of(context).colorScheme.onSurface,
-                                                  fontSize: 16,
+                                              const SizedBox(width: 16),
+                                              Expanded(
+                                                child: Text(
+                                                  query ?? 'Search for places...',
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.fade,
+                                                  softWrap: false,
+                                                  style: TextStyle(
+                                                    color: query == null
+                                                        ? Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurfaceVariant
+                                                        : Theme.of(context).colorScheme.onSurface,
+                                                    fontSize: 16,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                  ValueListenableBuilder<bool>(
-                                    valueListenable: _isMarkersLoading,
-                                    builder: (context, isLoading, child) {
-                                      return SizedBox(
-                                        height: 24,
-                                        width: 24,
-                                        child: CircularProgressIndicator(
-                                          value: isLoading ? null : 0.0,
-                                          color: Theme.of(context).colorScheme.primary,
-                                          strokeWidth: 2.0,
-                                          strokeCap: StrokeCap.round,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                    ValueListenableBuilder<bool>(
+                                      valueListenable: _isMarkersLoading,
+                                      builder: (context, isLoading, child) {
+                                        return SizedBox(
+                                          height: 24,
+                                          width: 24,
+                                          child: CircularProgressIndicator(
+                                            value: isLoading ? null : 0.0,
+                                            color: Theme.of(context).colorScheme.primary,
+                                            strokeWidth: 2.0,
+                                            strokeCap: StrokeCap.round,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        )),
+                          ValueListenableBuilder(
+                            valueListenable: mapRotation,
+                            builder: (context, rotation, child) {
+                              int _cameraRotation = rotation.floor().abs();
+                              bool isRotated = !(_cameraRotation < 2 || _cameraRotation > 358);
+
+                              return AnimatedOpacity(
+                                opacity: isRotated ? 1.0 : 0.0,
+                                duration: const Duration(milliseconds: 200),
+                                curve: Easing.standard,
+                                child: IconButton.filledTonal(
+                                  style: ButtonStyle(
+                                    backgroundColor: WidgetStateProperty.all(
+                                      appColors.scheme.surfaceContainerHighest,
+                                    ),
+                                    elevation: WidgetStateProperty.all(4),
+                                  ),
+                                  onPressed: () {
+                                    _animatedMapController.animateTo(
+                                      zoom: 17.5,
+                                      rotation: 0.0,
+                                    );
+                                  },
+                                  icon: Transform.rotate(
+                                    angle: rotation * (3.14 / 180),
+                                    child: SvgPicture.asset(
+                                      "assets/icons/ui/compass_point.svg",
+                                      colorFilter: ColorFilter.mode(
+                                        Theme.of(context).colorScheme.tertiary,
+                                        BlendMode.modulate,
+                                      ),
+                                    ),
+                                  ),
+                                  iconSize: 48,
+                                ),
+                              );
+                            },
+                          )
+                        ],
+                      ),
+                    ),
                   ),
                 ),
                 IgnorePointer(
@@ -462,7 +529,25 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
           HapticFeedback.lightImpact();
         },
         heroTag: 'searchIcon',
-        child: const Icon(Icons.near_me_rounded),
+        child: ValueListenableBuilder(
+          valueListenable: _isUserCenter,
+          builder: (context, isUserCenter, child) {
+            return AnimatedSwitcher(
+              duration: const Duration(milliseconds: 200),
+              switchInCurve: Curves.easeInOutCubicEmphasized,
+              switchOutCurve: Curves.easeInOutCubicEmphasized,
+              child: isUserCenter
+                  ? const Icon(
+                      key: ValueKey("my_location"),
+                      Icons.my_location_rounded,
+                    )
+                  : const Icon(
+                      key: ValueKey("location_searching"),
+                      Icons.location_searching_rounded,
+                    ),
+            );
+          },
+        ),
       ),
     );
   }
