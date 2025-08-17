@@ -330,7 +330,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                             child: FlutterMap(
                               options: MapOptions(
                                 initialCenter: widget.busStopLocation,
-                                minZoom: 11,
+                                minZoom: 16.5,
                                 initialZoom: 17.5,
                                 maxZoom: 18,
                                 interactionOptions: const InteractionOptions(
