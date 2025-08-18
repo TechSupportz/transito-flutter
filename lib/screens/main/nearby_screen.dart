@@ -11,7 +11,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:smooth_highlight/smooth_highlight.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
@@ -19,7 +21,6 @@ import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
-import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
@@ -173,6 +174,59 @@ class _NearbyScreenState extends State<NearbyScreen> {
     });
   }
 
+  // NOTE - Remove in future versions
+  void showMRTMapHint(BuildContext context) {
+    const mrtMapHintSnackbar = SnackBar(
+      content: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 2, children: [
+        Text("MRT Map has moved to the Search page."),
+        Text(
+          "Double-tap the icon below to open it instantly!",
+          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
+        )
+      ]),
+    );
+
+    OverlayEntry mrtMapHintOverlay = OverlayEntry(
+      builder: (context) => SafeArea(
+        child: Align(
+          alignment: Alignment.bottomRight,
+          child: IgnorePointer(
+            child: Transform.scale(
+              scale: 0.75,
+              child: Container(
+                alignment: AlignmentDirectional.bottomEnd,
+                width: MediaQuery.of(context).size.width * 0.33,
+                height: 72.0,
+                decoration: BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.circular(100),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: SmoothHighlight(
+                  useInitialHighLight: true,
+                  duration: Duration(seconds: 2),
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
+                  child: SizedBox(
+                    width: MediaQuery.of(context).size.width * 0.33,
+                    height: 72.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(mrtMapHintSnackbar);
+    Overlay.of(context).insert(mrtMapHintOverlay);
+
+    Future.delayed(const Duration(seconds: 5), () {
+      mrtMapHintOverlay.remove();
+      print("MRT Map hint overlay removed");
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -191,16 +245,16 @@ class _NearbyScreenState extends State<NearbyScreen> {
       appBar: AppBar(
         title: Text('Welcome ${user?.displayName ?? ''}'),
         actions: [
-          // button to open the MRT map screen
+          // NOTE - Remove phantom MRT Icon button in future versions
           IconButton(
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const MrtMapScreen(),
-                settings: const RouteSettings(name: 'MrtMapScreen'),
-              ),
+            onPressed: () {
+              showMRTMapHint(context);
+              Posthog().capture(eventName: "mrt_map_hint_shown");
+            },
+            icon: SizedBox(
+              height: 28,
+              width: 28,
             ),
-            icon: const Icon(Icons.map_rounded),
           ),
           IconButton(
             onPressed: () => Navigator.push(

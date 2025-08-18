@@ -58,6 +58,7 @@ dependencies:
     flutter_map_marker_cluster:
         git:
             url: "https://github.com/matteomrz/flutter_map_marker_cluster"
+    material_symbols_icons: ^4.2858.1
 
 dev_dependencies:
     flutter_test:

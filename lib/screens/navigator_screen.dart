@@ -1,13 +1,16 @@
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
+import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {
-  const NavigatorScreen({super.key});
+  const NavigatorScreen({super.key, this.initialPageIndex = 0});
+  final int initialPageIndex;
 
   @override
   State<NavigatorScreen> createState() => _NavigatorScreenState();
@@ -24,6 +27,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   @override
   void initState() {
     super.initState();
+    _pageIndex = widget.initialPageIndex;
   }
 
   @override
@@ -49,10 +53,23 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
             children: _pages,
           )),
       bottomNavigationBar: NavigationBar(
-        destinations: const <NavigationDestination>[
-          NavigationDestination(icon: Icon(Icons.explore_rounded), label: "Nearby"),
-          NavigationDestination(icon: Icon(Icons.favorite_rounded), label: "Favourites"),
-          NavigationDestination(icon: Icon(Icons.search_rounded), label: "Search"),
+        destinations: <NavigationDestination>[
+          NavigationDestination(icon: Icon(Symbols.explore_rounded, fill: 1), label: "Nearby"),
+          NavigationDestination(icon: Icon(Symbols.favorite_rounded, fill: 1), label: "Favourites"),
+          NavigationDestination(
+              icon: GestureDetector(
+                child: Icon(Symbols.map_search_rounded, fill: 1),
+                onTap: () => setState(() {
+                  _pageIndex = 2;
+                }),
+                onDoubleTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => MrtMapScreen(),
+                    settings: RouteSettings(name: 'MrtMapScreen'),
+                  ),
+                ),
+              ),
+              label: "Search"),
         ],
         selectedIndex: _pageIndex,
         height: 72,

@@ -18,6 +18,7 @@ import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
+import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -458,43 +459,60 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                               ),
                             ),
                           ),
-                          ValueListenableBuilder(
-                            valueListenable: mapRotation,
-                            builder: (context, rotation, child) {
-                              int _cameraRotation = rotation.floor().abs();
-                              bool isRotated = !(_cameraRotation < 2 || _cameraRotation > 358);
-
-                              return AnimatedOpacity(
-                                opacity: isRotated ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Easing.standard,
-                                child: IconButton.filledTonal(
-                                  style: ButtonStyle(
-                                    backgroundColor: WidgetStateProperty.all(
-                                      appColors.scheme.surfaceContainerHighest,
-                                    ),
-                                    elevation: WidgetStateProperty.all(4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              FilledButton.tonalIcon(
+                                onPressed: () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MrtMapScreen(),
+                                    settings: const RouteSettings(name: 'MrtMapScreen'),
                                   ),
-                                  onPressed: () {
-                                    _animatedMapController.animateTo(
-                                      zoom: 17.5,
-                                      rotation: 0.0,
-                                    );
-                                  },
-                                  icon: Transform.rotate(
-                                    angle: rotation * (3.14 / 180),
-                                    child: SvgPicture.asset(
-                                      "assets/icons/ui/compass_point.svg",
-                                      colorFilter: ColorFilter.mode(
-                                        Theme.of(context).colorScheme.tertiary,
-                                        BlendMode.modulate,
-                                      ),
-                                    ),
-                                  ),
-                                  iconSize: 48,
                                 ),
-                              );
-                            },
+                                icon: const Icon(Icons.map_rounded),
+                                label: const Text('MRT Map'),
+                              ),
+                              ValueListenableBuilder(
+                                valueListenable: mapRotation,
+                                builder: (context, rotation, child) {
+                                  int _cameraRotation = rotation.floor().abs();
+                                  bool isRotated = !(_cameraRotation < 2 || _cameraRotation > 358);
+
+                                  return AnimatedOpacity(
+                                    opacity: isRotated ? 1.0 : 0.0,
+                                    duration: const Duration(milliseconds: 200),
+                                    curve: Easing.standard,
+                                    child: IconButton.filledTonal(
+                                      style: ButtonStyle(
+                                        backgroundColor: WidgetStateProperty.all(
+                                          appColors.scheme.surfaceContainerHighest,
+                                        ),
+                                        elevation: WidgetStateProperty.all(4),
+                                      ),
+                                      onPressed: () {
+                                        _animatedMapController.animateTo(
+                                          zoom: 17.5,
+                                          rotation: 0.0,
+                                        );
+                                      },
+                                      icon: Transform.rotate(
+                                        angle: rotation * (3.14 / 180),
+                                        child: SvgPicture.asset(
+                                          "assets/icons/ui/compass_point.svg",
+                                          colorFilter: ColorFilter.mode(
+                                            Theme.of(context).colorScheme.tertiary,
+                                            BlendMode.modulate,
+                                          ),
+                                        ),
+                                      ),
+                                      iconSize: 48,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
                           )
                         ],
                       ),
