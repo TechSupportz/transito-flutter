@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_highlight/smooth_highlight.dart';
@@ -24,6 +25,7 @@ import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
@@ -264,7 +266,10 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 settings: const RouteSettings(name: 'SettingsScreen'),
               ),
             ),
-            icon: const Icon(Icons.settings_rounded),
+            icon: const AppSymbol(
+              Symbols.settings_rounded,
+              fill: true,
+            ),
           )
         ],
       ),
@@ -353,9 +358,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 getAllNearby();
                 HapticFeedback.selectionClick();
               },
-              child: _isFetchingLocation
-                  ? const Icon(Icons.location_searching_rounded)
-                  : const Icon(Icons.my_location_rounded),
+              child: const AppSymbol(Symbols.refresh_rounded),
             )
           : null,
     );

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_type_enum.dart';
 import 'package:transito/models/enums/crowd_lvl_enum.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 
 class BusTimingRow extends StatefulWidget {
   const BusTimingRow({
@@ -202,8 +204,11 @@ class _ArrivalCardState extends State<ArrivalCard> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.5),
                 child: widget.accessible
-                    ? Icon(Icons.accessible_rounded,
-                        size: 16, color: Theme.of(context).colorScheme.onSurfaceVariant)
+                    ? AppSymbol(
+                        Symbols.accessible_rounded,
+                        size: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      )
                     : const SizedBox(width: 16, height: 16),
               ),
               Column(

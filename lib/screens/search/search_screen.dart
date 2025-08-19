@@ -5,11 +5,13 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/bus_info/bus_service_card.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -132,7 +134,7 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
           // enabled: _busStopList.isNotEmpty,
           decoration: InputDecoration(
             suffixIcon: IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const AppSymbol(Symbols.clear),
               onPressed: () {
                 // clears the search field
                 _textFieldController.clear();
@@ -262,7 +264,6 @@ class _SearchScreenState extends State<SearchScreen> with SingleTickerProviderSt
     return FutureBuilder(
       future: _futureBusServiceSearchResults,
       builder: (BuildContext context, AsyncSnapshot<BusServiceSearchApiResponse> snapshot) {
-
         // if the bus service list is not yet loaded, show a loading indicator
         if (snapshot.hasData) {
           BusServiceSearchApiResponse res = snapshot.data!;

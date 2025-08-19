@@ -7,6 +7,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/authentication_service.dart';
@@ -18,6 +19,7 @@ import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/settings/settings_others_card.dart';
 import 'package:transito/widgets/settings/settings_radio_card.dart';
@@ -264,8 +266,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     HapticFeedback.mediumImpact();
                                     updateDisplayName(user);
                                   },
-                                  icon: Icon(
-                                    Icons.check_rounded,
+                                  icon: AppSymbol(
+                                    Symbols.check_rounded,
                                     size: 21,
                                     color: appColors.scheme.onPrimary,
                                   ),
@@ -491,9 +493,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           ),
                                           style: const TextStyle(fontSize: 18),
                                         ),
-                                        Icon(
-                                          Icons.circle_rounded,
+                                        AppSymbol(
+                                          Symbols.circle_rounded,
                                           color: Color(int.parse(snapshot.data!.accentColour)),
+                                          fill: true,
                                           size: 40,
                                         ),
                                       ],
@@ -601,13 +604,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 16),
                 SettingsOthersCard(
                   title: "View Quick Start",
-                  icon: Icons.description_rounded,
+                  icon: AppSymbol(Symbols.quick_reference_rounded, fill: true),
                   onTap: () => goToQuickStart(),
                 ),
                 const SizedBox(height: 16),
                 SettingsOthersCard(
                   title: "Feedback Form",
-                  icon: Icons.feedback_rounded,
+                  icon: AppSymbol(Symbols.feedback_rounded, fill: true),
                   onTap: () => launchUrl(
                     Uri.parse("https://transito.tnitish.com/feedback"),
                     mode: LaunchMode.inAppWebView,
@@ -620,7 +623,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       if (snapshot.hasData) {
                         return SettingsOthersCard(
                           title: "About",
-                          icon: Icons.info_outline_rounded,
+                          icon: AppSymbol(Symbols.info_rounded, fill: true),
                           onTap: () => showAboutDialog(
                               context: context,
                               applicationIcon: ClipRRect(

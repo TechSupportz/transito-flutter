@@ -4,11 +4,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/favourites/favourite_name_card.dart';
 
 import 'edit_favourite_screen.dart';
@@ -166,7 +168,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
       floatingActionButton: isFabVisible
           ? FloatingActionButton(
               heroTag: "manageFavFAB",
-              child: const Icon(Icons.done_rounded),
+              child: const AppSymbol(Symbols.done_rounded),
               onPressed: () => FavouritesService()
                   .reorderFavourites(reorderedFavouritesList, context.read<User?>()!.uid)
                   .then((value) => Navigator.pop(context)),

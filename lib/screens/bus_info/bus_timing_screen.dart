@@ -11,6 +11,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
@@ -23,6 +24,7 @@ import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/bus_timing_guide.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
@@ -274,10 +276,20 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
           IconButton(
             icon: Row(
               children: [
-                const Icon(Icons.arrow_downward_rounded),
+                const AppSymbol(
+                  Symbols.arrow_downward_rounded,
+                  weight: 500,
+                ),
                 sortByArrivalTime
-                    ? const Icon(Icons.onetwothree_rounded, size: 32,)
-                    : const Icon(Icons.access_time_rounded),
+                    ? const AppSymbol(
+                        Symbols.onetwothree_rounded,
+                        size: 32,
+                        grade: 100,
+                        weight: 500,
+                      )
+                    : const AppSymbol(
+                        Symbols.access_time_rounded,
+                      ),
               ],
             ),
             onPressed: () {
@@ -292,16 +304,16 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
           // display different IconButtons depending on whether the bus stop is a favourite or not
           isAddedToFavourites
               ? IconButton(
-                  icon: const Icon(Icons.favorite_rounded),
+                  icon: const AppSymbol(Symbols.favorite_rounded, fill: true, grade: 100),
                   onPressed: () => goToEditFavouritesScreen(context),
                 )
               : IconButton(
-                  icon: const Icon(Icons.favorite_border_rounded),
+                  icon: const AppSymbol(Symbols.favorite_rounded, grade: 100),
                   onPressed: () => goToAddFavouritesScreen(context),
                 ),
           IconButton(
-            icon: const Icon(
-              Icons.help_outline_rounded,
+            icon: const AppSymbol(
+              Symbols.help_rounded,
             ),
             onPressed: () => showTimingGuideDialog(),
           ),
@@ -410,8 +422,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                                     ),
                                                     controlAffinity:
                                                         ListTileControlAffinity.leading,
-                                                    leading: const Icon(
-                                                      Icons.info_outline_rounded,
+                                                    leading: const AppSymbol(
+                                                      Symbols.info_rounded,
                                                     ),
                                                     onExpansionChanged: (value) {
                                                       if (value) {
@@ -506,7 +518,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
               }),
               heroTag: "busTimingFAB",
               enableFeedback: true,
-              child: const Icon(Icons.refresh_rounded, size: 28),
+              child: const AppSymbol(Symbols.refresh_rounded, size: 28),
             )
           : null,
     );

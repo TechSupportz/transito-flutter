@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 
 class BusStopCard extends StatelessWidget {
   const BusStopCard({
@@ -178,7 +180,7 @@ class BusStopCard extends StatelessWidget {
                       context: context,
                       builder: (context) => busScheduleDialog(context),
                     ),
-                    icon: const Icon(Icons.info_outline_rounded),
+                    icon: const AppSymbol(Symbols.info_rounded),
                   )
                 ]
               ],
@@ -263,9 +265,9 @@ class BusStopCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(
-                        Icons.light_mode_rounded,
-                        size: 24,
+                      const AppSymbol(
+                        Symbols.light_mode_rounded,
+                        fill: true,
                       ),
                       const SizedBox(width: 6.0),
                       Text(
@@ -311,7 +313,7 @@ class BusStopCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.nights_stay_rounded, size: 24),
+                      const AppSymbol(Symbols.nights_stay_rounded, fill: true),
                       const SizedBox(width: 6.0),
                       Text(
                         "Last Bus",

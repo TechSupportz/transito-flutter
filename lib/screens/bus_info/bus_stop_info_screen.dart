@@ -6,6 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
@@ -16,6 +17,7 @@ import 'package:transito/models/secret.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -188,11 +190,11 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
         actions: [
           isAddedToFavourites
               ? IconButton(
-                  icon: const Icon(Icons.favorite_rounded),
+                  icon: const AppSymbol(Symbols.favorite_rounded, fill: true, grade: 100),
                   onPressed: () => goToEditFavouritesScreen(),
                 )
               : IconButton(
-                  icon: const Icon(Icons.favorite_border_rounded),
+                  icon: const AppSymbol(Symbols.favorite_rounded, grade: 100),
                   onPressed: () => goToAddFavouritesScreen(),
                 ),
         ],
@@ -359,8 +361,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                       width: 48,
                                       height: 48,
                                       point: widget.busStopLocation,
-                                      child: Icon(
-                                        Icons.place_rounded,
+                                      child: AppSymbol(
+                                        Symbols.location_on_sharp,
+                                        fill: true,
                                         size: 48,
                                         color: Theme.of(context).colorScheme.primary,
                                         shadows: [

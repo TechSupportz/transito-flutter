@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 
 import '../../global/services/authentication_service.dart';
 import '../../widgets/auth/email_verification_dialog.dart';
@@ -362,11 +364,14 @@ class _EmailScreenState extends State<EmailScreen> {
             decoration: InputDecoration(
               labelText: 'Password',
               suffixIcon: IconButton(
-                icon: Icon(isRegisterPasswordVisible
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded),
+                icon: AppSymbol(
+                  isRegisterPasswordVisible
+                      ? Symbols.visibility_off_rounded
+                      : Symbols.visibility_rounded,
+                  fill: true,
+                  grade: 100,
+                ),
                 iconSize: 24,
-                splashRadius: 1,
                 onPressed: () {
                   setState(() {
                     isRegisterPasswordVisible = !isRegisterPasswordVisible;
@@ -432,11 +437,14 @@ class _EmailScreenState extends State<EmailScreen> {
             decoration: InputDecoration(
               labelText: 'Password',
               suffixIcon: IconButton(
-                icon: Icon(_isLoginPasswordVisible
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded),
+                icon: AppSymbol(
+                  _isLoginPasswordVisible
+                      ? Symbols.visibility_off_rounded
+                      : Symbols.visibility_rounded,
+                  fill: true,
+                  grade: 100,
+                ),
                 iconSize: 24,
-                splashRadius: 1,
                 onPressed: () {
                   setState(() {
                     _isLoginPasswordVisible = !_isLoginPasswordVisible;

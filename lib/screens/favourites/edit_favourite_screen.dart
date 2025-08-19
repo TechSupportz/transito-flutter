@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
@@ -14,6 +15,7 @@ import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/navigator_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/chekbox_skeleton.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
@@ -184,7 +186,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         title: const Text('Edit Favourites'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete_rounded),
+            icon: const AppSymbol(Symbols.delete_rounded),
             onPressed: () {
               deleteFavorites();
             },

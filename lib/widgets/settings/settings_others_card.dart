@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 
 class SettingsOthersCard extends StatelessWidget {
   const SettingsOthersCard({
@@ -9,7 +10,7 @@ class SettingsOthersCard extends StatelessWidget {
   });
 
   final String title;
-  final IconData icon;
+  final AppSymbol icon;
   final void Function() onTap;
 
   final TextStyle titleTextStyle = const TextStyle(
@@ -35,7 +36,7 @@ class SettingsOthersCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(title, style: titleTextStyle),
-              Icon(icon),
+              icon,
             ],
           ),
         ),

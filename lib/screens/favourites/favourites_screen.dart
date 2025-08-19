@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class FavouritesScreen extends StatefulWidget {
@@ -118,7 +120,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
           ? FloatingActionButton(
               heroTag: 'favouritesFAB',
               onPressed: () => goToManageFavouritesScreen(context),
-              child: const Icon(Icons.edit_rounded),
+              child: const AppSymbol(Symbols.edit_rounded, fill: true),
             )
           : null,
     );

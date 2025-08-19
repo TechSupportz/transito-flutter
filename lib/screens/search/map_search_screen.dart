@@ -11,6 +11,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
@@ -19,6 +20,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -87,8 +89,11 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                 color: Theme.of(context).colorScheme.tertiary,
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.directions_bus_rounded,
-                  color: Theme.of(context).colorScheme.onTertiary),
+              child: AppSymbol(
+                Symbols.directions_bus_rounded,
+                fill: true,
+                color: Theme.of(context).colorScheme.onTertiary,
+              ),
             ),
           ),
           point: LatLng(busStop.busStop.latitude, busStop.busStop.longitude),
@@ -345,8 +350,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                       alignment: Alignment.topCenter,
                                       width: 40,
                                       height: 40,
-                                      child: Icon(
-                                        Icons.location_pin,
+                                      child: AppSymbol(
+                                        Symbols.location_pin_sharp,
+                                        fill: true,
                                         size: 48,
                                         color: Theme.of(context).colorScheme.primaryFixed,
                                         shadows: [
@@ -390,18 +396,18 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                             children: [
                                               IconButton(
                                                 icon: AnimatedSwitcher(
-                                                  duration: const Duration(milliseconds: 100),
+                                                  duration: const Duration(milliseconds: 200),
                                                   child: query == null
-                                                      ? Icon(
+                                                      ? AppSymbol(
                                                           key: const ValueKey('searchIcon'),
-                                                          Icons.search_rounded,
+                                                          Symbols.search_rounded,
                                                           color: Theme.of(context)
                                                               .colorScheme
                                                               .onSurfaceVariant,
                                                         )
-                                                      : Icon(
+                                                      : AppSymbol(
                                                           key: const ValueKey('clearSearchIcon'),
-                                                          Icons.clear_rounded,
+                                                          Symbols.clear_rounded,
                                                           color: Theme.of(context)
                                                               .colorScheme
                                                               .onSurfaceVariant,
@@ -471,7 +477,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                     settings: const RouteSettings(name: 'MrtMapScreen'),
                                   ),
                                 ),
-                                icon: const Icon(Icons.map_rounded),
+                                icon: const AppSymbol(Symbols.map_rounded, fill: true),
                                 label: const Text('MRT Map'),
                               ),
                               ValueListenableBuilder(
@@ -551,17 +557,18 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
           valueListenable: _isUserCenter,
           builder: (context, isUserCenter, child) {
             return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 500),
               switchInCurve: Curves.easeInOutCubicEmphasized,
               switchOutCurve: Curves.easeInOutCubicEmphasized,
               child: isUserCenter
-                  ? const Icon(
+                  ? const AppSymbol(
                       key: ValueKey("my_location"),
-                      Icons.my_location_rounded,
+                      Symbols.my_location_rounded,
+                      fill: true,
                     )
-                  : const Icon(
+                  : const AppSymbol(
                       key: ValueKey("location_searching"),
-                      Icons.location_searching_rounded,
+                      Symbols.location_searching_rounded,
                     ),
             );
           },

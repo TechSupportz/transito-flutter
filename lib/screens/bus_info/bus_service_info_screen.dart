@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
@@ -12,6 +13,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/bus_info/bus_routes_list.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
 class BusServiceInfoScreen extends StatefulWidget {
@@ -91,7 +93,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         title: const Text('Bus Service Information'),
       ),
       body: Padding(
-        padding: const EdgeInsets.only(top:12.0, left: 12, right: 12),
+        padding: const EdgeInsets.only(top: 12.0, left: 12, right: 12),
         child: FutureBuilder(
           future: futureBusServiceInfo,
           builder: (context, snapshot) {
@@ -229,31 +231,25 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         if (busService.isLoopService) ...[
-                                          Transform.rotate(
-                                            angle: 45,
-                                            child: Icon(
-                                              Icons.loop_rounded,
-                                              color: appColors.notReallyYellow,
-                                              size: 28,
-                                            ),
+                                          AppSymbol(
+                                            Symbols.sync_rounded,
+                                            color: appColors.notReallyYellow,
+                                            size: 28,
                                           ),
                                         ] else ...[
                                           Padding(
                                             padding: const EdgeInsets.only(bottom: 20),
-                                            child: Icon(
-                                              Icons.radio_button_unchecked_rounded,
+                                            child: AppSymbol(
+                                              Symbols.trip_origin_rounded,
                                               color: appColors.prettyGreen,
                                               size: 28,
                                             ),
                                           ),
                                           if (busService.isSingleRoute) ...[
-                                            const RotatedBox(
-                                              quarterTurns: 1,
-                                              child: Icon(
-                                                Icons.arrow_right_alt_rounded,
-                                                color: Colors.white,
-                                                size: 28,
-                                              ),
+                                            AppSymbol(
+                                              Symbols.south_rounded,
+                                              color: Colors.white,
+                                              size: 28,
                                             ),
                                           ] else ...[
                                             Ink(
@@ -271,9 +267,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                                   iconSize: 30,
                                                   splashRadius: 20,
                                                   enableFeedback: true,
-                                                  icon: Icon(
-                                                    Icons.swap_vert_rounded,
+                                                  icon: AppSymbol(
+                                                    Symbols.swap_vert_rounded,
                                                     color: Theme.of(context).colorScheme.onPrimary,
+                                                    opticalSize: 30,
                                                   ),
                                                   onPressed: () {
                                                     setState(
@@ -287,9 +284,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                           ],
                                           Padding(
                                             padding: const EdgeInsets.only(top: 20),
-                                            child: Icon(
-                                              Icons.place_rounded,
+                                            child: AppSymbol(
+                                              Symbols.distance_rounded,
                                               color: appColors.sortaRed,
+                                              fill: true,
                                               size: 28,
                                             ),
                                           ),

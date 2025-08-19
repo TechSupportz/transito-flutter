@@ -4,10 +4,12 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:http/http.dart' as http;
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/onemap/onemap_search.dart';
 import 'package:transito/models/secret.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/search/recent_search_list.dart';
 import 'package:transito/widgets/search/search_result_card.dart';
 
@@ -119,11 +121,11 @@ class _SearchDialogState extends State<SearchDialog> {
           ),
           actions: [
             AnimatedOpacity(
-              duration: const Duration(milliseconds: 200),
+              duration: const Duration(milliseconds: 300),
               curve: Easing.standard,
               opacity: _textFieldController.text.isNotEmpty ? 1.0 : 0.0,
               child: IconButton(
-                icon: const Icon(Icons.clear_rounded),
+                icon: const AppSymbol(Symbols.clear_rounded),
                 onPressed: () => clearSearch(),
               ),
             ),

@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:transito/screens/auth/email_screen.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 
 import '../../global/services/authentication_service.dart';
 import '../navigator_screen.dart';
@@ -249,8 +251,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 FilledButton.tonalIcon(
                                   onPressed: () => onEmailBtnPress(),
-                                  icon: Icon(
-                                    Icons.email_rounded,
+                                  icon: AppSymbol(
+                                    Symbols.mail_rounded,
+                                    fill: true,
+                                    opticalSize: 18,
                                   ),
                                   label: const Text(
                                     'Continue with Email',
@@ -263,8 +267,10 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                                 FilledButton.tonalIcon(
                                   onPressed: () => showGuestLoginDialog(),
-                                  icon: Icon(
-                                    Icons.person_rounded,
+                                  icon: AppSymbol(
+                                    Symbols.person_rounded,
+                                    fill: true,
+                                    opticalSize: 18,
                                   ),
                                   label: const Text(
                                     'Continue as a Guest',

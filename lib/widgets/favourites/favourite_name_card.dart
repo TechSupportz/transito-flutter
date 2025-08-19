@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 
 class FavouriteNameCard extends StatelessWidget {
   const FavouriteNameCard({
@@ -38,7 +40,7 @@ class FavouriteNameCard extends StatelessWidget {
               ),
             ),
             IconButton(
-              icon: const Icon(Icons.edit),
+              icon: const AppSymbol(Symbols.edit, fill: true),
               onPressed: () => onTap(),
             ),
           ],
