@@ -217,7 +217,7 @@ class BusStopCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            const Text('chedule'),
+            const Text('Schedule'),
             const SizedBox(height: 4.0),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               ChoiceChip(
