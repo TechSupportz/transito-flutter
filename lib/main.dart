@@ -19,7 +19,7 @@ import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/enums/app_theme_mode.dart';
+import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';

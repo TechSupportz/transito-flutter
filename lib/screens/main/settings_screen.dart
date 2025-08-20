@@ -14,7 +14,7 @@ import 'package:transito/global/services/authentication_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/settings_card_options.dart';
-import 'package:transito/models/enums/app_theme_mode.dart';
+import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';

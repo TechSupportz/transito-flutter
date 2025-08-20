@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/app/settings_card_options.dart';
-import 'package:transito/models/enums/app_theme_mode.dart';
+import 'package:transito/models/enums/app_theme_mode_enum.dart';
 
 import '../../global/services/settings_service.dart';
 

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/enums/app_theme_mode.dart';
+import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import 'package:transito/models/user/user_settings.dart';
 
 class SettingsService {

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:transito/models/enums/app_theme_mode.dart';
+import 'package:transito/models/enums/app_theme_mode_enum.dart';
 
 part 'user_settings.g.dart';
 
