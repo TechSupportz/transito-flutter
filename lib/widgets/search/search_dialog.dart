@@ -63,6 +63,14 @@ class _SearchDialogState extends State<SearchDialog> {
   }
 
   Future<BusStopSearchApiResponse> searchBusStops(String query) async {
+    if (query.isEmpty) {
+      return Future.value(BusStopSearchApiResponse(
+        message: "NA",
+        count: 0,
+        data: [],
+      ));
+    }
+
     final response = await http.get(
       Uri.parse('${Secret.API_URL}/search/bus-stops?query=$query'),
     );
@@ -77,6 +85,14 @@ class _SearchDialogState extends State<SearchDialog> {
   }
 
   Future<BusServiceSearchApiResponse> searchBusServices(String query) async {
+    if (query.isEmpty) {
+      return Future.value(BusServiceSearchApiResponse(
+        message: "NA",
+        count: 0,
+        data: [],
+      ));
+    }
+
     final response = await http.get(
       Uri.parse('${Secret.API_URL}/search/bus-services?query=$query'),
     );
@@ -124,6 +140,18 @@ class _SearchDialogState extends State<SearchDialog> {
         page: 1,
         data: [],
       ));
+
+      _futureBusStopSearchResults = Future.value(BusStopSearchApiResponse(
+        message: "NA",
+        count: 0,
+        data: [],
+      ));
+
+      _futureBusServiceSearchResults = Future.value(BusServiceSearchApiResponse(
+        message: "NA",
+        count: 0,
+        data: [],
+      ));
     });
     widget.onSearchCleared();
   }
@@ -138,16 +166,19 @@ class _SearchDialogState extends State<SearchDialog> {
       page: 1,
       data: [],
     ));
-    _futureBusStopSearchResults = Future(() => BusStopSearchApiResponse(
-          message: "NA",
-          count: 0,
-          data: [],
-        ));
-    _futureBusServiceSearchResults = Future(() => BusServiceSearchApiResponse(
-          message: "NA",
-          count: 0,
-          data: [],
-        ));
+
+    _futureBusStopSearchResults = Future.value(BusStopSearchApiResponse(
+      message: "NA",
+      count: 0,
+      data: [],
+    ));
+
+    _futureBusServiceSearchResults = Future.value(BusServiceSearchApiResponse(
+      message: "NA",
+      count: 0,
+      data: [],
+    ));
+
     if (widget.initialQuery != null) {
       _textFieldController.text = widget.initialQuery!;
       _onSearchChanged(widget.initialQuery!, 1);
