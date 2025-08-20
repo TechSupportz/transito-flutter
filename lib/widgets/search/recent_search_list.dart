@@ -34,7 +34,7 @@ class RecentSearchList extends StatelessWidget {
 
     return ListView.separated(
       shrinkWrap: true,
-      padding: const EdgeInsets.only(bottom: 32.0, left: 12.0, right: 12.0),
+      padding: const EdgeInsets.only(bottom: 32.0),
       itemCount: recentSearches.length,
       itemBuilder: (context, index) {
         // determines which widget to show depending on if the recent search is a bus stop or a bus service

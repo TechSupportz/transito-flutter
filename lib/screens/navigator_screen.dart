@@ -6,6 +6,7 @@ import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
+import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {
@@ -54,11 +55,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           )),
       bottomNavigationBar: NavigationBar(
         destinations: <NavigationDestination>[
-          NavigationDestination(icon: Icon(Symbols.explore_rounded, fill: 1), label: "Nearby"),
-          NavigationDestination(icon: Icon(Symbols.favorite_rounded, fill: 1), label: "Favourites"),
+          NavigationDestination(
+              icon: AppSymbol(Symbols.explore_rounded, fill: true), label: "Nearby"),
+          NavigationDestination(
+              icon: AppSymbol(Symbols.favorite_rounded, fill: true), label: "Favourites"),
           NavigationDestination(
               icon: GestureDetector(
-                child: Icon(Symbols.map_search_rounded, fill: 1),
+                child: AppSymbol(Symbols.map_search_rounded, fill: true),
                 onTap: () => setState(() {
                   _pageIndex = 2;
                 }),

@@ -44,7 +44,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
   late Future<bool> _isLocationPermissionGranted;
   late StreamSubscription<Position> userLocationStream;
   bool _isFabVisible = true;
-  bool _isFetchingLocation = false;
 
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
@@ -72,7 +71,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
   // gets the user's current location
   Future<Position> getUserLocation(bool refresh) async {
     debugPrint("Fetching user location");
-    setState(() => _isFetchingLocation = true);
     Position? lastKnownPosition = await Geolocator.getLastKnownPosition();
 
     if (!refresh &&
@@ -80,7 +78,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
         Jiffy.parse(lastKnownPosition.timestamp.toString()).add(minutes: 5).isBefore(Jiffy.now())) {
       debugPrint("Fetched user location from cache");
 
-      setState(() => _isFetchingLocation = false);
       return lastKnownPosition;
     }
 
@@ -99,7 +96,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
       streamUserLocation();
     }
 
-    setState(() => _isFetchingLocation = false);
     return position;
   }
 

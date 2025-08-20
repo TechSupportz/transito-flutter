@@ -8,6 +8,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/onemap/onemap_search.dart';
+import 'package:transito/models/enums/search_mode_enum.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/search/recent_search_list.dart';
@@ -35,6 +36,8 @@ class _SearchDialogState extends State<SearchDialog> {
   Timer? _debounce;
   final _textFieldController = TextEditingController();
   late final FocusNode _searchFocusNode = FocusNode();
+
+  SearchMode _searchMode = SearchMode.PLACES; // Default search mode
 
   Future<OneMapSearch> getSearchResults(String query, int page) async {
     if (query.isEmpty) {
@@ -131,157 +134,222 @@ class _SearchDialogState extends State<SearchDialog> {
             ),
           ],
         ),
-        body: FutureBuilder<OneMapSearch>(
-          future: _searchResults,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              OneMapSearch res = snapshot.data!;
-
-              // This should probably be ur recent searches widget
-              if (res.count == 0 && _textFieldController.text.isEmpty) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        body: Column(
+          children: [
+            Container(
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                padding: EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                child: Row(
+                  spacing: 8,
+                  mainAxisSize: MainAxisSize.max,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.only(left: 16.0, right: 12.0, top: 8.0),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            Theme.of(context).colorScheme.surface,
-                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                          ],
-                          stops: [0.85, 1.0],
-                        ),
+                    ChoiceChip(
+                      label: Text("Places"),
+                      selected: _searchMode == SearchMode.PLACES,
+                      onSelected: (value) => setState(() => _searchMode = SearchMode.PLACES),
+                      avatar: AnimatedOpacity(
+                          opacity: _searchMode == SearchMode.PLACES ? 0.2 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Easing.standard,
+                          child: AppSymbol(
+                            Symbols.place_rounded,
+                            fill: true,
+                          )),
+                    ),
+                    ChoiceChip(
+                      label: Text("Bus Stops"),
+                      selected: _searchMode == SearchMode.STOPS,
+                      onSelected: (value) => setState(() => _searchMode = SearchMode.STOPS),
+                      avatar: AnimatedOpacity(
+                          opacity: _searchMode == SearchMode.STOPS ? 0.2 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Easing.standard,
+                          child: AppSymbol(
+                            Symbols.signpost_rounded,
+                            fill: true,
+                          )),
+                    ),
+                    ChoiceChip(
+                      label: Text("Bus Services"),
+                      selected: _searchMode == SearchMode.SERVICES,
+                      onSelected: (value) => setState(
+                        () => _searchMode = SearchMode.SERVICES,
                       ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.baseline,
-                        textBaseline: TextBaseline.alphabetic,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Recent searches",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                          TextButton(
-                            onPressed: searchProvider.recentSearches.isEmpty
-                                ? null
-                                : () => searchProvider.clearAllRecentSearches(),
-                            child: Text(
-                              "Clear all",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
+                      avatar: AnimatedOpacity(
+                          opacity: _searchMode == SearchMode.SERVICES ? 0.2 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Easing.standard,
+                          child: AppSymbol(
+                            Symbols.directions_bus_rounded,
+                            fill: true,
+                          )),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Expanded(
+              child: FutureBuilder<OneMapSearch>(
+                future: _searchResults,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    OneMapSearch res = snapshot.data!;
+
+                    // This should probably be ur recent searches widget
+                    if (res.count == 0 && _textFieldController.text.isEmpty) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(left: 4.0, top: 8.0),
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: [
+                                    Theme.of(context).colorScheme.surface,
+                                    Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                                  ],
+                                  stops: [0.85, 1.0],
+                                ),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    "Recent searches",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                    ),
+                                  ),
+                                  TextButton(
+                                    onPressed: searchProvider.recentSearches.isEmpty
+                                        ? null
+                                        : () => searchProvider.clearAllRecentSearches(),
+                                    child: Text(
+                                      "Clear all",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
+                            RecentSearchList(
+                              onSearchCardSelected: (value) {
+                                widget.onSearchSelected(value);
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "We can't find that place 🤔",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 20,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "Try checking for typos or searching for a landmark or address nearby instead.",
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return Skeleton(
+                      isLoading: snapshot.connectionState == ConnectionState.waiting,
+                      skeleton: SkeletonListView(
+                        padding:
+                            const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+                        itemBuilder: (context, _) => SkeletonLine(
+                          style: SkeletonLineStyle(
+                            height: 88,
+                            borderRadius: BorderRadius.circular(12),
+                            padding: const EdgeInsets.only(bottom: 16),
+                          ),
+                        ),
+                      ),
+                      child: ListView.separated(
+                        itemCount: res.count,
+                        padding:
+                            const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+                        separatorBuilder: (context, index) => const SizedBox(height: 16),
+                        itemBuilder: (context, index) {
+                          final result = res.data[index];
+                          return SearchResultCard(
+                            searchData: result,
+                            onTap: () {
+                              widget.onSearchSelected(result);
+                              Navigator.pop(context);
+                            },
+                          );
+                        },
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    debugPrint("<=== ERROR ${snapshot.error} ===>");
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "⚠️ Something went wrong",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Please try again later",
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 16,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
                         ],
                       ),
-                    ),
-                    RecentSearchList(
-                      onSearchCardSelected: (value) {
-                        widget.onSearchSelected(value);
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                );
-              }
-
-              if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-                return Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "We can't find that place 🤔",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 20,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        "Try checking for typos or searching for a landmark or address nearby instead.",
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                );
-              }
-
-              return Skeleton(
-                isLoading: snapshot.connectionState == ConnectionState.waiting,
-                skeleton: SkeletonListView(
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-                  itemBuilder: (context, _) => SkeletonLine(
-                    style: SkeletonLineStyle(
-                      height: 88,
-                      borderRadius: BorderRadius.circular(12),
-                      padding: const EdgeInsets.only(bottom: 16),
-                    ),
-                  ),
-                ),
-                child: ListView.separated(
-                  itemCount: res.count,
-                  padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-                  separatorBuilder: (context, index) => const SizedBox(height: 16),
-                  itemBuilder: (context, index) {
-                    final result = res.data[index];
-                    return SearchResultCard(
-                      searchData: result,
-                      onTap: () {
-                        widget.onSearchSelected(result);
-                        Navigator.pop(context);
-                      },
                     );
-                  },
-                ),
-              );
-            } else if (snapshot.hasError) {
-              debugPrint("<=== ERROR ${snapshot.error} ===>");
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "⚠️ Something went wrong",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Please try again later",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                ),
-              );
-            }
+                  }
 
-            return const Center(child: CircularProgressIndicator(strokeWidth: 3));
-          },
+                  return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
