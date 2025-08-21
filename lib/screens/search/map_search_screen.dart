@@ -539,11 +539,14 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                       },
                                       icon: Transform.rotate(
                                         angle: rotation * (3.14 / 180),
-                                        child: SvgPicture.asset(
-                                          "assets/icons/ui/compass_point.svg",
-                                          colorFilter: ColorFilter.mode(
-                                            Theme.of(context).colorScheme.tertiary,
-                                            BlendMode.modulate,
+                                        child: RotatedBox(
+                                          quarterTurns: appColors.brightness == Brightness.light ? 2 : 0,
+                                          child: SvgPicture.asset(
+                                            "assets/icons/ui/compass_point.svg",
+                                            colorFilter: ColorFilter.mode(
+                                              Theme.of(context).colorScheme.tertiary,
+                                              BlendMode.modulate,
+                                            ),
                                           ),
                                         ),
                                       ),
