@@ -157,16 +157,18 @@ class BusStopCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          Text(
-                            (searchMode || !showDistanceFromUser)
-                                ? busStopInfo.roadName
-                                : '${transformDistanceFromUser(distanceFromUser!)} away',
-                            overflow: TextOverflow.fade,
-                            maxLines: 1,
-                            softWrap: false,
-                            style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              fontStyle: FontStyle.italic,
+                          Flexible(
+                            child: Text(
+                              (searchMode || !showDistanceFromUser)
+                                  ? busStopInfo.roadName
+                                  : '${transformDistanceFromUser(distanceFromUser!)} away',
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontStyle: FontStyle.italic,
+                              ),
                             ),
                           ),
                         ],
