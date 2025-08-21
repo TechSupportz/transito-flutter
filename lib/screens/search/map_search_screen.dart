@@ -13,6 +13,7 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
@@ -35,6 +36,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
   final ValueNotifier<double> mapRotation = ValueNotifier<double>(0.0);
   final ValueNotifier<bool> _isUserCenter = ValueNotifier<bool>(false);
+  late Future<LatLng> _initialCameraCenter;
 
   final ValueNotifier<List<Marker>> busStopMarkers = ValueNotifier<List<Marker>>([]);
   final ValueNotifier<bool> _isMarkersLoading = ValueNotifier<bool>(true);
@@ -48,7 +50,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
         '${Secret.API_URL}/bus-stops/nearby?latitude=${position.latitude}&longitude=${position.longitude}'));
 
     if (response.statusCode == 200) {
-      debugPrint("Nearby bus stops fetched");
+      debugPrint(">>> Nearby bus stops fetched");
       return NearbyBusStopsApiResponse.fromJson(jsonDecode(response.body)).data;
     } else {
       debugPrint("Failed to fetch nearby bus stops");
@@ -149,8 +151,6 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
 
   // gets the user's current location
   Future<Position> getUserLocation({bool? populateMarkers}) async {
-    debugPrint(">>> Fetching user location");
-
     Position position = await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.best,
@@ -169,12 +169,58 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     );
   }
 
+  void updateIsUserCenter(LatLng position) async {
+    Position userPosition = await getUserLocation();
+    if (userPosition.latitude == position.latitude &&
+        userPosition.longitude == position.longitude &&
+        !_isUserCenter.value) {
+      _isUserCenter.value = true;
+    } else if ((userPosition.latitude != position.latitude ||
+            userPosition.longitude != position.longitude) &&
+        _isUserCenter.value) {
+      _isUserCenter.value = false;
+    }
+  }
+
+  Marker buildLocationMarker(LatLng position) {
+    return Marker(
+      rotate: true,
+      point: position,
+      alignment: Alignment.topCenter,
+      width: 40,
+      height: 40,
+      child: AppSymbol(
+        Symbols.location_pin_sharp,
+        fill: true,
+        size: 48,
+        color: Theme.of(context).colorScheme.primaryFixed,
+        shadows: [
+          Shadow(
+            color: Theme.of(context).colorScheme.onPrimaryFixed,
+            blurRadius: 32,
+            offset: const Offset(0, 0),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
     super.initState();
+    LatLng? initialMapPinLocation = context.read<CommonProvider>().initialMapPinLocation;
+
+    if (initialMapPinLocation != null) {
+      _initialCameraCenter = Future.value(initialMapPinLocation);
+    } else {
+      _initialCameraCenter = getUserLocation().then((position) {
+        return LatLng(position.latitude, position.longitude);
+      });
+    }
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      Position position = await getUserLocation();
-      _onMapPositionChanged(LatLng(position.latitude, position.longitude));
+      LatLng initialCameraCenter = await _initialCameraCenter;
+      _onMapPositionChanged(initialCameraCenter);
     });
   }
 
@@ -197,7 +243,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       backgroundColor: appColors.scheme.surfaceContainer,
       // displays the recent search list widget
       body: FutureBuilder(
-          future: getUserLocation(),
+          future: _initialCameraCenter,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
               return const Center(
@@ -210,7 +256,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                 FlutterMap(
                   mapController: _animatedMapController.mapController,
                   options: MapOptions(
-                    initialCenter: LatLng(snapshot.data!.latitude, snapshot.data!.longitude),
+                    initialCenter: LatLng(
+                      snapshot.data!.latitude,
+                      snapshot.data!.longitude,
+                    ),
                     minZoom: 12,
                     initialZoom: 17.5,
                     maxZoom: 19,
@@ -221,6 +270,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                         ? Color(0xFF003653)
                         : Color(0xFF6DA7E3),
                     onPositionChanged: (camera, hasGesture) {
+                      updateIsUserCenter(camera.center);
                       _onMapPositionChanged(camera.center);
                       mapRotation.value = camera.rotation;
                     },
@@ -344,29 +394,13 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                   initialQuery: searchQuery.value,
                                   onSearchCleared: () => searchQuery.value = null,
                                   onSearchSelected: (value) {
-                                    searchLocationPin.value = Marker(
-                                      rotate: true,
-                                      point: LatLng(value.latitude, value.longitude),
-                                      alignment: Alignment.topCenter,
-                                      width: 40,
-                                      height: 40,
-                                      child: AppSymbol(
-                                        Symbols.location_pin_sharp,
-                                        fill: true,
-                                        size: 48,
-                                        color: Theme.of(context).colorScheme.primaryFixed,
-                                        shadows: [
-                                          Shadow(
-                                            color: Theme.of(context).colorScheme.onPrimaryFixed,
-                                            blurRadius: 32,
-                                            offset: const Offset(0, 0),
-                                          ),
-                                        ],
-                                      ),
+                                    searchLocationPin.value = buildLocationMarker(
+                                      LatLng(value.latitude, value.longitude),
                                     );
                                     searchQuery.value = value.name;
                                     _animatedMapController.animateTo(
                                       dest: LatLng(value.latitude, value.longitude),
+                                      zoom: 17.5,
                                     );
                                   },
                                 ),

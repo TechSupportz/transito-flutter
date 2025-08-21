@@ -45,6 +45,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
   late StreamSubscription<Position> userLocationStream;
   bool _isFabVisible = true;
 
+  LatLng _prevUserLocation = LatLng(0, 0);
+
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
@@ -163,11 +165,14 @@ class _NearbyScreenState extends State<NearbyScreen> {
         distanceFilter: 50,
       ),
     ).listen((Position position) {
-      debugPrint(">>> User location changed");
-      debugPrint(">>> $position");
+      if (_prevUserLocation.latitude == position.latitude &&
+          _prevUserLocation.longitude == position.longitude) {
+        return;
+      }
       setState(() {
         nearbyBusStops = getNearbyBusStops(currentLocation: position);
         nearbyFavourites = getNearbyFavourites(currentLocation: position);
+        _prevUserLocation = LatLng(position.latitude, position.longitude);
       });
     });
   }
@@ -233,6 +238,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
     nearbyBusStops = getNearbyBusStops();
     nearbyFavourites = getNearbyFavourites();
     streamUserLocation();
+  }
+
+  @override
+  void dispose() {
+    userLocationStream.cancel();
+    debugPrint("Cancelling user location stream");
+    super.dispose();
   }
 
   @override
@@ -358,13 +370,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
             )
           : null,
     );
-  }
-
-  @override
-  void dispose() {
-    userLocationStream.cancel();
-    debugPrint("Cancelling user location stream");
-    super.dispose();
   }
 
   Column nearbyBusStopsGrid() {

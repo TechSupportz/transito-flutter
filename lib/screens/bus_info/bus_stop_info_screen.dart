@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
+import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
@@ -327,92 +329,144 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                         SizedBox(
                           width: double.infinity,
                           height: isTablet ? 800 : 400,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: FlutterMap(
-                              options: MapOptions(
-                                initialCenter: widget.busStopLocation,
-                                minZoom: 16.5,
-                                initialZoom: 17.5,
-                                maxZoom: 18,
-                                interactionOptions: const InteractionOptions(
-                                  flags: InteractiveFlag.all &
-                                      ~InteractiveFlag.pinchMove &
-                                      ~InteractiveFlag.rotate,
-                                ),
-                                backgroundColor: appColors.brightness == Brightness.dark
-                                    ? Color(0xFF003653)
-                                    : Color(0xFF6DA7E3),
-                              ),
-                              children: [
-                                TileLayer(
-                                  urlTemplate:
-                                      "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
-                                  fallbackUrl:
-                                      "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
-                                  userAgentPackageName: 'com.tnitish.transito',
-                                  errorImage: const AssetImage('assets/images/mapError.png'),
-                                ),
-                                MarkerLayer(
-                                  markers: [
-                                    Marker(
-                                      key: const Key('bus-stop-marker'),
-                                      alignment: Alignment.topCenter,
-                                      width: 48,
-                                      height: 48,
-                                      point: widget.busStopLocation,
-                                      child: AppSymbol(
-                                        Symbols.location_on_sharp,
-                                        fill: true,
-                                        size: 48,
-                                        color: Theme.of(context).colorScheme.primary,
-                                        shadows: [
-                                          Shadow(
-                                            color: Theme.of(context).colorScheme.onPrimary,
-                                            blurRadius: 48,
-                                            offset: const Offset(0, 0),
-                                          ),
-                                        ],
-                                      ),
+                          child: Stack(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: FlutterMap(
+                                  options: MapOptions(
+                                    initialCenter: widget.busStopLocation,
+                                    minZoom: 16.5,
+                                    initialZoom: 17.5,
+                                    maxZoom: 18,
+                                    interactionOptions: const InteractionOptions(
+                                      flags: InteractiveFlag.all &
+                                          ~InteractiveFlag.pinchMove &
+                                          ~InteractiveFlag.rotate,
                                     ),
-                                  ],
-                                ),
-                                Align(
-                                  alignment: Alignment.bottomRight,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceContainerLowest
-                                          .withValues(alpha: 0.8),
-                                      borderRadius: BorderRadius.only(topLeft: Radius.circular(8)),
+                                    backgroundColor: appColors.brightness == Brightness.dark
+                                        ? Color(0xFF003653)
+                                        : Color(0xFF6DA7E3),
+                                  ),
+                                  children: [
+                                    TileLayer(
+                                      urlTemplate:
+                                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
+                                      fallbackUrl:
+                                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
+                                      userAgentPackageName: 'com.tnitish.transito',
+                                      errorImage: const AssetImage('assets/images/mapError.png'),
                                     ),
-                                    padding: const EdgeInsets.all(4),
-                                    child: Row(
-                                      spacing: 4,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(4),
-                                          child: Image.network(
-                                            "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
-                                            height: 16,
-                                            opacity: AlwaysStoppedAnimation(0.65),
-                                          ),
-                                        ),
-                                        Text(
-                                          "OneMap © contributors",
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                            fontSize: 12,
+                                    MarkerLayer(
+                                      markers: [
+                                        Marker(
+                                          key: const Key('bus-stop-marker'),
+                                          alignment: Alignment.topCenter,
+                                          width: 48,
+                                          height: 48,
+                                          point: widget.busStopLocation,
+                                          child: AppSymbol(
+                                            Symbols.location_on_sharp,
+                                            fill: true,
+                                            size: 48,
+                                            color: Theme.of(context).colorScheme.primary,
+                                            shadows: [
+                                              Shadow(
+                                                color: Theme.of(context).colorScheme.onPrimary,
+                                                blurRadius: 48,
+                                                offset: const Offset(0, 0),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
                                     ),
+                                    Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surfaceContainerLowest
+                                              .withValues(alpha: 0.8),
+                                          borderRadius:
+                                              BorderRadius.only(topLeft: Radius.circular(8)),
+                                        ),
+                                        padding: const EdgeInsets.all(4),
+                                        child: Row(
+                                          spacing: 4,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            ClipRRect(
+                                              borderRadius: BorderRadius.circular(4),
+                                              child: Image.network(
+                                                "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
+                                                height: 16,
+                                                opacity: AlwaysStoppedAnimation(0.65),
+                                              ),
+                                            ),
+                                            Text(
+                                              "OneMap © contributors",
+                                              style: TextStyle(
+                                                color:
+                                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Align(
+                                  alignment: Alignment.topRight,
+                                  child: IconButton.filled(
+                                    style: ButtonStyle(
+                                      padding: WidgetStateProperty.all<EdgeInsetsGeometry>(
+                                        const EdgeInsets.all(8),
+                                      ),
+                                      shape: WidgetStateProperty.all<RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
+                                        ),
+                                      ),
+                                      backgroundColor: WidgetStateProperty.all<Color>(
+                                        Theme.of(context).colorScheme.tertiaryContainer,
+                                      ),
+                                      iconColor: WidgetStateProperty.all<Color>(
+                                        Theme.of(context).colorScheme.onTertiaryContainer,
+                                      ),
+                                    ),
+                                    iconSize: 28,
+                                    onPressed: () {
+                                      context
+                                          .read<CommonProvider>()
+                                          .setInitialMapPinLocation(widget.busStopLocation);
+
+                                      Navigator.of(context).pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                          builder: (context) => const NavigatorScreen(
+                                            initialPageIndex: 2,
+                                          ),
+                                        ),
+                                        (Route<dynamic> route) => false,
+                                      );
+                                    },
+                                    icon: Transform.rotate(
+                                      angle: math.pi / 4,
+                                      child: AppSymbol(
+                                        Symbols.open_run_rounded,
+                                        opticalSize: 28,
+                                      ),
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
+                                ),
+                              )
+                            ],
                           ),
                         )
                       ],
@@ -446,9 +500,11 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                     onPressed: () => goToBusTimingScreen(),
                     child: const Text('View Bus Timings'),
                   ),
-                  OutlinedButton(
+                  OutlinedButton.icon(
                     onPressed: () => openMaps(widget.busStopLocation),
-                    child: const Text("Take me there!"),
+                    icon: const AppSymbol(Symbols.open_in_new_rounded),
+                    iconAlignment: IconAlignment.start,
+                    label: const Text("Take me there!"),
                   ),
                 ],
               ),
