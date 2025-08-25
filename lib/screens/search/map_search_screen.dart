@@ -243,10 +243,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
             return Stack(
               children: [
                 if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null)
-                  const Expanded(
-                    child: SkeletonLine(
-                      style: SkeletonLineStyle(height: double.infinity),
-                    ),
+                  SkeletonLine(
+                    style: SkeletonLineStyle(height: double.infinity),
                   )
                 else
                   FlutterMap(
