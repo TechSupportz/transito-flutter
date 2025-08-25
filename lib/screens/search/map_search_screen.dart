@@ -7,6 +7,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -63,6 +64,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     _debounce = Timer(const Duration(milliseconds: 200), () async {
       _isMarkersLoading.value = true;
 
+      if (_isUserCenter.value == true) {
+        updateIsUserCenter(position);
+      }
+
       List<NearbyBusStop> nearbyBusStops = await fetchNearbyBusStops(position);
       List<Marker> _newBusStopMarkers = nearbyBusStops.map((busStop) {
         BusStop busStopInfo = busStop.busStop;
@@ -105,17 +110,6 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       busStopMarkers.value = _newBusStopMarkers;
       _isMarkersLoading.value = false;
     });
-
-    Position userPosition = await getUserLocation();
-    if (userPosition.latitude == position.latitude &&
-        userPosition.longitude == position.longitude &&
-        !_isUserCenter.value) {
-      _isUserCenter.value = true;
-    } else if ((userPosition.latitude != position.latitude ||
-            userPosition.longitude != position.longitude) &&
-        _isUserCenter.value) {
-      _isUserCenter.value = false;
-    }
   }
 
   showClearAlertDialog(BuildContext context) {
@@ -167,6 +161,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       zoom: 17.5,
       rotation: 0,
     );
+    _isUserCenter.value = true;
   }
 
   void updateIsUserCenter(LatLng position) async {
@@ -245,134 +240,136 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       body: FutureBuilder(
           future: _initialCameraCenter,
           builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              ); // TODO: replace with skeleton
-            }
-
             return Stack(
               children: [
-                FlutterMap(
-                  mapController: _animatedMapController.mapController,
-                  options: MapOptions(
-                    initialCenter: LatLng(
-                      snapshot.data!.latitude,
-                      snapshot.data!.longitude,
+                if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null)
+                  const Expanded(
+                    child: SkeletonLine(
+                      style: SkeletonLineStyle(height: double.infinity),
                     ),
-                    minZoom: 12,
-                    initialZoom: 17.5,
-                    maxZoom: 19,
-                    interactionOptions: const InteractionOptions(
-                      flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove,
+                  )
+                else
+                  FlutterMap(
+                    mapController: _animatedMapController.mapController,
+                    options: MapOptions(
+                      initialCenter: LatLng(
+                        snapshot.data!.latitude,
+                        snapshot.data!.longitude,
+                      ),
+                      minZoom: 12,
+                      initialZoom: 17.5,
+                      maxZoom: 19,
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove,
+                      ),
+                      backgroundColor: appColors.brightness == Brightness.dark
+                          ? Color(0xFF003653)
+                          : Color(0xFF6DA7E3),
+                      onPositionChanged: (camera, hasGesture) {
+                        _onMapPositionChanged(camera.center);
+                        mapRotation.value = camera.rotation;
+                      },
                     ),
-                    backgroundColor: appColors.brightness == Brightness.dark
-                        ? Color(0xFF003653)
-                        : Color(0xFF6DA7E3),
-                    onPositionChanged: (camera, hasGesture) {
-                      updateIsUserCenter(camera.center);
-                      _onMapPositionChanged(camera.center);
-                      mapRotation.value = camera.rotation;
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate:
-                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
-                      fallbackUrl:
-                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
-                      userAgentPackageName: 'com.tnitish.transito',
-                      errorImage: const AssetImage('assets/images/mapError.png'),
-                    ),
-                    CurrentLocationLayer(
-                      style: LocationMarkerStyle(),
-                    ),
-                    ValueListenableBuilder<List<Marker>>(
-                      valueListenable: busStopMarkers,
-                      builder: (context, markers, child) {
-                        return MarkerClusterLayerWidget(
-                          options: MarkerClusterLayerOptions(
-                            rotate: true,
-                            maxClusterRadius: 120,
-                            disableClusteringAtZoom: 17,
-                            spiderfyCluster: false,
-                            zoomToBoundsOnClick: false,
-                            centerMarkerOnClick: false,
-                            animationsOptions: AnimationsOptions(zoom: Duration(milliseconds: 250)),
-                            onClusterTap: (p0) {
-                              _animatedMapController.animateTo(
-                                dest: LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
-                                zoom: 18.5,
-                              );
-                            },
-                            size: const Size(40, 40),
-                            markers: markers,
-                            builder: (context, clusterMarkers) {
-                              return Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    clusterMarkers.length.toString(),
-                                    style: TextStyle(
-                                      color: Theme.of(context).colorScheme.onPrimary,
-                                      fontWeight: FontWeight.bold,
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
+                        fallbackUrl:
+                            "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
+                        userAgentPackageName: 'com.tnitish.transito',
+                        errorImage: const AssetImage('assets/images/mapError.png'),
+                      ),
+                      CurrentLocationLayer(
+                        style: LocationMarkerStyle(),
+                      ),
+                      ValueListenableBuilder<List<Marker>>(
+                        valueListenable: busStopMarkers,
+                        builder: (context, markers, child) {
+                          return MarkerClusterLayerWidget(
+                            options: MarkerClusterLayerOptions(
+                              rotate: true,
+                              maxClusterRadius: 120,
+                              disableClusteringAtZoom: 17,
+                              spiderfyCluster: false,
+                              zoomToBoundsOnClick: false,
+                              centerMarkerOnClick: false,
+                              animationsOptions:
+                                  AnimationsOptions(zoom: Duration(milliseconds: 250)),
+                              onClusterTap: (p0) {
+                                _animatedMapController.animateTo(
+                                  dest:
+                                      LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
+                                  zoom: 18.5,
+                                );
+                              },
+                              size: const Size(40, 40),
+                              markers: markers,
+                              builder: (context, clusterMarkers) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      clusterMarkers.length.toString(),
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onPrimary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                              );
-                            },
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                      ValueListenableBuilder<Marker?>(
+                        valueListenable: searchLocationPin,
+                        builder: (context, pin, child) {
+                          return MarkerLayer(
+                            markers: pin != null
+                                ? [
+                                    pin,
+                                  ]
+                                : [],
+                          );
+                        },
+                      ),
+                      RichAttributionWidget(
+                        showFlutterMapAttribution: false,
+                        popupBorderRadius: BorderRadius.circular(8),
+                        attributions: [
+                          LogoSourceAttribution(
+                            Image.network(
+                              "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
+                            ),
                           ),
-                        );
-                      },
-                    ),
-                    ValueListenableBuilder<Marker?>(
-                      valueListenable: searchLocationPin,
-                      builder: (context, pin, child) {
-                        return MarkerLayer(
-                          markers: pin != null
-                              ? [
-                                  pin,
-                                ]
-                              : [],
-                        );
-                      },
-                    ),
-                    RichAttributionWidget(
-                      showFlutterMapAttribution: false,
-                      popupBorderRadius: BorderRadius.circular(8),
-                      attributions: [
-                        LogoSourceAttribution(
-                          Image.network(
-                            "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
+                          TextSourceAttribution(
+                            "OneMap © contributors",
+                            prependCopyright: false,
+                            onTap: () => launchUrl(Uri.parse("https://www.onemap.gov.sg/")),
                           ),
-                        ),
-                        TextSourceAttribution(
-                          "OneMap © contributors",
-                          prependCopyright: false,
-                          onTap: () => launchUrl(Uri.parse("https://www.onemap.gov.sg/")),
-                        ),
-                        TextSourceAttribution(
-                          "Singapore Land Authority",
-                          prependCopyright: false,
-                          onTap: () => launchUrl(Uri.parse("https://www.sla.gov.sg/")),
-                        ),
-                        TextSourceAttribution(
-                          "Powered by 'flutter_map'",
-                          textStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                            fontStyle: FontStyle.italic,
-                            fontSize: 12,
+                          TextSourceAttribution(
+                            "Singapore Land Authority",
+                            prependCopyright: false,
+                            onTap: () => launchUrl(Uri.parse("https://www.sla.gov.sg/")),
                           ),
-                          prependCopyright: false,
-                        ),
-                      ],
-                      alignment: AttributionAlignment.bottomLeft,
-                    )
-                  ],
-                ),
+                          TextSourceAttribution(
+                            "Powered by 'flutter_map'",
+                            textStyle: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                            ),
+                            prependCopyright: false,
+                          ),
+                        ],
+                        alignment: AttributionAlignment.bottomLeft,
+                      )
+                    ],
+                  ),
                 SafeArea(
                   left: false,
                   right: false,
@@ -540,7 +537,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                       icon: Transform.rotate(
                                         angle: rotation * (3.14 / 180),
                                         child: RotatedBox(
-                                          quarterTurns: appColors.brightness == Brightness.light ? 2 : 0,
+                                          quarterTurns:
+                                              appColors.brightness == Brightness.light ? 2 : 0,
                                           child: SvgPicture.asset(
                                             "assets/icons/ui/compass_point.svg",
                                             colorFilter: ColorFilter.mode(
