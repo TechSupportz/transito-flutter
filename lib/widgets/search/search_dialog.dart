@@ -228,10 +228,11 @@ class _SearchDialogState extends State<SearchDialog> {
         body: Column(
           children: [
             Container(
+              width: double.infinity,
               color: Theme.of(context).colorScheme.surfaceContainerHigh,
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(left: 16, right: 16, bottom: 8),
+                padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
                 child: Row(
                   spacing: 8,
                   mainAxisSize: MainAxisSize.max,
