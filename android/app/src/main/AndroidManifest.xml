@@ -3,7 +3,8 @@
         android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission
         android:name="android.permission.INTERNET"/>
-		    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
+    <uses-permission
+        android:name="com.google.android.gms.permission.AD_ID"/>
     <queries>
         <intent>
             <action
@@ -18,7 +19,6 @@
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
-			android:screenOrientation="portrait"
             android:exported="true"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
@@ -30,9 +30,8 @@
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
             <meta-data
-              android:name="io.flutter.embedding.android.NormalTheme"
-              android:resource="@style/NormalTheme"
-              />
+                android:name="io.flutter.embedding.android.NormalTheme"
+                android:resource="@style/NormalTheme"/>
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
@@ -42,10 +41,18 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
             android:name="flutterEmbedding"
-            android:value="2" />
-		<meta-data android:name="com.posthog.posthog.API_KEY" android:value="phc_u0EmFc7wpoXLQKzdIGDD7bBIxxj9DjU0wRNjf6wvuM1" />
-	<meta-data android:name="com.posthog.posthog.POSTHOG_HOST" android:value="https://app.posthog.com" />
-	<meta-data android:name="com.posthog.posthog.TRACK_APPLICATION_LIFECYCLE_EVENTS" android:value="false" />
-	<meta-data android:name="com.posthog.posthog.DEBUG" android:value="false" />
+            android:value="2"/>
+        <meta-data
+            android:name="com.posthog.posthog.API_KEY"
+            android:value="phc_u0EmFc7wpoXLQKzdIGDD7bBIxxj9DjU0wRNjf6wvuM1"/>
+        <meta-data
+            android:name="com.posthog.posthog.POSTHOG_HOST"
+            android:value="https://app.posthog.com"/>
+        <meta-data
+            android:name="com.posthog.posthog.TRACK_APPLICATION_LIFECYCLE_EVENTS"
+            android:value="false"/>
+        <meta-data
+            android:name="com.posthog.posthog.DEBUG"
+            android:value="false"/>
     </application>
 </manifest>

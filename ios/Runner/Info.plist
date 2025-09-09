@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>CADisableMinimumFrameDurationOnPhone</key>
-		<true />
+		<true/>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
@@ -25,18 +25,17 @@
 		<key>CFBundleVersion</key>
 		<string>$(FLUTTER_BUILD_NUMBER)</string>
 		<key>LSRequiresIPhoneOS</key>
-		<true />
+		<true/>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>Transito needs access to location to determine where you are and display nearby bus
-			stops and favourites.</string>
+		<string>Transito needs access to location to determine where you are and display nearby bus stops and favourites.</string>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
-		<true />
+		<true/>
 		<key>UILaunchStoryboardName</key>
 		<string>$(LAUNCH_SCREEN_STORYBOARD)</string>
 		<key>UIMainStoryboardFile</key>
 		<string>Main</string>
 		<key>UIStatusBarHidden</key>
-		<false />
+		<false/>
 		<key>UIStatusBarStyle</key>
 		<string></string>
 		<key>UISupportedInterfaceOrientations</key>
@@ -67,6 +66,6 @@
 		<key>com.posthog.posthog.POSTHOG_HOST</key>
 		<string>https://app.posthog.com</string>
 		<key>com.posthog.posthog.CAPTURE_APPLICATION_LIFECYCLE_EVENTS</key>
-		<false />
+		<false/>
 	</dict>
 </plist>
