@@ -11,10 +11,8 @@ class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   Posthog posthog = Posthog();
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn(
-      clientId: Platform.isIOS
-          ? "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com"
-          : null);
+  final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
+  bool _isGoogleSignInInitialized = false;
   final CollectionReference _favourites = FirebaseFirestore.instance.collection('favourites');
   final CollectionReference _settings = FirebaseFirestore.instance.collection('settings');
 
@@ -51,13 +49,39 @@ class AuthenticationService {
   }
 
 // Google login
-  Future<String?> signInWithGoogle() async {
+  Future<void> _initializeGoogleSignIn() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+      await _googleSignIn.initialize(
+        clientId: Platform.isIOS
+            ? "341566460699-4pfme9l8rr9iqcq5im3bdqcn2iudbqjo.apps.googleusercontent.com"
+            : null,
+        serverClientId: Platform.isAndroid
+            ? "341566460699-i4ng7anfspst36vi759f2d6vq12gnjur.apps.googleusercontent.com"
+            : null,
+      );
+      _isGoogleSignInInitialized = true;
+    } catch (e) {
+      print('Failed to initialize Google Sign-In: $e');
+    }
+  }
+
+  Future<void> _ensureGoogleSignInInitialized() async {
+    if (!_isGoogleSignInInitialized) {
+      await _initializeGoogleSignIn();
+    }
+  }
+
+  Future<String?> signInWithGoogle() async {
+    await _ensureGoogleSignInInitialized();
+
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInClientAuthorization? googleAuth =
+          await _googleSignIn.authorizationClient.authorizationForScopes(["email", "profile"]);
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
-        idToken: googleAuth?.idToken,
+        idToken: googleUser?.authentication.idToken,
       );
       UserCredential result = await _auth.signInWithCredential(credential);
       User? user = result.user;
@@ -70,6 +94,10 @@ class AuthenticationService {
       }
       debugPrint('✔️ Signed in with google');
       debugPrint('✔️ $user');
+    } on GoogleSignInException catch (e) {
+      debugPrint("❌ Google Login failed with code: ${e.code}");
+      debugPrint("❌ Google Login failed with message: ${e.description}\n${e.details}");
+      return null;
     } on FirebaseAuthException catch (e) {
       debugPrint("❌ Google Login failed with code: ${e.code}");
       debugPrint("❌ Google Login failed with message: ${e.message}");
@@ -94,7 +122,7 @@ class AuthenticationService {
       UserCredential result = await _auth.signInWithCredential(credential);
       User? user = result.user;
       await user?.updateDisplayName(appleAuth.givenName);
-      await user?.updateEmail(appleAuth.email ?? '');
+      await user?.verifyBeforeUpdateEmail(appleAuth.email ?? '');
       if (result.additionalUserInfo?.isNewUser ?? false) {
         await addNewUser(userId: user!.uid).then(
           (_) => debugPrint('✔️ Initialised user in Firestore'),

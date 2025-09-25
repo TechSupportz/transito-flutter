@@ -157,7 +157,7 @@ class _MyAppState extends State<MyApp> {
                   borderRadius: BorderRadius.circular(4),
                 ),
               ),
-              dialogTheme: DialogTheme(
+              dialogTheme: DialogThemeData(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(28),
                 ),
