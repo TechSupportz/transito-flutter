@@ -29,8 +29,13 @@ import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
+class NearbyScreenController extends ChangeNotifier {
+  void refresh() => notifyListeners();
+}
+
 class NearbyScreen extends StatefulWidget {
-  const NearbyScreen({super.key});
+  const NearbyScreen({super.key, this.controller});
+  final NearbyScreenController? controller;
 
   @override
   State<NearbyScreen> createState() => _NearbyScreenState();
@@ -238,12 +243,16 @@ class _NearbyScreenState extends State<NearbyScreen> {
     nearbyBusStops = getNearbyBusStops();
     nearbyFavourites = getNearbyFavourites();
     streamUserLocation();
+
+    widget.controller?.addListener(getAllNearby);
   }
 
   @override
   void dispose() {
     userLocationStream.cancel();
     debugPrint("Cancelling user location stream");
+
+    widget.controller?.removeListener(getAllNearby);
     super.dispose();
   }
 
@@ -304,6 +313,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
                     if (snapshot.data!) {
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        spacing: 16,
                         children: [
                           nearbyFavouritesList(),
                           nearbyBusStopsGrid(),
@@ -359,7 +370,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
         ),
       ),
       // floating action button to refresh user's location and nearbyBusStops
-      floatingActionButton: _isFabVisible
+      floatingActionButton: _isFabVisible && !Platform.isIOS
           ? FloatingActionButton(
               heroTag: "homeFAB",
               onPressed: () {
@@ -369,6 +380,87 @@ class _NearbyScreenState extends State<NearbyScreen> {
               child: const AppSymbol(Symbols.refresh_rounded),
             )
           : null,
+    );
+  }
+
+  Column nearbyFavouritesList() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "Nearby Favourites",
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(
+          height: 12,
+        ),
+        AnimatedSize(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.ease,
+          child: FutureBuilder(
+            future: nearbyFavourites,
+            builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
+              Widget _favouritesListWidget = const SizedBox();
+
+              if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+                // checks if user has any favourites within 750m of their current location and displays them if they do
+                if (snapshot.data!.isEmpty) {
+                  _favouritesListWidget = Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Text(
+                        "No favourites nearby",
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                      ),
+                    ),
+                  );
+                } else {
+                  _favouritesListWidget = ListView.separated(
+                    itemBuilder: (context, int index) {
+                      return FavouritesTimingCard(
+                        code: snapshot.data![index].busStopInfo.busStopCode,
+                        name: snapshot.data![index].busStopInfo.busStopName,
+                        address: snapshot.data![index].busStopInfo.busStopAddress,
+                        busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
+                        services: snapshot.data![index].busStopInfo.services,
+                      );
+                    },
+                    separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                      height: 16,
+                    ),
+                    shrinkWrap: true,
+                    padding: EdgeInsets.zero,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: snapshot.data!.length,
+                  );
+                }
+              }
+
+              if (snapshot.hasError) {
+                // return Text("${snapshot.error}");
+                debugPrint("<=== ERROR ${snapshot.error} ===>");
+                _favouritesListWidget = const ErrorText(
+                  enableBackground: true,
+                );
+              }
+
+              return Skeleton(
+                isLoading: snapshot.connectionState == ConnectionState.waiting,
+                skeleton: SkeletonLine(
+                  style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(12)),
+                ),
+                child: _favouritesListWidget,
+              );
+              // display a loading indicator while the list of nearby favourites is being fetched
+            },
+          ),
+        )
+      ],
     );
   }
 
@@ -485,89 +577,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 child: CircularProgressIndicator(strokeWidth: 3),
               );
             })
-      ],
-    );
-  }
-
-  Column nearbyFavouritesList() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "Nearby Favourites",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(
-          height: 12,
-        ),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.ease,
-            child: FutureBuilder(
-              future: nearbyFavourites,
-              builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-                Widget _favouritesListWidget = const SizedBox();
-
-                if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-                  // checks if user has any favourites within 750m of their current location and displays them if they do
-                  if (snapshot.data!.isEmpty) {
-                    _favouritesListWidget = Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Text(
-                          "No favourites nearby",
-                          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-                        ),
-                      ),
-                    );
-                  } else {
-                    _favouritesListWidget = ListView.separated(
-                      itemBuilder: (context, int index) {
-                        return FavouritesTimingCard(
-                          code: snapshot.data![index].busStopInfo.busStopCode,
-                          name: snapshot.data![index].busStopInfo.busStopName,
-                          address: snapshot.data![index].busStopInfo.busStopAddress,
-                          busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
-                          services: snapshot.data![index].busStopInfo.services,
-                        );
-                      },
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                        height: 16,
-                      ),
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: snapshot.data!.length,
-                    );
-                  }
-                }
-
-                if (snapshot.hasError) {
-                  // return Text("${snapshot.error}");
-                  debugPrint("<=== ERROR ${snapshot.error} ===>");
-                  _favouritesListWidget = const ErrorText(
-                    enableBackground: true,
-                  );
-                }
-
-                return Skeleton(
-                  isLoading: snapshot.connectionState == ConnectionState.waiting,
-                  skeleton: SkeletonLine(
-                    style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(12)),
-                  ),
-                  child: _favouritesListWidget,
-                );
-                // display a loading indicator while the list of nearby favourites is being fetched
-              },
-            ),
-          ),
-        )
       ],
     );
   }

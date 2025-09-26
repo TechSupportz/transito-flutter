@@ -249,6 +249,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.8"
+  cupertino_native:
+    dependency: "direct main"
+    description:
+      name: cupertino_native
+      sha256: "5f42e85a091797afb86bb30a25fffd7188335de97278fa4bb80c0f564c874e89"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.1"
   dart_earcut:
     dependency: transitive
     description:

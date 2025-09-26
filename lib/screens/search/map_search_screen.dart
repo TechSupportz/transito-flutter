@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -26,8 +27,13 @@ import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+class MapSearchScreenController extends ChangeNotifier {
+  void animateToUserLocation() => notifyListeners();
+}
+
 class MapSearchScreen extends StatefulWidget {
-  const MapSearchScreen({super.key});
+  const MapSearchScreen({super.key, this.controller});
+  final MapSearchScreenController? controller;
 
   @override
   State<MapSearchScreen> createState() => _MapSearchScreenState();
@@ -36,7 +42,6 @@ class MapSearchScreen extends StatefulWidget {
 class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderStateMixin {
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
   final ValueNotifier<double> mapRotation = ValueNotifier<double>(0.0);
-  final ValueNotifier<bool> _isUserCenter = ValueNotifier<bool>(false);
   late Future<LatLng> _initialCameraCenter;
 
   final ValueNotifier<List<Marker>> busStopMarkers = ValueNotifier<List<Marker>>([]);
@@ -64,7 +69,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     _debounce = Timer(const Duration(milliseconds: 200), () async {
       _isMarkersLoading.value = true;
 
-      if (_isUserCenter.value == true) {
+      if (context.read<CommonProvider>().isUserCenter) {
         updateIsUserCenter(position);
       }
 
@@ -161,20 +166,17 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       zoom: 17.5,
       rotation: 0,
     );
-    _isUserCenter.value = true;
+    if (mounted) context.read<CommonProvider>().setIsUserCenter(true);
   }
 
   void updateIsUserCenter(LatLng position) async {
     Position userPosition = await getUserLocation();
-    if (userPosition.latitude == position.latitude &&
-        userPosition.longitude == position.longitude &&
-        !_isUserCenter.value) {
-      _isUserCenter.value = true;
-    } else if ((userPosition.latitude != position.latitude ||
-            userPosition.longitude != position.longitude) &&
-        _isUserCenter.value) {
-      _isUserCenter.value = false;
-    }
+    if (!mounted) return;
+    final common = context.read<CommonProvider>();
+    final isCentered =
+        userPosition.latitude == position.latitude && userPosition.longitude == position.longitude;
+
+    common.setIsUserCenter(isCentered);
   }
 
   Marker buildLocationMarker(LatLng position) {
@@ -217,6 +219,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       LatLng initialCameraCenter = await _initialCameraCenter;
       _onMapPositionChanged(initialCameraCenter);
     });
+
+    widget.controller?.addListener(animateToUserLocation);
   }
 
   @override
@@ -227,12 +231,14 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     _isMarkersLoading.dispose();
     _animatedMapController.dispose();
     _debounce?.cancel();
+    widget.controller?.removeListener(animateToUserLocation);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     AppColors appColors = context.watch<AppColors>();
+    bool isUserCenter = context.watch<CommonProvider>().isUserCenter;
 
     return Scaffold(
       backgroundColor: appColors.scheme.surfaceContainer,
@@ -580,33 +586,30 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
             );
           }),
       // floating action button to clear the recent searches list by calling a function in the search provider
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          animateToUserLocation();
-          HapticFeedback.lightImpact();
-        },
-        heroTag: 'searchIcon',
-        child: ValueListenableBuilder(
-          valueListenable: _isUserCenter,
-          builder: (context, isUserCenter, child) {
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 500),
-              switchInCurve: Curves.easeInOutCubicEmphasized,
-              switchOutCurve: Curves.easeInOutCubicEmphasized,
-              child: isUserCenter
-                  ? const AppSymbol(
-                      key: ValueKey("my_location"),
-                      Symbols.my_location_rounded,
-                      fill: true,
-                    )
-                  : const AppSymbol(
-                      key: ValueKey("location_searching"),
-                      Symbols.location_searching_rounded,
-                    ),
-            );
-          },
-        ),
-      ),
+      floatingActionButton: !Platform.isIOS
+          ? FloatingActionButton(
+              onPressed: () {
+                animateToUserLocation();
+                HapticFeedback.lightImpact();
+              },
+              heroTag: 'searchIcon',
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 500),
+                switchInCurve: Curves.easeInOutCubicEmphasized,
+                switchOutCurve: Curves.easeInOutCubicEmphasized,
+                child: isUserCenter
+                    ? const AppSymbol(
+                        key: ValueKey("my_location"),
+                        Symbols.my_location_rounded,
+                        fill: true,
+                      )
+                    : const AppSymbol(
+                        key: ValueKey("location_searching"),
+                        Symbols.location_searching_rounded,
+                      ),
+              ),
+            )
+          : null,
     );
   }
 }

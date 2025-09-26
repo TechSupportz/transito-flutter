@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -9,8 +11,13 @@ import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
+class FavouritesScreenController extends ChangeNotifier {
+  void manageFavourites() => notifyListeners();
+}
+
 class FavouritesScreen extends StatefulWidget {
-  const FavouritesScreen({super.key});
+  const FavouritesScreen({super.key, this.controller});
+  final FavouritesScreenController? controller;
 
   @override
   State<FavouritesScreen> createState() => _FavouritesScreenState();
@@ -39,13 +46,17 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
     );
   }
 
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   FavouritesService().streamFavourites(context.read<User?>()!.uid).listen((value) {
-  //     print(value[0].busStopName);
-  //   });
-  // }
+  @override
+  void initState() {
+    super.initState();
+    widget.controller?.addListener(() => goToManageFavouritesScreen(context));
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(() => goToManageFavouritesScreen(context));
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +127,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
             }
           }),
       // floating action button to open the manage favourites screen
-      floatingActionButton: isFabVisible
+      floatingActionButton: isFabVisible && !Platform.isIOS
           ? FloatingActionButton(
               heroTag: 'favouritesFAB',
               onPressed: () => goToManageFavouritesScreen(context),
