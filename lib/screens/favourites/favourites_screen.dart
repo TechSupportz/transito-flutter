@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
@@ -61,6 +60,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   Widget build(BuildContext context) {
     String userId = context.watch<User>().uid;
+    bool supportsLiquidGlass = context.watch<CommonProvider>().supportsLiquidGlass;
 
     return Scaffold(
       appBar: AppBar(
@@ -127,7 +127,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
             }
           }),
       // floating action button to open the manage favourites screen
-      floatingActionButton: isFabVisible && !Platform.isIOS
+      floatingActionButton: isFabVisible && !supportsLiquidGlass
           ? FloatingActionButton(
               heroTag: 'favouritesFAB',
               onPressed: () => goToManageFavouritesScreen(context),

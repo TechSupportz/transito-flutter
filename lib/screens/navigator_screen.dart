@@ -45,9 +45,11 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool supportsLiquidGlass = context.watch<CommonProvider>().supportsLiquidGlass;
     bool isUserCenter = context.watch<CommonProvider>().isUserCenter;
 
     var navigationBar = NavigationBar(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       destinations: <NavigationDestination>[
         NavigationDestination(
             icon: AppSymbol(Symbols.explore_rounded, fill: true), label: "Nearby"),
@@ -100,7 +102,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
               index: _pageIndex,
               children: _pages,
             ),
-            if (Platform.isIOS)
+            if (Platform.isIOS && supportsLiquidGlass)
               Align(
                 alignment: Alignment.bottomCenter,
                 child: CNTabBar(
@@ -152,7 +154,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: Platform.isIOS ? null : navigationBar,
+      bottomNavigationBar: Platform.isIOS && supportsLiquidGlass ? null : navigationBar,
     );
   }
 }

@@ -74,8 +74,15 @@ void main() async {
           value: FirebaseAuth.instance.userChanges(),
           initialData: null,
         ),
-        ChangeNotifierProvider(create: (context) => AppColors()),
+        ChangeNotifierProvider(
+          create: (context) => AppColors(),
+          lazy: false,
+        ),
         ChangeNotifierProvider(create: (context) => CommonProvider()),
+        ChangeNotifierProvider(
+          create: (context) => CommonProvider()..checkSupportsLiquidGlass(),
+          lazy: false,
+        ),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
       ],

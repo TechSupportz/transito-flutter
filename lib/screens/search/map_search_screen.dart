@@ -239,6 +239,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   Widget build(BuildContext context) {
     AppColors appColors = context.watch<AppColors>();
     bool isUserCenter = context.watch<CommonProvider>().isUserCenter;
+    bool supportsLiquidGlass = context.watch<CommonProvider>().supportsLiquidGlass;
 
     return Scaffold(
       backgroundColor: appColors.scheme.surfaceContainer,
@@ -417,7 +418,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                   borderRadius: BorderRadius.circular(64),
                                 ),
                                 height: 56,
-                                padding: const EdgeInsets.symmetric(horizontal: 24),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: Row(
                                   spacing: 8,
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -564,29 +565,33 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                     ),
                   ),
                 ),
-                IgnorePointer(
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Theme.of(context).colorScheme.surfaceContainer,
-                            Theme.of(context).colorScheme.surfaceContainer.withValues(alpha: 0.0),
-                          ],
-                          stops: [0, 0.01],
+                if (!supportsLiquidGlass)
+                  IgnorePointer(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                            colors: [
+                              Theme.of(context).colorScheme.surfaceContainerLow,
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerLow
+                                  .withValues(alpha: 0.0),
+                            ],
+                            stops: [0, 0.01],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                )
+                  )
               ],
             );
           }),
       // floating action button to clear the recent searches list by calling a function in the search provider
-      floatingActionButton: !Platform.isIOS
+      floatingActionButton: !supportsLiquidGlass
           ? FloatingActionButton(
               onPressed: () {
                 animateToUserLocation();

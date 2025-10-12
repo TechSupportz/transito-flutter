@@ -9,12 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
-import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:smooth_highlight/smooth_highlight.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
@@ -76,17 +73,8 @@ class _NearbyScreenState extends State<NearbyScreen> {
   }
 
   // gets the user's current location
-  Future<Position> getUserLocation(bool refresh) async {
+  Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
-    Position? lastKnownPosition = await Geolocator.getLastKnownPosition();
-
-    if (!refresh &&
-        lastKnownPosition != null &&
-        Jiffy.parse(lastKnownPosition.timestamp.toString()).add(minutes: 5).isBefore(Jiffy.now())) {
-      debugPrint("Fetched user location from cache");
-
-      return lastKnownPosition;
-    }
 
     if (Platform.isIOS) {
       userLocationStream.cancel();
@@ -107,11 +95,10 @@ class _NearbyScreenState extends State<NearbyScreen> {
   }
 
   Future<List<NearbyBusStop>> getNearbyBusStops({
-    bool refresh = false,
     Position? currentLocation,
   }) async {
     debugPrint("Fetching nearby bus stops");
-    Position userLocation = currentLocation ?? await getUserLocation(refresh);
+    Position userLocation = currentLocation ?? await getUserLocation();
 
     final response = await http.get(Uri.parse(
         '${Secret.API_URL}/bus-stops/nearby?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}'));
@@ -128,14 +115,13 @@ class _NearbyScreenState extends State<NearbyScreen> {
 
   // function to get the user's nearby favourites
   Future<List<NearbyFavourites>> getNearbyFavourites({
-    bool refresh = false,
     Position? currentLocation,
   }) async {
     debugPrint("Fetching nearby favourites");
     List<NearbyFavourites> nearbyFavourites = [];
     List<Favourite> favouritesList =
         await FavouritesService().getFavourites(context.read<User>().uid);
-    Position userLocation = currentLocation ?? await getUserLocation(refresh);
+    Position userLocation = currentLocation ?? await getUserLocation();
 
     // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
     for (var favourite in favouritesList) {
@@ -156,10 +142,11 @@ class _NearbyScreenState extends State<NearbyScreen> {
   // function to get the list of all nearby bus stops
   void getAllNearby() async {
     debugPrint("Getting all nearby");
+    Position userLocation = await getUserLocation();
 
     setState(() {
-      nearbyBusStops = getNearbyBusStops(refresh: true);
-      nearbyFavourites = getNearbyFavourites(refresh: true);
+      nearbyBusStops = getNearbyBusStops(currentLocation: userLocation);
+      nearbyFavourites = getNearbyFavourites(currentLocation: userLocation);
     });
   }
 
@@ -179,59 +166,6 @@ class _NearbyScreenState extends State<NearbyScreen> {
         nearbyFavourites = getNearbyFavourites(currentLocation: position);
         _prevUserLocation = LatLng(position.latitude, position.longitude);
       });
-    });
-  }
-
-  // NOTE - Remove in future versions
-  void showMRTMapHint(BuildContext context) {
-    const mrtMapHintSnackbar = SnackBar(
-      content: Column(crossAxisAlignment: CrossAxisAlignment.start, spacing: 2, children: [
-        Text("MRT Map has moved to the Search page."),
-        Text(
-          "Double-tap the icon below to open it instantly!",
-          style: TextStyle(fontStyle: FontStyle.italic, fontSize: 12),
-        )
-      ]),
-    );
-
-    OverlayEntry mrtMapHintOverlay = OverlayEntry(
-      builder: (context) => SafeArea(
-        child: Align(
-          alignment: Alignment.bottomRight,
-          child: IgnorePointer(
-            child: Transform.scale(
-              scale: 0.75,
-              child: Container(
-                alignment: AlignmentDirectional.bottomEnd,
-                width: MediaQuery.of(context).size.width * 0.33,
-                height: 72.0,
-                decoration: BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(100),
-                ),
-                clipBehavior: Clip.antiAlias,
-                child: SmoothHighlight(
-                  useInitialHighLight: true,
-                  duration: Duration(seconds: 2),
-                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.33,
-                    height: 72.0,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(mrtMapHintSnackbar);
-    Overlay.of(context).insert(mrtMapHintOverlay);
-
-    Future.delayed(const Duration(seconds: 5), () {
-      mrtMapHintOverlay.remove();
-      print("MRT Map hint overlay removed");
     });
   }
 
@@ -259,22 +193,12 @@ class _NearbyScreenState extends State<NearbyScreen> {
   @override
   Widget build(BuildContext context) {
     var user = context.watch<User?>();
+    bool supportsLiquidGlass = context.watch<CommonProvider>().supportsLiquidGlass;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Welcome ${user?.displayName ?? ''}'),
         actions: [
-          // NOTE - Remove phantom MRT Icon button in future versions
-          IconButton(
-            onPressed: () {
-              showMRTMapHint(context);
-              Posthog().capture(eventName: "mrt_map_hint_shown");
-            },
-            icon: SizedBox(
-              height: 28,
-              width: 28,
-            ),
-          ),
           IconButton(
             onPressed: () => Navigator.push(
               context,
@@ -370,7 +294,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
         ),
       ),
       // floating action button to refresh user's location and nearbyBusStops
-      floatingActionButton: _isFabVisible && !Platform.isIOS
+      floatingActionButton: _isFabVisible && !supportsLiquidGlass
           ? FloatingActionButton(
               heroTag: "homeFAB",
               onPressed: () {
@@ -484,16 +408,21 @@ class _NearbyScreenState extends State<NearbyScreen> {
                 UserSettings userSettings = userSettingsSnapshot.data as UserSettings;
 
                 GridView renderGridView(List<Widget> children) {
-                  return GridView.count(
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: userSettings.isNearbyGrid ? 18 : 16,
-                    crossAxisCount: userSettings.isNearbyGrid ? 2 : 1,
-                    childAspectRatio: isTablet
-                        ? (userSettings.isNearbyGrid ? 3.5 : 7)
-                        : (userSettings.isNearbyGrid ? 2.25 : 4.5),
+                  return GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: isTablet
+                          ? (userSettings.isNearbyGrid ? 3 : 1)
+                          : (userSettings.isNearbyGrid ? 2 : 1),
+                      mainAxisSpacing: 12,
+                      crossAxisSpacing: 12,
+                      mainAxisExtent: 80,
+                    ),
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
-                    children: children,
+                    itemCount: children.length,
+                    itemBuilder: (context, index) {
+                      return children[index];
+                    },
                   );
                 }
 
