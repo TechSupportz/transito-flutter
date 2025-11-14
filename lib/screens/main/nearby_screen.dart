@@ -40,7 +40,7 @@ class NearbyScreen extends StatefulWidget {
 
 const distance = Distance();
 
-class _NearbyScreenState extends State<NearbyScreen> {
+class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver {
   late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
   late Future<bool> _isLocationPermissionGranted;
@@ -178,14 +178,24 @@ class _NearbyScreenState extends State<NearbyScreen> {
     nearbyFavourites = getNearbyFavourites();
     streamUserLocation();
 
+    WidgetsBinding.instance.addObserver(this);
+
     widget.controller?.addListener(getAllNearby);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      getAllNearby();
+    }
   }
 
   @override
   void dispose() {
     userLocationStream.cancel();
     debugPrint("Cancelling user location stream");
-
+    
+    WidgetsBinding.instance.removeObserver(this);
     widget.controller?.removeListener(getAllNearby);
     super.dispose();
   }
@@ -198,6 +208,7 @@ class _NearbyScreenState extends State<NearbyScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Welcome ${user?.displayName ?? ''}'),
+        centerTitle: false,
         actions: [
           IconButton(
             onPressed: () => Navigator.push(
