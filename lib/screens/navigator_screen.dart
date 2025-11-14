@@ -114,7 +114,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
                         icon: _pageIndex == 0
                             ? CNSymbol('arrow.clockwise')
                             : _pageIndex == 1
-                                ? CNSymbol('pencil')
+                                ? CNSymbol('square.and.pencil')
                                 : _pageIndex == 2
                                     ? isUserCenter
                                         ? CNSymbol('location.fill')

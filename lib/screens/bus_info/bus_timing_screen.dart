@@ -5,7 +5,6 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -24,6 +23,7 @@ import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
+import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/bus_timing_guide.dart';
 import 'package:transito/widgets/common/error_text.dart';
@@ -266,6 +266,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
+    
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
@@ -508,17 +509,13 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
             }
           }),
       floatingActionButton: isFabVisible
-          // re-fetch data when user taps the refresh button
-          ? FloatingActionButton(
+          ? AdaptiveFloatingActionButton(
+              materialSymbol: Symbols.refresh_rounded,
+              cupertinoSymbolString: 'arrow.clockwise',
               onPressed: () => setState(() {
-                futureBusArrivalInfo = fetchArrivalTimings().then(
-                  (value) => sortBusArrivalInfo(value),
-                );
-                HapticFeedback.selectionClick();
+                futureBusArrivalInfo =
+                    fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
               }),
-              heroTag: "busTimingFAB",
-              enableFeedback: true,
-              child: const AppSymbol(Symbols.refresh_rounded, size: 28),
             )
           : null,
     );

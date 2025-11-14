@@ -90,6 +90,12 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   }
 
   @override
+  void dispose() {
+    timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
 
@@ -250,13 +256,5 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
             );
           }
         });
-  }
-
-  // function to dispose the timer when the widget is disposed
-  @override
-  void dispose() {
-    timer.cancel();
-    debugPrint("Timer cancelled");
-    super.dispose();
   }
 }

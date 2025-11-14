@@ -10,7 +10,7 @@ import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
-import 'package:transito/widgets/common/app_symbol.dart';
+import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
 import 'package:transito/widgets/favourites/favourite_name_card.dart';
 
 import 'edit_favourite_screen.dart';
@@ -166,12 +166,14 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
         ),
       ),
       floatingActionButton: isFabVisible
-          ? FloatingActionButton(
-              heroTag: "manageFavFAB",
-              child: const AppSymbol(Symbols.done_rounded),
+          ? AdaptiveFloatingActionButton(
               onPressed: () => FavouritesService()
                   .reorderFavourites(reorderedFavouritesList, context.read<User?>()!.uid)
-                  .then((value) => Navigator.pop(context)),
+                  .then(
+                    (value) => Navigator.pop(context),
+                  ),
+              materialSymbol: Symbols.done_rounded,
+              cupertinoSymbolString: 'checkmark',
             )
           : null,
     );
