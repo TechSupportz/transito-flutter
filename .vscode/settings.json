@@ -1,6 +1,14 @@
 {
-	"cSpell.words": ["Centered", "favorite", "latlong", "overscroll", "svgs", "upgrader"],
-	"yaml.schemas": {
-		"https://json.schemastore.org/pubspec.json": "git:/Users/tnitish/Developer/Transito/transito_flutter/pubspec.yaml?%7B%22path%22%3A%22%2FUsers%2Ftnitish%2FDeveloper%2FTransito%2Ftransito_flutter%2Fpubspec.yaml%22%2C%22ref%22%3A%22%22%7D"
-	}
+  "cSpell.words": [
+    "Centered",
+    "favorite",
+    "latlong",
+    "overscroll",
+    "svgs",
+    "upgrader"
+  ],
+  "yaml.schemas": {
+    "https://json.schemastore.org/pubspec.json": "git:/Users/tnitish/Developer/Transito/transito_flutter/pubspec.yaml?%7B%22path%22%3A%22%2FUsers%2Ftnitish%2FDeveloper%2FTransito%2Ftransito_flutter%2Fpubspec.yaml%22%2C%22ref%22%3A%22%22%7D"
+  },
+  "dart.flutterSdkPath": ".fvm/versions/3.35.4"
 }
