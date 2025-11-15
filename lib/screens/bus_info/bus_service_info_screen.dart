@@ -407,7 +407,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                         const Duration(milliseconds: 0),
                                         () {
                                           scrollController.animateTo(
-                                            currentStopIndex * 82.0,
+                                            currentStopIndex * 88.0,
                                             duration: const Duration(seconds: 1),
                                             curve: Curves.easeInOutCubicEmphasized,
                                           );

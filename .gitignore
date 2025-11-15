@@ -50,3 +50,6 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /.firebaserc
+
+# FVM Version Cache
+.fvm/
