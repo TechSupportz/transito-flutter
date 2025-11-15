@@ -156,8 +156,11 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
               appBarTheme: AppBarTheme(
-                shape:
-                    const RoundedRectangleBorder(), //NOTE - This is a workaround to make tint elevation animate.
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ), //NOTE - This is a workaround to make tint elevation animate.
+                shadowColor: appColors.scheme.shadow,
+                toolbarHeight: 64,
               ),
               checkboxTheme: CheckboxThemeData(
                 shape: RoundedRectangleBorder(

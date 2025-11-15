@@ -199,6 +199,7 @@ class _SearchDialogState extends State<SearchDialog> {
     return Dialog.fullscreen(
       child: Scaffold(
         appBar: AppBar(
+          shape: RoundedRectangleBorder(),
           backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
           title: TextField(
             controller: _textFieldController,
@@ -229,7 +230,13 @@ class _SearchDialogState extends State<SearchDialog> {
           children: [
             Container(
               width: double.infinity,
-              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(12),
+                  bottomRight: Radius.circular(12),
+                ),
+              ),
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
