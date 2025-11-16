@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:geolocator/geolocator.dart';
@@ -132,95 +133,107 @@ class _MyAppState extends State<MyApp> {
     return StreamBuilder<UserSettings>(
         stream: SettingsService().streamSettings(user?.uid),
         builder: (context, snapshot) {
-          return MaterialApp(
-            title: "Transito",
-            supportedLocales: const [Locale('en', 'US')],
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              FormBuilderLocalizations.delegate,
-            ],
-            navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
-            theme: ThemeData(
-              fontFamily: 'Poppins',
-              colorScheme: appColors.scheme,
-              splashFactory: InkSparkle.splashFactory,
-              tooltipTheme: TooltipThemeData(
-                textStyle: TextStyle(
-                  color: appColors.scheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: BoxDecoration(
-                  color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              appBarTheme: AppBarTheme(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ), //NOTE - This is a workaround to make tint elevation animate.
-                shadowColor: appColors.scheme.shadow,
-                toolbarHeight: 64,
-              ),
-              checkboxTheme: CheckboxThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              ),
-              dialogTheme: DialogThemeData(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                ),
-                titleTextStyle: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: appColors.scheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 24,
-                ),
-              ),
-              snackBarTheme: SnackBarThemeData(
-                //FIXME - Animation is non-existant
-                backgroundColor: appColors.scheme.surfaceContainerHighest,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                contentTextStyle: TextStyle(
-                  fontFamily: 'Poppins',
-                  color: appColors.scheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              inputDecorationTheme: InputDecorationTheme(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    width: 1.75,
+          return SkeletonTheme(
+            darkShimmerGradient: LinearGradient(colors: [
+              appColors.scheme.surfaceContainerLow,
+              appColors.scheme.surfaceContainerHigh,
+              appColors.scheme.surfaceContainerLow,
+            ]),
+            shimmerGradient: LinearGradient(colors: [
+              appColors.scheme.surfaceContainerLow,
+              appColors.scheme.surfaceContainerHigh,
+              appColors.scheme.surfaceContainerLow,
+            ]),
+            child: MaterialApp(
+              title: "Transito",
+              supportedLocales: const [Locale('en', 'US')],
+              localizationsDelegates: const [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                FormBuilderLocalizations.delegate,
+              ],
+              navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
+              theme: ThemeData(
+                fontFamily: 'Poppins',
+                colorScheme: appColors.scheme,
+                splashFactory: InkSparkle.splashFactory,
+                tooltipTheme: TooltipThemeData(
+                  textStyle: TextStyle(
+                    color: appColors.scheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  decoration: BoxDecoration(
+                    color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
+                appBarTheme: AppBarTheme(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ), //NOTE - This is a workaround to make tint elevation animate.
+                  shadowColor: appColors.scheme.shadow,
+                  toolbarHeight: 64,
                 ),
-                floatingLabelStyle: TextStyle(
-                  fontWeight: FontWeight.w600,
+                checkboxTheme: CheckboxThemeData(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(4),
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                filled: true,
+                dialogTheme: DialogThemeData(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(28),
+                  ),
+                  titleTextStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: appColors.scheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 24,
+                  ),
+                ),
+                snackBarTheme: SnackBarThemeData(
+                  //FIXME - Animation is non-existant
+                  backgroundColor: appColors.scheme.surfaceContainerHighest,
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  contentTextStyle: TextStyle(
+                    fontFamily: 'Poppins',
+                    color: appColors.scheme.onSurface,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                inputDecorationTheme: InputDecorationTheme(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      width: 1.75,
+                    ),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  floatingLabelStyle: TextStyle(
+                    fontWeight: FontWeight.w600,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  filled: true,
+                ),
               ),
+              home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
+              builder: (context, child) {
+                return MediaQuery(
+                  data: MediaQuery.of(context).copyWith(
+                      textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
+                  child: SafeArea(
+                    top: false,
+                    bottom: false,
+                    child: child!,
+                  ),
+                );
+              },
             ),
-            home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
-            builder: (context, child) {
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                    textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
-                child: SafeArea(
-                  top: false,
-                  bottom: false,
-                  child: child!,
-                ),
-              );
-            },
           );
         });
   }

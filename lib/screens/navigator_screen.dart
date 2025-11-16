@@ -50,6 +50,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
 
     var navigationBar = NavigationBar(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
+      shadowColor: Theme.of(context).colorScheme.shadow,
       destinations: <NavigationDestination>[
         NavigationDestination(
             icon: AppSymbol(Symbols.explore_rounded, fill: true), label: "Nearby"),
