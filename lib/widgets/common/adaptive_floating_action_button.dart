@@ -27,7 +27,11 @@ class AdaptiveFloatingActionButton extends StatelessWidget {
           onPressed();
           HapticFeedback.selectionClick();
         },
-        icon: CNSymbol(cupertinoSymbolString, size: 16),
+        icon: CNSymbol(
+          cupertinoSymbolString,
+          size: 16,
+          color: Theme.of(context).colorScheme.onPrimaryContainer,
+        ),
         tint: Theme.of(context).colorScheme.primaryContainer,
         size: 56,
         style: CNButtonStyle.prominentGlass,
