@@ -12,22 +12,30 @@ class NativeTabBarItem {
   });
 }
 
+class TabBarActionButton {
+  final String symbol;
+  final VoidCallback onTap;
+
+  const TabBarActionButton({
+    required this.symbol,
+    required this.onTap,
+  });
+}
+
 class NativeTabBar extends StatefulWidget {
-  final List<NativeTabBarItem> items;
+  final List<NativeTabBarItem> tabs;
+  final TabBarActionButton actionButton;
   final int currentIndex;
   final ValueChanged<int> onTap;
   final Color tintColor;
-  final bool split;
-  final int rightCount;
 
   const NativeTabBar({
     super.key,
-    required this.items,
+    required this.tabs,
+    required this.actionButton,
     required this.currentIndex,
     required this.onTap,
     required this.tintColor,
-    this.split = false,
-    this.rightCount = 1,
   });
 
   @override
@@ -51,11 +59,10 @@ class _NativeTabBarState extends State<NativeTabBar> {
 
   Map<String, dynamic> _createParams() {
     return {
-      'labels': widget.items.map((e) => e.label).toList(),
-      'symbols': widget.items.map((e) => e.symbol).toList(),
+      'labels': widget.tabs.map((e) => e.label).toList(),
+      'symbols': widget.tabs.map((e) => e.symbol).toList(),
+      'actionButtonSymbol': widget.actionButton.symbol,
       'selectedIndex': widget.currentIndex,
-      'split': widget.split,
-      'rightCount': widget.rightCount,
       'isDark': Theme.of(context).brightness == Brightness.dark,
       'tintColor': widget.tintColor.toARGB32(),
     };
@@ -84,6 +91,10 @@ class _NativeTabBarState extends State<NativeTabBar> {
             if (call.method == 'valueChanged') {
               final index = call.arguments['index'] as int;
               widget.onTap(index);
+            }
+
+            if (call.method == 'actionButtonPressed') {
+              widget.actionButton.onTap();
             }
           });
         },

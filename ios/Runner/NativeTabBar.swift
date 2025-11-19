@@ -48,6 +48,10 @@ class NativeTabBarView: NSObject, FlutterPlatformView {
         model.onSelect = { [weak self] index in
             self?.channel.invokeMethod("valueChanged", arguments: ["index": index])
         }
+		
+		model.onActionButtonSelect = {
+			self.channel.invokeMethod("actionButtonPressed", arguments: [])
+		}
 
         let swiftUIView = SwiftUITabBarView(model: model)
         let hc = UIHostingController(rootView: swiftUIView)
@@ -94,11 +98,10 @@ class NativeTabBarView: NSObject, FlutterPlatformView {
     private func updateModel(with dict: [String: Any]) {
         if let labels = dict["labels"] as? [String] { model.labels = labels }
         if let symbols = dict["symbols"] as? [String] { model.symbols = symbols }
+		if let actionButtonSymbol = dict["actionButtonSymbol"] as? String {model.actionButtonSymbol = actionButtonSymbol }
         if let v = dict["selectedIndex"] as? NSNumber { model.selectedIndex = v.intValue }
         if let v = dict["isDark"] as? NSNumber { model.isDark = v.boolValue }
         if let n = dict["tintColor"] as? NSNumber { model.tintColor = Self.colorFromARGB(n.intValue) }
-        if let s = dict["split"] as? NSNumber { model.split = s.boolValue }
-        if let rc = dict["rightCount"] as? NSNumber { model.rightCount = rc.intValue }
     }
 
     private static func colorFromARGB(_ argb: Int) -> Color {
@@ -113,13 +116,13 @@ class NativeTabBarView: NSObject, FlutterPlatformView {
 class TabBarModel: ObservableObject {
     @Published var labels: [String] = []
     @Published var symbols: [String] = []
+    @Published var actionButtonSymbol: String = ""
     @Published var selectedIndex: Int = 0
-    @Published var split: Bool = false
-    @Published var rightCount: Int = 1
     @Published var tintColor: Color = .blue
     @Published var isDark: Bool = false
     
     var onSelect: ((Int) -> Void)?
+	var onActionButtonSelect: (() -> Void)?
 }
 
 struct SwiftUITabBarView: View {
@@ -128,10 +131,9 @@ struct SwiftUITabBarView: View {
     var body: some View {
         Group {
             if #available(iOS 18.0, *) {
-                TabView(selection: selectionBinding) {
+                TabView(selection: tabSelectionBinding) {
                     ForEach(0..<count, id: \.self) { i in
-                        let isActionItem = model.split && i >= (count - model.rightCount)
-                        Tab(value: i, role: isActionItem ? .search : nil) {
+                        Tab(value: i) {
                             Color.clear
                         } label: {
                             if i < model.symbols.count {
@@ -142,6 +144,16 @@ struct SwiftUITabBarView: View {
                             }
                         }
                     }
+					// Action Button
+					Tab(value: 99, role: .search) {
+						Color.clear
+					} label: {
+						if !model.actionButtonSymbol.isEmpty {
+							Image(systemName: model.actionButtonSymbol)
+								.environment(\.symbolVariants, .none)
+						}
+					}
+					
                 }
                 .tint(model.tintColor)
                 .environment(\.colorScheme, model.isDark ? .dark : .light)
@@ -152,23 +164,19 @@ struct SwiftUITabBarView: View {
                 Text("Requires iOS 18+")
             }
         }
-        .background(Color.clear)
-        .contentShape(Rectangle())
+        .background(.clear)
     }
     
-    var selectionBinding: Binding<Int> {
+    var tabSelectionBinding: Binding<Int> {
         Binding(
             get: { model.selectedIndex },
             set: { value in
+				if (value == 99) {
+					model.onActionButtonSelect?()
+					return
+				}
+				
                 let count = max(model.labels.count, model.symbols.count)
-                if model.split {
-                    let right = model.rightCount
-                    let splitIndex = max(0, count - right)
-                    if value >= splitIndex {
-                        model.onSelect?(value)
-                        return
-                    }
-                }
                 model.selectedIndex = value
                 model.onSelect?(value)
             }

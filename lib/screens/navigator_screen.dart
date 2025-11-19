@@ -107,45 +107,38 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
               Align(
                 alignment: Alignment.bottomCenter,
                 child: NativeTabBar(
-                  items: [
+                  tabs: [
                     NativeTabBarItem(label: 'Nearby', symbol: 'safari.fill'),
                     NativeTabBarItem(label: 'Favourites', symbol: 'heart.fill'),
                     NativeTabBarItem(label: 'Search', symbol: 'map.fill'),
-                    NativeTabBarItem(
-                        label: '', // Empty label for the action button if desired, or provide one
-                        symbol: _pageIndex == 0
-                            ? 'arrow.clockwise'
-                            : _pageIndex == 1
-                                ? 'square.and.pencil'
-                                : _pageIndex == 2
-                                    ? isUserCenter
-                                        ? 'location.fill'
-                                        : 'location'
-                                    : 'circle'),
                   ],
+                  actionButton: TabBarActionButton(
+                      symbol: _pageIndex == 0
+                          ? 'arrow.clockwise'
+                          : _pageIndex == 1
+                              ? 'square.and.pencil'
+                              : _pageIndex == 2
+                                  ? isUserCenter
+                                      ? 'location.fill'
+                                      : 'location'
+                                  : 'circle',
+                      onTap: () {
+                        switch (_pageIndex) {
+                          case 0:
+                            _nearbyScreenController.refresh();
+                            break;
+                          case 1:
+                            _favouritesScreenController.manageFavourites();
+                            break;
+                          case 2:
+                            _mapSearchScreenController.animateToUserLocation();
+                            break;
+                          default:
+                        }
+                      }),
                   currentIndex: _pageIndex,
-                  split: true,
-                  rightCount: 1,
                   tintColor: Theme.of(context).colorScheme.primary,
                   onTap: (index) {
-                    if (index == 3) {
-                      switch (_pageIndex) {
-                        case 0:
-                          _nearbyScreenController.refresh();
-                          break;
-                        case 1:
-                          _favouritesScreenController.manageFavourites();
-                          break;
-                        case 2:
-                          _mapSearchScreenController.animateToUserLocation();
-                          break;
-                        default:
-                      }
-
-                      setState(() => _pageIndex = _pageIndex);
-                      return;
-                    }
-
                     setState(() {
                       _pageIndex = index;
                     });
