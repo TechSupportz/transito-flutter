@@ -1,196 +1,241 @@
 import Flutter
 import UIKit
-import SwiftUI
 
+// MARK: - 1. Factory
 class NativeTabBarFactory: NSObject, FlutterPlatformViewFactory {
-    private var messenger: FlutterBinaryMessenger
-
-    init(messenger: FlutterBinaryMessenger) {
-        self.messenger = messenger
-        super.init()
-    }
-
-    func create(
-        withFrame frame: CGRect,
-        viewIdentifier viewId: Int64,
-        arguments args: Any?
-    ) -> FlutterPlatformView {
-        return NativeTabBarView(
-            frame: frame,
-            viewId: viewId,
-            args: args,
-            messenger: messenger
-        )
-    }
-    
-    public func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
-          return FlutterStandardMessageCodec.sharedInstance()
-    }
+	private var messenger: FlutterBinaryMessenger
+	
+	init(messenger: FlutterBinaryMessenger) {
+		self.messenger = messenger
+		super.init()
+	}
+	
+	func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
+		return NativeTabBarPlatformView(frame: frame, viewId: viewId, args: args, messenger: messenger)
+	}
+	
+	func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+		return FlutterStandardMessageCodec.sharedInstance()
+	}
 }
 
-class NativeTabBarView: NSObject, FlutterPlatformView {
-    private let channel: FlutterMethodChannel
-    private let container: UIView
-    private let model = TabBarModel()
-    private var hostingController: UIHostingController<SwiftUITabBarView>?
+// MARK: - 2. Platform View Wrapper
+class NativeTabBarPlatformView: NSObject, FlutterPlatformView {
+	private let controller: LiquidGlassTabBarController
+	
+	init(frame: CGRect, viewId: Int64, args: Any?, messenger: FlutterBinaryMessenger) {
+		self.controller = LiquidGlassTabBarController(
+			viewId: viewId,
+			messenger: messenger,
+			args: args
+		)
+		super.init()
+	}
+	
+	func view() -> UIView {
+		return controller.view
+	}
+}
 
-    init(frame: CGRect, viewId: Int64, args: Any?, messenger: FlutterBinaryMessenger) {
-        self.channel = FlutterMethodChannel(name: "NativeTabBar_\(viewId)", binaryMessenger: messenger)
-        self.container = UIView(frame: frame)
-        self.container.backgroundColor = .clear
-        self.container.isOpaque = false
-        super.init()
-
-        if let dict = args as? [String: Any] {
-            updateModel(with: dict)
-        }
-
-        model.onSelect = { [weak self] index in
-            self?.channel.invokeMethod("valueChanged", arguments: ["index": index])
-        }
-		
-		model.onActionButtonSelect = {
-			self.channel.invokeMethod("actionButtonPressed", arguments: [])
+// MARK: - 3. Data Model
+struct TabBarConfig: Equatable {
+	var labels: [String] = []
+	var symbols: [String] = []
+	var hasActionButton: Bool = false
+	var tintColor: UIColor = .systemBlue
+	var selectedIndex: Int = 0
+	
+	init(from dict: [String: Any]?) {
+		guard let dict = dict else { return }
+		if let l = dict["labels"] as? [String] { self.labels = l }
+		if let s = dict["symbols"] as? [String] { self.symbols = s }
+		if let action = dict["actionButtonSymbol"] as? String, !action.isEmpty {
+			self.hasActionButton = true
 		}
-
-        let swiftUIView = SwiftUITabBarView(model: model)
-        let hc = UIHostingController(rootView: swiftUIView)
-        hc.view.backgroundColor = .clear
-        hc.view.isOpaque = false
-        
-        addChild(hc, to: container)
-        self.hostingController = hc
-        
-        channel.setMethodCallHandler { [weak self] call, result in
-            self?.handle(call, result: result)
-        }
-    }
-    
-    private func addChild(_ child: UIViewController, to parentView: UIView) {
-        child.view.translatesAutoresizingMaskIntoConstraints = false
-        parentView.addSubview(child.view)
-        NSLayoutConstraint.activate([
-            child.view.leadingAnchor.constraint(equalTo: parentView.leadingAnchor),
-            child.view.trailingAnchor.constraint(equalTo: parentView.trailingAnchor),
-            child.view.topAnchor.constraint(equalTo: parentView.topAnchor),
-            child.view.bottomAnchor.constraint(equalTo: parentView.bottomAnchor)
-        ])
-    }
-
-    func view() -> UIView {
-        return container
-    }
-    
-    private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        switch call.method {
-        case "update":
-            if let args = call.arguments as? [String: Any] {
-                updateModel(with: args)
-                result(nil)
-            } else {
-                result(FlutterError(code: "bad_args", message: "Missing args", details: nil))
-            }
-        default:
-            result(FlutterMethodNotImplemented)
-        }
-    }
-
-    private func updateModel(with dict: [String: Any]) {
-        if let labels = dict["labels"] as? [String] { model.labels = labels }
-        if let symbols = dict["symbols"] as? [String] { model.symbols = symbols }
-		if let actionButtonSymbol = dict["actionButtonSymbol"] as? String {model.actionButtonSymbol = actionButtonSymbol }
-        if let v = dict["selectedIndex"] as? NSNumber { model.selectedIndex = v.intValue }
-        if let v = dict["isDark"] as? NSNumber { model.isDark = v.boolValue }
-        if let n = dict["tintColor"] as? NSNumber { model.tintColor = Self.colorFromARGB(n.intValue) }
-    }
-
-    private static func colorFromARGB(_ argb: Int) -> Color {
-        let a = Double((argb >> 24) & 0xFF) / 255.0
-        let r = Double((argb >> 16) & 0xFF) / 255.0
-        let g = Double((argb >> 8) & 0xFF) / 255.0
-        let b = Double(argb & 0xFF) / 255.0
-        return Color(red: r, green: g, blue: b, opacity: a)
-    }
+		if let colorInt = dict["tintColor"] as? NSNumber {
+			self.tintColor = TabBarConfig.uiColorFromARGB(colorInt.intValue)
+		}
+		if let idx = dict["selectedIndex"] as? Int {
+			self.selectedIndex = idx
+		}
+	}
+	
+	// Helper to check if we need to destroy/recreate tabs
+	func structuralChange(from other: TabBarConfig) -> Bool {
+		return labels != other.labels ||
+		symbols != other.symbols ||
+		hasActionButton != other.hasActionButton
+	}
+	
+	private static func uiColorFromARGB(_ argb: Int) -> UIColor {
+		let a = CGFloat((argb >> 24) & 0xFF) / 255.0
+		let r = CGFloat((argb >> 16) & 0xFF) / 255.0
+		let g = CGFloat((argb >> 8) & 0xFF) / 255.0
+		let b = CGFloat(argb & 0xFF) / 255.0
+		return UIColor(red: r, green: g, blue: b, alpha: a)
+	}
 }
 
-class TabBarModel: ObservableObject {
-    @Published var labels: [String] = []
-    @Published var symbols: [String] = []
-    @Published var actionButtonSymbol: String = ""
-    @Published var selectedIndex: Int = 0
-    @Published var tintColor: Color = .blue
-    @Published var isDark: Bool = false
-    
-    var onSelect: ((Int) -> Void)?
-	var onActionButtonSelect: (() -> Void)?
-}
-
-struct SwiftUITabBarView: View {
-    @ObservedObject var model: TabBarModel
-    
-    var body: some View {
-        Group {
-            if #available(iOS 18.0, *) {
-                TabView(selection: tabSelectionBinding) {
-                    ForEach(0..<count, id: \.self) { i in
-                        Tab(value: i) {
-                            Color.clear
-                        } label: {
-                            if i < model.symbols.count {
-                                Image(systemName: model.symbols[i])
-                            }
-                            if i < model.labels.count {
-                                Text(model.labels[i])
-                            }
-                        }
-                    }
-					// Action Button
-					Tab(value: 99, role: .search) {
-						Color.clear
-					} label: {
-						if !model.actionButtonSymbol.isEmpty {
-							Image(systemName: model.actionButtonSymbol)
-								.environment(\.symbolVariants, .none)
-						}
-					}
-					
-                }
-                .tint(model.tintColor)
-                .environment(\.colorScheme, model.isDark ? .dark : .light)
-                .toolbarBackground(.hidden, for: .tabBar)
-                .onAppear { updateAppearance() }
-            } else {
-                // Fallback for older iOS versions if needed, or just empty/error
-                Text("Requires iOS 18+")
-            }
-        }
-        .background(.clear)
-    }
-    
-    var tabSelectionBinding: Binding<Int> {
-        Binding(
-            get: { model.selectedIndex },
-            set: { value in
-				if (value == 99) {
-					model.onActionButtonSelect?()
-					return
-				}
-				
-                let count = max(model.labels.count, model.symbols.count)
-                model.selectedIndex = value
-                model.onSelect?(value)
-            }
-        )
-    }
-    
-    var count: Int {
-        max(model.labels.count, model.symbols.count)
-    }
-    
-    func updateAppearance() {
-        // iOS 18+ handled by SwiftUI modifiers
-        if #available(iOS 18.0, *) { return }
-
-        let appearance = UITabBarAppearance()
-}
+// MARK: - 4. Optimized Controller
+class LiquidGlassTabBarController: UITabBarController, UITabBarControllerDelegate {
+	private let channel: FlutterMethodChannel
+	private var config: TabBarConfig
+	
+	init(viewId: Int64, messenger: FlutterBinaryMessenger, args: Any?) {
+		self.channel = FlutterMethodChannel(name: "NativeTabBar_\(viewId)", binaryMessenger: messenger)
+		self.config = TabBarConfig(from: args as? [String: Any])
+		super.init(nibName: nil, bundle: nil)
+	}
+	
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		
+		// 1. Base Transparency
+		self.view.backgroundColor = .clear
+		self.view.isOpaque = false
+		
+		self.delegate = self
+		
+		// 2. Initial Setup
+		configureAppearance()
+		performFullRebuild() // Only called once on load
+		
+		// 3. Listen for Updates
+		channel.setMethodCallHandler { [weak self] call, result in
+			self?.handle(call, result: result)
+		}
+	}
+	
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews()
+		// Aggressively maintain transparency to prevent "White Flash" during rotation/resize
+		self.view.backgroundColor = .clear
+	}
+	
+	// MARK: - Appearance
+	private func configureAppearance() {
+		let appearance = UITabBarAppearance()
+		appearance.configureWithDefaultBackground() // Uses System Liquid/Glass Material
+		appearance.backgroundColor = .clear
+		appearance.shadowColor = .clear
+		
+		let itemAppearance = UITabBarItemAppearance()
+		itemAppearance.normal.iconColor = .systemGray
+		itemAppearance.selected.iconColor = config.tintColor
+		
+		appearance.stackedLayoutAppearance = itemAppearance
+		appearance.inlineLayoutAppearance = itemAppearance
+		appearance.compactInlineLayoutAppearance = itemAppearance
+		
+		tabBar.standardAppearance = appearance
+		if #available(iOS 15.0, *) {
+			tabBar.scrollEdgeAppearance = appearance
+		}
+		
+		tabBar.isTranslucent = true
+		tabBar.tintColor = config.tintColor
+	}
+	
+	// MARK: - Logic
+	private func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+		if call.method == "update", let dict = call.arguments as? [String: Any] {
+			let newConfig = TabBarConfig(from: dict)
+			
+			// 1. Check for Structural Changes (Labels/Icons changed)
+			// Only rebuild if absolutely necessary to prevent animation resets
+			if newConfig.structuralChange(from: self.config) {
+				self.config = newConfig
+				performFullRebuild()
+			} else {
+				// 2. Light Update (Color/Selection only)
+				self.config = newConfig
+				updateSelectionAndColors()
+			}
+			
+			result(nil)
+		} else {
+			result(FlutterMethodNotImplemented)
+		}
+	}
+	
+	// Heavy Operation: Destroys and recreates all tabs
+	private func performFullRebuild() {
+		var controllers: [UIViewController] = []
+		let count = max(config.labels.count, config.symbols.count)
+		
+		for i in 0..<count {
+			let dummyVC = UIViewController()
+			dummyVC.view.backgroundColor = .clear
+			
+			let symbolName = i < config.symbols.count ? config.symbols[i] : "questionmark"
+			let label = i < config.labels.count ? config.labels[i] : ""
+			
+			dummyVC.tabBarItem = UITabBarItem(
+				title: label,
+				image: UIImage(systemName: symbolName),
+				tag: i
+			)
+			controllers.append(dummyVC)
+		}
+		
+		if config.hasActionButton {
+			let actionVC = UIViewController()
+			actionVC.view.backgroundColor = .clear
+			// Use System Search Item
+			let item = UITabBarItem(tabBarSystemItem: .search, tag: 99)
+			actionVC.tabBarItem = item
+			controllers.append(actionVC)
+		}
+		
+		// Set controllers without animation to prevent visual jumping during init
+		self.setViewControllers(controllers, animated: false)
+		
+		// Restore selection
+		updateSelectionAndColors()
+	}
+	
+	// Light Operation: Just changes properties
+	private func updateSelectionAndColors() {
+		// Update Tint
+		if tabBar.tintColor != config.tintColor {
+			tabBar.tintColor = config.tintColor
+			// We must update the appearance object too for unselected states if needed
+			configureAppearance()
+		}
+		
+		// Update Selection
+		// Only update if different to avoid interrupting native transitions
+		if self.selectedIndex != config.selectedIndex {
+			// Ensure we don't select the action button
+			if let vcs = self.viewControllers,
+			   config.selectedIndex < vcs.count,
+			   vcs[config.selectedIndex].tabBarItem.tag != 99 {
+				self.selectedIndex = config.selectedIndex
+			}
+		}
+	}
+	
+	// MARK: - Delegate
+	func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+		let tag = viewController.tabBarItem.tag
+		
+		if tag == 99 {
+			channel.invokeMethod("actionButtonPressed", arguments: nil)
+			return false
+		}
+		return true
+	}
+	
+	func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+		let tag = viewController.tabBarItem.tag
+		if tag != 99 {
+			// Update our local config immediately so incoming Flutter updates don't revert it momentarily
+			config.selectedIndex = tag
+			channel.invokeMethod("valueChanged", arguments: ["index": tag])
+		}
+	}
 }
