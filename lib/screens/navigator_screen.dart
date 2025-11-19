@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:animations/animations.dart';
-import 'package:cupertino_native/cupertino_native.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +11,7 @@ import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
+import 'package:transito/widgets/native_tab_bar.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {
@@ -106,27 +106,27 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
             if (Platform.isIOS && supportsLiquidGlass)
               Align(
                 alignment: Alignment.bottomCenter,
-                child: CNTabBar(
+                child: NativeTabBar(
                   items: [
-                    CNTabBarItem(label: 'Nearby', icon: CNSymbol('safari.fill')),
-                    CNTabBarItem(label: 'Favourites', icon: CNSymbol('heart.fill')),
-                    CNTabBarItem(label: 'Search', icon: CNSymbol('map.fill')),
-                    CNTabBarItem(
-                        icon: _pageIndex == 0
-                            ? CNSymbol('arrow.clockwise')
+                    NativeTabBarItem(label: 'Nearby', symbol: 'safari.fill'),
+                    NativeTabBarItem(label: 'Favourites', symbol: 'heart.fill'),
+                    NativeTabBarItem(label: 'Search', symbol: 'map.fill'),
+                    NativeTabBarItem(
+                        label: '', // Empty label for the action button if desired, or provide one
+                        symbol: _pageIndex == 0
+                            ? 'arrow.clockwise'
                             : _pageIndex == 1
-                                ? CNSymbol('square.and.pencil')
+                                ? 'square.and.pencil'
                                 : _pageIndex == 2
                                     ? isUserCenter
-                                        ? CNSymbol('location.fill')
-                                        : CNSymbol('location')
-                                    : CNSymbol('circle')),
+                                        ? 'location.fill'
+                                        : 'location'
+                                    : 'circle'),
                   ],
                   currentIndex: _pageIndex,
                   split: true,
                   rightCount: 1,
-                  splitSpacing: 1.0,
-                  shrinkCentered: false,
+                  tintColor: Theme.of(context).colorScheme.primary,
                   onTap: (index) {
                     if (index == 3) {
                       switch (_pageIndex) {
