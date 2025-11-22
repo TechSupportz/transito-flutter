@@ -12,6 +12,9 @@ import Flutter
     let registrar = self.registrar(forPlugin: "NativeTabBar")!
     let factory = NativeTabBarFactory(messenger: registrar.messenger())
     registrar.register(factory, withId: "NativeTabBar")
+
+    let glassButtonFactory = GlassButtonFactory(messenger: registrar.messenger())
+    registrar.register(glassButtonFactory, withId: "GlassButton")
     
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }

@@ -11,7 +11,7 @@ import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
-import 'package:transito/widgets/native_tab_bar.dart';
+import 'package:transito/widgets/liquid_glass/native_tab_bar.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {

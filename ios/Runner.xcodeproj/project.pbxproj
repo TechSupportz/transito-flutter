@@ -14,6 +14,7 @@
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7EB95F7F2E6FE37C009544B2 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7EB95F7E2E6FE37C009544B2 /* AppIcon.icon */; };
 		7ECF6CE82ECD62E7009A0BCF /* NativeTabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECF6CE72ECD62E7009A0BCF /* NativeTabBar.swift */; };
+		7ECF6CEA2ECD62E7009A0BCF /* NativeGlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECF6CE92ECD62E7009A0BCF /* NativeGlassButton.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -62,6 +63,7 @@
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		7EB95F7E2E6FE37C009544B2 /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		7ECF6CE72ECD62E7009A0BCF /* NativeTabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NativeTabBar.swift; path = Runner/NativeTabBar.swift; sourceTree = "<group>"; };
+		7ECF6CE92ECD62E7009A0BCF /* NativeGlassButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = NativeGlassButton.swift; path = Runner/NativeGlassButton.swift; sourceTree = "<group>"; };
 		7EDEBEEA2AA23BB100318EEF /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 			isa = PBXGroup;
 			children = (
 				7ECF6CE72ECD62E7009A0BCF /* NativeTabBar.swift */,
+				7ECF6CE92ECD62E7009A0BCF /* NativeGlassButton.swift */,
 				9740EEB11CF90186004384FC /* Flutter */,
 				97C146F01CF9000F007C117D /* Runner */,
 				97C146EF1CF9000F007C117D /* Products */,
@@ -410,6 +413,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7ECF6CE82ECD62E7009A0BCF /* NativeTabBar.swift in Sources */,
+				7ECF6CEA2ECD62E7009A0BCF /* NativeGlassButton.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 			);
