@@ -48,7 +48,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
     bool supportsLiquidGlass = context.watch<CommonProvider>().supportsLiquidGlass;
     bool isUserCenter = context.watch<CommonProvider>().isUserCenter;
 
-    var navigationBar = NavigationBar(
+    var materialNavigationBar = NavigationBar(
       backgroundColor: Theme.of(context).colorScheme.surfaceContainerLow,
       shadowColor: Theme.of(context).colorScheme.shadow,
       destinations: <NavigationDestination>[
@@ -81,74 +81,68 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       }),
     );
 
+    var liquidGlassTabBar = NativeTabBar(
+      tabs: [
+        NativeTabBarItem(label: 'Nearby', symbol: 'safari.fill'),
+        NativeTabBarItem(label: 'Favourites', symbol: 'heart.fill'),
+        NativeTabBarItem(label: 'Search', symbol: 'map.fill'),
+      ],
+      actionButton: TabBarActionButton(
+          symbol: _pageIndex == 0
+              ? 'arrow.clockwise'
+              : _pageIndex == 1
+                  ? 'square.and.pencil'
+                  : _pageIndex == 2
+                      ? isUserCenter
+                          ? 'location.fill'
+                          : 'location'
+                      : 'circle',
+          onTap: () {
+            switch (_pageIndex) {
+              case 0:
+                _nearbyScreenController.refresh();
+                break;
+              case 1:
+                _favouritesScreenController.manageFavourites();
+                break;
+              case 2:
+                _mapSearchScreenController.animateToUserLocation();
+                break;
+              default:
+            }
+          }),
+      currentIndex: _pageIndex,
+      tintColor: Theme.of(context).colorScheme.primary,
+      onTap: (index) {
+        setState(() {
+          _pageIndex = index;
+        });
+      },
+    );
+
     return Scaffold(
+		extendBody: true,
       body: UpgradeAlert(
         upgrader: Upgrader(
           countryCode: "SG",
         ),
-        child: Stack(
-          children: [
-            AnimatedIndexedStack(
-              transitionBuilder: (
-                Widget child,
-                Animation<double> animation,
-                Animation<double> secondaryAnimation,
-              ) {
-                return FadeThroughTransition(
-                  animation: animation,
-                  secondaryAnimation: secondaryAnimation,
-                  child: child,
-                );
-              },
-              index: _pageIndex,
-              children: _pages,
-            ),
-            if (Platform.isIOS && supportsLiquidGlass)
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: NativeTabBar(
-                  tabs: [
-                    NativeTabBarItem(label: 'Nearby', symbol: 'safari.fill'),
-                    NativeTabBarItem(label: 'Favourites', symbol: 'heart.fill'),
-                    NativeTabBarItem(label: 'Search', symbol: 'map.fill'),
-                  ],
-                  actionButton: TabBarActionButton(
-                      symbol: _pageIndex == 0
-                          ? 'arrow.clockwise'
-                          : _pageIndex == 1
-                              ? 'square.and.pencil'
-                              : _pageIndex == 2
-                                  ? isUserCenter
-                                      ? 'location.fill'
-                                      : 'location'
-                                  : 'circle',
-                      onTap: () {
-                        switch (_pageIndex) {
-                          case 0:
-                            _nearbyScreenController.refresh();
-                            break;
-                          case 1:
-                            _favouritesScreenController.manageFavourites();
-                            break;
-                          case 2:
-                            _mapSearchScreenController.animateToUserLocation();
-                            break;
-                          default:
-                        }
-                      }),
-                  currentIndex: _pageIndex,
-                  tintColor: Theme.of(context).colorScheme.primary,
-                  onTap: (index) {
-                    setState(() {
-                      _pageIndex = index;
-                    });
-                  },
-                ),
-              )
-          ],
+        child: AnimatedIndexedStack(
+          transitionBuilder: (
+            Widget child,
+            Animation<double> animation,
+            Animation<double> secondaryAnimation,
+          ) {
+            return FadeThroughTransition(
+              animation: animation,
+              secondaryAnimation: secondaryAnimation,
+              child: child,
+            );
+          },
+          index: _pageIndex,
+          children: _pages,
         ),
       ),
-      bottomNavigationBar: Platform.isIOS && supportsLiquidGlass ? null : navigationBar,
+      bottomNavigationBar: Platform.isIOS && supportsLiquidGlass ? liquidGlassTabBar : materialNavigationBar,
     );
   }
 }
