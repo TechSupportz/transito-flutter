@@ -121,7 +121,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
     );
 
     return Scaffold(
-		extendBody: true,
+      extendBody: supportsLiquidGlass ? true : false,
       body: UpgradeAlert(
         upgrader: Upgrader(
           countryCode: "SG",
@@ -142,7 +142,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           children: _pages,
         ),
       ),
-      bottomNavigationBar: Platform.isIOS && supportsLiquidGlass ? liquidGlassTabBar : materialNavigationBar,
+      bottomNavigationBar:
+          Platform.isIOS && supportsLiquidGlass ? liquidGlassTabBar : materialNavigationBar,
     );
   }
 }
