@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:native_glass_navbar/liquid_glass_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonProvider extends ChangeNotifier {
@@ -46,15 +46,16 @@ class CommonProvider extends ChangeNotifier {
       return;
     }
 
-    if (Platform.isIOS && !_supportsLiquidGlass) {
-      final deviceInfo = await DeviceInfoPlugin().iosInfo;
-      int? majorSystemVersion = int.tryParse(deviceInfo.systemVersion.split(".")[0]);
+    if (!_supportsLiquidGlass) {
+      bool isSupported = await LiquidGlassHelper.isLiquidGlassSupported();
 
-      if (majorSystemVersion != null && majorSystemVersion >= 26) {
+      if (isSupported) {
         _supportsLiquidGlass = true;
+        prefs?.setBool('supportsLiquidGlass', true);
         notifyListeners();
-      } else if (_supportsLiquidGlass == true) {
+      } else if (_supportsLiquidGlass == true && !isSupported) {
         _supportsLiquidGlass = false;
+        prefs?.setBool('supportsLiquidGlass', false);
         notifyListeners();
       }
 

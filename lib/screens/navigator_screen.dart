@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import "package:native_glass_navbar/native_glass_navbar.dart";
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
@@ -11,7 +12,6 @@ import 'package:transito/screens/main/nearby_screen.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
-import 'package:transito/widgets/liquid_glass/native_tab_bar.dart';
 import 'package:upgrader/upgrader.dart';
 
 class NavigatorScreen extends StatefulWidget {
@@ -81,11 +81,11 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       }),
     );
 
-    var liquidGlassTabBar = NativeTabBar(
+    var nativeGlassNavBar = NativeGlassNavBar(
       tabs: [
-        NativeTabBarItem(label: 'Nearby', symbol: 'safari.fill'),
-        NativeTabBarItem(label: 'Favourites', symbol: 'heart.fill'),
-        NativeTabBarItem(label: 'Search', symbol: 'map.fill'),
+        NativeGlassNavBarItem(label: 'Nearby', symbol: 'safari.fill'),
+        NativeGlassNavBarItem(label: 'Favourites', symbol: 'heart.fill'),
+        NativeGlassNavBarItem(label: 'Search', symbol: 'map.fill'),
       ],
       actionButton: TabBarActionButton(
           symbol: _pageIndex == 0
@@ -113,6 +113,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           }),
       currentIndex: _pageIndex,
       tintColor: Theme.of(context).colorScheme.primary,
+      fallback:
+          materialNavigationBar, // Fallback to material nav bar if liquid glass is not supported
       onTap: (index) {
         setState(() {
           _pageIndex = index;
@@ -142,8 +144,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           children: _pages,
         ),
       ),
-      bottomNavigationBar:
-          Platform.isIOS && supportsLiquidGlass ? liquidGlassTabBar : materialNavigationBar,
+      bottomNavigationBar: Platform.isIOS ? nativeGlassNavBar : materialNavigationBar,
     );
   }
 }

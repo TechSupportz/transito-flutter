@@ -10,7 +10,7 @@
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
-		5A3FDB2A1C9B298EAA2B7BEA /* (null) in Resources */ = {isa = PBXBuildFile; };
+		5A3FDB2A1C9B298EAA2B7BEA /* BuildFile in Resources */ = {isa = PBXBuildFile; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7EB95F7F2E6FE37C009544B2 /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 7EB95F7E2E6FE37C009544B2 /* AppIcon.icon */; };
 		7ECF6CEA2ECD62E7009A0BCF /* NativeGlassButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7ECF6CE92ECD62E7009A0BCF /* NativeGlassButton.swift */; };
@@ -276,7 +276,7 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
-				5A3FDB2A1C9B298EAA2B7BEA /* (null) in Resources */,
+				5A3FDB2A1C9B298EAA2B7BEA /* BuildFile in Resources */,
 				7EB95F7F2E6FE37C009544B2 /* AppIcon.icon in Resources */,
 				F91150A8C1361C8880A8D1D7 /* GoogleService-Info.plist in Resources */,
 			);
@@ -353,13 +353,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -389,13 +385,9 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

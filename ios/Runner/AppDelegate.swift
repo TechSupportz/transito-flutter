@@ -9,10 +9,7 @@ import Flutter
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
     
-    let registrar = self.registrar(forPlugin: "NativeTabBar")!
-    let factory = NativeTabBarFactory(messenger: registrar.messenger())
-    registrar.register(factory, withId: "NativeTabBar")
-
+    let registrar = self.registrar(forPlugin: "GlassButton")!
     let glassButtonFactory = GlassButtonFactory(messenger: registrar.messenger())
     registrar.register(glassButtonFactory, withId: "GlassButton")
     

@@ -59,7 +59,6 @@ dependencies:
         git:
             url: "https://github.com/matteomrz/flutter_map_marker_cluster"
     material_symbols_icons: ^4.2858.1
-    device_info_plus: ^12.1.0
     native_glass_navbar:
         git:
             url: "https://github.com/TechSupportz/native_glass_navbar"
