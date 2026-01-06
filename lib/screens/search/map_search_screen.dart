@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -535,8 +534,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                       ),
                                       onPressed: () {
                                         _animatedMapController.animateTo(
-                                          zoom: 17.5,
                                           rotation: 0.0,
+                                          zoom: _animatedMapController.mapController.camera.zoom +
+                                              0.25,
                                         );
                                       },
                                       icon: Transform.rotate(
