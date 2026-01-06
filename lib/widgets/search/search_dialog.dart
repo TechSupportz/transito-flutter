@@ -201,11 +201,15 @@ class _SearchDialogState extends State<SearchDialog> {
         appBar: AppBar(
           shape: RoundedRectangleBorder(),
           backgroundColor: Theme.of(context).colorScheme.surfaceContainerHigh,
+          scrolledUnderElevation: 0,
           title: TextField(
             controller: _textFieldController,
             focusNode: _searchFocusNode,
             autofocus: true,
             onChanged: (_) => _onSearchChanged(_textFieldController.text, 1),
+            keyboardType: _searchMode == SearchMode.SERVICES
+                ? TextInputType.numberWithOptions(decimal: false)
+                : TextInputType.text,
             decoration: InputDecoration(
               hintText: 'Search...',
               isDense: false,
@@ -213,6 +217,7 @@ class _SearchDialogState extends State<SearchDialog> {
               border: InputBorder.none,
               enabledBorder: InputBorder.none,
             ),
+            onTapOutside: (event) => _searchFocusNode.unfocus(),
           ),
           actions: [
             AnimatedOpacity(
@@ -248,8 +253,16 @@ class _SearchDialogState extends State<SearchDialog> {
                       label: Text("Places"),
                       selected: _searchMode == SearchMode.PLACES,
                       onSelected: (value) {
+                        if (_searchMode == SearchMode.SERVICES) _textFieldController.clear();
+
                         setState(() => _searchMode = SearchMode.PLACES);
-                        _textFieldController.clear();
+                        _onSearchChanged(_textFieldController.text, 1);
+
+                        if (_textFieldController.text.isEmpty) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _searchFocusNode.requestFocus();
+                          });
+                        }
                       },
                       avatar: AnimatedOpacity(
                           opacity: _searchMode == SearchMode.PLACES ? 0.2 : 1.0,
@@ -264,8 +277,16 @@ class _SearchDialogState extends State<SearchDialog> {
                       label: Text("Bus Stops"),
                       selected: _searchMode == SearchMode.STOPS,
                       onSelected: (value) {
+                        if (_searchMode == SearchMode.SERVICES) _textFieldController.clear();
+
                         setState(() => _searchMode = SearchMode.STOPS);
-                        _textFieldController.clear();
+                        _onSearchChanged(_textFieldController.text, 1);
+
+                        if (_textFieldController.text.isEmpty) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            _searchFocusNode.requestFocus();
+                          });
+                        }
                       },
                       avatar: AnimatedOpacity(
                           opacity: _searchMode == SearchMode.STOPS ? 0.2 : 1.0,
@@ -280,8 +301,15 @@ class _SearchDialogState extends State<SearchDialog> {
                       label: Text("Bus Services"),
                       selected: _searchMode == SearchMode.SERVICES,
                       onSelected: (value) {
-                        setState(() => _searchMode = SearchMode.SERVICES);
                         _textFieldController.clear();
+
+                        setState(() {
+                          _searchMode = SearchMode.SERVICES;
+                        });
+
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _searchFocusNode.requestFocus();
+                        });
                       },
                       avatar: AnimatedOpacity(
                           opacity: _searchMode == SearchMode.SERVICES ? 0.2 : 1.0,
