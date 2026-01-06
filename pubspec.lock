@@ -858,12 +858,11 @@ packages:
   native_glass_navbar:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: addc985247fc8a99fad96292e8a95c84f4373c0b
-      url: "https://github.com/TechSupportz/native_glass_navbar"
-    source: git
-    version: "1.0.0"
+      name: native_glass_navbar
+      sha256: d12708bc5936e0bc018f476c8078e251aaa672ddc41b58b986431665605072b5
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
   nested:
     dependency: transitive
     description:
