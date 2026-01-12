@@ -47,6 +47,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   late Future<LatLng> _initialCameraCenter;
 
   final ValueNotifier<Set<Marker>> busStopMarkers = ValueNotifier<Set<Marker>>({});
+  final ValueNotifier<Set<Marker>> favouriteBusStopMarkers = ValueNotifier<Set<Marker>>({});
   final ValueNotifier<bool> _isMarkersLoading = ValueNotifier<bool>(true);
   final Map<String, Marker> _busStopMarkersByCode = <String, Marker>{};
   final Set<String> _favouriteBusStopCodes = <String>{};
@@ -71,30 +72,23 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
 
   void populateFavouriteBusStopMarkers(String userId) {
     _favouritesSubscription = FavouritesService().streamFavourites(userId).listen((favouritesList) {
-      final oldFavouriteCodeSet = Set<String>.from(_favouriteBusStopCodes);
       _favouriteBusStopCodes.clear();
+      final favouriteMarkers = <Marker>{};
 
       for (final favourite in favouritesList) {
         _favouriteBusStopCodes.add(favourite.busStopCode);
-        _busStopMarkersByCode[favourite.busStopCode] = generateBusStopMarker(
+        final marker = generateBusStopMarker(
           busStopCode: favourite.busStopCode,
           busStopName: favourite.busStopName,
           busStopAddress: favourite.busStopAddress,
           busStopLocation: favourite.busStopLocation,
           isFavourite: true,
         );
+        _busStopMarkersByCode[favourite.busStopCode] = marker;
+        favouriteMarkers.add(marker);
       }
 
-      for (final oldFavouriteCode in oldFavouriteCodeSet) {
-        if (!_favouriteBusStopCodes.contains(oldFavouriteCode)) {
-          final marker = _busStopMarkersByCode[oldFavouriteCode];
-          if (marker != null) {
-            _busStopMarkersByCode.remove(oldFavouriteCode);
-          }
-        }
-      }
-
-      busStopMarkers.value = _busStopMarkersByCode.values.toSet();
+      favouriteBusStopMarkers.value = favouriteMarkers;
     });
   }
 
@@ -111,24 +105,20 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
 
       final nextMarkersByCode = <String, Marker>{};
 
-      for (final favouriteCode in _favouriteBusStopCodes) {
-        final existing = _busStopMarkersByCode[favouriteCode];
-        if (existing != null) {
-          nextMarkersByCode[favouriteCode] = existing;
-        }
-      }
-
       for (final nearby in nearbyBusStops) {
         final BusStop busStopInfo = nearby.busStop;
         final code = busStopInfo.code;
 
-        final existing = nextMarkersByCode[code] ?? _busStopMarkersByCode[code];
+        if (_favouriteBusStopCodes.contains(code)) {
+          continue;
+        }
+
+        final existing = _busStopMarkersByCode[code];
         if (existing != null) {
           nextMarkersByCode[code] = existing;
           continue;
         }
 
-        final isFavourite = _favouriteBusStopCodes.contains(code);
         nextMarkersByCode[code] = generateBusStopMarker(
           busStopCode: code,
           busStopName: busStopInfo.name,
@@ -137,7 +127,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
             busStopInfo.latitude,
             busStopInfo.longitude,
           ),
-          isFavourite: isFavourite,
+          isFavourite: false,
         );
       }
 
@@ -308,6 +298,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   @override
   void dispose() {
     busStopMarkers.dispose();
+    favouriteBusStopMarkers.dispose();
     searchQuery.dispose();
     searchLocationPin.dispose();
     _isMarkersLoading.dispose();
@@ -370,8 +361,53 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                       CurrentLocationLayer(
                         style: LocationMarkerStyle(),
                       ),
+                      // Regular bus stop markers
                       ValueListenableBuilder<Set<Marker>>(
                         valueListenable: busStopMarkers,
+                        builder: (context, markers, child) {
+                          return MarkerClusterLayerWidget(
+                            options: MarkerClusterLayerOptions(
+                              rotate: true,
+                              maxClusterRadius: 120,
+                              disableClusteringAtZoom: 17,
+                              spiderfyCluster: false,
+                              zoomToBoundsOnClick: false,
+                              centerMarkerOnClick: false,
+                              animationsOptions:
+                                  AnimationsOptions(zoom: Duration(milliseconds: 250)),
+                              onClusterTap: (p0) {
+                                _animatedMapController.animateTo(
+                                  dest:
+                                      LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
+                                  zoom: 17,
+                                );
+                              },
+                              size: const Size(40, 40),
+                              markers: markers.toList(),
+                              builder: (context, clusterMarkers) {
+                                return Container(
+                                  decoration: BoxDecoration(
+                                    color: Theme.of(context).colorScheme.tertiary,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Center(
+                                    child: Text(
+                                      clusterMarkers.length.toString(),
+                                      style: TextStyle(
+                                        color: Theme.of(context).colorScheme.onTertiary,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      ),
+                      // Favourite bus stop markers (separate layer)
+                      ValueListenableBuilder<Set<Marker>>(
+                        valueListenable: favouriteBusStopMarkers,
                         builder: (context, markers, child) {
                           return MarkerClusterLayerWidget(
                             options: MarkerClusterLayerOptions(
