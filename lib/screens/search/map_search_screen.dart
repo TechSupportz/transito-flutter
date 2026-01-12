@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -16,9 +17,11 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
+import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
@@ -43,12 +46,15 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   final ValueNotifier<double> mapRotation = ValueNotifier<double>(0.0);
   late Future<LatLng> _initialCameraCenter;
 
-  final ValueNotifier<List<Marker>> busStopMarkers = ValueNotifier<List<Marker>>([]);
+  final ValueNotifier<Set<Marker>> busStopMarkers = ValueNotifier<Set<Marker>>({});
   final ValueNotifier<bool> _isMarkersLoading = ValueNotifier<bool>(true);
+  final Map<String, Marker> _busStopMarkersByCode = <String, Marker>{};
+  final Set<String> _favouriteBusStopCodes = <String>{};
 
   final ValueNotifier<String?> searchQuery = ValueNotifier<String?>(null);
   final ValueNotifier<Marker?> searchLocationPin = ValueNotifier<Marker?>(null);
   Timer? _debounce;
+  StreamSubscription<List<Favourite>>? _favouritesSubscription;
 
   Future<List<NearbyBusStop>> fetchNearbyBusStops(LatLng position) async {
     final response = await http.get(Uri.parse(
@@ -63,6 +69,35 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     }
   }
 
+  void populateFavouriteBusStopMarkers(String userId) {
+    _favouritesSubscription = FavouritesService().streamFavourites(userId).listen((favouritesList) {
+      final oldFavouriteCodeSet = Set<String>.from(_favouriteBusStopCodes);
+      _favouriteBusStopCodes.clear();
+
+      for (final favourite in favouritesList) {
+        _favouriteBusStopCodes.add(favourite.busStopCode);
+        _busStopMarkersByCode[favourite.busStopCode] = generateBusStopMarker(
+          busStopCode: favourite.busStopCode,
+          busStopName: favourite.busStopName,
+          busStopAddress: favourite.busStopAddress,
+          busStopLocation: favourite.busStopLocation,
+          isFavourite: true,
+        );
+      }
+
+      for (final oldFavouriteCode in oldFavouriteCodeSet) {
+        if (!_favouriteBusStopCodes.contains(oldFavouriteCode)) {
+          final marker = _busStopMarkersByCode[oldFavouriteCode];
+          if (marker != null) {
+            _busStopMarkersByCode.remove(oldFavouriteCode);
+          }
+        }
+      }
+
+      busStopMarkers.value = _busStopMarkersByCode.values.toSet();
+    });
+  }
+
   void _onMapPositionChanged(LatLng position) async {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 200), () async {
@@ -73,47 +108,92 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       }
 
       List<NearbyBusStop> nearbyBusStops = await fetchNearbyBusStops(position);
-      List<Marker> _newBusStopMarkers = nearbyBusStops.map((busStop) {
-        BusStop busStopInfo = busStop.busStop;
 
-        return Marker(
-          key: ValueKey(busStopInfo.code),
-          rotate: true,
-          width: 40,
-          height: 40,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => BusStopInfoScreen(
-                    code: busStopInfo.code,
-                    name: busStopInfo.name,
-                    address: busStopInfo.roadName,
-                    busStopLocation: LatLng(busStopInfo.latitude, busStopInfo.longitude),
-                  ),
-                ),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.tertiary,
-                shape: BoxShape.circle,
-              ),
-              child: AppSymbol(
-                Symbols.directions_bus_rounded,
-                fill: true,
-                color: Theme.of(context).colorScheme.onTertiary,
-              ),
-            ),
+      final nextMarkersByCode = <String, Marker>{};
+
+      for (final favouriteCode in _favouriteBusStopCodes) {
+        final existing = _busStopMarkersByCode[favouriteCode];
+        if (existing != null) {
+          nextMarkersByCode[favouriteCode] = existing;
+        }
+      }
+
+      for (final nearby in nearbyBusStops) {
+        final BusStop busStopInfo = nearby.busStop;
+        final code = busStopInfo.code;
+
+        final existing = nextMarkersByCode[code] ?? _busStopMarkersByCode[code];
+        if (existing != null) {
+          nextMarkersByCode[code] = existing;
+          continue;
+        }
+
+        final isFavourite = _favouriteBusStopCodes.contains(code);
+        nextMarkersByCode[code] = generateBusStopMarker(
+          busStopCode: code,
+          busStopName: busStopInfo.name,
+          busStopAddress: busStopInfo.roadName,
+          busStopLocation: LatLng(
+            busStopInfo.latitude,
+            busStopInfo.longitude,
           ),
-          point: LatLng(busStop.busStop.latitude, busStop.busStop.longitude),
+          isFavourite: isFavourite,
         );
-      }).toList();
+      }
 
-      busStopMarkers.value = _newBusStopMarkers;
+      _busStopMarkersByCode
+        ..clear()
+        ..addAll(nextMarkersByCode);
+      busStopMarkers.value = nextMarkersByCode.values.toSet();
       _isMarkersLoading.value = false;
     });
+  }
+
+  Marker generateBusStopMarker({
+    required String busStopCode,
+    required String busStopName,
+    required String busStopAddress,
+    required LatLng busStopLocation,
+    bool isFavourite = false,
+  }) {
+    return Marker(
+      key: ValueKey(busStopCode),
+      rotate: true,
+      width: 40,
+      height: 40,
+      child: InkWell(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BusStopInfoScreen(
+                code: busStopCode,
+                name: busStopName,
+                address: busStopAddress,
+                busStopLocation: busStopLocation,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: isFavourite
+                ? Theme.of(context).colorScheme.primary
+                : Theme.of(context).colorScheme.tertiary,
+            borderRadius: isFavourite ? BorderRadius.circular(8) : null,
+            shape: isFavourite ? BoxShape.rectangle : BoxShape.circle,
+          ),
+          child: AppSymbol(
+            Symbols.directions_bus_rounded,
+            fill: true,
+            color: isFavourite
+                ? Theme.of(context).colorScheme.onPrimary
+                : Theme.of(context).colorScheme.onTertiary,
+          ),
+        ),
+      ),
+      point: busStopLocation,
+    );
   }
 
   showClearAlertDialog(BuildContext context) {
@@ -205,6 +285,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   void initState() {
     super.initState();
     LatLng? initialMapPinLocation = context.read<CommonProvider>().initialMapPinLocation;
+    var userId = context.read<User?>()?.uid;
+
+    if (userId != null) populateFavouriteBusStopMarkers(userId);
 
     if (initialMapPinLocation != null) {
       _initialCameraCenter = Future.value(initialMapPinLocation);
@@ -230,6 +313,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     _isMarkersLoading.dispose();
     _animatedMapController.dispose();
     _debounce?.cancel();
+    _favouritesSubscription?.cancel();
     widget.controller?.removeListener(animateToUserLocation);
     super.dispose();
   }
@@ -286,7 +370,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                       CurrentLocationLayer(
                         style: LocationMarkerStyle(),
                       ),
-                      ValueListenableBuilder<List<Marker>>(
+                      ValueListenableBuilder<Set<Marker>>(
                         valueListenable: busStopMarkers,
                         builder: (context, markers, child) {
                           return MarkerClusterLayerWidget(
@@ -303,11 +387,11 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                 _animatedMapController.animateTo(
                                   dest:
                                       LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
-                                  zoom: 18.5,
+                                  zoom: 17,
                                 );
                               },
                               size: const Size(40, 40),
-                              markers: markers,
+                              markers: markers.toList(),
                               builder: (context, clusterMarkers) {
                                 return Container(
                                   decoration: BoxDecoration(
