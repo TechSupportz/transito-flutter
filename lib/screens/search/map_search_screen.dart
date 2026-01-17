@@ -530,7 +530,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                             },
                             child: Material(
                               borderRadius: BorderRadius.circular(64),
-                              elevation: 4,
+                              elevation: 5,
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: Theme.of(context).colorScheme.surfaceContainerHigh,
@@ -625,6 +625,13 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                             mainAxisSize: MainAxisSize.max,
                             children: [
                               FilledButton.tonalIcon(
+                                style: ButtonStyle(
+                                  backgroundColor:
+                                      WidgetStateProperty.all(appColors.scheme.primary),
+                                  foregroundColor:
+                                      WidgetStateProperty.all(appColors.scheme.onPrimary),
+                                  elevation: WidgetStateProperty.all(3),
+                                ),
                                 onPressed: () => Navigator.push(
                                   context,
                                   MaterialPageRoute(
