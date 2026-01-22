@@ -8,13 +8,14 @@ void showLtaMaintenanceWarningSnackbar(BuildContext context) {
     SnackBar(
       behavior: SnackBarBehavior.fixed,
       backgroundColor: AppColors().scheme.error,
-      duration: const Duration(seconds: 30),
+      showCloseIcon: true,
+      duration: const Duration(seconds: 6),
       content: Row(
         children: [
           Text(
             "!!!",
             style: TextStyle(
-                fontSize: 20, fontWeight: FontWeight.w900, color: AppColors().scheme.onError),
+                fontSize: 18, fontWeight: FontWeight.w900, color: AppColors().scheme.onError),
           ),
           const SizedBox(width: 16),
           Flexible(
@@ -24,7 +25,7 @@ void showLtaMaintenanceWarningSnackbar(BuildContext context) {
               overflow: TextOverflow.visible,
               const TextSpan(
                 text:
-                    "Bus timings may be temporarily unavailable due to scheduled system maintenance by LTA",
+                    "Bus timings may be temporarily unavailable due to system maintenance by LTA",
               ),
             ),
           ),
