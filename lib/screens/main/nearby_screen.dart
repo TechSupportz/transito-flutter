@@ -25,6 +25,7 @@ import 'package:transito/screens/onboarding/location_access_screen.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
+import 'package:transito/widgets/common/lta_maintenance_warning_snackbar.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class NearbyScreenController extends ChangeNotifier {
@@ -170,37 +171,6 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
     });
   }
 
-  void showWarningSnackbar() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        behavior: SnackBarBehavior.fixed,
-        backgroundColor: AppColors().scheme.error,
-        duration: const Duration(seconds: 30),
-        content: Row(
-          children: [
-            Text(
-              "!!!",
-              style: TextStyle(
-                  fontSize: 20, fontWeight: FontWeight.w900, color: AppColors().scheme.onError),
-            ),
-            SizedBox(width: 16),
-            Flexible(
-              child: Text.rich(
-                style: TextStyle(color: AppColors().scheme.onError),
-                softWrap: true,
-                overflow: TextOverflow.visible,
-                TextSpan(
-                  text:
-                      "Bus timings may be temporarily unavailable due to scheduled system maintenance by LTA",
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   @override
   void initState() {
     super.initState();
@@ -215,7 +185,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
     widget.controller?.addListener(getAllNearby);
 
     WidgetsBinding.instance.addPostFrameCallback(
-      (_) => showWarningSnackbar(),
+      (_) => showLtaMaintenanceWarningSnackbar(context),
     );
   }
 
