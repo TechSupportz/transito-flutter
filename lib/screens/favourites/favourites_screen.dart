@@ -8,7 +8,6 @@ import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
-import 'package:transito/widgets/common/lta_maintenance_warning_snackbar.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class FavouritesScreenController extends ChangeNotifier {
@@ -50,9 +49,6 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   void initState() {
     super.initState();
     widget.controller?.addListener(() => goToManageFavouritesScreen(context));
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => showLtaMaintenanceWarningSnackbar(context),
-    );
   }
 
   @override

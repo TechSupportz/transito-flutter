@@ -16,7 +16,6 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
-import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
@@ -25,7 +24,6 @@ import 'package:transito/screens/onboarding/location_access_screen.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
-import 'package:transito/widgets/common/lta_maintenance_warning_snackbar.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class NearbyScreenController extends ChangeNotifier {
@@ -183,10 +181,6 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
     WidgetsBinding.instance.addObserver(this);
 
     widget.controller?.addListener(getAllNearby);
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => showLtaMaintenanceWarningSnackbar(context),
-    );
   }
 
   @override
