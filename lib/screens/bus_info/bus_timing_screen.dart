@@ -27,7 +27,6 @@ import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/bus_timing_guide.dart';
 import 'package:transito/widgets/common/error_text.dart';
-import 'package:transito/widgets/common/lta_maintenance_warning_snackbar.dart';
 
 import 'bus_stop_info_screen.dart';
 
@@ -261,10 +260,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => showLtaMaintenanceWarningSnackbar(context),
     );
   }
 
