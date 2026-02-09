@@ -1,16 +1,14 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:http/http.dart' as http;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/bus_info/bus_routes_list.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -45,28 +43,16 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   double sheetHeight = 0;
 
   Future<BusService> getBusService() async {
-    final response = await http.get(Uri.parse('${Secret.API_URL}/bus-service/${widget.serviceNo}'));
-
-    if (response.statusCode == 200) {
-      debugPrint("Service info fetched");
-      return BusServiceDetailsApiResponse.fromJson(json.decode(response.body)).data;
-    } else {
-      debugPrint("Error fetching bus service info");
-      throw Exception("Error fetching bus service routes");
-    }
+    final BusService service = await TransitoApiService().getBusService(widget.serviceNo);
+    debugPrint("Service info fetched");
+    return service;
   }
 
   Future<List<List<BusRouteInfo>>> getBusRoutes() async {
-    final response = await http.get(Uri.parse(
-        '${Secret.API_URL}/bus-service/${widget.serviceNo}?includeRoutes')); // NOTE - This should be replaced with an endpoint which just returns the routes
-
-    if (response.statusCode == 200) {
-      debugPrint("Service info fetched");
-      return BusServiceDetailsApiResponse.fromJson(json.decode(response.body)).data.routes!;
-    } else {
-      debugPrint("Error fetching bus service info");
-      throw Exception("Error fetching bus service routes");
-    }
+    final List<List<BusRouteInfo>> routes =
+        await TransitoApiService().getBusRoutes(widget.serviceNo);
+    debugPrint("Service info fetched");
+    return routes;
   }
 
   @override

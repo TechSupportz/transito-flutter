@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -11,18 +10,17 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -58,16 +56,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   StreamSubscription<List<Favourite>>? _favouritesSubscription;
 
   Future<List<NearbyBusStop>> fetchNearbyBusStops(LatLng position) async {
-    final response = await http.get(Uri.parse(
-        '${Secret.API_URL}/bus-stops/nearby?latitude=${position.latitude}&longitude=${position.longitude}'));
-
-    if (response.statusCode == 200) {
-      debugPrint(">>> Nearby bus stops fetched");
-      return NearbyBusStopsApiResponse.fromJson(jsonDecode(response.body)).data;
-    } else {
-      debugPrint("Failed to fetch nearby bus stops");
-      throw Exception('Failed to fetch nearby bus stops');
-    }
+    final List<NearbyBusStop> stops = await TransitoApiService().getNearbyBusStops(position);
+    debugPrint(">>> Nearby bus stops fetched");
+    return stops;
   }
 
   void populateFavouriteBusStopMarkers(String userId) {

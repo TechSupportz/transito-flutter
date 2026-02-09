@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -8,16 +7,15 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
@@ -99,18 +97,11 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   }) async {
     debugPrint("Fetching nearby bus stops");
     Position userLocation = currentLocation ?? await getUserLocation();
-
-    final response = await http.get(Uri.parse(
-        '${Secret.API_URL}/bus-stops/nearby?latitude=${userLocation.latitude}&longitude=${userLocation.longitude}'));
-
-    if (response.statusCode == 200) {
-      debugPrint("Nearby bus stops fetched");
-      // print(response.body);
-      return NearbyBusStopsApiResponse.fromJson(jsonDecode(response.body)).data;
-    } else {
-      debugPrint("Failed to fetch nearby bus stops");
-      throw Exception('Failed to fetch nearby bus stops');
-    }
+    final List<NearbyBusStop> stops = await TransitoApiService().getNearbyBusStops(
+      LatLng(userLocation.latitude, userLocation.longitude),
+    );
+    debugPrint("Nearby bus stops fetched");
+    return stops;
   }
 
   // function to get the user's nearby favourites

@@ -37,6 +37,8 @@ flutter build ios
 - Prefer single quotes for strings
 - Use `super.key` in widget constructors
 - Explicit types preferred over `var`/`dynamic`
+- **Follow VS Code's formatting** - The project uses VS Code's default Dart formatter with a 100-character line length. When running `dart format` commands ALWAYS specify `--line-length=100`.
+- **Format Command** `dart format --line-length=100 <file>` to match VS Code's output
 
 ### Imports Order
 1. Dart SDK imports (`dart:async`, `dart:convert`, etc.)

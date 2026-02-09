@@ -1,15 +1,10 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:http/http.dart' as http;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
-import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
 import 'package:transito/widgets/favourites/favourite_name_card.dart';
 
@@ -26,31 +21,6 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   bool isFabVisible = true;
   late Future<List<Favourite>> _futureFavouritesList;
   List<Favourite> reorderedFavouritesList = [];
-
-  // api headers
-  Map<String, String> requestHeaders = {
-    'Accept': 'application/json',
-    'AccountKey': Secret.LTA_API_KEY
-  };
-
-  // fetch arrival into to retrieve what buses are available if user wants to edit a favourite
-  Future<BusArrivalInfo> fetchArrivalTimings(String busStopCode) async {
-    debugPrint("Fetching arrival timings");
-    // gets response from api
-    final response = await http.get(
-        Uri.parse(
-            'https://datamall2.mytransport.sg/ltaodataservice/v3/BusArrival?BusStopCode=$busStopCode'),
-        headers: requestHeaders);
-
-    // if response is successful, parse the response and return it as a BusArrivalInfo object
-    if (response.statusCode == 200) {
-      debugPrint("Timing fetched");
-      return BusArrivalInfo.fromJson(jsonDecode(response.body));
-    } else {
-      debugPrint("Error fetching arrival timings");
-      throw Exception('Failed to load data');
-    }
-  }
 
   // function to route to edit favourites screen
   Future<void> goToEditFavouritesScreen(BuildContext context, Favourite favourite) async {

@@ -1,19 +1,15 @@
-import 'dart:convert';
-
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
-import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/favourites/favourite.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/chekbox_skeleton.dart';
@@ -72,18 +68,9 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     }
 
     debugPrint("Fetching all services");
-
-    final response = await http.get(
-      Uri.parse('${Secret.API_URL}/bus-stop/${widget.busStopCode}/services'),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("Services fetched");
-      return BusStopServicesApiResponse.fromJson(json.decode(response.body)).data;
-    } else {
-      debugPrint("Error fetching bus stop services");
-      throw Exception("Error fetching bus stop services");
-    }
+    final List<String> services = await TransitoApiService().getBusStopServices(widget.busStopCode);
+    debugPrint("Services fetched");
+    return services;
   }
 
   @override

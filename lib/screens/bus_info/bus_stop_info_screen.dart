@@ -1,20 +1,18 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/lta_api_service.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
-import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
@@ -50,12 +48,6 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   late Future<List<String>> futureServices;
   bool isAddedToFavourites = false;
 
-  // api request headers
-  Map<String, String> requestHeaders = {
-    'Accept': 'application/json',
-    'AccountKey': Secret.LTA_API_KEY
-  };
-
   // function to fetch all services of a bus stop
   Future<List<String>> fetchServices() async {
     if (widget.services != null) {
@@ -65,37 +57,17 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
     debugPrint("Fetching all services");
 
-    final response = await http.get(
-      Uri.parse('${Secret.API_URL}/bus-stop/${widget.code}/services'),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("Services fetched");
-      return BusStopServicesApiResponse.fromJson(json.decode(response.body)).data;
-    } else {
-      debugPrint("Error fetching bus stop services");
-      throw Exception("Error fetching bus stop services");
-    }
+    final List<String> services = await TransitoApiService().getBusStopServices(widget.code);
+    debugPrint("Services fetched");
+    return services;
   }
 
   // function to fetch currently operating services bus arrival info
   Future<List<String>> fetchCurrOperatingServices() async {
     debugPrint("Fetching currently operating services");
-    // gets response from api
-    final response = await http.get(
-        Uri.parse(
-            'https://datamall2.mytransport.sg/ltaodataservice/v3/BusArrival?BusStopCode=${widget.code}'),
-        headers: requestHeaders);
-
-    // if response is successful, parse the response and return it as a BusArrivalInfo object
-    if (response.statusCode == 200) {
-      debugPrint("Currently operating services fetched");
-      final busArrivalInfo = BusArrivalInfo.fromJson(jsonDecode(response.body));
-      return busArrivalInfo.services.map((e) => e.serviceNum).toList();
-    } else {
-      debugPrint("Error fetching currently operating services");
-      throw Exception('Failed to load data');
-    }
+    final BusArrivalInfo busArrivalInfo = await LtaApiService().getBusArrival(widget.code);
+    debugPrint("Currently operating services fetched");
+    return busArrivalInfo.services.map((e) => e.serviceNum).toList();
   }
 
   Future<void> openMaps(LatLng navigationLocation) async {

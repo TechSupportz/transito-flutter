@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -7,17 +6,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/lta_api_service.dart';
 import 'package:transito/global/services/settings_service.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/global/utils/scroll_to_content.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
-import 'package:transito/models/api/transito/bus_services.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
@@ -71,12 +69,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     return position;
   }
 
-  // api request headers
-  Map<String, String> requestHeaders = {
-    'Accept': 'application/json',
-    'AccountKey': Secret.LTA_API_KEY
-  };
-
   // function to fetch all services of a bus stop
   Future<List<String>> fetchServices() async {
     if (widget.services != null) {
@@ -85,37 +77,17 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     }
 
     debugPrint("Fetching all services");
-
-    final response = await http.get(
-      Uri.parse('${Secret.API_URL}/bus-stop/${widget.code}/services'),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("Services fetched");
-      return BusStopServicesApiResponse.fromJson(json.decode(response.body)).data;
-    } else {
-      debugPrint("Error fetching bus stop services");
-      throw Exception("Error fetching bus stop services");
-    }
+    final List<String> services = await TransitoApiService().getBusStopServices(widget.code);
+    debugPrint("Services fetched");
+    return services;
   }
 
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
-    // gets response from api
-    final response = await http.get(
-        Uri.parse(
-            'https://datamall2.mytransport.sg/ltaodataservice/v3/BusArrival?BusStopCode=${widget.code}'),
-        headers: requestHeaders);
-
-    // if response is successful, parse the response and return it as a BusArrivalInfo object
-    if (response.statusCode == 200) {
-      debugPrint("Timing fetched");
-      return BusArrivalInfo.fromJson(jsonDecode(response.body));
-    } else {
-      debugPrint("Error fetching arrival timings");
-      throw Exception('Failed to load data');
-    }
+    final BusArrivalInfo info = await LtaApiService().getBusArrival(widget.code);
+    debugPrint("Timing fetched");
+    return info;
   }
 
   // function to properly sort the bus arrival info according to the Bus Service number

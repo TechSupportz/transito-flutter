@@ -1,17 +1,15 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:http/http.dart' as http;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/onemap/onemap_search.dart';
 import 'package:transito/models/enums/search_mode_enum.dart';
-import 'package:transito/models/secret.dart';
 import 'package:transito/widgets/bus_info/bus_service_card.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -50,16 +48,7 @@ class _SearchDialogState extends State<SearchDialog> {
     if (query.isEmpty) {
       return Future.value(OneMapSearch(totalCount: 0, count: 0, totalPages: 0, page: 1, data: []));
     }
-
-    final response = await http.get(
-      Uri.parse('${Secret.API_URL}/onemap/search?query=$query&page=$page'),
-    );
-
-    if (response.statusCode == 200) {
-      return OneMapSearch.fromJson(json.decode(response.body));
-    } else {
-      throw Exception('Failed to load search results');
-    }
+    return TransitoApiService().searchPlaces(query, page);
   }
 
   Future<BusStopSearchApiResponse> searchBusStops(String query) async {
@@ -71,17 +60,9 @@ class _SearchDialogState extends State<SearchDialog> {
       ));
     }
 
-    final response = await http.get(
-      Uri.parse('${Secret.API_URL}/search/bus-stops?query=$query'),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("Services fetched");
-      return BusStopSearchApiResponse.fromJson(json.decode(response.body));
-    } else {
-      debugPrint("Error fetching bus stop search results");
-      throw Exception("Error fetching bus stop search results");
-    }
+    final BusStopSearchApiResponse response = await TransitoApiService().searchBusStops(query);
+    debugPrint("Services fetched");
+    return response;
   }
 
   Future<BusServiceSearchApiResponse> searchBusServices(String query) async {
@@ -93,17 +74,10 @@ class _SearchDialogState extends State<SearchDialog> {
       ));
     }
 
-    final response = await http.get(
-      Uri.parse('${Secret.API_URL}/search/bus-services?query=$query'),
-    );
-
-    if (response.statusCode == 200) {
-      debugPrint("Services fetched");
-      return BusServiceSearchApiResponse.fromJson(json.decode(response.body));
-    } else {
-      debugPrint("Error fetching bus service search results");
-      throw Exception("Error fetching bus service search results");
-    }
+    final BusServiceSearchApiResponse response =
+        await TransitoApiService().searchBusServices(query);
+    debugPrint("Services fetched");
+    return response;
   }
 
   // debounces the search query to prevent spamming the api
