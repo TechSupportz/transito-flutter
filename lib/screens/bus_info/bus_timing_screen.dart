@@ -85,7 +85,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
-    final BusArrivalInfo info = await LtaApiService().getBusArrival(widget.code);
+    final BusArrivalInfo info =
+        await LtaApiService().getBusArrival(widget.code, isBusTimingScreen: true);
     debugPrint("Timing fetched");
     return info;
   }

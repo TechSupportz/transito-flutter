@@ -79,7 +79,6 @@ void main() async {
           create: (context) => AppColors(),
           lazy: false,
         ),
-        ChangeNotifierProvider(create: (context) => CommonProvider()),
         ChangeNotifierProvider(
           create: (context) => CommonProvider()..checkSupportsLiquidGlass(),
           lazy: false,
@@ -147,6 +146,7 @@ class _MyAppState extends State<MyApp> {
             child: MaterialApp(
               title: "Transito",
               supportedLocales: const [Locale('en', 'US')],
+              scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
               localizationsDelegates: const [
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,

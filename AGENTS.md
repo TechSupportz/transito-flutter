@@ -29,6 +29,11 @@ flutter build ios
 
 **IMPORTANT:** Never run Shorebird commands (`shorebird release`, `shorebird patch`). These are always run by the user.
 
+**IMPORTANT:** After editing ANY Dart file, you MUST format it with the line length parameter:
+```bash
+dart format --line-length=100 <file>
+```
+
 ## Code Style Guidelines
 
 ### General
@@ -37,8 +42,6 @@ flutter build ios
 - Prefer single quotes for strings
 - Use `super.key` in widget constructors
 - Explicit types preferred over `var`/`dynamic`
-- **Follow VS Code's formatting** - The project uses VS Code's default Dart formatter with a 100-character line length. When running `dart format` commands ALWAYS specify `--line-length=100`.
-- **Format Command** `dart format --line-length=100 <file>` to match VS Code's output
 
 ### Imports Order
 1. Dart SDK imports (`dart:async`, `dart:convert`, etc.)
@@ -84,6 +87,20 @@ class MyScreen extends StatefulWidget {
 }
 ```
 
+**API Services**: Singleton pattern extending `BaseApiService`
+```dart
+class MyApiService extends BaseApiService {
+  MyApiService._internal();
+  static final MyApiService _instance = MyApiService._internal();
+  factory MyApiService() => _instance;
+}
+```
+
+**Global UI Access**: Use `CommonProvider.scaffoldMessengerKey` to show snackbars from services without a BuildContext:
+```dart
+CommonProvider.scaffoldMessengerKey.currentState?.showSnackBar(...);
+```
+
 ### Error Handling
 - Use `try-catch` for async operations
 - Use `debugPrint()` for debug logging (not `print`)
@@ -98,6 +115,8 @@ class MyScreen extends StatefulWidget {
 
 ## Project Structure
 
+**Note:** This section should be updated whenever new folders or files are added to the project to always reflect the most current state.
+
 ```
 lib/
 ├── main.dart                 # App entry point
@@ -107,11 +126,15 @@ lib/
 │   ├── services/            # Business logic services
 │   └── utils/               # Utility functions
 ├── models/
-│   ├── api/transito/        # API response models
+│   ├── api/
+│   │   ├── lta/             # LTA API response models
+│   │   └── transito/
+│   │       └── onemap/      # OneMap-related models
 │   ├── app/                 # App-level models (colors, settings)
 │   ├── enums/               # Enum definitions
 │   ├── favourites/          # Favourite-related models
-│   └── user/                # User-related models
+│   ├── user/                # User-related models
+│   └── secret.dart          # API keys and secrets
 ├── screens/
 │   ├── auth/                # Authentication screens
 │   ├── bus_info/            # Bus information screens
@@ -150,3 +173,25 @@ lib/
 - Assets located in `assets/` (images, icons, fonts)
 - Supports both phone and tablet layouts (isTablet check in CommonProvider)
 - FVM manages Flutter version (3.35.7) - commands work without `fvm` prefix in this project
+- API exceptions are defined in `lib/global/services/api_exceptions.dart` (`ApiException`, `NetworkException`, `ApiParsingException`)
+
+## Common Patterns
+
+### LTA API Failure Handling
+Use `showLtaMaintenanceWarningSnackbar()` to alert users when LTA API calls fail:
+```dart
+try {
+  final info = await LtaApiService().getBusArrival(busStopCode);
+} catch (error) {
+  showLtaMaintenanceWarningSnackbar();
+  rethrow;
+}
+```
+
+### FutureBuilder Error Display
+Use the `ErrorText` widget for consistent error UI in FutureBuilders:
+```dart
+if (snapshot.hasError) {
+  return const ErrorText();
+}
+```

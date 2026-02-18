@@ -6,6 +6,8 @@ import 'package:native_glass_navbar/liquid_glass_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CommonProvider extends ChangeNotifier {
+  static final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+      GlobalKey<ScaffoldMessengerState>();
   SharedPreferences? prefs;
 
   final bool isTablet =
