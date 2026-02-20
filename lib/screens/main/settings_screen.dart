@@ -556,6 +556,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       debugPrint("<=== ERROR ${snapshot.error} ===>");
                       settingsContentWidget = const ErrorText(
                         enableBackground: true,
+                        icon: Symbols.settings_alert_rounded,
                       );
                       WidgetsBinding.instance.addPostFrameCallback((_) {
                         setState(() {

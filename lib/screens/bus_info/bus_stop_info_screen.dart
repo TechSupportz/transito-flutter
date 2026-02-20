@@ -244,7 +244,10 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           height: 8,
                         ),
                         FutureBuilder(
-                            future: Future.wait([futureCurrOperatingServices, futureServices]),
+                            future: Future.wait([
+                              futureCurrOperatingServices,
+                              futureServices
+                            ]), //FIXME - this should be chnages so that if currently operating services fail to load, it should still show the list of services available at that bus stop. Currently if fetching currently operating services fail, it will not show any services at all, which is not ideal.
                             builder:
                                 (BuildContext context, AsyncSnapshot<List<List<String>>> snapshot) {
                               if (snapshot.hasData) {
@@ -268,7 +271,13 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               } else if (snapshot.hasError) {
                                 // return Text("${snapshot.error}");
                                 debugPrint("<=== ERROR ${snapshot.error} ===>");
-                                return const ErrorText();
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                  child: const ErrorText(
+                                    style: ErrorTextStyle.inline,
+                                    title: "Couldn't load services",
+                                  ),
+                                );
                               } else {
                                 return Center(
                                   child: SkeletonLine(

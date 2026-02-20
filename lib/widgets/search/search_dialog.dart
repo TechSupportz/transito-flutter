@@ -159,6 +159,14 @@ class _SearchDialogState extends State<SearchDialog> {
     }
   }
 
+  Widget searchErrorText() {
+    return const ErrorText(
+      title: 'Search failed',
+      message: 'Try again later',
+      icon: Symbols.search_off_rounded,
+    );
+  }
+
   @override
   void dispose() {
     _textFieldController.dispose();
@@ -441,32 +449,8 @@ class _SearchDialogState extends State<SearchDialog> {
           );
         } else if (snapshot.hasError) {
           debugPrint("<=== ERROR ${snapshot.error} ===>");
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  "⚠️ Something went wrong",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 20,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "Please try again later",
-                  style: TextStyle(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 16,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          );
+          return searchErrorText();
+
         }
 
         return const Center(child: CircularProgressIndicator(strokeWidth: 3));
@@ -534,7 +518,7 @@ class _SearchDialogState extends State<SearchDialog> {
           } else if (snapshot.hasError) {
             // return Text("${snapshot.error}");
             debugPrint("<=== ERROR ${snapshot.error} ===>");
-            return const ErrorText();
+            return searchErrorText();
           }
 
           return const Center(child: CircularProgressIndicator(strokeWidth: 3));
@@ -601,7 +585,7 @@ class _SearchDialogState extends State<SearchDialog> {
         } else if (snapshot.hasError) {
           // return Text("${snapshot.error}");
           debugPrint("<=== ERROR ${snapshot.error} ===>");
-          return const ErrorText();
+          return searchErrorText();
         }
 
         return const Center(child: CircularProgressIndicator(strokeWidth: 3));

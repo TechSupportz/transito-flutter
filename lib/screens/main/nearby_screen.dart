@@ -372,6 +372,8 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                 debugPrint("<=== ERROR ${snapshot.error} ===>");
                 _favouritesListWidget = const ErrorText(
                   enableBackground: true,
+				  icon: Symbols.heart_broken_rounded,
+                  title: "Couldn't load favourites",
                 );
               }
 
@@ -475,6 +477,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                         debugPrint("<=== ERROR ${nearbyBusStopList.error} ===>");
                         _busStopsResultsWidget = const ErrorText(
                           enableBackground: true,
+                          title: "Couldn't load nearby stops",
                         );
                       }
 
@@ -497,10 +500,13 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
               }
 
               if (userSettingsSnapshot.hasError) {
-                // return Text("${snapshot.error}");
                 debugPrint("<=== ERROR ${userSettingsSnapshot.error} ===>");
-                return const ErrorText(
-                  enableBackground: true,
+                return Expanded(
+                  flex: 1,
+                  child: const ErrorText(
+                    enableBackground: true,
+                    icon: Symbols.settings_alert_rounded,
+                  ),
                 );
               }
 

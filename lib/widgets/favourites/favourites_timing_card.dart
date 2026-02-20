@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/lta_api_service.dart';
 import 'package:transito/global/services/settings_service.dart';
@@ -118,7 +119,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                     mainAxisSize: MainAxisSize.max,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 18, bottom: 4),
+                        padding: const EdgeInsets.only(left: 16, top: 12),
                         child: Text(
                           widget.name,
                           overflow: TextOverflow.fade,
@@ -130,6 +131,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                               color: Theme.of(context).colorScheme.onSurfaceVariant),
                         ),
                       ),
+                      SizedBox(height: 4),
                       FutureBuilder(
                           future: futureBusArrivalInfo,
                           builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
@@ -179,15 +181,11 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                             } else if (snapshot.hasError) {
                               // return Text("${snapshot.error}");
                               debugPrint("<=== ERROR ${snapshot.error} ===>");
-                              return Container(
-                                padding: const EdgeInsets.symmetric(vertical: 12),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8),
-                                  child: const ErrorText(),
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+                                child: const ErrorText(
+                                  style: ErrorTextStyle.inline,
+                                  title: "Couldn't load timings",
                                 ),
                               );
                             } else if (snapshot.connectionState == ConnectionState.waiting) {
@@ -221,13 +219,10 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
           } else if (snapshot.hasError) {
             // return Text("${snapshot.error}");
             debugPrint("<=== ERROR ${snapshot.error} ===>");
-            return Container(
-              padding: const EdgeInsets.symmetric(vertical: 12),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const ErrorText(),
+            return const ErrorText(
+              enableBackground: true,
+              style: ErrorTextStyle.inline,
+              icon: Symbols.error_rounded,
             );
           } else {
             return const Center(

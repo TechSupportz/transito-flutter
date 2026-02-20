@@ -429,7 +429,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                             ),
                                           );
                                         } else if (servicesSnapshot.hasError) {
-                                          nonOperationalServicesResults = const ErrorText();
+                                          nonOperationalServicesResults = SizedBox();
                                         }
 
                                         return Skeleton(
@@ -445,7 +445,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                   } else if (busArrivalInfoSnapshot.hasError) {
                     // return Text("${snapshot.error}");
                     debugPrint("<=== ERROR ${busArrivalInfoSnapshot.error} ===>");
-                    arrivalInfoResults = const ErrorText();
+                    arrivalInfoResults = const ErrorText(
+                      title: "Couldn't load timings",
+                    );
                   }
 
                   Animation<double> _animation =
@@ -476,7 +478,9 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
             } else if (snapshot.hasError) {
               // return Text("${snapshot.error}");
               debugPrint("<=== ERROR ${snapshot.error} ===>");
-              return const ErrorText();
+              return const ErrorText(
+                icon: Symbols.error_rounded,
+              );
             } else {
               return const Center();
             }

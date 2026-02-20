@@ -400,7 +400,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                         },
                                       );
                                     } else if (snapshot.hasError) {
-                                      return const ErrorText();
+                                      return const ErrorText(
+                                        title: "Couldn't load routes",
+                                      );
                                     }
 
                                     return Skeleton(
@@ -430,7 +432,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                 ],
               );
             } else if (snapshot.hasError) {
-              child = const ErrorText();
+              child = const ErrorText(
+                title: "Couldn't load service information",
+              );
             }
 
             return AnimatedSwitcher(
