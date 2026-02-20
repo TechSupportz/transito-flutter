@@ -87,7 +87,7 @@ class ErrorText extends StatelessWidget {
             color: textColor,
           ),
         ),
-        if (message != null && message.isNotEmpty) ...[
+        if (message.isNotEmpty) ...[
           SizedBox(height: 2),
           Text(
             message,

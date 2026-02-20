@@ -243,37 +243,82 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                         const SizedBox(
                           height: 8,
                         ),
-                        FutureBuilder(
-                            future: Future.wait([
-                              futureCurrOperatingServices,
-                              futureServices
-                            ]), //FIXME - this should be chnages so that if currently operating services fail to load, it should still show the list of services available at that bus stop. Currently if fetching currently operating services fail, it will not show any services at all, which is not ideal.
-                            builder:
-                                (BuildContext context, AsyncSnapshot<List<List<String>>> snapshot) {
-                              if (snapshot.hasData) {
-                                final currOperatingServices = snapshot.data![0];
-                                final services = snapshot.data![1];
+                        FutureBuilder<List<String>>(
+                            future: futureServices,
+                            builder: (context, servicesSnapshot) {
+                              if (servicesSnapshot.hasData) {
+                                final services = servicesSnapshot.data!;
 
-                                return Wrap(
-                                  spacing: 8,
-                                  runSpacing: 8,
-                                  children:
-                                      services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
-                                          .map(
-                                            (service) => BusServiceChip(
-                                              busServiceNumber: service,
-                                              currentStopCode: widget.code,
-                                              isOperating: currOperatingServices.contains(service),
-                                            ),
+                                return FutureBuilder<List<String>>(
+                                  future: futureCurrOperatingServices,
+                                  builder: (context, operatingSnapshot) {
+                                    if (operatingSnapshot.connectionState ==
+                                        ConnectionState.waiting) {
+                                      return Center(
+                                        child: SkeletonLine(
+                                          style: SkeletonLineStyle(
+                                            height: 50,
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                        ),
+                                      );
+                                    }
+
+                                    // If operating services fail, display all services but show a warning that not all services may be operating
+                                    final currOperatingServices =
+                                        operatingSnapshot.data ?? services;
+
+                                    return Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Wrap(
+                                          spacing: 8,
+                                          runSpacing: 8,
+                                          children:
+                                              services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
+                                                  .map(
+                                                    (service) => BusServiceChip(
+                                                      busServiceNumber: service,
+                                                      currentStopCode: widget.code,
+                                                      isOperating:
+                                                          currOperatingServices.contains(service),
+                                                    ),
+                                                  )
+                                                  .toList(),
+                                        ),
+                                        if (operatingSnapshot.data == null) ...[
+                                          SizedBox(
+                                            height: 8,
+                                          ),
+                                          Row(
+                                            spacing: 4,
+                                            children: [
+                                              AppSymbol(
+                                                Symbols.error_rounded,
+                                                fill: true,
+                                                color: appColors.scheme.error,
+                                                size: 16,
+                                              ),
+                                              Text(
+                                                "Not all services may be operating at the moment",
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontStyle: FontStyle.italic,
+                                                  color: appColors.scheme.error,
+                                                ),
+                                              ),
+                                            ],
                                           )
-                                          .toList(),
+                                        ]
+                                      ],
+                                    );
+                                  },
                                 );
-                              } else if (snapshot.hasError) {
-                                // return Text("${snapshot.error}");
-                                debugPrint("<=== ERROR ${snapshot.error} ===>");
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: const ErrorText(
+                              } else if (servicesSnapshot.hasError) {
+                                debugPrint("<=== ERROR ${servicesSnapshot.error} ===>");
+                                return const Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 4.0),
+                                  child: ErrorText(
                                     style: ErrorTextStyle.inline,
                                     title: "Couldn't load services",
                                   ),
