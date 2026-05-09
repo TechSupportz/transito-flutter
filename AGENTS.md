@@ -18,9 +18,9 @@ flutter pub run build_runner build
 # Linting
 flutter analyze
 
-# Testing (no tests currently exist in this project)
+# Testing (no test/ directory currently exists in this project)
 flutter test
-flutter test test/widget_test.dart  # Run single test file
+flutter test test/widget_test.dart  # Run single test file once tests are added
 
 # Building
 flutter build apk
@@ -128,18 +128,19 @@ lib/
 ├── models/
 │   ├── api/
 │   │   ├── lta/             # LTA API response models
-│   │   └── transito/
-│   │       └── onemap/      # OneMap-related models
+│   │   └── transito/        # Transito backend API models
+│   │       └── onemap/      # OneMap search models
 │   ├── app/                 # App-level models (colors, settings)
 │   ├── enums/               # Enum definitions
 │   ├── favourites/          # Favourite-related models
 │   ├── user/                # User-related models
 │   └── secret.dart          # API keys and secrets
 ├── screens/
+│   ├── navigator_screen.dart # Root adaptive navigation screen
 │   ├── auth/                # Authentication screens
 │   ├── bus_info/            # Bus information screens
 │   ├── favourites/          # Favourites screens
-│   ├── main/                # Main app screens (nearby, settings)
+│   ├── main/                # Main app screens (nearby, MRT map, settings)
 │   ├── onboarding/          # First-time user screens
 │   └── search/              # Search/map screens
 └── widgets/
@@ -157,23 +158,27 @@ lib/
 
 - **State**: `provider`, `ChangeNotifier`
 - **Firebase**: `firebase_core`, `firebase_auth`, `cloud_firestore`
-- **Maps**: `flutter_map`, `latlong2`
+- **Maps**: `flutter_map`, `flutter_map_animations`, `flutter_map_location_marker`, `flutter_map_marker_cluster`, `latlong2`
 - **Network**: `http`
 - **Location**: `geolocator`
 - **Auth**: `google_sign_in`, `sign_in_with_apple`
 - **Serialization**: `json_annotation`, `json_serializable`
-- **UI**: `animations`, `flutter_skeleton_ui`, `material_symbols_icons`
+- **Storage & Settings**: `shared_preferences`, `package_info_plus`
+- **Analytics & Updates**: `posthog_flutter`, `upgrader`
+- **UI**: `animations`, `cupertino_icons`, `flutter_colorpicker`, `flutter_form_builder`, `flutter_skeleton_ui`, `flutter_svg`, `form_builder_validators`, `material_symbols_icons`, `native_glass_navbar`, `photo_view`, `smooth_highlight`
+- **Utilities**: `alphanum_comparator`, `collection`, `google_polyline_algorithm`, `jiffy`, `measure_size`, `url_launcher`
 
 ## Development Notes
 
 - Firebase emulators run on ports 9099 (auth) and 8088 (firestore)
 - Backend API (Node.js/Koa) runs on localhost port 8080
 - Use Shorebird for over-the-air updates (user runs these commands)
-- No automated tests exist yet - add to `test/` directory when needed
+- No `test/` directory exists yet - add tests there when needed
 - Assets located in `assets/` (images, icons, fonts)
 - Supports both phone and tablet layouts (isTablet check in CommonProvider)
 - FVM manages Flutter version (3.35.7) - commands work without `fvm` prefix in this project
 - API exceptions are defined in `lib/global/services/api_exceptions.dart` (`ApiException`, `NetworkException`, `ApiParsingException`)
+- `pubspec.yaml` defines a `dev` script, but agents should still use the user's `transito-dev` alias instead of running it directly
 
 ## Common Patterns
 
