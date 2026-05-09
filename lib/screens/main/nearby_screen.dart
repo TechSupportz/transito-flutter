@@ -372,7 +372,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                 debugPrint("<=== ERROR ${snapshot.error} ===>");
                 _favouritesListWidget = const ErrorText(
                   enableBackground: true,
-				  icon: Symbols.heart_broken_rounded,
+                  icon: Symbols.heart_broken_rounded,
                   title: "Couldn't load favourites",
                 );
               }
@@ -394,6 +394,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
 
   Column nearbyBusStopsGrid() {
     bool isTablet = context.read<CommonProvider>().isTablet;
+    bool supportsLiquidGlass = context.watch<CommonProvider>().supportsLiquidGlass;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -452,22 +453,11 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                             ],
                           );
                         } else {
-                          _busStopsResultsWidget = Center(
-                            child: Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainer,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Center(
-                                  child: Text("No bus stops nearby",
-                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18)),
-                                ),
-                              ),
-                            ),
+                          _busStopsResultsWidget = const ErrorText(
+                            enableBackground: true,
+                            icon: Symbols.bus_map_pin_rounded,
+                            title: "No bus stops nearby",
+                            message: "Try moving to a less ulu place",
                           );
                         }
                       }
@@ -475,9 +465,12 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                       if (nearbyBusStopList.hasError) {
                         // return Text("${snapshot.error}");
                         debugPrint("<=== ERROR ${nearbyBusStopList.error} ===>");
-                        _busStopsResultsWidget = const ErrorText(
-                          enableBackground: true,
-                          title: "Couldn't load nearby stops",
+                        _busStopsResultsWidget = Padding(
+                          padding: EdgeInsets.only(bottom: supportsLiquidGlass ? 80.0 : 0),
+                          child: const ErrorText(
+                            enableBackground: true,
+                            title: "Couldn't load nearby stops",
+                          ),
                         );
                       }
 
