@@ -176,7 +176,7 @@ lib/
 - No `test/` directory exists yet - add tests there when needed
 - Assets located in `assets/` (images, icons, fonts)
 - Supports both phone and tablet layouts (isTablet check in CommonProvider)
-- FVM manages Flutter version (3.35.7) - commands work without `fvm` prefix in this project
+- FVM manages Flutter version (3.41.0) - commands work without `fvm` prefix in this project
 - API exceptions are defined in `lib/global/services/api_exceptions.dart` (`ApiException`, `NetworkException`, `ApiParsingException`)
 - `pubspec.yaml` defines a `dev` script, but agents should still use the user's `transito-dev` alias instead of running it directly
 

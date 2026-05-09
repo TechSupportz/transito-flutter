@@ -6,7 +6,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 4.3.1+46
 
 environment:
-    sdk: ">=3.1.0 <4.0.0"
+    sdk: ">=3.10.0 <4.0.0"
 
 scripts:
     dev: firebase emulators:start; flutter run
@@ -17,56 +17,56 @@ dependencies:
     flutter_localizations:
         sdk: flutter
 
-    cupertino_icons: ^1.0.2
-    jiffy: ^6.2.1
-    latlong2: ^0.9.0
-    geolocator: ^14.0.0
-    provider: ^6.0.3
-    json_annotation: ^4.8.1
-    http: ^1.1.0
-    alphanum_comparator: ^2.0.1
+    cupertino_icons: ^1.0.9
+    jiffy: ^6.4.4
+    latlong2: ^0.9.1
+    geolocator: ^14.0.1
+    provider: ^6.1.5+1
+    json_annotation: ^4.11.0
+    http: ^1.6.0
+    alphanum_comparator: ^2.0.3
     photo_view: ^0.15.0
-    flutter_svg: ^2.0.7
+    flutter_svg: ^2.3.0
     parent_child_checkbox:
         git:
             url: https://github.com/TechSupportz/parent-child-checkbox
     is_first_run: ^1.0.0
-    flutter_form_builder: ^10.0.1
-    form_builder_validators: ^11.0.0
+    flutter_form_builder: ^10.3.0+2
+    form_builder_validators: ^11.3.0
     android_intent_plus: ^6.0.0
-    url_launcher: ^6.1.5
-    firebase_core: ^4.1.1
-    firebase_auth: ^6.1.0
-    cloud_firestore: ^6.0.2
+    url_launcher: ^6.3.2
+    firebase_core: ^4.7.0
+    firebase_auth: ^6.4.0
+    cloud_firestore: ^6.3.0
     google_sign_in: ^7.2.0
-    sign_in_with_apple: ^7.0.1
-    flutter_map: ^8.2.0
-    flutter_native_splash: ^2.4.6
-    package_info_plus: ^8.0.2
-    upgrader: ^12.1.0
-    shared_preferences: ^2.2.2
-    posthog_flutter: ^5.0.0
-    measure_size: ^4.0.0
+    sign_in_with_apple: ^8.0.0
+    flutter_map: ^8.3.0
+    flutter_native_splash: ^2.4.7
+    package_info_plus: ^10.1.0
+    upgrader: ^13.2.0
+    shared_preferences: ^2.5.5
+    posthog_flutter: ^5.24.2
+    measure_size: ^5.0.2
     flutter_skeleton_ui: ^0.0.6
-    collection: ^1.18.0
-    smooth_highlight: ^0.1.1
+    collection: ^1.19.1
+    smooth_highlight: ^0.1.2
     flutter_colorpicker: ^1.1.0
-    animations: ^2.0.11
+    animations: ^2.2.0
     google_polyline_algorithm: ^3.1.0
-    flutter_map_animations: ^0.9.0
-    flutter_map_location_marker: ^10.1.0
+    flutter_map_animations: ^0.10.0
+    flutter_map_location_marker: ^10.2.0
     flutter_map_marker_cluster:
         git:
             url: "https://github.com/matteomrz/flutter_map_marker_cluster"
     material_symbols_icons: ^4.2928.1
-    native_glass_navbar: ^1.0.1
+    native_glass_navbar: ^1.0.2
 dev_dependencies:
     flutter_test:
         sdk: flutter
 
     flutter_lints: ^6.0.0
-    json_serializable: ^6.7.1
-    build_runner: ^2.1.11
+    json_serializable: ^6.13.2
+    build_runner: ^2.15.0
 
 flutter_native_splash:
     ios: true

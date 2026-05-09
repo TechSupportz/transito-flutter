@@ -33,9 +33,7 @@ void main() async {
 
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   bool isFirstRun = await IsFirstRun.isFirstRun();
   LocationPermission permission = await Geolocator.checkPermission();
   if (!isFirstRun && permission == LocationPermission.always ||
@@ -55,15 +53,12 @@ void main() async {
   }
 
   // load all svg assets
-  final manifestJson = await rootBundle.loadString('AssetManifest.json');
-  List svgsPaths = (json
-              .decode(manifestJson)
-              .keys
-              .where((String key) => key.startsWith('assets/images/') && key.endsWith('.svg'))
-          as Iterable)
-      .toList();
+  final assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
+  final svgsPaths = assetManifest.listAssets().where(
+    (String key) => key.startsWith('assets/images/') && key.endsWith('.svg'),
+  );
 
-  for (var svgPath in svgsPaths as List<String>) {
+  for (var svgPath in svgsPaths) {
     var loader = SvgAssetLoader(svgPath);
     await svg.cache.putIfAbsent(loader.cacheKey(null), () => loader.loadBytes(null));
   }
@@ -71,14 +66,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        StreamProvider<User?>.value(
-          value: FirebaseAuth.instance.userChanges(),
-          initialData: null,
-        ),
-        ChangeNotifierProvider(
-          create: (context) => AppColors(),
-          lazy: false,
-        ),
+        StreamProvider<User?>.value(value: FirebaseAuth.instance.userChanges(), initialData: null),
+        ChangeNotifierProvider(create: (context) => AppColors(), lazy: false),
         ChangeNotifierProvider(
           create: (context) => CommonProvider()..checkSupportsLiquidGlass(),
           lazy: false,
@@ -115,8 +104,8 @@ class _MyAppState extends State<MyApp> {
       Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
           ? Brightness.dark
           : userSettings.themeMode == AppThemeMode.LIGHT
-              ? Brightness.light
-              : MediaQuery.platformBrightnessOf(context);
+          ? Brightness.light
+          : MediaQuery.platformBrightnessOf(context);
       Color seedColor = Color(int.parse(userSettings.accentColour));
 
       if (seedColor != appColors.accentColour || brightness != appColors.brightness) {
@@ -125,116 +114,110 @@ class _MyAppState extends State<MyApp> {
     });
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      systemNavigationBarColor: Theme.of(context).colorScheme.primary.withAlpha(0),
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        systemNavigationBarColor: Theme.of(context).colorScheme.primary.withAlpha(0),
+      ),
+    );
 
     return StreamBuilder<UserSettings>(
-        stream: SettingsService().streamSettings(user?.uid),
-        builder: (context, snapshot) {
-          return SkeletonTheme(
-            darkShimmerGradient: LinearGradient(colors: [
+      stream: SettingsService().streamSettings(user?.uid),
+      builder: (context, snapshot) {
+        return SkeletonTheme(
+          darkShimmerGradient: LinearGradient(
+            colors: [
               appColors.scheme.surfaceContainerLow,
               appColors.scheme.surfaceContainerHigh,
               appColors.scheme.surfaceContainerLow,
-            ]),
-            shimmerGradient: LinearGradient(colors: [
+            ],
+          ),
+          shimmerGradient: LinearGradient(
+            colors: [
               appColors.scheme.surfaceContainerLow,
               appColors.scheme.surfaceContainerHigh,
               appColors.scheme.surfaceContainerLow,
-            ]),
-            child: MaterialApp(
-              title: "Transito",
-              supportedLocales: const [Locale('en', 'US')],
-              scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
-              localizationsDelegates: const [
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                FormBuilderLocalizations.delegate,
-              ],
-              navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
-              theme: ThemeData(
-                fontFamily: 'Poppins',
-                colorScheme: appColors.scheme,
-                splashFactory: InkSparkle.splashFactory,
-                tooltipTheme: TooltipThemeData(
-                  textStyle: TextStyle(
-                    color: appColors.scheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  decoration: BoxDecoration(
-                    color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+            ],
+          ),
+          child: MaterialApp(
+            title: "Transito",
+            supportedLocales: const [Locale('en', 'US')],
+            scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              FormBuilderLocalizations.delegate,
+            ],
+            navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
+            theme: ThemeData(
+              fontFamily: 'Poppins',
+              colorScheme: appColors.scheme,
+              splashFactory: InkSparkle.splashFactory,
+              tooltipTheme: TooltipThemeData(
+                textStyle: TextStyle(
+                  color: appColors.scheme.onSurface,
+                  fontWeight: FontWeight.w500,
                 ),
-                appBarTheme: AppBarTheme(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ), //NOTE - This is a workaround to make tint elevation animate.
-                  shadowColor: appColors.scheme.shadow,
-                  toolbarHeight: 64,
-                ),
-                checkboxTheme: CheckboxThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ),
-                dialogTheme: DialogThemeData(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  titleTextStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: appColors.scheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 24,
-                  ),
-                ),
-                snackBarTheme: SnackBarThemeData(
-                  //FIXME - Animation is non-existant
-                  backgroundColor: appColors.scheme.surfaceContainerHighest,
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  contentTextStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: appColors.scheme.onSurface,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                inputDecorationTheme: InputDecorationTheme(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(
-                      width: 1.75,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  floatingLabelStyle: TextStyle(
-                    fontWeight: FontWeight.w600,
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  filled: true,
+                decoration: BoxDecoration(
+                  color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
-              builder: (context, child) {
-                return MediaQuery(
-                  data: MediaQuery.of(context).copyWith(
-                      textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling),
-                  child: SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: child!,
-                  ),
-                );
-              },
+              appBarTheme: AppBarTheme(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ), //NOTE - This is a workaround to make tint elevation animate.
+                shadowColor: appColors.scheme.shadow,
+                toolbarHeight: 64,
+              ),
+              checkboxTheme: CheckboxThemeData(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+              ),
+              dialogTheme: DialogThemeData(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+                titleTextStyle: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: appColors.scheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 24,
+                ),
+              ),
+              snackBarTheme: SnackBarThemeData(
+                //FIXME - Animation is non-existant
+                backgroundColor: appColors.scheme.surfaceContainerHighest,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                contentTextStyle: TextStyle(
+                  fontFamily: 'Poppins',
+                  color: appColors.scheme.onSurface,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              inputDecorationTheme: InputDecorationTheme(
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(width: 1.75),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+                floatingLabelStyle: TextStyle(fontWeight: FontWeight.w600),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                filled: true,
+              ),
             ),
-          );
-        });
+            home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
+            builder: (context, child) {
+              return MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
+                ),
+                child: SafeArea(top: false, bottom: false, child: child!),
+              );
+            },
+          ),
+        );
+      },
+    );
   }
 }
