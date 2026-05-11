@@ -215,7 +215,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
     futureServices = fetchServices();
     timer = Timer.periodic(
-        const Duration(seconds: 30),
+        const Duration(seconds: 20),
         (Timer t) => setState(
               () {
                 futureBusArrivalInfo =

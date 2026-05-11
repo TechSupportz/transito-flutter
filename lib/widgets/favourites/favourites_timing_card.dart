@@ -64,7 +64,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     super.initState();
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => filterBusArrivalInfo(value));
     timer = Timer.periodic(
-      const Duration(seconds: 30),
+      const Duration(seconds: 20),
       (Timer t) => setState(() {
         futureBusArrivalInfo = fetchArrivalTimings().then((value) => filterBusArrivalInfo(value));
       }),
