@@ -87,6 +87,7 @@ flutter:
     assets:
         - assets/
         - assets/images/
+        - assets/images/mrt_maps/
         - assets/icons/
         - assets/icons/ui/
         - shorebird.yaml
