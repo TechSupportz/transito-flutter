@@ -19,28 +19,19 @@ class AppColors with ChangeNotifier {
 
   // Method to update dynamic colors
   void updateLocalAccentColour(Color newColor) {
-    _scheme = ColorScheme.fromSeed(
-      seedColor: _accentColour,
-      brightness: _brightness,
-    );
+    _scheme = ColorScheme.fromSeed(seedColor: _accentColour, brightness: _brightness);
     _accentColour = newColor;
     notifyListeners();
   }
 
   void updateLocalBrightness(Brightness newBrightness) {
-    _scheme = ColorScheme.fromSeed(
-      seedColor: _accentColour,
-      brightness: _brightness,
-    );
+    _scheme = ColorScheme.fromSeed(seedColor: _accentColour, brightness: _brightness);
     _brightness = newBrightness;
     notifyListeners();
   }
 
   void updateLocalColorScheme(Color newAccentColour, Brightness newBrightness) {
-    _scheme = ColorScheme.fromSeed(
-      seedColor: newAccentColour,
-      brightness: newBrightness,
-    );
+    _scheme = ColorScheme.fromSeed(seedColor: newAccentColour, brightness: newBrightness);
     _accentColour = newAccentColour;
     _brightness = newBrightness;
     notifyListeners();
@@ -58,6 +49,7 @@ class AppColors with ChangeNotifier {
   static const Color SMRT = Color(0xFFE23C46);
   static const Color TTS = Color(0xFF47A854);
   static const Color GAS = Color(0xFFF6C322);
+  static const Color NUS = Color(0xFF003D7C);
 
   // Instance method for operator colors, as it depends on the instance's scheme for the default case
   (Color, Color) getOperatorColor(BusOperator operator) {
@@ -70,6 +62,8 @@ class AppColors with ChangeNotifier {
         return (AppColors.TTS, Colors.black); // Accessing static getter
       case BusOperator.GAS:
         return (AppColors.GAS, Colors.black); // Accessing static getter
+      case BusOperator.NUS:
+        return (AppColors.NUS, Colors.white); // Accessing static getter
       default:
         // Accessing instance's scheme
         return (_scheme.primary, _scheme.onPrimary);

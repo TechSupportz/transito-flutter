@@ -12,11 +12,7 @@ class BusArrivalInfo {
   String busStopCode;
   List<ServiceInfo> services;
 
-  BusArrivalInfo({
-    required this.metadata,
-    required this.busStopCode,
-    required this.services,
-  });
+  BusArrivalInfo({required this.metadata, required this.busStopCode, required this.services});
 
   factory BusArrivalInfo.fromJson(Map<String, dynamic> json) => _$BusArrivalInfoFromJson(json);
 }
@@ -43,6 +39,8 @@ class ServiceInfo {
         return BusOperator.TTS;
       case "GAS":
         return BusOperator.GAS;
+      case "NUS":
+        return BusOperator.NUS;
       default:
         return BusOperator.NA;
     }

@@ -2,6 +2,21 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'bus_stops.g.dart';
 
+@JsonSerializable()
+class BusStopProviderSources {
+  @JsonKey(name: 'LTA')
+  String? lta;
+
+  @JsonKey(name: 'NUS')
+  String? nus;
+
+  BusStopProviderSources({this.lta, this.nus});
+
+  factory BusStopProviderSources.fromJson(Map<String, dynamic> json) =>
+      _$BusStopProviderSourcesFromJson(json);
+  Map<String, dynamic> toJson() => _$BusStopProviderSourcesToJson(this);
+}
+
 @JsonSerializable(explicitToJson: true)
 class BusStop {
   String code;
@@ -11,6 +26,7 @@ class BusStop {
   double latitude;
   double longitude;
   List<String>? services;
+  BusStopProviderSources? sources;
 
   BusStop({
     required this.code,
@@ -19,6 +35,7 @@ class BusStop {
     required this.latitude,
     required this.longitude,
     required this.services,
+    this.sources,
   });
 
   factory BusStop.fromJson(Map<String, dynamic> json) => _$BusStopFromJson(json);
@@ -31,11 +48,7 @@ class BusStopSearchApiResponse {
   int count;
   List<BusStop> data;
 
-  BusStopSearchApiResponse({
-    required this.message,
-    required this.count,
-    required this.data,
-  });
+  BusStopSearchApiResponse({required this.message, required this.count, required this.data});
 
   factory BusStopSearchApiResponse.fromJson(Map<String, dynamic> json) =>
       _$BusStopSearchApiResponseFromJson(json);

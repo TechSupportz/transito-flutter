@@ -4,6 +4,7 @@ enum BusOperator {
   SBST, // SBS Transit
   SMRT, // SMRT Corporation
   TTS, // Tower Transit Singapore
-  GAS,
-  NA // Go Ahead Singapore
+  GAS, // Go Ahead Singapore
+  NUS, // National University of Singapore
+  NA,
 }
