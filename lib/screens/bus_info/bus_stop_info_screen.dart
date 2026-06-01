@@ -8,10 +8,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
+import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/favourites_service.dart';
-import 'package:transito/global/services/lta_api_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
@@ -30,6 +31,7 @@ class BusStopInfoScreen extends StatefulWidget {
     required this.name,
     required this.address,
     required this.busStopLocation,
+    required this.sources,
     this.services,
   });
 
@@ -37,6 +39,7 @@ class BusStopInfoScreen extends StatefulWidget {
   final String name;
   final String address;
   final LatLng busStopLocation;
+  final BusStopProviderSources? sources;
   final List<String>? services;
 
   @override
@@ -65,7 +68,10 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   // function to fetch currently operating services bus arrival info
   Future<List<String>> fetchCurrOperatingServices() async {
     debugPrint("Fetching currently operating services");
-    final BusArrivalInfo busArrivalInfo = await LtaApiService().getBusArrival(widget.code);
+    final BusArrivalInfo busArrivalInfo = await BusArrivalService().getBusArrival(
+      widget.code,
+      sources: widget.sources,
+    );
     debugPrint("Currently operating services fetched");
     return busArrivalInfo.services.map((e) => e.serviceNum).toList();
   }
@@ -91,6 +97,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           name: widget.name,
           address: widget.address,
           busStopLocation: widget.busStopLocation,
+          sources: widget.sources,
         ),
         settings: const RouteSettings(name: 'BusTimingScreen'),
       ),

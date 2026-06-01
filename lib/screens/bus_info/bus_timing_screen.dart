@@ -10,12 +10,13 @@ import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/favourites_service.dart';
-import 'package:transito/global/services/lta_api_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/global/utils/scroll_to_content.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
@@ -35,6 +36,7 @@ class BusTimingScreen extends StatefulWidget {
     required this.name,
     required this.address,
     required this.busStopLocation,
+    required this.sources,
     this.services,
   });
 
@@ -43,6 +45,7 @@ class BusTimingScreen extends StatefulWidget {
   final String address;
   final List<String>? services;
   final LatLng busStopLocation;
+  final BusStopProviderSources? sources;
 
   @override
   State<BusTimingScreen> createState() => _BusTimingScreenState();
@@ -85,8 +88,11 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching arrival timings");
-    final BusArrivalInfo info =
-        await LtaApiService().getBusArrival(widget.code, isBusTimingScreen: true);
+    final BusArrivalInfo info = await BusArrivalService().getBusArrival(
+      widget.code,
+      sources: widget.sources,
+      isBusTimingScreen: true,
+    );
     debugPrint("Timing fetched");
     return info;
   }
@@ -183,6 +189,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
           address: widget.address,
           busStopLocation: widget.busStopLocation,
           services: services,
+          sources: widget.sources,
         ),
         settings: const RouteSettings(name: 'BusStopInfoScreen'),
       ),

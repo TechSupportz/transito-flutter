@@ -18,11 +18,11 @@ class LtaApiService extends BaseApiService {
   static const _debounceDuration = Duration(minutes: 1);
 
   Map<String, String> get _headers => {
-        'Accept': 'application/json',
-        'AccountKey': Secret.LTA_API_KEY,
-      };
+    'Accept': 'application/json',
+    'AccountKey': Secret.LTA_API_KEY,
+  };
 
-  Future<BusArrivalInfo> getBusArrival(
+  Future<BusArrivalInfo> getLTABusArrival(
     String busStopCode, {
     bool? isBusTimingScreen = false,
   }) async {

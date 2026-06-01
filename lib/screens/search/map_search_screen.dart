@@ -114,6 +114,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
           busStopCode: code,
           busStopName: busStopInfo.name,
           busStopAddress: busStopInfo.roadName,
+          sources: busStopInfo.sources,
           busStopLocation: LatLng(
             busStopInfo.latitude,
             busStopInfo.longitude,
@@ -134,6 +135,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     required String busStopCode,
     required String busStopName,
     required String busStopAddress,
+    BusStopProviderSources? sources,
     required LatLng busStopLocation,
     bool isFavourite = false,
   }) {
@@ -152,6 +154,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                 name: busStopName,
                 address: busStopAddress,
                 busStopLocation: busStopLocation,
+                sources: sources,
               ),
             ),
           );

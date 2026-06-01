@@ -35,6 +35,7 @@ class BusStopCard extends StatelessWidget {
     String name,
     String address,
     List<String>? services,
+    BusStopProviderSources? sources,
     LatLng busStopLocation,
   ) {
     Navigator.push(
@@ -45,6 +46,7 @@ class BusStopCard extends StatelessWidget {
           name: name,
           address: address,
           services: services,
+          sources: sources,
           busStopLocation: busStopLocation,
         ),
         settings: const RouteSettings(name: 'BusTimingScreen'),
@@ -58,6 +60,7 @@ class BusStopCard extends StatelessWidget {
     String name,
     String address,
     List<String>? services,
+    BusStopProviderSources? sources,
     LatLng busStopLocation,
   ) {
     Navigator.push(
@@ -68,6 +71,7 @@ class BusStopCard extends StatelessWidget {
           name: name,
           address: address,
           services: services,
+          sources: sources,
           busStopLocation: busStopLocation,
         ),
         settings: const RouteSettings(name: 'BusStopInfoScreen'),
@@ -102,6 +106,7 @@ class BusStopCard extends StatelessWidget {
                 busStopInfo.name,
                 busStopInfo.roadName,
                 busStopInfo.services,
+                busStopInfo.sources,
                 LatLng(busStopInfo.latitude, busStopInfo.longitude),
               );
             } else {
@@ -111,6 +116,7 @@ class BusStopCard extends StatelessWidget {
                 busStopInfo.name,
                 busStopInfo.roadName,
                 busStopInfo.services,
+                busStopInfo.sources,
                 LatLng(busStopInfo.latitude, busStopInfo.longitude),
               );
             }

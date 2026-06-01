@@ -1,5 +1,6 @@
 import 'package:latlong2/latlong.dart';
 import 'package:transito/global/services/base_api_service.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
@@ -66,5 +67,12 @@ class TransitoApiService extends BaseApiService {
     final response = await get(uri);
     final Map<String, dynamic> data = decodeJson(response.body, uri);
     return BusServiceDetailsApiResponse.fromJson(data).data.routes!;
+  }
+
+  Future<BusArrivalInfo> getNUSBusArrival(String busStopCode) async {
+    final Uri uri = Uri.parse('$_baseUrl/bus-arrivals/nus/${Uri.encodeComponent(busStopCode)}');
+    final response = await get(uri);
+    final Map<String, dynamic> data = decodeJson(response.body, uri);
+    return BusArrivalInfo.fromJson(data);
   }
 }

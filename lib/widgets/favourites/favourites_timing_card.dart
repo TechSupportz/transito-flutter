@@ -43,7 +43,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching favourite arrival timings");
-    final BusArrivalInfo info = await LtaApiService().getBusArrival(widget.code);
+    final BusArrivalInfo info = await LtaApiService().getLTABusArrival(widget.code);
     debugPrint("Favourites Timing fetched");
     return info;
   }
@@ -51,8 +51,9 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   // function to properly sort the bus arrival info according to the Bus Service number and to filter it based on users favourite services
   List<ServiceInfo> filterBusArrivalInfo(BusArrivalInfo value) {
     var _value = value;
-    var filteredList =
-        _value.services.where((value) => widget.services.contains(value.serviceNum)).toList();
+    var filteredList = _value.services
+        .where((value) => widget.services.contains(value.serviceNum))
+        .toList();
     filteredList.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
 
     return filteredList;
@@ -82,155 +83,148 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     User? user = context.watch<User?>();
 
     return StreamBuilder(
-        stream: SettingsService().streamSettings(user?.uid),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            UserSettings userSettings = snapshot.data as UserSettings;
-            return Tooltip(
-              preferBelow: false,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surfaceContainer,
-              ),
-              textStyle: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-              ),
-              showDuration: const Duration(milliseconds: 350),
-              message: widget.name,
-              child: GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BusTimingScreen(
-                            code: widget.code,
-                            name: widget.name,
-                            address: widget.address,
-                            busStopLocation: widget.busStopLocation,
-                          ),
-                      settings: const RouteSettings(name: "BusTimingScreen")),
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surfaceContainer,
-                    borderRadius: BorderRadius.circular(12),
+      stream: SettingsService().streamSettings(user?.uid),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          UserSettings userSettings = snapshot.data as UserSettings;
+          return Tooltip(
+            preferBelow: false,
+            decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
+            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            showDuration: const Duration(milliseconds: 350),
+            message: widget.name,
+            child: GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BusTimingScreen(
+                    code: widget.code,
+                    name: widget.name,
+                    address: widget.address,
+                    busStopLocation: widget.busStopLocation,
+                    sources: null,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(left: 16, top: 12),
-                        child: Text(
-                          widget.name,
-                          overflow: TextOverflow.fade,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w600,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  settings: const RouteSettings(name: "BusTimingScreen"),
+                ),
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 16, top: 12),
+                      child: Text(
+                        widget.name,
+                        overflow: TextOverflow.fade,
+                        maxLines: 1,
+                        softWrap: false,
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
-                      SizedBox(height: 4),
-                      FutureBuilder(
-                          future: futureBusArrivalInfo,
-                          builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
-                            if (snapshot.hasData) {
-                              return snapshot.data!.isNotEmpty
-                                  ? ListView.separated(
-                                      itemBuilder: (context, int index) {
-                                        return Transform.scale(
-                                          scale: 0.9,
-                                          child: BusTimingRow(
-                                            busStopCode: widget.code,
-                                            serviceInfo: snapshot.data![index],
-                                            userLatLng: widget.busStopLocation,
-                                            isETAminutes: userSettings.isETAminutes,
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder: (BuildContext context, int index) =>
-                                          const SizedBox(
-                                        height: 6,
-                                      ),
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      padding: const EdgeInsets.only(bottom: 18),
-                                      shrinkWrap: true,
-                                      itemCount: snapshot.data!.length,
-                                    )
-                                  : Center(
-                                      child: Padding(
-                                        padding: const EdgeInsets.only(
-                                          top: 16,
-                                          bottom: 24,
-                                          left: 16,
-                                          right: 16,
-                                        ),
-                                        child: Text(
-                                          Jiffy.now().hour > 5
-                                              ? '🦥 Your favourites are lepaking 🦥'
-                                              : "💤 Buses are sleeping 💤",
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          textAlign: TextAlign.center,
-                                        ),
+                    ),
+                    SizedBox(height: 4),
+                    FutureBuilder(
+                      future: futureBusArrivalInfo,
+                      builder: (context, AsyncSnapshot<List<ServiceInfo>> snapshot) {
+                        if (snapshot.hasData) {
+                          return snapshot.data!.isNotEmpty
+                              ? ListView.separated(
+                                  itemBuilder: (context, int index) {
+                                    return Transform.scale(
+                                      scale: 0.9,
+                                      child: BusTimingRow(
+                                        busStopCode: widget.code,
+                                        serviceInfo: snapshot.data![index],
+                                        userLatLng: widget.busStopLocation,
+                                        isETAminutes: userSettings.isETAminutes,
                                       ),
                                     );
-                            } else if (snapshot.hasError) {
-                              // return Text("${snapshot.error}");
-                              debugPrint("<=== ERROR ${snapshot.error} ===>");
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
-                                child: const ErrorText(
-                                  style: ErrorTextStyle.inline,
-                                  title: "Couldn't load timings",
-                                ),
-                              );
-                            } else if (snapshot.connectionState == ConnectionState.waiting) {
-                              return ListView.separated(
-                                  itemBuilder: (context, index) => const SkeletonItem(
-                                        child: SkeletonLine(
-                                          style: SkeletonLineStyle(
-                                              height: 55,
-                                              borderRadius: BorderRadius.all(Radius.circular(10)),
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 12, vertical: 1.5)),
-                                        ),
-                                      ),
+                                  },
                                   separatorBuilder: (BuildContext context, int index) =>
-                                      const SizedBox(
-                                        height: 12,
-                                      ),
+                                      const SizedBox(height: 6),
                                   physics: const NeverScrollableScrollPhysics(),
                                   padding: const EdgeInsets.only(bottom: 18),
                                   shrinkWrap: true,
-                                  itemCount: widget.services.length);
-                            } else {
-                              return const SizedBox(height: 10);
-                            }
-                          }),
-                    ],
-                  ),
+                                  itemCount: snapshot.data!.length,
+                                )
+                              : Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 16,
+                                      bottom: 24,
+                                      left: 16,
+                                      right: 16,
+                                    ),
+                                    child: Text(
+                                      Jiffy.now().hour > 5
+                                          ? '🦥 Your favourites are lepaking 🦥'
+                                          : "💤 Buses are sleeping 💤",
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                );
+                        } else if (snapshot.hasError) {
+                          // return Text("${snapshot.error}");
+                          debugPrint("<=== ERROR ${snapshot.error} ===>");
+                          return Padding(
+                            padding: const EdgeInsets.only(top: 8.0, bottom: 24.0),
+                            child: const ErrorText(
+                              style: ErrorTextStyle.inline,
+                              title: "Couldn't load timings",
+                            ),
+                          );
+                        } else if (snapshot.connectionState == ConnectionState.waiting) {
+                          return ListView.separated(
+                            itemBuilder: (context, index) => const SkeletonItem(
+                              child: SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 55,
+                                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1.5),
+                                ),
+                              ),
+                            ),
+                            separatorBuilder: (BuildContext context, int index) =>
+                                const SizedBox(height: 12),
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: const EdgeInsets.only(bottom: 18),
+                            shrinkWrap: true,
+                            itemCount: widget.services.length,
+                          );
+                        } else {
+                          return const SizedBox(height: 10);
+                        }
+                      },
+                    ),
+                  ],
                 ),
               ),
-            );
-          } else if (snapshot.hasError) {
-            // return Text("${snapshot.error}");
-            debugPrint("<=== ERROR ${snapshot.error} ===>");
-            return const ErrorText(
-              enableBackground: true,
-              style: ErrorTextStyle.inline,
-              icon: Symbols.error_rounded,
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(
-                strokeWidth: 3,
-              ),
-            );
-          }
-        });
+            ),
+          );
+        } else if (snapshot.hasError) {
+          // return Text("${snapshot.error}");
+          debugPrint("<=== ERROR ${snapshot.error} ===>");
+          return const ErrorText(
+            enableBackground: true,
+            style: ErrorTextStyle.inline,
+            icon: Symbols.error_rounded,
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+        }
+      },
+    );
   }
 }
