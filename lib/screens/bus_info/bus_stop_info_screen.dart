@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -73,7 +74,26 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
       sources: widget.sources,
     );
     debugPrint("Currently operating services fetched");
-    return busArrivalInfo.services.map((e) => e.serviceNum).toList();
+    return busArrivalInfo.services
+        .where((serviceInfo) => isCurrentlyOperating(serviceInfo.nextBus.estimatedArrival))
+        .map((e) => e.serviceNum)
+        .toList();
+  }
+
+  bool isCurrentlyOperating(String? arrivalTime) {
+    if (arrivalTime == null || arrivalTime == '') {
+      return false;
+    }
+
+    final num minutesToArrival = Jiffy.parse(arrivalTime.split("+")[0])
+        .diff(
+          Jiffy.now(),
+          unit: Unit.minute,
+          asFloat: false,
+        )
+        .floor();
+
+    return minutesToArrival <= 99;
   }
 
   Future<void> openMaps(LatLng navigationLocation) async {

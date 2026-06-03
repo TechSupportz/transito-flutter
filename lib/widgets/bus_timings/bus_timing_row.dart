@@ -53,6 +53,8 @@ class _BusTimingRowState extends State<BusTimingRow> {
           return "left";
         } else if (minutesToArrival <= 1) {
           return "arr";
+        } else if (minutesToArrival > 99) {
+          return '${minutesToArrival ~/ 60}h';
         } else {
           return minutesToArrival.toString();
         }
