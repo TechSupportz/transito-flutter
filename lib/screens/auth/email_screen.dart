@@ -390,11 +390,14 @@ class _EmailScreenState extends State<EmailScreen> {
               ),
               duration: const Duration(milliseconds: 125),
               child: _isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 16,
                       width: 16,
                       child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     )
                   : const Text('Register'),
@@ -463,11 +466,14 @@ class _EmailScreenState extends State<EmailScreen> {
               ),
               duration: const Duration(milliseconds: 175),
               child: _isLoading
-                  ? const SizedBox(
+                  ? SizedBox(
                       height: 16,
                       width: 16,
                       child: Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     )
                   : const Text('Login'),
