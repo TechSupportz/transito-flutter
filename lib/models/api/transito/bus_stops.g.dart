@@ -10,7 +10,7 @@ BusStopProviderSources _$BusStopProviderSourcesFromJson(Map<String, dynamic> jso
     BusStopProviderSources(lta: json['LTA'] as String?, nus: json['NUS'] as String?);
 
 Map<String, dynamic> _$BusStopProviderSourcesToJson(BusStopProviderSources instance) =>
-    <String, dynamic>{'LTA': instance.lta, 'NUS': instance.nus};
+    <String, dynamic>{'LTA': ?instance.lta, 'NUS': ?instance.nus};
 
 BusStop _$BusStopFromJson(Map<String, dynamic> json) => BusStop(
   code: json['code'] as String,
@@ -41,4 +41,10 @@ BusStopSearchApiResponse _$BusStopSearchApiResponseFromJson(Map<String, dynamic>
       data: (json['data'] as List<dynamic>)
           .map((e) => BusStop.fromJson(e as Map<String, dynamic>))
           .toList(),
+    );
+
+BusStopDetailsApiResponse _$BusStopDetailsApiResponseFromJson(Map<String, dynamic> json) =>
+    BusStopDetailsApiResponse(
+      message: json['message'] as String,
+      data: BusStop.fromJson(json['data'] as Map<String, dynamic>),
     );

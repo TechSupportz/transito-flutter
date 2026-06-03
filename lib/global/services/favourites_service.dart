@@ -58,17 +58,29 @@ class FavouritesService {
   }
 
   Future<void> removeFavourite(Favourite favourite, String userId) {
-    return _favouritesCollection
-        .doc(userId)
-        .update({
-          'favouritesList': FieldValue.arrayRemove([favourite.toJson()])
-        })
-        .then(
-          (_) => debugPrint('✔️ Removed ${favourite.busStopCode} from favourites'),
-        )
-        .catchError(
-          (error) => debugPrint('❌ Error removing favourite from Firestore: $error'),
-        );
+    return removeFavouriteByBusStopCode(favourite.busStopCode, userId);
+  }
+
+  Future<void> removeFavouriteByBusStopCode(String busStopCode, String userId) async {
+    _favouritesCollection.doc(userId).get().then(
+      (snapshot) {
+        if (snapshot.exists) {
+          List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
+          favouritesList.removeWhere((element) => element.busStopCode == busStopCode);
+
+          _favouritesCollection
+              .doc(userId)
+              .update(
+                  {'favouritesList': favouritesList.map((element) => element.toJson()).toList()})
+              .then(
+                (_) => debugPrint('✔️ Removed $busStopCode from favourites'),
+              )
+              .catchError(
+                (error) => debugPrint('❌ Error removing favourite from Firestore: $error'),
+              );
+        }
+      },
+    );
   }
 
   Future<void> reorderFavourites(List<Favourite> favourites, String userId) async {
@@ -93,8 +105,15 @@ class FavouritesService {
       (snapshot) {
         if (snapshot.exists) {
           List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
-          favouritesList[favouritesList
-              .indexWhere((element) => element.busStopCode == favourite.busStopCode)] = favourite;
+          final int favouriteIndex =
+              favouritesList.indexWhere((element) => element.busStopCode == favourite.busStopCode);
+
+          if (favouriteIndex == -1) {
+            debugPrint('❌ ${favourite.busStopCode} was not found in favourites');
+            return;
+          }
+
+          favouritesList[favouriteIndex] = favourite;
 
           _favouritesCollection
               .doc(userId)

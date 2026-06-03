@@ -354,6 +354,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                         address: snapshot.data![index].busStopInfo.busStopAddress,
                         busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
                         services: snapshot.data![index].busStopInfo.services,
+                        sources: snapshot.data![index].busStopInfo.sources,
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) => const SizedBox(

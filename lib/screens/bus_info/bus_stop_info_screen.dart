@@ -138,6 +138,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           busStopAddress: widget.address,
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
+          sources: widget.sources,
         ),
         settings: const RouteSettings(name: 'AddFavouritesScreen'),
       ),
@@ -146,7 +147,12 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the edit favourites screen
   Future<void> goToEditFavouritesScreen() async {
-    List<String> busServicesList = await futureServices;
+    List<String>? busServicesList;
+    try {
+      busServicesList = await futureServices;
+    } catch (error) {
+      debugPrint('Failed to fetch bus services before editing favourite: $error');
+    }
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(
@@ -158,6 +164,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
           busStopAddress: widget.address,
           busStopLocation: widget.busStopLocation,
           busServicesList: busServicesList,
+          sources: widget.sources,
         ),
         settings: const RouteSettings(name: 'EditFavouritesScreen'),
       ),

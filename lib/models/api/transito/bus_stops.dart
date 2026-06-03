@@ -2,7 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'bus_stops.g.dart';
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class BusStopProviderSources {
   @JsonKey(name: 'LTA')
   String? lta;
@@ -52,4 +52,15 @@ class BusStopSearchApiResponse {
 
   factory BusStopSearchApiResponse.fromJson(Map<String, dynamic> json) =>
       _$BusStopSearchApiResponseFromJson(json);
+}
+
+@JsonSerializable(explicitToJson: true, createToJson: false)
+class BusStopDetailsApiResponse {
+  String message;
+  BusStop data;
+
+  BusStopDetailsApiResponse({required this.message, required this.data});
+
+  factory BusStopDetailsApiResponse.fromJson(Map<String, dynamic> json) =>
+      _$BusStopDetailsApiResponseFromJson(json);
 }

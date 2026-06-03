@@ -85,6 +85,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                             address: favouritesList[index].busStopAddress,
                             busStopLocation: favouritesList[index].busStopLocation,
                             services: favouritesList[index].services,
+                            sources: favouritesList[index].sources,
                           );
                         },
                         padding: EdgeInsets.only(

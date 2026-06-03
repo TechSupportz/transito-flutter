@@ -73,6 +73,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
           busStopName: favourite.busStopName,
           busStopAddress: favourite.busStopAddress,
           busStopLocation: favourite.busStopLocation,
+          sources: favourite.sources,
           isFavourite: true,
         );
         _busStopMarkersByCode[favourite.busStopCode] = marker;

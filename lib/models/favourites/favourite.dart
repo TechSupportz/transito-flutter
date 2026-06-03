@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 
 part 'favourite.g.dart';
 
@@ -29,6 +30,8 @@ class Favourite {
   LatLng busStopLocation;
 
   List<String?> services;
+  @JsonKey(includeIfNull: false)
+  BusStopProviderSources? sources;
 
   static LatLng decodeBusStopLocation(GeoPoint busStopGeoPoint) {
     return LatLng(busStopGeoPoint.latitude, busStopGeoPoint.longitude);
@@ -44,6 +47,7 @@ class Favourite {
     required this.busStopAddress,
     required this.busStopLocation,
     required this.services,
+    this.sources,
   });
 
   factory Favourite.fromJson(Map<String, dynamic> json) => _$FavouriteFromJson(json);

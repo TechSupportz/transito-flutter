@@ -8,9 +8,10 @@ import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
-import 'package:transito/global/services/lta_api_service.dart';
+import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
@@ -24,6 +25,7 @@ class FavouritesTimingCard extends StatefulWidget {
     required this.address,
     required this.services,
     required this.busStopLocation,
+    required this.sources,
   });
 
   final String code;
@@ -31,6 +33,7 @@ class FavouritesTimingCard extends StatefulWidget {
   final String address;
   final List<String?> services;
   final LatLng busStopLocation;
+  final BusStopProviderSources? sources;
 
   @override
   State<FavouritesTimingCard> createState() => _FavouritesTimingCardState();
@@ -43,7 +46,10 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings() async {
     debugPrint("Fetching favourite arrival timings");
-    final BusArrivalInfo info = await LtaApiService().getLTABusArrival(widget.code);
+    final BusArrivalInfo info = await BusArrivalService().getBusArrival(
+      widget.code,
+      sources: widget.sources,
+    );
     debugPrint("Favourites Timing fetched");
     return info;
   }
@@ -102,7 +108,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                     name: widget.name,
                     address: widget.address,
                     busStopLocation: widget.busStopLocation,
-                    sources: null,
+                    sources: widget.sources,
                   ),
                   settings: const RouteSettings(name: "BusTimingScreen"),
                 ),

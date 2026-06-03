@@ -24,6 +24,13 @@ class TransitoApiService extends BaseApiService {
     return BusStopServicesApiResponse.fromJson(data).data;
   }
 
+  Future<BusStop> getBusStop(String code) async {
+    final Uri uri = Uri.parse('$_baseUrl/bus-stop/$code');
+    final response = await get(uri);
+    final Map<String, dynamic> data = decodeJson(response.body, uri);
+    return BusStopDetailsApiResponse.fromJson(data).data;
+  }
+
   Future<List<NearbyBusStop>> getNearbyBusStops(LatLng position) async {
     final Uri uri = Uri.parse(
       '$_baseUrl/bus-stops/nearby?latitude=${position.latitude}&longitude=${position.longitude}',

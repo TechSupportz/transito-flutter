@@ -34,6 +34,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
           busStopName: favourite.busStopName,
           busStopAddress: favourite.busStopAddress,
           busStopLocation: favourite.busStopLocation,
+          sources: favourite.sources,
         ),
         settings: const RouteSettings(name: 'EditFavouritesScreen'),
       ),

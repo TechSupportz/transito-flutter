@@ -6,9 +6,11 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/api_exceptions.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -21,12 +23,14 @@ class EditFavouritesScreen extends StatefulWidget {
     required this.busStopName,
     required this.busStopAddress,
     required this.busStopLocation,
+    required this.sources,
     this.busServicesList,
   });
   final String busStopCode;
   final String busStopName;
   final String busStopAddress;
   final LatLng busStopLocation;
+  final BusStopProviderSources? sources;
   final List<String>? busServicesList;
 
   @override
@@ -40,6 +44,8 @@ const checkBoxFontStyle = TextStyle(
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   late Future<Map<String?, List<String?>>> futureFavouriteServicesList;
   late Future<List<String>> futureBusServicesList;
+  late Future<BusStop?> futureCurrentBusStop;
+  bool _currentBusStopMissing = false;
 
   // function to display snackbar
   void _showSnackBar(String message) {
@@ -67,18 +73,121 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
       return widget.busServicesList!;
     }
 
-    debugPrint("Fetching all services");
-    final List<String> services = await TransitoApiService().getBusStopServices(widget.busStopCode);
-    debugPrint("Services fetched");
-    return services;
+    final BusStop? currentBusStop = await futureCurrentBusStop;
+    if (currentBusStop != null) {
+      debugPrint("Retrieving services from current bus stop");
+      return currentBusStop.services ?? [];
+    }
+
+    debugPrint("Retrieving services from saved favourite");
+    final Map<String?, List<String?>> favouriteServices = await futureFavouriteServicesList;
+    return favouriteServices['Bus Services']!.whereType<String>().toList();
+  }
+
+  Future<BusStop?> fetchCurrentBusStop() async {
+    try {
+      return await TransitoApiService().getBusStop(widget.busStopCode);
+    } on ApiException catch (error) {
+      if (error.statusCode == 404) {
+        _currentBusStopMissing = true;
+        return null;
+      }
+
+      debugPrint('Failed to refresh favourite bus stop: $error');
+      return null;
+    } catch (error) {
+      debugPrint('Failed to refresh favourite bus stop: $error');
+      return null;
+    }
+  }
+
+  Future<Favourite> _buildFavourite(List<String?> selectedServices) async {
+    final BusStop? currentBusStop = await futureCurrentBusStop;
+
+    if (currentBusStop != null) {
+      return Favourite(
+        busStopCode: currentBusStop.code,
+        busStopName: currentBusStop.name,
+        busStopAddress: currentBusStop.roadName,
+        busStopLocation: LatLng(currentBusStop.latitude, currentBusStop.longitude),
+        services: selectedServices,
+        sources: currentBusStop.sources,
+      );
+    }
+
+    return Favourite(
+      busStopCode: widget.busStopCode,
+      busStopName: widget.busStopName,
+      busStopAddress: widget.busStopAddress,
+      busStopLocation: widget.busStopLocation,
+      services: selectedServices,
+      sources: widget.sources ?? BusStopProviderSources(lta: widget.busStopCode),
+    );
+  }
+
+  Future<void> _showMissingBusStopDialog(String userId) async {
+    if (!mounted || !_currentBusStopMissing) {
+      return;
+    }
+
+    await showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text("Bus stop no longer exists"),
+        content: Text(
+          "${widget.busStopName} is no longer in the current bus stop catalogue. "
+          "Would you like to remove it from your favourites?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text("Keep"),
+          ),
+          TextButton(
+            onPressed: () {
+              FavouritesService().removeFavouriteByBusStopCode(widget.busStopCode, userId);
+              _showSnackBar('Removed ${widget.busStopName} from favourites');
+              Navigator.of(dialogContext).pop();
+              if (!mounted) {
+                return;
+              }
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const NavigatorScreen(),
+                ),
+                (Route<dynamic> route) => false,
+              );
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text("Remove"),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   void initState() {
     super.initState();
+    final String userId = context.read<User?>()!.uid;
+    futureCurrentBusStop = fetchCurrentBusStop();
+    futureFavouriteServicesList = FavouritesService().getFavouriteServicesByBusStopCode(
+      userId,
+      widget.busStopCode,
+    );
     futureBusServicesList = fetchServicesList();
-    futureFavouriteServicesList = FavouritesService()
-        .getFavouriteServicesByBusStopCode(context.read<User?>()!.uid, widget.busStopCode);
+    futureCurrentBusStop.then((_) {
+      if (!_currentBusStopMissing) {
+        return;
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showMissingBusStopDialog(userId);
+      });
+    });
   }
 
   @override
@@ -115,7 +224,8 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                                 busStopName: widget.busStopName,
                                 busStopAddress: widget.busStopAddress,
                                 busStopLocation: widget.busStopLocation,
-                                services: initialServices),
+                                services: initialServices,
+                                sources: widget.sources),
                             userId!);
                         _showSnackBar('Removed ${widget.busStopName} from favourites');
                         // navigate to main screen
@@ -142,14 +252,14 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
       // check if user wants to edit or remove favourites
       if (selectedServices.isNotEmpty) {
+        final Favourite favourite = await _buildFavourite(selectedServices);
+        if (!context.mounted) {
+          return;
+        }
+
         // if services were selected then update the favourites list
         FavouritesService().updateFavourite(
-          Favourite(
-              busStopCode: widget.busStopCode,
-              busStopName: widget.busStopName,
-              busStopAddress: widget.busStopAddress,
-              busStopLocation: widget.busStopLocation,
-              services: selectedServices),
+          favourite,
           userId!,
         );
         _showSnackBar('Updated favourites for ${widget.busStopName}');

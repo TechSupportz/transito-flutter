@@ -22,6 +22,9 @@ Favourite _$FavouriteFromJson(Map<String, dynamic> json) => Favourite(
   busStopAddress: json['busStopAddress'] as String,
   busStopLocation: Favourite.decodeBusStopLocation(json['busStopLocation'] as GeoPoint),
   services: (json['services'] as List<dynamic>).map((e) => e as String?).toList(),
+  sources: json['sources'] == null
+      ? null
+      : BusStopProviderSources.fromJson(json['sources'] as Map<String, dynamic>),
 );
 
 Map<String, dynamic> _$FavouriteToJson(Favourite instance) => <String, dynamic>{
@@ -30,4 +33,5 @@ Map<String, dynamic> _$FavouriteToJson(Favourite instance) => <String, dynamic>{
   'busStopAddress': instance.busStopAddress,
   'busStopLocation': Favourite.encodeBusStopLocation(instance.busStopLocation),
   'services': instance.services,
+  'sources': ?instance.sources?.toJson(),
 };
