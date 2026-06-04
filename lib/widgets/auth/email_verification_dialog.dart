@@ -24,7 +24,8 @@ class EmailVerificationDialog extends StatelessWidget {
     return AlertDialog(
       title: const Text('Verify your email'),
       content: const Text(
-          'Please check your email and click on the link to verify your account, before proceeding to login.'),
+        'Please check your email and click on the link to verify your account, before proceeding to login.',
+      ),
       actions: [
         TextButton(
           child: const Text('Ok'),

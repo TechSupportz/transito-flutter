@@ -33,10 +33,11 @@ class BusTimingGuide extends StatelessWidget {
               TextSpan(text: 'are a rough estimate based on the bus\'s schedule'),
             ],
             style: TextStyle(
-                fontFamily: 'Itim',
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurface),
+              fontFamily: 'Itim',
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
           ),
         ),
         const SizedBox(

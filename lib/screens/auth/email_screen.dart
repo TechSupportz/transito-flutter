@@ -50,52 +50,54 @@ class _EmailScreenState extends State<EmailScreen> {
     if (_loginFormKey.currentState!.isValid) {
       AuthenticationService()
           .loginUserWithEmail(
-        _emailLoginFieldKey.currentState!.value,
-        _passwordLoginFieldKey.currentState!.value,
-      )
+            _emailLoginFieldKey.currentState!.value,
+            _passwordLoginFieldKey.currentState!.value,
+          )
           .then(
-        (err) async {
-          if (err == null) {
-            setState(() {
-              _isLoading = false;
-            });
-            if (context.read<User>().emailVerified) {
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(
-                  builder: (context) => _defaultHome,
-                ),
-                (Route<dynamic> route) => false,
-              );
-            } else {
-              showDialog(
-                context: context,
-                builder: (context) => const EmailVerificationDialog(),
-              );
-            }
-          } else {
-            setState(() {
-              _isLoading = false;
-            });
-            switch (err) {
-              case 'user-not-found':
-                _emailLoginFieldKey.currentState!.invalidate("No user found with this email");
-                break;
-              case 'wrong-password':
-                _passwordLoginFieldKey.currentState!.invalidate("Incorrect password");
-                break;
-              case 'user-disabled':
-                _emailLoginFieldKey.currentState!.invalidate("This account has been disabled");
-                break;
-              default:
-                _emailLoginFieldKey.currentState!
-                    .invalidate("Oops, something went wrong on our end");
-                _passwordLoginFieldKey.currentState!
-                    .invalidate("Oops, something went wrong on our end");
-                break;
-            }
-          }
-        },
-      );
+            (err) async {
+              if (err == null) {
+                setState(() {
+                  _isLoading = false;
+                });
+                if (context.read<User>().emailVerified) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => _defaultHome,
+                    ),
+                    (Route<dynamic> route) => false,
+                  );
+                } else {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const EmailVerificationDialog(),
+                  );
+                }
+              } else {
+                setState(() {
+                  _isLoading = false;
+                });
+                switch (err) {
+                  case 'user-not-found':
+                    _emailLoginFieldKey.currentState!.invalidate("No user found with this email");
+                    break;
+                  case 'wrong-password':
+                    _passwordLoginFieldKey.currentState!.invalidate("Incorrect password");
+                    break;
+                  case 'user-disabled':
+                    _emailLoginFieldKey.currentState!.invalidate("This account has been disabled");
+                    break;
+                  default:
+                    _emailLoginFieldKey.currentState!.invalidate(
+                      "Oops, something went wrong on our end",
+                    );
+                    _passwordLoginFieldKey.currentState!.invalidate(
+                      "Oops, something went wrong on our end",
+                    );
+                    break;
+                }
+              }
+            },
+          );
     } else {
       Timer(const Duration(milliseconds: 500), () {
         setState(() {
@@ -120,29 +122,31 @@ class _EmailScreenState extends State<EmailScreen> {
       await AuthenticationService()
           .sendPasswordResetEmail(_forgotPasswordEmailFieldKey.currentState!.value)
           .then(
-        (err) {
-          if (err == null) {
-            Navigator.of(context).pop();
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Check your email for a password reset link'),
-                duration: Duration(seconds: 2),
-              ),
-            );
-          } else {
-            switch (err) {
-              case 'user-not-found':
-                _forgotPasswordEmailFieldKey.currentState!
-                    .invalidate("No user found with this email");
-                break;
-              default:
-                _forgotPasswordEmailFieldKey.currentState!
-                    .invalidate("Oops, something went wrong on our end");
-                break;
-            }
-          }
-        },
-      );
+            (err) {
+              if (err == null) {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Check your email for a password reset link'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              } else {
+                switch (err) {
+                  case 'user-not-found':
+                    _forgotPasswordEmailFieldKey.currentState!.invalidate(
+                      "No user found with this email",
+                    );
+                    break;
+                  default:
+                    _forgotPasswordEmailFieldKey.currentState!.invalidate(
+                      "Oops, something went wrong on our end",
+                    );
+                    break;
+                }
+              }
+            },
+          );
     }
   }
 
@@ -154,37 +158,37 @@ class _EmailScreenState extends State<EmailScreen> {
     if (_registerFormKey.currentState!.validate()) {
       AuthenticationService()
           .registerUserWithEmail(
-        _nameFieldKey.currentState!.value,
-        _emailRegisterFieldKey.currentState!.value,
-        _passwordRegisterFieldKey.currentState!.value,
-      )
+            _nameFieldKey.currentState!.value,
+            _emailRegisterFieldKey.currentState!.value,
+            _passwordRegisterFieldKey.currentState!.value,
+          )
           .then((err) {
-        if (err == null) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => const LoginScreen(),
-              settings: const RouteSettings(name: 'LoginScreen'),
-            ),
-            (Route<dynamic> route) => false,
-          );
-          showDialog(
-            context: context,
-            builder: (context) => const EmailVerificationDialog(),
-          );
-        } else {
-          setState(() {
-            _isLoading = false;
+            if (err == null) {
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const LoginScreen(),
+                  settings: const RouteSettings(name: 'LoginScreen'),
+                ),
+                (Route<dynamic> route) => false,
+              );
+              showDialog(
+                context: context,
+                builder: (context) => const EmailVerificationDialog(),
+              );
+            } else {
+              setState(() {
+                _isLoading = false;
+              });
+              switch (err) {
+                case 'email-already-in-use':
+                  _emailRegisterFieldKey.currentState!.invalidate('Email already in use');
+                  break;
+                case 'weak-password':
+                  _passwordRegisterFieldKey.currentState!.invalidate('Password is too weak');
+                  break;
+              }
+            }
           });
-          switch (err) {
-            case 'email-already-in-use':
-              _emailRegisterFieldKey.currentState!.invalidate('Email already in use');
-              break;
-            case 'weak-password':
-              _passwordRegisterFieldKey.currentState!.invalidate('Password is too weak');
-              break;
-          }
-        }
-      });
     } else {
       Timer(const Duration(milliseconds: 500), () {
         setState(() {
@@ -402,7 +406,7 @@ class _EmailScreenState extends State<EmailScreen> {
                     )
                   : const Text('Register'),
             ),
-          )
+          ),
         ],
       ),
     );
@@ -500,11 +504,12 @@ class _EmailScreenState extends State<EmailScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-              'Please enter your email address and we will send you a link to reset your password.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              )),
+            'Please enter your email address and we will send you a link to reset your password.',
+            style: TextStyle(
+              fontSize: 16,
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: 16),
           FormBuilderTextField(
             key: _forgotPasswordEmailFieldKey,
@@ -520,7 +525,7 @@ class _EmailScreenState extends State<EmailScreen> {
                 FormBuilderValidators.required(),
               ],
             ),
-          )
+          ),
         ],
       ),
       actions: [

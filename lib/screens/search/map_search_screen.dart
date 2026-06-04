@@ -187,7 +187,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       builder: (context) => AlertDialog(
         title: const Text('Clear recent searches?'),
         content: const Text(
-            'Are you sure you want to clear your recent searches? \n\nThis action cannot be undone.'),
+          'Are you sure you want to clear your recent searches? \n\nThis action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () {
@@ -206,7 +207,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
               ),
             ),
             child: const Text('Clear'),
-          )
+          ),
         ],
       ),
     );
@@ -314,404 +315,400 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       backgroundColor: appColors.scheme.surfaceContainer,
       // displays the recent search list widget
       body: FutureBuilder(
-          future: _initialCameraCenter,
-          builder: (context, snapshot) {
-            return Stack(
-              children: [
-                if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null)
-                  SkeletonLine(
-                    style: SkeletonLineStyle(height: double.infinity),
-                  )
-                else
-                  FlutterMap(
-                    mapController: _animatedMapController.mapController,
-                    options: MapOptions(
-                      initialCenter: LatLng(
-                        snapshot.data!.latitude,
-                        snapshot.data!.longitude,
-                      ),
-                      minZoom: 12,
-                      initialZoom: 17.5,
-                      maxZoom: 19,
-                      interactionOptions: const InteractionOptions(
-                        flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove,
-                      ),
-                      backgroundColor: appColors.brightness == Brightness.dark
-                          ? Color(0xFF003653)
-                          : Color(0xFF6DA7E3),
-                      onPositionChanged: (camera, hasGesture) {
-                        _onMapPositionChanged(camera.center);
-                        mapRotation.value = camera.rotation;
-                      },
+        future: _initialCameraCenter,
+        builder: (context, snapshot) {
+          return Stack(
+            children: [
+              if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null)
+                SkeletonLine(
+                  style: SkeletonLineStyle(height: double.infinity),
+                )
+              else
+                FlutterMap(
+                  mapController: _animatedMapController.mapController,
+                  options: MapOptions(
+                    initialCenter: LatLng(
+                      snapshot.data!.latitude,
+                      snapshot.data!.longitude,
                     ),
-                    children: [
-                      TileLayer(
-                        urlTemplate:
-                            "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
-                        fallbackUrl:
-                            "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
-                        userAgentPackageName: 'com.tnitish.transito',
-                        errorImage: const AssetImage('assets/images/mapError.png'),
-                      ),
-                      CurrentLocationLayer(
-                        style: LocationMarkerStyle(),
-                      ),
-                      // Regular bus stop markers
-                      ValueListenableBuilder<Set<Marker>>(
-                        valueListenable: busStopMarkers,
-                        builder: (context, markers, child) {
-                          return MarkerClusterLayerWidget(
-                            options: MarkerClusterLayerOptions(
-                              rotate: true,
-                              maxClusterRadius: 120,
-                              disableClusteringAtZoom: 17,
-                              spiderfyCluster: false,
-                              zoomToBoundsOnClick: false,
-                              centerMarkerOnClick: false,
-                              animationsOptions:
-                                  AnimationsOptions(zoom: Duration(milliseconds: 250)),
-                              onClusterTap: (p0) {
-                                _animatedMapController.animateTo(
-                                  dest:
-                                      LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
-                                  zoom: 17,
-                                );
-                              },
-                              size: const Size(40, 40),
-                              markers: markers.toList(),
-                              builder: (context, clusterMarkers) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.tertiary,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      clusterMarkers.length.toString(),
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onTertiary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                      // Favourite bus stop markers (separate layer)
-                      ValueListenableBuilder<Set<Marker>>(
-                        valueListenable: favouriteBusStopMarkers,
-                        builder: (context, markers, child) {
-                          return MarkerClusterLayerWidget(
-                            options: MarkerClusterLayerOptions(
-                              rotate: true,
-                              maxClusterRadius: 120,
-                              disableClusteringAtZoom: 17,
-                              spiderfyCluster: false,
-                              zoomToBoundsOnClick: false,
-                              centerMarkerOnClick: false,
-                              animationsOptions:
-                                  AnimationsOptions(zoom: Duration(milliseconds: 250)),
-                              onClusterTap: (p0) {
-                                _animatedMapController.animateTo(
-                                  dest:
-                                      LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
-                                  zoom: 17,
-                                );
-                              },
-                              size: const Size(40, 40),
-                              markers: markers.toList(),
-                              builder: (context, clusterMarkers) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).colorScheme.primary,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      clusterMarkers.length.toString(),
-                                      style: TextStyle(
-                                        color: Theme.of(context).colorScheme.onPrimary,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                      ),
-                      ValueListenableBuilder<Marker?>(
-                        valueListenable: searchLocationPin,
-                        builder: (context, pin, child) {
-                          return MarkerLayer(
-                            markers: pin != null
-                                ? [
-                                    pin,
-                                  ]
-                                : [],
-                          );
-                        },
-                      ),
-                      RichAttributionWidget(
-                        showFlutterMapAttribution: false,
-                        popupBorderRadius: BorderRadius.circular(8),
-                        attributions: [
-                          LogoSourceAttribution(
-                            Image.network(
-                              "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
-                            ),
-                          ),
-                          TextSourceAttribution(
-                            "OneMap © contributors",
-                            prependCopyright: false,
-                            onTap: () => launchUrl(Uri.parse("https://www.onemap.gov.sg/")),
-                          ),
-                          TextSourceAttribution(
-                            "Singapore Land Authority",
-                            prependCopyright: false,
-                            onTap: () => launchUrl(Uri.parse("https://www.sla.gov.sg/")),
-                          ),
-                          TextSourceAttribution(
-                            "Powered by 'flutter_map'",
-                            textStyle: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
-                              fontStyle: FontStyle.italic,
-                              fontSize: 12,
-                            ),
-                            prependCopyright: false,
-                          ),
-                        ],
-                        alignment: AttributionAlignment.bottomLeft,
-                      )
-                    ],
+                    minZoom: 12,
+                    initialZoom: 17.5,
+                    maxZoom: 19,
+                    interactionOptions: const InteractionOptions(
+                      flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove,
+                    ),
+                    backgroundColor: appColors.brightness == Brightness.dark
+                        ? Color(0xFF003653)
+                        : Color(0xFF6DA7E3),
+                    onPositionChanged: (camera, hasGesture) {
+                      _onMapPositionChanged(camera.center);
+                      mapRotation.value = camera.rotation;
+                    },
                   ),
-                SafeArea(
-                  left: false,
-                  right: false,
-                  bottom: false,
-                  child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Column(
-                        spacing: 16,
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                context: context,
-                                useSafeArea: false,
-                                builder: (context) => SearchDialog(
-                                  initialQuery: searchQuery.value,
-                                  onSearchCleared: () => searchQuery.value = null,
-                                  onSearchSelected: (value) {
-                                    searchLocationPin.value = buildLocationMarker(
-                                      LatLng(value.latitude, value.longitude),
-                                    );
-                                    searchQuery.value = value.name;
-                                    _animatedMapController.animateTo(
-                                      dest: LatLng(value.latitude, value.longitude),
-                                      zoom: 17.5,
-                                    );
-                                  },
+                  children: [
+                    TileLayer(
+                      urlTemplate:
+                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
+                      fallbackUrl:
+                          "https://www.onemap.gov.sg/maps/tiles/${appColors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
+                      userAgentPackageName: 'com.tnitish.transito',
+                      errorImage: const AssetImage('assets/images/mapError.png'),
+                    ),
+                    CurrentLocationLayer(
+                      style: LocationMarkerStyle(),
+                    ),
+                    // Regular bus stop markers
+                    ValueListenableBuilder<Set<Marker>>(
+                      valueListenable: busStopMarkers,
+                      builder: (context, markers, child) {
+                        return MarkerClusterLayerWidget(
+                          options: MarkerClusterLayerOptions(
+                            rotate: true,
+                            maxClusterRadius: 120,
+                            disableClusteringAtZoom: 17,
+                            spiderfyCluster: false,
+                            zoomToBoundsOnClick: false,
+                            centerMarkerOnClick: false,
+                            animationsOptions: AnimationsOptions(zoom: Duration(milliseconds: 250)),
+                            onClusterTap: (p0) {
+                              _animatedMapController.animateTo(
+                                dest: LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
+                                zoom: 17,
+                              );
+                            },
+                            size: const Size(40, 40),
+                            markers: markers.toList(),
+                            builder: (context, clusterMarkers) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    clusterMarkers.length.toString(),
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onTertiary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
                               );
-                              HapticFeedback.selectionClick();
                             },
-                            child: Material(
-                              borderRadius: BorderRadius.circular(64),
-                              elevation: 5,
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                                  borderRadius: BorderRadius.circular(64),
-                                ),
-                                height: 56,
-                                padding: const EdgeInsets.symmetric(horizontal: 16),
-                                child: Row(
-                                  spacing: 8,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    ValueListenableBuilder<String?>(
-                                      valueListenable: searchQuery,
-                                      builder: (context, query, child) {
-                                        return Flexible(
-                                          child: Row(
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              IconButton(
-                                                icon: AnimatedSwitcher(
-                                                  duration: const Duration(milliseconds: 200),
-                                                  child: query == null
-                                                      ? AppSymbol(
-                                                          key: const ValueKey('searchIcon'),
-                                                          Symbols.search_rounded,
-                                                          color: Theme.of(context)
-                                                              .colorScheme
-                                                              .onSurfaceVariant,
-                                                        )
-                                                      : AppSymbol(
-                                                          key: const ValueKey('clearSearchIcon'),
-                                                          Symbols.clear_rounded,
-                                                          color: Theme.of(context)
-                                                              .colorScheme
-                                                              .onSurfaceVariant,
-                                                        ),
-                                                ),
-                                                color:
-                                                    Theme.of(context).colorScheme.onSurfaceVariant,
-                                                style: ButtonStyle(
-                                                    tapTargetSize:
-                                                        MaterialTapTargetSize.shrinkWrap),
-                                                onPressed: () {
-                                                  searchQuery.value = null;
-                                                  searchLocationPin.value = null;
-                                                },
-                                              ),
-                                              const SizedBox(width: 16),
-                                              Expanded(
-                                                child: Text(
-                                                  query ?? 'Search for places...',
-                                                  maxLines: 1,
-                                                  overflow: TextOverflow.fade,
-                                                  softWrap: false,
-                                                  style: TextStyle(
-                                                    color: query == null
-                                                        ? Theme.of(context)
-                                                            .colorScheme
-                                                            .onSurfaceVariant
-                                                        : Theme.of(context).colorScheme.onSurface,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                    ValueListenableBuilder<bool>(
-                                      valueListenable: _isMarkersLoading,
-                                      builder: (context, isLoading, child) {
-                                        return SizedBox(
-                                          height: 24,
-                                          width: 24,
-                                          child: CircularProgressIndicator(
-                                            value: isLoading ? null : 0.0,
-                                            color: Theme.of(context).colorScheme.primary,
-                                            strokeWidth: 2.0,
-                                            strokeCap: StrokeCap.round,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
                           ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              FilledButton.tonalIcon(
-                                style: ButtonStyle(
-                                  backgroundColor:
-                                      WidgetStateProperty.all(appColors.scheme.primary),
-                                  foregroundColor:
-                                      WidgetStateProperty.all(appColors.scheme.onPrimary),
-                                  elevation: WidgetStateProperty.all(3),
+                        );
+                      },
+                    ),
+                    // Favourite bus stop markers (separate layer)
+                    ValueListenableBuilder<Set<Marker>>(
+                      valueListenable: favouriteBusStopMarkers,
+                      builder: (context, markers, child) {
+                        return MarkerClusterLayerWidget(
+                          options: MarkerClusterLayerOptions(
+                            rotate: true,
+                            maxClusterRadius: 120,
+                            disableClusteringAtZoom: 17,
+                            spiderfyCluster: false,
+                            zoomToBoundsOnClick: false,
+                            centerMarkerOnClick: false,
+                            animationsOptions: AnimationsOptions(zoom: Duration(milliseconds: 250)),
+                            onClusterTap: (p0) {
+                              _animatedMapController.animateTo(
+                                dest: LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
+                                zoom: 17,
+                              );
+                            },
+                            size: const Size(40, 40),
+                            markers: markers.toList(),
+                            builder: (context, clusterMarkers) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(20),
                                 ),
-                                onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MrtMapScreen(),
-                                    settings: const RouteSettings(name: 'MrtMapScreen'),
+                                child: Center(
+                                  child: Text(
+                                    clusterMarkers.length.toString(),
+                                    style: TextStyle(
+                                      color: Theme.of(context).colorScheme.onPrimary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
                                 ),
-                                icon: const AppSymbol(Symbols.map_rounded, fill: true),
-                                label: const Text('MRT Map'),
-                              ),
-                              ValueListenableBuilder(
-                                valueListenable: mapRotation,
-                                builder: (context, rotation, child) {
-                                  int _cameraRotation = rotation.floor().abs();
-                                  bool isRotated = !(_cameraRotation < 2 || _cameraRotation > 358);
-
-                                  return AnimatedOpacity(
-                                    opacity: isRotated ? 1.0 : 0.0,
-                                    duration: const Duration(milliseconds: 200),
-                                    curve: Easing.standard,
-                                    child: IconButton.filledTonal(
-                                      style: ButtonStyle(
-                                        backgroundColor: WidgetStateProperty.all(
-                                          appColors.scheme.surfaceContainerHighest,
-                                        ),
-                                        elevation: WidgetStateProperty.all(4),
-                                      ),
-                                      onPressed: () {
-                                        _animatedMapController.animateTo(
-                                          rotation: 0.0,
-                                          zoom: _animatedMapController.mapController.camera.zoom +
-                                              0.25,
-                                        );
-                                      },
-                                      icon: Transform.rotate(
-                                        angle: rotation * (3.14 / 180),
-                                        child: RotatedBox(
-                                          quarterTurns:
-                                              appColors.brightness == Brightness.light ? 2 : 0,
-                                          child: SvgPicture.asset(
-                                            "assets/icons/ui/compass_point.svg",
-                                            colorFilter: ColorFilter.mode(
-                                              Theme.of(context).colorScheme.tertiary,
-                                              BlendMode.modulate,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      iconSize: 48,
-                                    ),
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ),
+                    ValueListenableBuilder<Marker?>(
+                      valueListenable: searchLocationPin,
+                      builder: (context, pin, child) {
+                        return MarkerLayer(
+                          markers: pin != null
+                              ? [
+                                  pin,
+                                ]
+                              : [],
+                        );
+                      },
+                    ),
+                    RichAttributionWidget(
+                      showFlutterMapAttribution: false,
+                      popupBorderRadius: BorderRadius.circular(8),
+                      attributions: [
+                        LogoSourceAttribution(
+                          Image.network(
+                            "https://www.onemap.gov.sg/web-assets/images/logo/om_logo.png",
+                          ),
+                        ),
+                        TextSourceAttribution(
+                          "OneMap © contributors",
+                          prependCopyright: false,
+                          onTap: () => launchUrl(Uri.parse("https://www.onemap.gov.sg/")),
+                        ),
+                        TextSourceAttribution(
+                          "Singapore Land Authority",
+                          prependCopyright: false,
+                          onTap: () => launchUrl(Uri.parse("https://www.sla.gov.sg/")),
+                        ),
+                        TextSourceAttribution(
+                          "Powered by 'flutter_map'",
+                          textStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                            fontSize: 12,
+                          ),
+                          prependCopyright: false,
+                        ),
+                      ],
+                      alignment: AttributionAlignment.bottomLeft,
+                    ),
+                  ],
+                ),
+              SafeArea(
+                left: false,
+                right: false,
+                bottom: false,
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Column(
+                      spacing: 16,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              useSafeArea: false,
+                              builder: (context) => SearchDialog(
+                                initialQuery: searchQuery.value,
+                                onSearchCleared: () => searchQuery.value = null,
+                                onSearchSelected: (value) {
+                                  searchLocationPin.value = buildLocationMarker(
+                                    LatLng(value.latitude, value.longitude),
+                                  );
+                                  searchQuery.value = value.name;
+                                  _animatedMapController.animateTo(
+                                    dest: LatLng(value.latitude, value.longitude),
+                                    zoom: 17.5,
                                   );
                                 },
                               ),
-                            ],
-                          )
-                        ],
+                            );
+                            HapticFeedback.selectionClick();
+                          },
+                          child: Material(
+                            borderRadius: BorderRadius.circular(64),
+                            elevation: 5,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surfaceContainerHigh,
+                                borderRadius: BorderRadius.circular(64),
+                              ),
+                              height: 56,
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Row(
+                                spacing: 8,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  ValueListenableBuilder<String?>(
+                                    valueListenable: searchQuery,
+                                    builder: (context, query, child) {
+                                      return Flexible(
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: [
+                                            IconButton(
+                                              icon: AnimatedSwitcher(
+                                                duration: const Duration(milliseconds: 200),
+                                                child: query == null
+                                                    ? AppSymbol(
+                                                        key: const ValueKey('searchIcon'),
+                                                        Symbols.search_rounded,
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.onSurfaceVariant,
+                                                      )
+                                                    : AppSymbol(
+                                                        key: const ValueKey('clearSearchIcon'),
+                                                        Symbols.clear_rounded,
+                                                        color: Theme.of(
+                                                          context,
+                                                        ).colorScheme.onSurfaceVariant,
+                                                      ),
+                                              ),
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                              style: ButtonStyle(
+                                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                              ),
+                                              onPressed: () {
+                                                searchQuery.value = null;
+                                                searchLocationPin.value = null;
+                                              },
+                                            ),
+                                            const SizedBox(width: 16),
+                                            Expanded(
+                                              child: Text(
+                                                query ?? 'Search for places...',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.fade,
+                                                softWrap: false,
+                                                style: TextStyle(
+                                                  color: query == null
+                                                      ? Theme.of(
+                                                          context,
+                                                        ).colorScheme.onSurfaceVariant
+                                                      : Theme.of(context).colorScheme.onSurface,
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  ValueListenableBuilder<bool>(
+                                    valueListenable: _isMarkersLoading,
+                                    builder: (context, isLoading, child) {
+                                      return SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(
+                                          value: isLoading ? null : 0.0,
+                                          color: Theme.of(context).colorScheme.primary,
+                                          strokeWidth: 2.0,
+                                          strokeCap: StrokeCap.round,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            FilledButton.tonalIcon(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(appColors.scheme.primary),
+                                foregroundColor: WidgetStateProperty.all(
+                                  appColors.scheme.onPrimary,
+                                ),
+                                elevation: WidgetStateProperty.all(3),
+                              ),
+                              onPressed: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const MrtMapScreen(),
+                                  settings: const RouteSettings(name: 'MrtMapScreen'),
+                                ),
+                              ),
+                              icon: const AppSymbol(Symbols.map_rounded, fill: true),
+                              label: const Text('MRT Map'),
+                            ),
+                            ValueListenableBuilder(
+                              valueListenable: mapRotation,
+                              builder: (context, rotation, child) {
+                                int _cameraRotation = rotation.floor().abs();
+                                bool isRotated = !(_cameraRotation < 2 || _cameraRotation > 358);
+
+                                return AnimatedOpacity(
+                                  opacity: isRotated ? 1.0 : 0.0,
+                                  duration: const Duration(milliseconds: 200),
+                                  curve: Easing.standard,
+                                  child: IconButton.filledTonal(
+                                    style: ButtonStyle(
+                                      backgroundColor: WidgetStateProperty.all(
+                                        appColors.scheme.surfaceContainerHighest,
+                                      ),
+                                      elevation: WidgetStateProperty.all(4),
+                                    ),
+                                    onPressed: () {
+                                      _animatedMapController.animateTo(
+                                        rotation: 0.0,
+                                        zoom:
+                                            _animatedMapController.mapController.camera.zoom + 0.25,
+                                      );
+                                    },
+                                    icon: Transform.rotate(
+                                      angle: rotation * (3.14 / 180),
+                                      child: RotatedBox(
+                                        quarterTurns: appColors.brightness == Brightness.light
+                                            ? 2
+                                            : 0,
+                                        child: SvgPicture.asset(
+                                          "assets/icons/ui/compass_point.svg",
+                                          colorFilter: ColorFilter.mode(
+                                            Theme.of(context).colorScheme.tertiary,
+                                            BlendMode.modulate,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    iconSize: 48,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              if (!supportsLiquidGlass)
+                IgnorePointer(
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Theme.of(context).colorScheme.surfaceContainerLow,
+                            Theme.of(
+                              context,
+                            ).colorScheme.surfaceContainerLow.withValues(alpha: 0.0),
+                          ],
+                          stops: [0, 0.01],
+                        ),
                       ),
                     ),
                   ),
                 ),
-                if (!supportsLiquidGlass)
-                  IgnorePointer(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                            colors: [
-                              Theme.of(context).colorScheme.surfaceContainerLow,
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surfaceContainerLow
-                                  .withValues(alpha: 0.0),
-                            ],
-                            stops: [0, 0.01],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-              ],
-            );
-          }),
+            ],
+          );
+        },
+      ),
       // floating action button to clear the recent searches list by calling a function in the search provider
       floatingActionButton: !supportsLiquidGlass
           ? FloatingActionButton(

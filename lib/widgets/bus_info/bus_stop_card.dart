@@ -153,8 +153,9 @@ class BusStopCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
                             decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.primary,
-                                borderRadius: BorderRadius.circular(8)),
+                              color: Theme.of(context).colorScheme.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
                             child: Text(
                               busStopInfo.code,
                               style: TextStyle(
@@ -178,7 +179,7 @@ class BusStopCard extends StatelessWidget {
                             ),
                           ),
                         ],
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -189,8 +190,8 @@ class BusStopCard extends StatelessWidget {
                       builder: (context) => busScheduleDialog(context),
                     ),
                     icon: const AppSymbol(Symbols.info_rounded),
-                  )
-                ]
+                  ),
+                ],
               ],
             ),
           ),
@@ -204,8 +205,8 @@ class BusStopCard extends StatelessWidget {
     int selectedDay = currentDay == "Sat"
         ? 1
         : currentDay == "Sun"
-            ? 2
-            : 0;
+        ? 2
+        : 0;
 
     TextStyle titleStyle = TextStyle(
       fontWeight: FontWeight.w400,
@@ -229,35 +230,38 @@ class BusStopCard extends StatelessWidget {
           children: [
             const Text('Schedule'),
             const SizedBox(height: 4.0),
-            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              ChoiceChip(
-                label: const Text("Weekday"),
-                selected: selectedDay == 0,
-                onSelected: (selected) {
-                  setState(() {
-                    selectedDay = 0;
-                  });
-                },
-              ),
-              ChoiceChip(
-                label: const Text("Saturday"),
-                selected: selectedDay == 1,
-                onSelected: (selected) {
-                  setState(() {
-                    selectedDay = 1;
-                  });
-                },
-              ),
-              ChoiceChip(
-                label: const Text("Sunday"),
-                selected: selectedDay == 2,
-                onSelected: (selected) {
-                  setState(() {
-                    selectedDay = 2;
-                  });
-                },
-              ),
-            ]),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ChoiceChip(
+                  label: const Text("Weekday"),
+                  selected: selectedDay == 0,
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedDay = 0;
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text("Saturday"),
+                  selected: selectedDay == 1,
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedDay = 1;
+                    });
+                  },
+                ),
+                ChoiceChip(
+                  label: const Text("Sunday"),
+                  selected: selectedDay == 2,
+                  onSelected: (selected) {
+                    setState(() {
+                      selectedDay = 2;
+                    });
+                  },
+                ),
+              ],
+            ),
           ],
         ),
         insetPadding: const EdgeInsets.symmetric(horizontal: 16),
@@ -281,7 +285,7 @@ class BusStopCard extends StatelessWidget {
                       Text(
                         "First Bus",
                         style: titleStyle,
-                      )
+                      ),
                     ],
                   ),
                   if (selectedDay == 0 && busSchedule!.firstBus.weekdays != "-:")
@@ -326,7 +330,7 @@ class BusStopCard extends StatelessWidget {
                       Text(
                         "Last Bus",
                         style: titleStyle,
-                      )
+                      ),
                     ],
                   ),
                   if (selectedDay == 0 && busSchedule!.lastBus.weekdays != "-:")

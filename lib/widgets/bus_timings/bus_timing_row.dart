@@ -70,12 +70,13 @@ class _BusTimingRowState extends State<BusTimingRow> {
       return '???';
     } else {
       double distanceAway = distance.as(
-          LengthUnit.Meter,
-          LatLng(
-            widget.serviceInfo.nextBus.latitude,
-            widget.serviceInfo.nextBus.longitude,
-          ),
-          widget.userLatLng);
+        LengthUnit.Meter,
+        LatLng(
+          widget.serviceInfo.nextBus.latitude,
+          widget.serviceInfo.nextBus.longitude,
+        ),
+        widget.userLatLng,
+      );
       if (distanceAway < 1000) {
         return '${(distanceAway).toStringAsFixed(0)}m';
       } else {
@@ -123,9 +124,10 @@ class _BusTimingRowState extends State<BusTimingRow> {
                 Text(
                   '~ ${calculateDistanceAway()} away',
                   style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.italic,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    fontSize: 14,
+                    fontStyle: FontStyle.italic,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
               ],
             ),
@@ -240,8 +242,9 @@ class _ArrivalCardState extends State<ArrivalCard> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
                     decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
-                        borderRadius: const BorderRadius.all(Radius.circular(5))),
+                      border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      borderRadius: const BorderRadius.all(Radius.circular(5)),
+                    ),
                     // displays different text based on bus type
                     child: Text(
                       (() {
@@ -269,11 +272,13 @@ class _ArrivalCardState extends State<ArrivalCard> {
         // if there is no bus arrival time available it displays '-'
         : Center(
             child: Text(
-            '    -  ',
-            style: TextStyle(
+              '    -  ',
+              style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w500,
-                color: Theme.of(context).colorScheme.onSurfaceVariant),
-          ));
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
+              ),
+            ),
+          );
   }
 }

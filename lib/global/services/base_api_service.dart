@@ -33,8 +33,7 @@ abstract class BaseApiService {
       }
       throw ApiParsingException('Unexpected response format', uri: uri);
     } on FormatException catch (error) {
-      throw ApiParsingException('Failed to parse response',
-          uri: uri, cause: error);
+      throw ApiParsingException('Failed to parse response', uri: uri, cause: error);
     }
   }
 }

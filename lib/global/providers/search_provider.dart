@@ -81,7 +81,8 @@ class SearchProvider extends ChangeNotifier {
         debugPrint('Added recent search: ${search.serviceNo}');
       } else {
         _recentSearches.removeWhere(
-            (element) => element is BusService && element.serviceNo == search.serviceNo);
+          (element) => element is BusService && element.serviceNo == search.serviceNo,
+        );
         _recentSearches.insert(0, search);
         debugPrint('Moved recent search to top: ${search.serviceNo}');
       }
@@ -93,8 +94,9 @@ class SearchProvider extends ChangeNotifier {
         _recentSearches.insert(0, search);
         debugPrint('Added recent search: ${search.name}');
       } else {
-        _recentSearches
-            .removeWhere((element) => element is OneMapSearchData && element.name == search.name);
+        _recentSearches.removeWhere(
+          (element) => element is OneMapSearchData && element.name == search.name,
+        );
         _recentSearches.insert(0, search);
         debugPrint('Moved recent search to top: ${search.name}');
       }

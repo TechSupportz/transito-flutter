@@ -44,43 +44,51 @@ class SettingsService {
     required BuildContext context,
   }) async {
     if (userId != null) {
-      _settingsCollection.doc(userId).update({
-        'themeMode': newValue.name,
-      }).then(
-        (_) {
-          AppColors().updateLocalBrightness(
-            newValue == AppThemeMode.DARK
-                ? Brightness.dark
-                : newValue == AppThemeMode.LIGHT
+      _settingsCollection
+          .doc(userId)
+          .update({
+            'themeMode': newValue.name,
+          })
+          .then(
+            (_) {
+              AppColors().updateLocalBrightness(
+                newValue == AppThemeMode.DARK
+                    ? Brightness.dark
+                    : newValue == AppThemeMode.LIGHT
                     ? Brightness.light
                     : context.mounted
-                        ? MediaQuery.platformBrightnessOf(context)
-                        : Brightness.dark,
+                    ? MediaQuery.platformBrightnessOf(context)
+                    : Brightness.dark,
+              );
+              debugPrint('✔️ Updated themeMode to $newValue');
+            },
+          )
+          .catchError(
+            (error) {
+              debugPrint('❌ Error updating themeMode in Firestore: $error');
+            },
           );
-          debugPrint('✔️ Updated themeMode to $newValue');
-        },
-      ).catchError(
-        (error) {
-          debugPrint('❌ Error updating themeMode in Firestore: $error');
-        },
-      );
     }
   }
 
   Future<void> updateAccentColour({String? userId, required String newValue}) async {
     if (userId != null) {
-      _settingsCollection.doc(userId).update({
-        'accentColour': newValue,
-      }).then(
-        (_) {
-          AppColors().updateLocalAccentColour(Color(int.parse(newValue)));
-          debugPrint('✔️ Updated accentColour to $newValue');
-        },
-      ).catchError(
-        (error) {
-          debugPrint('❌ Error updating accentColour in Firestore: $error');
-        },
-      );
+      _settingsCollection
+          .doc(userId)
+          .update({
+            'accentColour': newValue,
+          })
+          .then(
+            (_) {
+              AppColors().updateLocalAccentColour(Color(int.parse(newValue)));
+              debugPrint('✔️ Updated accentColour to $newValue');
+            },
+          )
+          .catchError(
+            (error) {
+              debugPrint('❌ Error updating accentColour in Firestore: $error');
+            },
+          );
     }
   }
 

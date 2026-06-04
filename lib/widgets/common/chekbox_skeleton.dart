@@ -13,7 +13,10 @@ class CheckboxSkeleton extends StatelessWidget {
         borderRadius: BorderRadius.circular(4),
       ),
       titleStyle: SkeletonLineStyle(
-          height: 20, padding: const EdgeInsets.only(left: 10), randomLength: true),
+        height: 20,
+        padding: const EdgeInsets.only(left: 10),
+        randomLength: true,
+      ),
     );
   }
 }

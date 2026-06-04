@@ -11,10 +11,10 @@ class CommonProvider extends ChangeNotifier {
   SharedPreferences? prefs;
 
   final bool isTablet =
-      MediaQueryData.fromView(WidgetsBinding.instance.platformDispatcher.views.single)
-              .size
-              .shortestSide >
-          600;
+      MediaQueryData.fromView(
+        WidgetsBinding.instance.platformDispatcher.views.single,
+      ).size.shortestSide >
+      600;
 
   LatLng? _initialMapPinLocation;
   LatLng? get initialMapPinLocation => _initialMapPinLocation;

@@ -169,20 +169,24 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       margin: const EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(8)),
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       child: Text(
                         widget.busStopCode,
-                        style:
-                            TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onPrimary),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     ),
                     Text(
                       widget.busStopAddress,
                       style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontStyle: FontStyle.italic),
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ],
                 ),
@@ -192,7 +196,9 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                 Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
                   style: TextStyle(
-                      fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(
                   height: 8,
@@ -265,7 +271,9 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                     height: 8,
                   ),
                   FilledButton.tonal(
-                      onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
                 ],
               ),
             ),

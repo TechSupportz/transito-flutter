@@ -203,44 +203,48 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
       // if no services were selected then remove the bus stop from favourites list
       if (context.mounted) {
         showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-                  title: const Text("Delete Favourite"),
-                  content: const Text(
-                      "Are you sure you want to remove this bus stop from your favourites?"),
-                  actions: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                      child: const Text("No"),
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text("Delete Favourite"),
+            content: const Text(
+              "Are you sure you want to remove this bus stop from your favourites?",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("No"),
+              ),
+              TextButton(
+                onPressed: () {
+                  // delete favourite
+                  FavouritesService().removeFavourite(
+                    Favourite(
+                      busStopCode: widget.busStopCode,
+                      busStopName: widget.busStopName,
+                      busStopAddress: widget.busStopAddress,
+                      busStopLocation: widget.busStopLocation,
+                      services: initialServices,
+                      sources: widget.sources,
                     ),
-                    TextButton(
-                      onPressed: () {
-                        // delete favourite
-                        FavouritesService().removeFavourite(
-                            Favourite(
-                                busStopCode: widget.busStopCode,
-                                busStopName: widget.busStopName,
-                                busStopAddress: widget.busStopAddress,
-                                busStopLocation: widget.busStopLocation,
-                                services: initialServices,
-                                sources: widget.sources),
-                            userId!);
-                        _showSnackBar('Removed ${widget.busStopName} from favourites');
-                        // navigate to main screen
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const NavigatorScreen(),
-                          ),
-                          (Route<dynamic> route) => false,
-                        );
-                      },
-                      child: const Text("Yes"),
+                    userId!,
+                  );
+                  _showSnackBar('Removed ${widget.busStopName} from favourites');
+                  // navigate to main screen
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const NavigatorScreen(),
                     ),
-                  ],
-                ));
+                    (Route<dynamic> route) => false,
+                  );
+                },
+                child: const Text("Yes"),
+              ),
+            ],
+          ),
+        );
       }
     }
 
@@ -287,7 +291,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
             onPressed: () {
               deleteFavorites();
             },
-          )
+          ),
         ],
       ),
       body: Padding(
@@ -311,20 +315,24 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
                       margin: const EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primary,
-                          borderRadius: BorderRadius.circular(8)),
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                       child: Text(
                         widget.busStopCode,
-                        style:
-                            TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onPrimary),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                       ),
                     ),
                     Text(
                       widget.busStopAddress,
                       style: TextStyle(
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontStyle: FontStyle.italic),
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                        fontStyle: FontStyle.italic,
+                      ),
                     ),
                   ],
                 ),
@@ -334,7 +342,9 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
                   style: TextStyle(
-                      fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(
                   height: 8,
@@ -342,7 +352,9 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 Text(
                   "Unselecting all the bus services will remove this bus stop from your favourites",
                   style: TextStyle(
-                      fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                    fontSize: 16,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(
                   height: 8,
@@ -445,12 +457,16 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   FilledButton(
-                      onPressed: () => updateFavorites(), child: const Text("Save changes")),
+                    onPressed: () => updateFavorites(),
+                    child: const Text("Save changes"),
+                  ),
                   const SizedBox(
                     height: 8,
                   ),
                   FilledButton.tonal(
-                      onPressed: () => Navigator.pop(context), child: const Text('Cancel'))
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Cancel'),
+                  ),
                 ],
               ),
             ),

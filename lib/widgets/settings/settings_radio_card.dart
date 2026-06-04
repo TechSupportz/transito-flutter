@@ -8,12 +8,13 @@ import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import '../../global/services/settings_service.dart';
 
 class SettingsRadioCard<T> extends StatelessWidget {
-  const SettingsRadioCard(
-      {super.key,
-      required this.title,
-      required this.initialValue,
-      required this.firebaseFieldName,
-      required this.options});
+  const SettingsRadioCard({
+    super.key,
+    required this.title,
+    required this.initialValue,
+    required this.firebaseFieldName,
+    required this.options,
+  });
 
   final String title;
   final T initialValue;
@@ -100,10 +101,12 @@ class SettingsRadioCard<T> extends StatelessWidget {
               fillColor: Theme.of(context).colorScheme.surfaceContainerHigh,
             ),
             options: options
-                .map((option) => FormBuilderFieldOption(
-                      value: option.value,
-                      child: Text(option.label, style: optionTextStyle),
-                    ))
+                .map(
+                  (option) => FormBuilderFieldOption(
+                    value: option.value,
+                    child: Text(option.label, style: optionTextStyle),
+                  ),
+                )
                 .toList(),
           ),
         ],

@@ -98,7 +98,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   Future<void> openMaps(LatLng navigationLocation) async {
     Uri uri = Uri.parse(
-        'https://www.google.com/maps/search/?api=1&query=${navigationLocation.latitude},${navigationLocation.longitude}');
+      'https://www.google.com/maps/search/?api=1&query=${navigationLocation.latitude},${navigationLocation.longitude}',
+    );
 
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
@@ -239,13 +240,15 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                               margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  borderRadius: BorderRadius.circular(8)),
+                                color: Theme.of(context).colorScheme.primary,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
                               child: Text(
                                 widget.code,
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: Theme.of(context).colorScheme.onPrimary),
+                                  fontWeight: FontWeight.w500,
+                                  color: Theme.of(context).colorScheme.onPrimary,
+                                ),
                               ),
                             ),
                             Text(
@@ -254,11 +257,12 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               maxLines: 1,
                               softWrap: false,
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  fontStyle: FontStyle.italic),
-                            )
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                     const SizedBox(
@@ -278,96 +282,97 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           height: 8,
                         ),
                         FutureBuilder<List<String>>(
-                            future: futureServices,
-                            builder: (context, servicesSnapshot) {
-                              if (servicesSnapshot.hasData) {
-                                final services = servicesSnapshot.data!;
+                          future: futureServices,
+                          builder: (context, servicesSnapshot) {
+                            if (servicesSnapshot.hasData) {
+                              final services = servicesSnapshot.data!;
 
-                                return FutureBuilder<List<String>>(
-                                  future: futureCurrOperatingServices,
-                                  builder: (context, operatingSnapshot) {
-                                    if (operatingSnapshot.connectionState ==
-                                        ConnectionState.waiting) {
-                                      return Center(
-                                        child: SkeletonLine(
-                                          style: SkeletonLineStyle(
-                                            height: 50,
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
+                              return FutureBuilder<List<String>>(
+                                future: futureCurrOperatingServices,
+                                builder: (context, operatingSnapshot) {
+                                  if (operatingSnapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child: SkeletonLine(
+                                        style: SkeletonLineStyle(
+                                          height: 50,
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
-                                      );
-                                    }
-
-                                    // If operating services fail, display all services but show a warning that not all services may be operating
-                                    final currOperatingServices =
-                                        operatingSnapshot.data ?? services;
-
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Wrap(
-                                          spacing: 8,
-                                          runSpacing: 8,
-                                          children:
-                                              services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
-                                                  .map(
-                                                    (service) => BusServiceChip(
-                                                      busServiceNumber: service,
-                                                      currentStopCode: widget.code,
-                                                      isOperating:
-                                                          currOperatingServices.contains(service),
-                                                    ),
-                                                  )
-                                                  .toList(),
-                                        ),
-                                        if (operatingSnapshot.data == null) ...[
-                                          SizedBox(
-                                            height: 8,
-                                          ),
-                                          Row(
-                                            spacing: 4,
-                                            children: [
-                                              AppSymbol(
-                                                Symbols.error_rounded,
-                                                fill: true,
-                                                color: appColors.scheme.error,
-                                                size: 16,
-                                              ),
-                                              Text(
-                                                "Not all services may be operating at the moment",
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontStyle: FontStyle.italic,
-                                                  color: appColors.scheme.error,
-                                                ),
-                                              ),
-                                            ],
-                                          )
-                                        ]
-                                      ],
+                                      ),
                                     );
-                                  },
-                                );
-                              } else if (servicesSnapshot.hasError) {
-                                debugPrint("<=== ERROR ${servicesSnapshot.error} ===>");
-                                return const Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 4.0),
-                                  child: ErrorText(
-                                    style: ErrorTextStyle.inline,
-                                    title: "Couldn't load services",
+                                  }
+
+                                  // If operating services fail, display all services but show a warning that not all services may be operating
+                                  final currOperatingServices = operatingSnapshot.data ?? services;
+
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Wrap(
+                                        spacing: 8,
+                                        runSpacing: 8,
+                                        children:
+                                            services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
+                                                .map(
+                                                  (service) => BusServiceChip(
+                                                    busServiceNumber: service,
+                                                    currentStopCode: widget.code,
+                                                    isOperating: currOperatingServices.contains(
+                                                      service,
+                                                    ),
+                                                  ),
+                                                )
+                                                .toList(),
+                                      ),
+                                      if (operatingSnapshot.data == null) ...[
+                                        SizedBox(
+                                          height: 8,
+                                        ),
+                                        Row(
+                                          spacing: 4,
+                                          children: [
+                                            AppSymbol(
+                                              Symbols.error_rounded,
+                                              fill: true,
+                                              color: appColors.scheme.error,
+                                              size: 16,
+                                            ),
+                                            Text(
+                                              "Not all services may be operating at the moment",
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                fontStyle: FontStyle.italic,
+                                                color: appColors.scheme.error,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ],
+                                  );
+                                },
+                              );
+                            } else if (servicesSnapshot.hasError) {
+                              debugPrint("<=== ERROR ${servicesSnapshot.error} ===>");
+                              return const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4.0),
+                                child: ErrorText(
+                                  style: ErrorTextStyle.inline,
+                                  title: "Couldn't load services",
+                                ),
+                              );
+                            } else {
+                              return Center(
+                                child: SkeletonLine(
+                                  style: SkeletonLineStyle(
+                                    height: 50,
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
-                                );
-                              } else {
-                                return Center(
-                                  child: SkeletonLine(
-                                    style: SkeletonLineStyle(
-                                      height: 50,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                );
-                              }
-                            }),
+                                ),
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
                     const SizedBox(
@@ -400,7 +405,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                     initialZoom: 17.5,
                                     maxZoom: 18,
                                     interactionOptions: const InteractionOptions(
-                                      flags: InteractiveFlag.all &
+                                      flags:
+                                          InteractiveFlag.all &
                                           ~InteractiveFlag.pinchMove &
                                           ~InteractiveFlag.rotate,
                                     ),
@@ -449,8 +455,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                               .colorScheme
                                               .surfaceContainerLowest
                                               .withValues(alpha: 0.8),
-                                          borderRadius:
-                                              BorderRadius.only(topLeft: Radius.circular(8)),
+                                          borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(8),
+                                          ),
                                         ),
                                         padding: const EdgeInsets.all(4),
                                         child: Row(
@@ -468,15 +475,16 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                             Text(
                                               "OneMap © contributors",
                                               style: TextStyle(
-                                                color:
-                                                    Theme.of(context).colorScheme.onSurfaceVariant,
+                                                color: Theme.of(
+                                                  context,
+                                                ).colorScheme.onSurfaceVariant,
                                                 fontSize: 12,
                                               ),
                                             ),
                                           ],
                                         ),
                                       ),
-                                    )
+                                    ),
                                   ],
                                 ),
                               ),
@@ -503,9 +511,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                     ),
                                     iconSize: 28,
                                     onPressed: () {
-                                      context
-                                          .read<CommonProvider>()
-                                          .setInitialMapPinLocation(widget.busStopLocation);
+                                      context.read<CommonProvider>().setInitialMapPinLocation(
+                                        widget.busStopLocation,
+                                      );
 
                                       Navigator.of(context).pushAndRemoveUntil(
                                         MaterialPageRoute(
@@ -525,10 +533,10 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                     ),
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ],

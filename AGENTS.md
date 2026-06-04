@@ -29,10 +29,13 @@ flutter build ios
 
 **IMPORTANT:** Never run Shorebird commands (`shorebird release`, `shorebird patch`). These are always run by the user.
 
-**IMPORTANT:** After editing ANY Dart file, you MUST format it with the line length parameter:
+**IMPORTANT:** After editing ANY Dart file, you MUST format it with the repo formatter config:
 ```bash
-dart format --line-length=100 <file>
+dart format <file>
 ```
+The formatter contract lives in `analysis_options.yaml` (`formatter.page_width: 100`,
+`trailing_commas: preserve`) and `.vscode/settings.json` mirrors it for VS Code. Do not manually
+format checked-in `.g.dart` files; regenerate them with `flutter pub run build_runner build`.
 
 ## Code Style Guidelines
 

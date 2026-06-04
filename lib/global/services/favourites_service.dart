@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:transito/models/favourites/favourite.dart';
 
 class FavouritesService {
-  final CollectionReference _favouritesCollection =
-      FirebaseFirestore.instance.collection('favourites');
+  final CollectionReference _favouritesCollection = FirebaseFirestore.instance.collection(
+    'favourites',
+  );
 
   Stream<List<Favourite>> streamFavourites(String? userId) {
     if (userId != null) {
@@ -31,13 +32,17 @@ class FavouritesService {
   }
 
   Future<Map<String?, List<String?>>> getFavouriteServicesByBusStopCode(
-      String userId, String busStopCode) async {
-    var favouritesList =
-        FavouritesList.fromFirestore(await _favouritesCollection.doc(userId).get()).favouritesList;
+    String userId,
+    String busStopCode,
+  ) async {
+    var favouritesList = FavouritesList.fromFirestore(
+      await _favouritesCollection.doc(userId).get(),
+    ).favouritesList;
 
     Map<String?, List<String?>> initialSelectedChildren = {
-      'Bus Services':
-          favouritesList.firstWhere((element) => element.busStopCode == busStopCode).services,
+      'Bus Services': favouritesList
+          .firstWhere((element) => element.busStopCode == busStopCode)
+          .services,
     };
 
     return initialSelectedChildren;
@@ -47,7 +52,7 @@ class FavouritesService {
     return _favouritesCollection
         .doc(userId)
         .update({
-          'favouritesList': FieldValue.arrayUnion([favourite.toJson()])
+          'favouritesList': FieldValue.arrayUnion([favourite.toJson()]),
         })
         .then(
           (_) => debugPrint('✔️ Added ${favourite.busStopCode} to favourites'),
@@ -70,8 +75,9 @@ class FavouritesService {
 
           _favouritesCollection
               .doc(userId)
-              .update(
-                  {'favouritesList': favouritesList.map((element) => element.toJson()).toList()})
+              .update({
+                'favouritesList': favouritesList.map((element) => element.toJson()).toList(),
+              })
               .then(
                 (_) => debugPrint('✔️ Removed $busStopCode from favourites'),
               )
@@ -90,7 +96,8 @@ class FavouritesService {
           .update({'favouritesList': favourites.map((favourite) => favourite.toJson()).toList()})
           .then(
             (_) => debugPrint(
-                '✔️ Reordered favourites list to ${favourites.map((favourite) => favourite.busStopCode).toList()}'),
+              '✔️ Reordered favourites list to ${favourites.map((favourite) => favourite.busStopCode).toList()}',
+            ),
           )
           .catchError(
             (error) => debugPrint('❌ Error reordering favourite from Firestore: $error'),
@@ -105,8 +112,9 @@ class FavouritesService {
       (snapshot) {
         if (snapshot.exists) {
           List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
-          final int favouriteIndex =
-              favouritesList.indexWhere((element) => element.busStopCode == favourite.busStopCode);
+          final int favouriteIndex = favouritesList.indexWhere(
+            (element) => element.busStopCode == favourite.busStopCode,
+          );
 
           if (favouriteIndex == -1) {
             debugPrint('❌ ${favourite.busStopCode} was not found in favourites');
@@ -117,8 +125,9 @@ class FavouritesService {
 
           _favouritesCollection
               .doc(userId)
-              .update(
-                  {'favouritesList': favouritesList.map((element) => element.toJson()).toList()})
+              .update({
+                'favouritesList': favouritesList.map((element) => element.toJson()).toList(),
+              })
               .then(
                 (_) => debugPrint('✔️ Updated ${favourite.busStopCode}\'s favourites'),
               )

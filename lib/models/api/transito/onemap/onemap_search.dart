@@ -21,7 +21,6 @@ class OneMapSearch {
     required this.totalPages,
     required this.page,
     required this.data,
-    
   });
 
   factory OneMapSearch.fromJson(Map<String, dynamic> json) => _$OneMapSearchFromJson(json);

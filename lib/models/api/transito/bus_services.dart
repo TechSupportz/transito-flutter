@@ -71,7 +71,7 @@ class BusService {
 
   @JsonKey(defaultValue: BusOperator.NA, unknownEnumValue: BusOperator.NA)
   BusOperator operator;
-  
+
   bool isLoopService;
   bool isSingleRoute;
   List<BusStop> interchanges;

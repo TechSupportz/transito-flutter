@@ -77,7 +77,8 @@ class AnimatedIndexedStack extends StatefulWidget {
     Widget child,
     Animation<double> primaryAnimation,
     Animation<double> secondaryAnimation,
-  ) transitionBuilder;
+  )
+  transitionBuilder;
 
   /// A function that lays out all the children in this IndexedStack.
   /// This defaults to [PageTransitionSwitcher.defaultLayoutBuilder].
@@ -273,17 +274,17 @@ class _AnimatedIndexedStackState extends State<AnimatedIndexedStack> with Ticker
   }
 
   _ChildEntry _newEntry(Widget child) => _ChildEntry(
-        key: GlobalKey(),
-        child: child,
-        primaryController: AnimationController(
-          duration: widget.duration,
-          vsync: this,
-        ),
-        secondaryController: AnimationController(
-          duration: widget.duration,
-          vsync: this,
-        ),
-      );
+    key: GlobalKey(),
+    child: child,
+    primaryController: AnimationController(
+      duration: widget.duration,
+      vsync: this,
+    ),
+    secondaryController: AnimationController(
+      duration: widget.duration,
+      vsync: this,
+    ),
+  );
 
   @override
   void dispose() {
@@ -294,30 +295,31 @@ class _AnimatedIndexedStackState extends State<AnimatedIndexedStack> with Ticker
   }
 
   Widget _buildChild(_ChildEntry entry) => AnimatedBuilder(
-        animation: Listenable.merge([
+    animation: Listenable.merge([
+      entry.primaryController,
+      entry.secondaryController,
+    ]),
+    builder: (context, child) {
+      bool isVisible =
+          entry.primaryController.isAnimating ||
+          entry.secondaryController.isAnimating ||
+          entry == _currentEntry;
+
+      return Visibility(
+        visible: isVisible,
+        maintainState: true,
+        child: widget.transitionBuilder(
+          KeyedSubtree(
+            key: entry.key,
+            child: child!,
+          ),
           entry.primaryController,
           entry.secondaryController,
-        ]),
-        builder: (context, child) {
-          bool isVisible = entry.primaryController.isAnimating ||
-              entry.secondaryController.isAnimating ||
-              entry == _currentEntry;
-
-          return Visibility(
-            visible: isVisible,
-            maintainState: true,
-            child: widget.transitionBuilder(
-              KeyedSubtree(
-                key: entry.key,
-                child: child!,
-              ),
-              entry.primaryController,
-              entry.secondaryController,
-            ),
-          );
-        },
-        child: entry.child,
+        ),
       );
+    },
+    child: entry.child,
+  );
 
   @override
   Widget build(BuildContext context) {

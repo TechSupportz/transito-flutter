@@ -53,11 +53,13 @@ class _SearchDialogState extends State<SearchDialog> {
 
   Future<BusStopSearchApiResponse> searchBusStops(String query) async {
     if (query.isEmpty) {
-      return Future.value(BusStopSearchApiResponse(
-        message: "NA",
-        count: 0,
-        data: [],
-      ));
+      return Future.value(
+        BusStopSearchApiResponse(
+          message: "NA",
+          count: 0,
+          data: [],
+        ),
+      );
     }
 
     final BusStopSearchApiResponse response = await TransitoApiService().searchBusStops(query);
@@ -67,15 +69,18 @@ class _SearchDialogState extends State<SearchDialog> {
 
   Future<BusServiceSearchApiResponse> searchBusServices(String query) async {
     if (query.isEmpty) {
-      return Future.value(BusServiceSearchApiResponse(
-        message: "NA",
-        count: 0,
-        data: [],
-      ));
+      return Future.value(
+        BusServiceSearchApiResponse(
+          message: "NA",
+          count: 0,
+          data: [],
+        ),
+      );
     }
 
-    final BusServiceSearchApiResponse response =
-        await TransitoApiService().searchBusServices(query);
+    final BusServiceSearchApiResponse response = await TransitoApiService().searchBusServices(
+      query,
+    );
     debugPrint("Services fetched");
     return response;
   }
@@ -107,25 +112,31 @@ class _SearchDialogState extends State<SearchDialog> {
   void clearSearch() {
     _textFieldController.clear();
     setState(() {
-      _searchResults = Future.value(OneMapSearch(
-        totalCount: 0,
-        count: 0,
-        totalPages: 0,
-        page: 1,
-        data: [],
-      ));
+      _searchResults = Future.value(
+        OneMapSearch(
+          totalCount: 0,
+          count: 0,
+          totalPages: 0,
+          page: 1,
+          data: [],
+        ),
+      );
 
-      _futureBusStopSearchResults = Future.value(BusStopSearchApiResponse(
-        message: "NA",
-        count: 0,
-        data: [],
-      ));
+      _futureBusStopSearchResults = Future.value(
+        BusStopSearchApiResponse(
+          message: "NA",
+          count: 0,
+          data: [],
+        ),
+      );
 
-      _futureBusServiceSearchResults = Future.value(BusServiceSearchApiResponse(
-        message: "NA",
-        count: 0,
-        data: [],
-      ));
+      _futureBusServiceSearchResults = Future.value(
+        BusServiceSearchApiResponse(
+          message: "NA",
+          count: 0,
+          data: [],
+        ),
+      );
     });
     widget.onSearchCleared();
   }
@@ -133,25 +144,31 @@ class _SearchDialogState extends State<SearchDialog> {
   @override
   void initState() {
     super.initState();
-    _searchResults = Future.value(OneMapSearch(
-      totalCount: 0,
-      count: 0,
-      totalPages: 0,
-      page: 1,
-      data: [],
-    ));
+    _searchResults = Future.value(
+      OneMapSearch(
+        totalCount: 0,
+        count: 0,
+        totalPages: 0,
+        page: 1,
+        data: [],
+      ),
+    );
 
-    _futureBusStopSearchResults = Future.value(BusStopSearchApiResponse(
-      message: "NA",
-      count: 0,
-      data: [],
-    ));
+    _futureBusStopSearchResults = Future.value(
+      BusStopSearchApiResponse(
+        message: "NA",
+        count: 0,
+        data: [],
+      ),
+    );
 
-    _futureBusServiceSearchResults = Future.value(BusServiceSearchApiResponse(
-      message: "NA",
-      count: 0,
-      data: [],
-    ));
+    _futureBusServiceSearchResults = Future.value(
+      BusServiceSearchApiResponse(
+        message: "NA",
+        count: 0,
+        data: [],
+      ),
+    );
 
     if (widget.initialQuery != null) {
       _textFieldController.text = widget.initialQuery!;
@@ -247,13 +264,14 @@ class _SearchDialogState extends State<SearchDialog> {
                         }
                       },
                       avatar: AnimatedOpacity(
-                          opacity: _searchMode == SearchMode.PLACES ? 0.2 : 1.0,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Easing.standard,
-                          child: AppSymbol(
-                            Symbols.place_rounded,
-                            fill: true,
-                          )),
+                        opacity: _searchMode == SearchMode.PLACES ? 0.2 : 1.0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Easing.standard,
+                        child: AppSymbol(
+                          Symbols.place_rounded,
+                          fill: true,
+                        ),
+                      ),
                     ),
                     ChoiceChip(
                       label: Text("Bus Stops"),
@@ -271,13 +289,14 @@ class _SearchDialogState extends State<SearchDialog> {
                         }
                       },
                       avatar: AnimatedOpacity(
-                          opacity: _searchMode == SearchMode.STOPS ? 0.2 : 1.0,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Easing.standard,
-                          child: AppSymbol(
-                            Symbols.signpost_rounded,
-                            fill: true,
-                          )),
+                        opacity: _searchMode == SearchMode.STOPS ? 0.2 : 1.0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Easing.standard,
+                        child: AppSymbol(
+                          Symbols.signpost_rounded,
+                          fill: true,
+                        ),
+                      ),
                     ),
                     ChoiceChip(
                       label: Text("Bus Services"),
@@ -294,13 +313,14 @@ class _SearchDialogState extends State<SearchDialog> {
                         });
                       },
                       avatar: AnimatedOpacity(
-                          opacity: _searchMode == SearchMode.SERVICES ? 0.2 : 1.0,
-                          duration: const Duration(milliseconds: 300),
-                          curve: Easing.standard,
-                          child: AppSymbol(
-                            Symbols.directions_bus_rounded,
-                            fill: true,
-                          )),
+                        opacity: _searchMode == SearchMode.SERVICES ? 0.2 : 1.0,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Easing.standard,
+                        child: AppSymbol(
+                          Symbols.directions_bus_rounded,
+                          fill: true,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -450,7 +470,6 @@ class _SearchDialogState extends State<SearchDialog> {
         } else if (snapshot.hasError) {
           debugPrint("<=== ERROR ${snapshot.error} ===>");
           return searchErrorText();
-
         }
 
         return const Center(child: CircularProgressIndicator(strokeWidth: 3));
@@ -460,69 +479,71 @@ class _SearchDialogState extends State<SearchDialog> {
 
   FutureBuilder<BusStopSearchApiResponse> busStopSearchResults() {
     return FutureBuilder(
-        future: _futureBusStopSearchResults,
-        builder: (BuildContext context, AsyncSnapshot<BusStopSearchApiResponse> snapshot) {
-          // if the bus stop list is not yet loaded, show a loading indicator
-          if (snapshot.hasData) {
-            BusStopSearchApiResponse res = snapshot.data!;
+      future: _futureBusStopSearchResults,
+      builder: (BuildContext context, AsyncSnapshot<BusStopSearchApiResponse> snapshot) {
+        // if the bus stop list is not yet loaded, show a loading indicator
+        if (snapshot.hasData) {
+          BusStopSearchApiResponse res = snapshot.data!;
 
-            if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "🔍 We couldn't find any bus stops 🤔",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 20,
-                      ),
-                      textAlign: TextAlign.center,
+          if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "🔍 We couldn't find any bus stops 🤔",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      "Try checking search for typos or use a different search term",
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 16,
-                      ),
-                      textAlign: TextAlign.center,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "Try checking search for typos or use a different search term",
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 16,
                     ),
-                  ],
-                ),
-              );
-            }
-
-            return Skeleton(
-              isLoading: snapshot.connectionState == ConnectionState.waiting,
-              skeleton: SkeletonListView(
-                padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-                itemBuilder: (context, _) => SkeletonLine(
-                  style: SkeletonLineStyle(
-                      height: 79,
-                      borderRadius: BorderRadius.circular(12),
-                      padding: const EdgeInsets.only(bottom: 16)),
-                ),
-              ),
-              child: ListView.separated(
-                itemCount: res.count,
-                padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
-                itemBuilder: (BuildContext context, int index) {
-                  return BusStopCard(busStopInfo: res.data[index], searchMode: true);
-                },
-                separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
               ),
             );
-          } else if (snapshot.hasError) {
-            // return Text("${snapshot.error}");
-            debugPrint("<=== ERROR ${snapshot.error} ===>");
-            return searchErrorText();
           }
 
-          return const Center(child: CircularProgressIndicator(strokeWidth: 3));
-        });
+          return Skeleton(
+            isLoading: snapshot.connectionState == ConnectionState.waiting,
+            skeleton: SkeletonListView(
+              padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+              itemBuilder: (context, _) => SkeletonLine(
+                style: SkeletonLineStyle(
+                  height: 79,
+                  borderRadius: BorderRadius.circular(12),
+                  padding: const EdgeInsets.only(bottom: 16),
+                ),
+              ),
+            ),
+            child: ListView.separated(
+              itemCount: res.count,
+              padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
+              itemBuilder: (BuildContext context, int index) {
+                return BusStopCard(busStopInfo: res.data[index], searchMode: true);
+              },
+              separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+            ),
+          );
+        } else if (snapshot.hasError) {
+          // return Text("${snapshot.error}");
+          debugPrint("<=== ERROR ${snapshot.error} ===>");
+          return searchErrorText();
+        }
+
+        return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+      },
+    );
   }
 
   FutureBuilder<BusServiceSearchApiResponse> busServiceSearchResults() {
@@ -568,9 +589,10 @@ class _SearchDialogState extends State<SearchDialog> {
               padding: const EdgeInsets.only(top: 16.0, bottom: 32.0, left: 12.0, right: 12.0),
               itemBuilder: (context, _) => SkeletonLine(
                 style: SkeletonLineStyle(
-                    height: 79,
-                    borderRadius: BorderRadius.circular(12),
-                    padding: const EdgeInsets.only(bottom: 16)),
+                  height: 79,
+                  borderRadius: BorderRadius.circular(12),
+                  padding: const EdgeInsets.only(bottom: 16),
+                ),
               ),
             ),
             child: ListView.separated(

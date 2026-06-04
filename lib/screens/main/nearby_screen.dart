@@ -110,17 +110,22 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   }) async {
     debugPrint("Fetching nearby favourites");
     List<NearbyFavourites> nearbyFavourites = [];
-    List<Favourite> favouritesList =
-        await FavouritesService().getFavourites(context.read<User>().uid);
+    List<Favourite> favouritesList = await FavouritesService().getFavourites(
+      context.read<User>().uid,
+    );
     Position userLocation = currentLocation ?? await getUserLocation();
 
     // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
     for (var favourite in favouritesList) {
-      double distanceAway = distance.as(LengthUnit.Meter,
-          LatLng(userLocation.latitude, userLocation.longitude), favourite.busStopLocation);
+      double distanceAway = distance.as(
+        LengthUnit.Meter,
+        LatLng(userLocation.latitude, userLocation.longitude),
+        favourite.busStopLocation,
+      );
       if (distanceAway <= 750) {
-        nearbyFavourites
-            .add(NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway));
+        nearbyFavourites.add(
+          NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway),
+        );
       }
     }
     List<NearbyFavourites> tempNearbyFavourites = nearbyFavourites;
@@ -142,22 +147,23 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   }
 
   void streamUserLocation() {
-    userLocationStream = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 50,
-      ),
-    ).listen((Position position) {
-      if (_prevUserLocation.latitude == position.latitude &&
-          _prevUserLocation.longitude == position.longitude) {
-        return;
-      }
-      setState(() {
-        nearbyBusStops = getNearbyBusStops(currentLocation: position);
-        nearbyFavourites = getNearbyFavourites(currentLocation: position);
-        _prevUserLocation = LatLng(position.latitude, position.longitude);
-      });
-    });
+    userLocationStream =
+        Geolocator.getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.best,
+            distanceFilter: 50,
+          ),
+        ).listen((Position position) {
+          if (_prevUserLocation.latitude == position.latitude &&
+              _prevUserLocation.longitude == position.longitude) {
+            return;
+          }
+          setState(() {
+            nearbyBusStops = getNearbyBusStops(currentLocation: position);
+            nearbyFavourites = getNearbyFavourites(currentLocation: position);
+            _prevUserLocation = LatLng(position.latitude, position.longitude);
+          });
+        });
   }
 
   @override
@@ -213,7 +219,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
               Symbols.settings_rounded,
               fill: true,
             ),
-          )
+          ),
         ],
       ),
       // notification listener to call the hideFabOnScroll function when the user scrolls
@@ -231,67 +237,69 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
           child: SingleChildScrollView(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
             child: FutureBuilder(
-                future: _isLocationPermissionGranted,
-                builder: (context, AsyncSnapshot<bool> snapshot) {
-                  // display a loading indicator while the user's location is being fetched
-                  if (snapshot.hasData) {
-                    // if the user has granted access to their location, display the list of nearby bus stops
-                    if (snapshot.data!) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: 16,
-                        children: [
-                          nearbyFavouritesList(),
-                          nearbyBusStopsGrid(),
-                        ],
-                      );
-                    } else {
-                      // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
-                      return Material(
-                        color: Theme.of(context).colorScheme.surfaceContainer,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          child: Center(
-                            child: Column(
-                              children: [
-                                const Text(
-                                  "Please grant location permission to use this feature",
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                TextButton(
-                                    onPressed: () => Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => const LocationAccessScreen(),
-                                          settings:
-                                              const RouteSettings(name: 'LocationAccessScreen'),
-                                        ),
-                                        (route) => false),
-                                    child: const Text("Grant permission")),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                  } else if (snapshot.hasError) {
-                    return Text("${snapshot.error}");
-                  } else if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(strokeWidth: 3),
+              future: _isLocationPermissionGranted,
+              builder: (context, AsyncSnapshot<bool> snapshot) {
+                // display a loading indicator while the user's location is being fetched
+                if (snapshot.hasData) {
+                  // if the user has granted access to their location, display the list of nearby bus stops
+                  if (snapshot.data!) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 16,
+                      children: [
+                        nearbyFavouritesList(),
+                        nearbyBusStopsGrid(),
+                      ],
                     );
                   } else {
-                    return const SizedBox(height: 0);
+                    // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
+                    return Material(
+                      color: Theme.of(context).colorScheme.surfaceContainer,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Center(
+                          child: Column(
+                            children: [
+                              const Text(
+                                "Please grant location permission to use this feature",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                              TextButton(
+                                onPressed: () => Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LocationAccessScreen(),
+                                    settings: const RouteSettings(name: 'LocationAccessScreen'),
+                                  ),
+                                  (route) => false,
+                                ),
+                                child: const Text("Grant permission"),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
                   }
-                }),
+                } else if (snapshot.hasError) {
+                  return Text("${snapshot.error}");
+                } else if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(strokeWidth: 3),
+                  );
+                } else {
+                  return const SizedBox(height: 0);
+                }
+              },
+            ),
           ),
         ),
       ),
@@ -388,7 +396,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
               // display a loading indicator while the list of nearby favourites is being fetched
             },
           ),
-        )
+        ),
       ],
     );
   }
@@ -408,33 +416,34 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
           height: 12,
         ),
         StreamBuilder(
-            stream: SettingsService().streamSettings(context.watch<User?>()?.uid),
-            builder: (context, userSettingsSnapshot) {
-              if (userSettingsSnapshot.hasData) {
-                UserSettings userSettings = userSettingsSnapshot.data as UserSettings;
+          stream: SettingsService().streamSettings(context.watch<User?>()?.uid),
+          builder: (context, userSettingsSnapshot) {
+            if (userSettingsSnapshot.hasData) {
+              UserSettings userSettings = userSettingsSnapshot.data as UserSettings;
 
-                GridView renderGridView(List<Widget> children) {
-                  return GridView.builder(
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: isTablet
-                          ? (userSettings.isNearbyGrid ? 3 : 1)
-                          : (userSettings.isNearbyGrid ? 2 : 1),
-                      mainAxisSpacing: 12,
-                      crossAxisSpacing: 12,
-                      mainAxisExtent: 80,
-                    ),
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: children.length,
-                    itemBuilder: (context, index) {
-                      return children[index];
-                    },
-                  );
-                }
+              GridView renderGridView(List<Widget> children) {
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: isTablet
+                        ? (userSettings.isNearbyGrid ? 3 : 1)
+                        : (userSettings.isNearbyGrid ? 2 : 1),
+                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 12,
+                    mainAxisExtent: 80,
+                  ),
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: children.length,
+                  itemBuilder: (context, index) {
+                    return children[index];
+                  },
+                );
+              }
 
-                return FutureBuilder(
-                    future: nearbyBusStops,
-                    builder: (
+              return FutureBuilder(
+                future: nearbyBusStops,
+                builder:
+                    (
                       BuildContext context,
                       AsyncSnapshot<List<NearbyBusStop>> nearbyBusStopList,
                     ) {
@@ -490,24 +499,26 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                         ),
                         child: _busStopsResultsWidget,
                       );
-                    });
-              }
-
-              if (userSettingsSnapshot.hasError) {
-                debugPrint("<=== ERROR ${userSettingsSnapshot.error} ===>");
-                return Expanded(
-                  flex: 1,
-                  child: const ErrorText(
-                    enableBackground: true,
-                    icon: Symbols.settings_alert_rounded,
-                  ),
-                );
-              }
-
-              return const Center(
-                child: CircularProgressIndicator(strokeWidth: 3),
+                    },
               );
-            })
+            }
+
+            if (userSettingsSnapshot.hasError) {
+              debugPrint("<=== ERROR ${userSettingsSnapshot.error} ===>");
+              return Expanded(
+                flex: 1,
+                child: const ErrorText(
+                  enableBackground: true,
+                  icon: Symbols.settings_alert_rounded,
+                ),
+              );
+            }
+
+            return const Center(
+              child: CircularProgressIndicator(strokeWidth: 3),
+            );
+          },
+        ),
       ],
     );
   }

@@ -19,8 +19,10 @@ class FavouritesProvider extends ChangeNotifier {
 
   // finds index where the old favourite is located based on bus stop code and replaces the old favourite with the new favourite
   void updateFavourite(Favourite favourite) {
-    _favouritesList[_favouritesList
-        .indexWhere((element) => element.busStopCode == favourite.busStopCode)] = favourite;
+    _favouritesList[_favouritesList.indexWhere(
+          (element) => element.busStopCode == favourite.busStopCode,
+        )] =
+        favourite;
     notifyListeners();
   }
 

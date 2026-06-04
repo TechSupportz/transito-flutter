@@ -77,13 +77,17 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                   Text(
                     "Drag and drop to reorder your favourites",
                     style: TextStyle(
-                        fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "Click the pencil icon to modify or delete your favourites",
                     style: TextStyle(
-                        fontSize: 16, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(height: 18),
                 ],
@@ -98,32 +102,33 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                     child: NotificationListener<UserScrollNotification>(
                       onNotification: (notification) => hideFabOnScroll(notification),
                       child: ReorderableListView.builder(
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              key: Key(favouritesList[index].busStopCode),
-                              padding: const EdgeInsets.only(bottom: 18),
-                              child: FavouriteNameCard(
-                                  busStopName: favouritesList[index].busStopName,
-                                  onTap: () =>
-                                      goToEditFavouritesScreen(context, favouritesList[index])),
-                            );
-                          },
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          shrinkWrap: true,
-                          buildDefaultDragHandles: true,
-                          itemCount: favouritesList.length,
-                          // calls reorder function in FavouritesProvider to reorder the favourites list
-                          onReorder: (oldIndex, newIndex) {
-                            if (oldIndex < newIndex) {
-                              // removing the item at oldIndex will shorten the list by 1
-                              newIndex--;
-                            }
-                            favouritesList.insert(newIndex, favouritesList.removeAt(oldIndex));
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            key: Key(favouritesList[index].busStopCode),
+                            padding: const EdgeInsets.only(bottom: 18),
+                            child: FavouriteNameCard(
+                              busStopName: favouritesList[index].busStopName,
+                              onTap: () => goToEditFavouritesScreen(context, favouritesList[index]),
+                            ),
+                          );
+                        },
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        shrinkWrap: true,
+                        buildDefaultDragHandles: true,
+                        itemCount: favouritesList.length,
+                        // calls reorder function in FavouritesProvider to reorder the favourites list
+                        onReorder: (oldIndex, newIndex) {
+                          if (oldIndex < newIndex) {
+                            // removing the item at oldIndex will shorten the list by 1
+                            newIndex--;
+                          }
+                          favouritesList.insert(newIndex, favouritesList.removeAt(oldIndex));
 
-                            setState(() {
-                              reorderedFavouritesList = favouritesList;
-                            });
-                          }),
+                          setState(() {
+                            reorderedFavouritesList = favouritesList;
+                          });
+                        },
+                      ),
                     ),
                   );
                 } else if (snapshot.hasError) {

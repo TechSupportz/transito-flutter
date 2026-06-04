@@ -20,14 +20,15 @@ class BusRoutesList extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: ListView.separated(
-          shrinkWrap: true,
-          controller: controller,
-          padding: const EdgeInsets.only(bottom: 24),
-          itemCount: routes.length,
-          separatorBuilder: (context, _) => const SizedBox(height: 12),
-          itemBuilder: (context, index) {
-            if (currentStopCode != null && routes[index].busStop.code == currentStopCode) {
-              return Stack(children: [
+        shrinkWrap: true,
+        controller: controller,
+        padding: const EdgeInsets.only(bottom: 24),
+        itemCount: routes.length,
+        separatorBuilder: (context, _) => const SizedBox(height: 12),
+        itemBuilder: (context, index) {
+          if (currentStopCode != null && routes[index].busStop.code == currentStopCode) {
+            return Stack(
+              children: [
                 BusStopCard(
                   busStopInfo: routes[index].busStop,
                   routeMode: true,
@@ -49,15 +50,17 @@ class BusRoutesList extends StatelessWidget {
                     ),
                   ),
                 ),
-              ]);
-            }
-
-            return BusStopCard(
-              busStopInfo: routes[index].busStop,
-              routeMode: true,
-              busSchedule: (firstBus: routes[index].firstBus, lastBus: routes[index].lastBus),
+              ],
             );
-          }),
+          }
+
+          return BusStopCard(
+            busStopInfo: routes[index].busStop,
+            routeMode: true,
+            busSchedule: (firstBus: routes[index].firstBus, lastBus: routes[index].lastBus),
+          );
+        },
+      ),
     );
   }
 }

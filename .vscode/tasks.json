@@ -1,0 +1,11 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dart: Format source and regenerate",
+      "type": "shell",
+      "command": "git ls-files '*.dart' | grep -v '\\.g\\.dart$' | xargs dart format && flutter pub run build_runner build",
+      "problemMatcher": []
+    }
+  ]
+}

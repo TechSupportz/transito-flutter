@@ -67,7 +67,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   Future<Position> getUserLocation() async {
     debugPrint("Fetching user location");
     Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.best));
+      locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
+    );
     debugPrint('$position');
     return position;
   }
@@ -111,8 +112,8 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
         }
 
         return Jiffy.parse(a.nextBus.estimatedArrival!.split("+")[0]).isAfter(
-          Jiffy.parse(b.nextBus.estimatedArrival!.split("+")[0]),
-        )
+              Jiffy.parse(b.nextBus.estimatedArrival!.split("+")[0]),
+            )
             ? 1
             : 0;
       });
@@ -229,13 +230,13 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
     futureServices = fetchServices();
     timer = Timer.periodic(
-        const Duration(seconds: 20),
-        (Timer t) => setState(
-              () {
-                futureBusArrivalInfo =
-                    fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
-              },
-            ));
+      const Duration(seconds: 20),
+      (Timer t) => setState(
+        () {
+          futureBusArrivalInfo = fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+        },
+      ),
+    );
 
     var userId = context.read<User?>()?.uid;
     FavouritesService().isAddedToFavourites(widget.code, userId!).then((value) {
@@ -308,204 +309,217 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
         ],
       ),
       body: StreamBuilder(
-          stream: SettingsService().streamSettings(user?.uid),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              UserSettings userSettings = snapshot.data as UserSettings;
-              return FutureBuilder(
-                future: futureBusArrivalInfo,
-                builder:
-                    (BuildContext context, AsyncSnapshot<BusArrivalInfo> busArrivalInfoSnapshot) {
-                  Widget arrivalInfoResults = Container();
+        stream: SettingsService().streamSettings(user?.uid),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            UserSettings userSettings = snapshot.data as UserSettings;
+            return FutureBuilder(
+              future: futureBusArrivalInfo,
+              builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> busArrivalInfoSnapshot) {
+                Widget arrivalInfoResults = Container();
 
-                  // check if the snapshot has data, if not then display a loading indicator
-                  if (busArrivalInfoSnapshot.hasData) {
-                    // notification listener to hide the fab when the user is scrolling down the list
-                    arrivalInfoResults = NotificationListener<UserScrollNotification>(
-                      onNotification: (notification) => hideFabOnScroll(notification),
-                      child: busArrivalInfoSnapshot.data!.services.isEmpty
-                          ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Text(
-                                  Jiffy.now().hour >= 5
-                                      ? '🦥 All the buses are lepaking 🦥'
-                                      : "💤 Buses are sleeping 💤",
-                                  style: const TextStyle(
-                                    fontSize: 21,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  textAlign: TextAlign.center,
+                // check if the snapshot has data, if not then display a loading indicator
+                if (busArrivalInfoSnapshot.hasData) {
+                  // notification listener to hide the fab when the user is scrolling down the list
+                  arrivalInfoResults = NotificationListener<UserScrollNotification>(
+                    onNotification: (notification) => hideFabOnScroll(notification),
+                    child: busArrivalInfoSnapshot.data!.services.isEmpty
+                        ? Center(
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Text(
+                                Jiffy.now().hour >= 5
+                                    ? '🦥 All the buses are lepaking 🦥'
+                                    : "💤 Buses are sleeping 💤",
+                                style: const TextStyle(
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ),
-                            )
-                          : RefreshIndicator(
-                              onRefresh: () async {
-                                setState(() {
-                                  futureBusArrivalInfo = fetchArrivalTimings().then(
-                                    (value) => sortBusArrivalInfo(value),
-                                  );
-                                });
-                              },
-                              child: ListView(
-                                controller: _scrollController,
-                                padding:
-                                    const EdgeInsets.only(top: 12, bottom: 32, left: 12, right: 12),
-                                children: [
-                                  ListView.separated(
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      itemBuilder: (context, int index) {
-                                        return Padding(
-                                          padding: const EdgeInsets.only(bottom: 8.0),
-                                          child: BusTimingRow(
-                                            busStopCode: widget.code,
-                                            serviceInfo:
-                                                busArrivalInfoSnapshot.data!.services[index],
-                                            userLatLng: widget.busStopLocation,
-                                            isETAminutes: userSettings.isETAminutes,
-                                          ),
-                                        );
-                                      },
-                                      separatorBuilder: (BuildContext context, int index) =>
-                                          const Divider(),
-                                      itemCount: busArrivalInfoSnapshot.data!.services.length),
-                                  FutureBuilder(
-                                      future: futureServices,
-                                      builder: (context, servicesSnapshot) {
-                                        Widget nonOperationalServicesResults = Container();
-                                        final currOperatingServices = busArrivalInfoSnapshot
-                                            .data!.services
-                                            .map((e) => e.serviceNum)
-                                            .toList();
-
-                                        if (servicesSnapshot.hasData) {
-                                          final services = servicesSnapshot.data as List<String>;
-                                          final nonOperatingServices = services
-                                              .where((element) =>
-                                                  !currOperatingServices.contains(element))
-                                              .toList();
-
-                                          if (nonOperatingServices.isEmpty) {
-                                            return const SizedBox.shrink();
-                                          }
-
-                                          nonOperationalServicesResults = Opacity(
-                                            opacity: 0.65,
-                                            child: Column(
-                                              children: [
-                                                Theme(
-                                                  data: Theme.of(context).copyWith(
-                                                    splashFactory: NoSplash.splashFactory,
-                                                    highlightColor: Colors.transparent,
-                                                  ),
-                                                  child: ExpansionTile(
-                                                    key: expansionTileKey,
-                                                    title: const Text(
-                                                      "Non-operational services",
-                                                      style: TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight: FontWeight.w500,
-                                                      ),
-                                                    ),
-                                                    controlAffinity:
-                                                        ListTileControlAffinity.leading,
-                                                    leading: const AppSymbol(
-                                                      Symbols.info_rounded,
-                                                    ),
-                                                    onExpansionChanged: (value) {
-                                                      if (value) {
-                                                        scrollToSelectedContent(expansionTileKey);
-                                                      }
-                                                    },
-                                                    shape: const Border(),
-                                                    children: [
-                                                      Wrap(
-                                                        spacing: 8,
-                                                        runSpacing: 8,
-                                                        direction: Axis.horizontal,
-                                                        alignment: WrapAlignment.start,
-                                                        children:
-                                                            nonOperatingServices //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
-                                                                .map(
-                                                                  (service) => BusServiceChip(
-                                                                    busServiceNumber: service,
-                                                                    currentStopCode: widget.code,
-                                                                    isOperating: true,
-                                                                  ),
-                                                                )
-                                                                .toList(),
-                                                      )
-                                                    ],
-                                                  ),
-                                                )
-                                              ],
-                                            ),
-                                          );
-                                        } else if (servicesSnapshot.hasError) {
-                                          nonOperationalServicesResults = SizedBox();
-                                        }
-
-                                        return Skeleton(
-                                            isLoading: servicesSnapshot.connectionState ==
-                                                ConnectionState.waiting,
-                                            skeleton: Container(),
-                                            child: nonOperationalServicesResults);
-                                      })
-                                ],
+                                textAlign: TextAlign.center,
                               ),
                             ),
-                    );
-                  } else if (busArrivalInfoSnapshot.hasError) {
-                    // return Text("${snapshot.error}");
-                    debugPrint("<=== ERROR ${busArrivalInfoSnapshot.error} ===>");
-                    arrivalInfoResults = const ErrorText(
-                      title: "Couldn't load timings",
-                    );
-                  }
-
-                  Animation<double> _animation =
-                      Tween(begin: 0.0, end: 0.5).animate(_animationController);
-                  _animationController.forward();
-
-                  return AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 350),
-                      transitionBuilder: (child, animation) {
-                        return FadeTransition(
-                          opacity: animation,
-                          child: child,
-                        );
-                      },
-                      child: busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
-                              !busArrivalInfoSnapshot.hasData
-                          ? FadeTransition(
-                              opacity: _animation,
-                              child: const SkeletonLine(
-                                style: SkeletonLineStyle(
-                                  height: double.infinity,
-                                ),
+                          )
+                        : RefreshIndicator(
+                            onRefresh: () async {
+                              setState(() {
+                                futureBusArrivalInfo = fetchArrivalTimings().then(
+                                  (value) => sortBusArrivalInfo(value),
+                                );
+                              });
+                            },
+                            child: ListView(
+                              controller: _scrollController,
+                              padding: const EdgeInsets.only(
+                                top: 12,
+                                bottom: 32,
+                                left: 12,
+                                right: 12,
                               ),
-                            )
-                          : arrivalInfoResults);
-                },
-              );
-            } else if (snapshot.hasError) {
-              // return Text("${snapshot.error}");
-              debugPrint("<=== ERROR ${snapshot.error} ===>");
-              return const ErrorText(
-                icon: Symbols.error_rounded,
-              );
-            } else {
-              return const Center();
-            }
-          }),
+                              children: [
+                                ListView.separated(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemBuilder: (context, int index) {
+                                    return Padding(
+                                      padding: const EdgeInsets.only(bottom: 8.0),
+                                      child: BusTimingRow(
+                                        busStopCode: widget.code,
+                                        serviceInfo: busArrivalInfoSnapshot.data!.services[index],
+                                        userLatLng: widget.busStopLocation,
+                                        isETAminutes: userSettings.isETAminutes,
+                                      ),
+                                    );
+                                  },
+                                  separatorBuilder: (BuildContext context, int index) =>
+                                      const Divider(),
+                                  itemCount: busArrivalInfoSnapshot.data!.services.length,
+                                ),
+                                FutureBuilder(
+                                  future: futureServices,
+                                  builder: (context, servicesSnapshot) {
+                                    Widget nonOperationalServicesResults = Container();
+                                    final currOperatingServices = busArrivalInfoSnapshot
+                                        .data!
+                                        .services
+                                        .map((e) => e.serviceNum)
+                                        .toList();
+
+                                    if (servicesSnapshot.hasData) {
+                                      final services = servicesSnapshot.data as List<String>;
+                                      final nonOperatingServices = services
+                                          .where(
+                                            (element) => !currOperatingServices.contains(element),
+                                          )
+                                          .toList();
+
+                                      if (nonOperatingServices.isEmpty) {
+                                        return const SizedBox.shrink();
+                                      }
+
+                                      nonOperationalServicesResults = Opacity(
+                                        opacity: 0.65,
+                                        child: Column(
+                                          children: [
+                                            Theme(
+                                              data: Theme.of(context).copyWith(
+                                                splashFactory: NoSplash.splashFactory,
+                                                highlightColor: Colors.transparent,
+                                              ),
+                                              child: ExpansionTile(
+                                                key: expansionTileKey,
+                                                title: const Text(
+                                                  "Non-operational services",
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                                controlAffinity: ListTileControlAffinity.leading,
+                                                leading: const AppSymbol(
+                                                  Symbols.info_rounded,
+                                                ),
+                                                onExpansionChanged: (value) {
+                                                  if (value) {
+                                                    scrollToSelectedContent(expansionTileKey);
+                                                  }
+                                                },
+                                                shape: const Border(),
+                                                children: [
+                                                  Wrap(
+                                                    spacing: 8,
+                                                    runSpacing: 8,
+                                                    direction: Axis.horizontal,
+                                                    alignment: WrapAlignment.start,
+                                                    children:
+                                                        nonOperatingServices //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
+                                                            .map(
+                                                              (service) => BusServiceChip(
+                                                                busServiceNumber: service,
+                                                                currentStopCode: widget.code,
+                                                                isOperating: true,
+                                                              ),
+                                                            )
+                                                            .toList(),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    } else if (servicesSnapshot.hasError) {
+                                      nonOperationalServicesResults = SizedBox();
+                                    }
+
+                                    return Skeleton(
+                                      isLoading:
+                                          servicesSnapshot.connectionState ==
+                                          ConnectionState.waiting,
+                                      skeleton: Container(),
+                                      child: nonOperationalServicesResults,
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                  );
+                } else if (busArrivalInfoSnapshot.hasError) {
+                  // return Text("${snapshot.error}");
+                  debugPrint("<=== ERROR ${busArrivalInfoSnapshot.error} ===>");
+                  arrivalInfoResults = const ErrorText(
+                    title: "Couldn't load timings",
+                  );
+                }
+
+                Animation<double> _animation = Tween(
+                  begin: 0.0,
+                  end: 0.5,
+                ).animate(_animationController);
+                _animationController.forward();
+
+                return AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 350),
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    );
+                  },
+                  child:
+                      busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
+                          !busArrivalInfoSnapshot.hasData
+                      ? FadeTransition(
+                          opacity: _animation,
+                          child: const SkeletonLine(
+                            style: SkeletonLineStyle(
+                              height: double.infinity,
+                            ),
+                          ),
+                        )
+                      : arrivalInfoResults,
+                );
+              },
+            );
+          } else if (snapshot.hasError) {
+            // return Text("${snapshot.error}");
+            debugPrint("<=== ERROR ${snapshot.error} ===>");
+            return const ErrorText(
+              icon: Symbols.error_rounded,
+            );
+          } else {
+            return const Center();
+          }
+        },
+      ),
       floatingActionButton: isFabVisible
           ? AdaptiveFloatingActionButton(
               materialSymbol: Symbols.refresh_rounded,
               cupertinoSymbolString: 'arrow.clockwise',
               onPressed: () => setState(() {
-                futureBusArrivalInfo =
-                    fetchArrivalTimings().then((value) => sortBusArrivalInfo(value));
+                futureBusArrivalInfo = fetchArrivalTimings().then(
+                  (value) => sortBusArrivalInfo(value),
+                );
               }),
             )
           : null,

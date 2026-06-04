@@ -133,32 +133,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
             userId: user.uid,
             newValue: '0x${newColour.value.toRadixString(16).toUpperCase()}',
           )
-          .then((_) => showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Accent colour updated'),
-                  content: const Text('A restart may be required for the change to take effect.'),
-                  actions: [
-                    TextButton(
-                      child: const Text('Ok'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                            builder: (context) => const NavigatorScreen(),
-                          ),
-                          (Route<dynamic> route) => false,
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              ));
+          .then(
+            (_) => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Accent colour updated'),
+                content: const Text('A restart may be required for the change to take effect.'),
+                actions: [
+                  TextButton(
+                    child: const Text('Ok'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => const NavigatorScreen(),
+                        ),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
     }
   }
 
   void resetAccentColour(User? user) async {
-    SettingsService().updateAccentColour(userId: user?.uid, newValue: '0xFF7E6BFF').then(
+    SettingsService()
+        .updateAccentColour(userId: user?.uid, newValue: '0xFF7E6BFF')
+        .then(
           (_) => showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -244,41 +248,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         color: appColors.scheme.primary,
                       ),
                       child: AnimatedSwitcher(
-                          transitionBuilder: (child, animation) => ScaleTransition(
-                                scale: animation,
-                                child: child,
-                              ),
-                          duration: const Duration(milliseconds: 175),
-                          child: _isNameFieldLoading
-                              ? SizedBox(
-                                  height: 16,
-                                  width: 16,
-                                  child: Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      color: appColors.scheme.onPrimary,
-                                    ),
-                                  ),
-                                )
-                              : IconButton(
-                                  splashRadius: 1,
-                                  onPressed: () {
-                                    HapticFeedback.mediumImpact();
-                                    updateDisplayName(user);
-                                  },
-                                  icon: AppSymbol(
-                                    Symbols.check_rounded,
-                                    size: 21,
+                        transitionBuilder: (child, animation) => ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        ),
+                        duration: const Duration(milliseconds: 175),
+                        child: _isNameFieldLoading
+                            ? SizedBox(
+                                height: 16,
+                                width: 16,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
                                     color: appColors.scheme.onPrimary,
                                   ),
-                                )),
+                                ),
+                              )
+                            : IconButton(
+                                splashRadius: 1,
+                                onPressed: () {
+                                  HapticFeedback.mediumImpact();
+                                  updateDisplayName(user);
+                                },
+                                icon: AppSymbol(
+                                  Symbols.check_rounded,
+                                  size: 21,
+                                  color: appColors.scheme.onPrimary,
+                                ),
+                              ),
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
                       (user != null &&
                               user.providerData.map((e) => e.providerId).contains('password'))
                           ? Padding(
@@ -309,16 +316,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       TextButton(
                                         onPressed: () {
                                           AuthenticationService().logout().then(
-                                                (value) => Navigator.pushAndRemoveUntil(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => const LoginScreen(),
-                                                    settings:
-                                                        const RouteSettings(name: 'LoginScreen'),
-                                                  ),
-                                                  (Route<dynamic> route) => false,
-                                                ),
-                                              );
+                                            (value) => Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => const LoginScreen(),
+                                                settings: const RouteSettings(name: 'LoginScreen'),
+                                              ),
+                                              (Route<dynamic> route) => false,
+                                            ),
+                                          );
                                         },
                                         child: const Text('Yes'),
                                       ),
@@ -335,55 +341,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           : const SizedBox(),
                       FilledButton(
                         onPressed: () => showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                                  title: const Text('Delete account'),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Delete account'),
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Text(
+                                  'Are you sure you want to delete your account and all the data related to it?',
+                                ),
+                                const SizedBox(height: 12),
+                                Text.rich(
+                                  TextSpan(
+                                    text: 'This action is ',
                                     children: [
-                                      const Text(
-                                          'Are you sure you want to delete your account and all the data related to it?'),
-                                      const SizedBox(height: 12),
-                                      Text.rich(TextSpan(text: 'This action is ', children: [
-                                        TextSpan(
-                                          text: 'PERMANENT',
-                                          style: TextStyle(
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context).colorScheme.error),
+                                      TextSpan(
+                                        text: 'PERMANENT',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Theme.of(context).colorScheme.error,
                                         ),
-                                        const TextSpan(text: ' and cannot be undone.')
-                                      ])),
+                                      ),
+                                      const TextSpan(text: ' and cannot be undone.'),
                                     ],
                                   ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.of(context).pop(),
-                                      child: const Text('No'),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: const Text('No'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  AuthenticationService().deleteAccount();
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginScreen(),
+                                      settings: const RouteSettings(name: 'LoginScreen'),
                                     ),
-                                    TextButton(
-                                      onPressed: () {
-                                        AuthenticationService().deleteAccount();
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => const LoginScreen(),
-                                            settings: const RouteSettings(name: 'LoginScreen'),
-                                          ),
-                                          (Route<dynamic> route) => false,
-                                        );
-                                      },
-                                      child: const Text('Yes'),
-                                    ),
-                                  ],
-                                )),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                },
+                                child: const Text('Yes'),
+                              ),
+                            ],
+                          ),
+                        ),
                         style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(appColors.scheme.error)),
+                          backgroundColor: WidgetStateProperty.all(appColors.scheme.error),
+                        ),
                         child: Text(
                           "Delete account",
                           style: TextStyle(color: appColors.scheme.onError),
                         ),
-                      )
-                    ])),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -413,7 +430,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: AppThemeMode.LIGHT, label: "Light"),
                               SettingsCardOption(value: AppThemeMode.DARK, label: "Dark"),
                               SettingsCardOption(
-                                  value: AppThemeMode.SYSTEM, label: "Follow System"),
+                                value: AppThemeMode.SYSTEM,
+                                label: "Follow System",
+                              ),
                             ],
                           ),
                           Container(
@@ -443,21 +462,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           child: FormBuilderField(
                                             key: _accentColourFieldKey,
                                             name: "Accent Colour",
-                                            initialValue:
-                                                Color(int.parse(snapshot.data!.accentColour)),
+                                            initialValue: Color(
+                                              int.parse(snapshot.data!.accentColour),
+                                            ),
                                             autovalidateMode: AutovalidateMode.onUserInteraction,
                                             builder: (field) => ColorPicker(
-                                                paletteType: PaletteType.hueWheel,
-                                                displayThumbColor: true,
-                                                enableAlpha: false,
-                                                hexInputBar: true,
-                                                labelTypes: [],
-                                                colorPickerWidth: 300,
-                                                pickerColor: field.value ??
-                                                    Color(int.parse(snapshot.data!.accentColour)),
-                                                onColorChanged: (color) {
-                                                  field.didChange(color);
-                                                }),
+                                              paletteType: PaletteType.hueWheel,
+                                              displayThumbColor: true,
+                                              enableAlpha: false,
+                                              hexInputBar: true,
+                                              labelTypes: [],
+                                              colorPickerWidth: 300,
+                                              pickerColor:
+                                                  field.value ??
+                                                  Color(int.parse(snapshot.data!.accentColour)),
+                                              onColorChanged: (color) {
+                                                field.didChange(color);
+                                              },
+                                            ),
                                           ),
                                         ),
                                         actions: [
@@ -466,18 +488,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             child: const Text("Close"),
                                           ),
                                           FilledButton(
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                                updateAccentColour(user);
-                                              },
-                                              child: const Text("Apply"))
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                              updateAccentColour(user);
+                                            },
+                                            child: const Text("Apply"),
+                                          ),
                                         ],
                                       ),
                                     );
                                   },
                                   child: Container(
                                     padding: const EdgeInsets.only(
-                                        top: 8, bottom: 8, left: 16, right: 8),
+                                      top: 8,
+                                      bottom: 8,
+                                      left: 16,
+                                      right: 8,
+                                    ),
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(12),
                                       color: appColors.scheme.surfaceContainerHighest,
@@ -521,7 +548,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             firebaseFieldName: 'isETAminutes',
                             options: [
                               SettingsCardOption(value: true, label: "Minutes to arrival (2 mins)"),
-                              SettingsCardOption(value: false, label: "Time of arrival (18:21)")
+                              SettingsCardOption(value: false, label: "Time of arrival (18:21)"),
                             ],
                           ),
                           SettingsRadioCard<bool>(
@@ -530,7 +557,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             firebaseFieldName: 'isNearbyGrid',
                             options: [
                               SettingsCardOption(value: true, label: "Grid layout"),
-                              SettingsCardOption(value: false, label: "Column layout")
+                              SettingsCardOption(value: false, label: "Column layout"),
                             ],
                           ),
                           SettingsRadioCard<bool>(
@@ -539,7 +566,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             firebaseFieldName: 'showNearbyDistance',
                             options: [
                               SettingsCardOption(value: true, label: "Distance to bus stops"),
-                              SettingsCardOption(value: false, label: "Road name of bus stops")
+                              SettingsCardOption(value: false, label: "Road name of bus stops"),
                             ],
                           ),
                           if (snapshot.data!.betaServer.enabled)
@@ -577,26 +604,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         spacing: 16,
                         children: [
                           SkeletonLine(
-                              style: SkeletonLineStyle(
-                                  height: 234, borderRadius: BorderRadius.circular(12))),
+                            style: SkeletonLineStyle(
+                              height: 234,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           SkeletonLine(
-                              style: SkeletonLineStyle(
-                                  height: 178, borderRadius: BorderRadius.circular(12))),
+                            style: SkeletonLineStyle(
+                              height: 178,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           SkeletonLine(
-                              style: SkeletonLineStyle(
-                                  height: 186, borderRadius: BorderRadius.circular(12))),
+                            style: SkeletonLineStyle(
+                              height: 186,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           SkeletonLine(
-                              style: SkeletonLineStyle(
-                                  height: 186, borderRadius: BorderRadius.circular(12))),
+                            style: SkeletonLineStyle(
+                              height: 186,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                           SkeletonLine(
-                              style: SkeletonLineStyle(
-                                  height: 186, borderRadius: BorderRadius.circular(12))),
+                            style: SkeletonLineStyle(
+                              height: 186,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
                         ],
                       ),
                       child: settingsContentWidget ?? const SizedBox.shrink(),
                     );
                   },
-                )
+                ),
               ],
             ),
             const SizedBox(height: 24),
@@ -624,51 +666,54 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 16),
                 FutureBuilder(
-                    future: _appInfo,
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData) {
-                        return SettingsOthersCard(
-                          title: "About",
-                          icon: AppSymbol(Symbols.info_rounded, fill: true),
-                          onTap: () => showAboutDialog(
-                              context: context,
-                              applicationIcon: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  "assets/icons/Icon-1024x1024.png",
-                                  width: 64,
-                                  height: 64,
-                                ),
-                              ),
-                              applicationName: "Transito",
-                              applicationVersion: "v${snapshot.data!.version}",
-                              applicationLegalese: "© 2023 Transito",
-                              children: const [
-                                SizedBox(height: 16),
-                                Text(
-                                  "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                                SizedBox(height: 8),
-                                Text(
-                                  "Transito is not responsible for any inaccuracies in the data.",
-                                  style: TextStyle(fontSize: 14),
-                                ),
-                              ]),
-                        );
-                      } else if (snapshot.hasError) {
-                        debugPrint("Error fetching app info: ${snapshot.error}");
-                      }
-                      return SkeletonItem(
-                          child: SkeletonLine(
+                  future: _appInfo,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return SettingsOthersCard(
+                        title: "About",
+                        icon: AppSymbol(Symbols.info_rounded, fill: true),
+                        onTap: () => showAboutDialog(
+                          context: context,
+                          applicationIcon: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Image.asset(
+                              "assets/icons/Icon-1024x1024.png",
+                              width: 64,
+                              height: 64,
+                            ),
+                          ),
+                          applicationName: "Transito",
+                          applicationVersion: "v${snapshot.data!.version}",
+                          applicationLegalese: "© 2023 Transito",
+                          children: const [
+                            SizedBox(height: 16),
+                            Text(
+                              "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              "Transito is not responsible for any inaccuracies in the data.",
+                              style: TextStyle(fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      debugPrint("Error fetching app info: ${snapshot.error}");
+                    }
+                    return SkeletonItem(
+                      child: SkeletonLine(
                         style: SkeletonLineStyle(
                           height: 45,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                      ));
-                    })
+                      ),
+                    );
+                  },
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),

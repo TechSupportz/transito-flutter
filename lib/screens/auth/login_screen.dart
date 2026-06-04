@@ -52,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(
-                'Sign in with Apple is not available on this device. Please try another method.'),
+              'Sign in with Apple is not available on this device. Please try another method.',
+            ),
           ),
         );
       }
@@ -281,8 +282,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                                     iconColor: WidgetStateColor.fromMap(
                                       {
-                                        WidgetState.any:
-                                            Theme.of(context).colorScheme.onTertiaryContainer,
+                                        WidgetState.any: Theme.of(
+                                          context,
+                                        ).colorScheme.onTertiaryContainer,
                                       },
                                     ),
                                     foregroundColor: WidgetStateProperty.all<Color>(
@@ -313,7 +315,8 @@ class _LoginScreenState extends State<LoginScreen> {
     return AlertDialog(
       title: const Text('Continue as a Guest'),
       content: const Text(
-          'Using a guest account will prevent your favourites and setting from being synced. Are you sure you want to continue?'),
+        'Using a guest account will prevent your favourites and setting from being synced. Are you sure you want to continue?',
+      ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),

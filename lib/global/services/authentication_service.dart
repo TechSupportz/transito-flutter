@@ -19,7 +19,7 @@ class AuthenticationService {
   List<String> get _userProviders =>
       _auth.currentUser?.providerData.map((e) => e.providerId).toList() ?? [];
 
-// Used by all login methods to initialise user in Firestore on first login
+  // Used by all login methods to initialise user in Firestore on first login
   Future<void> addNewUser({required String userId}) async {
     _favourites
         .doc(userId)
@@ -48,7 +48,7 @@ class AuthenticationService {
         );
   }
 
-// Google login
+  // Google login
   Future<void> _initializeGoogleSignIn() async {
     try {
       await _googleSignIn.initialize(
@@ -76,8 +76,8 @@ class AuthenticationService {
 
     try {
       final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
-      final GoogleSignInClientAuthorization? googleAuth =
-          await _googleSignIn.authorizationClient.authorizationForScopes(["email", "profile"]);
+      final GoogleSignInClientAuthorization? googleAuth = await _googleSignIn.authorizationClient
+          .authorizationForScopes(["email", "profile"]);
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
@@ -109,10 +109,12 @@ class AuthenticationService {
   // Apple login
   Future<String?> signInWithApple() async {
     try {
-      final appleAuth = await SignInWithApple.getAppleIDCredential(scopes: [
-        AppleIDAuthorizationScopes.email,
-        AppleIDAuthorizationScopes.fullName,
-      ]);
+      final appleAuth = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+      );
 
       final credential = OAuthProvider('apple.com').credential(
         idToken: appleAuth.identityToken,
@@ -140,7 +142,7 @@ class AuthenticationService {
     return null;
   }
 
-// Guest login
+  // Guest login
   Future<String?> signInAnonymously() async {
     try {
       UserCredential result = await _auth.signInAnonymously();
@@ -162,7 +164,7 @@ class AuthenticationService {
     return null;
   }
 
-// Email login and registration
+  // Email login and registration
   Future<String?> loginUserWithEmail(String email, String password) async {
     try {
       await _auth.signInWithEmailAndPassword(
@@ -179,8 +181,10 @@ class AuthenticationService {
 
   Future<String?> registerUserWithEmail(String name, String email, String password) async {
     try {
-      UserCredential result =
-          await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       User? user = result.user;
       await user?.updateDisplayName(name);
       await user?.sendEmailVerification();

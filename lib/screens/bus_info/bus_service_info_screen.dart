@@ -49,8 +49,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   }
 
   Future<List<List<BusRouteInfo>>> getBusRoutes() async {
-    final List<List<BusRouteInfo>> routes =
-        await TransitoApiService().getBusRoutes(widget.serviceNo);
+    final List<List<BusRouteInfo>> routes = await TransitoApiService().getBusRoutes(
+      widget.serviceNo,
+    );
     debugPrint("Service info fetched");
     return routes;
   }
@@ -58,8 +59,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   @override
   void initState() {
     super.initState();
-    futureBusServiceInfo =
-        widget.busService != null ? Future.value(widget.busService) : getBusService();
+    futureBusServiceInfo = widget.busService != null
+        ? Future.value(widget.busService)
+        : getBusService();
     futureBusServiceRoutes = getBusRoutes();
   }
 
@@ -103,19 +105,23 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                     ),
                     SkeletonLine(
                       style: SkeletonLineStyle(
-                          height: 25, width: 64, borderRadius: BorderRadius.circular(8)),
+                        height: 25,
+                        width: 64,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                    child: SkeletonLine(
-                  style: SkeletonLineStyle(
-                    height: double.maxFinite,
-                    width: double.infinity,
-                    borderRadius: BorderRadius.circular(24),
+                  child: SkeletonLine(
+                    style: SkeletonLineStyle(
+                      height: double.maxFinite,
+                      width: double.infinity,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                   ),
-                ))
+                ),
               ],
             );
 
@@ -139,8 +145,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                   LayoutBuilder(
                     builder: (context, constraints) => MeasureSize(
                       onChange: (Size size) {
-                        double gapPercentage =
-                            MediaQuery.of(context).viewInsets.bottom > 0.0 ? 0.04 : 0.02;
+                        double gapPercentage = MediaQuery.of(context).viewInsets.bottom > 0.0
+                            ? 0.04
+                            : 0.02;
                         double heightPercentage =
                             (1 - gapPercentage) - (size.height / constraints.maxHeight);
                         setState(() {
@@ -168,13 +175,15 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
                                 margin: const EdgeInsets.only(right: 8),
                                 decoration: BoxDecoration(
-                                    color: appColors.getOperatorColor(busService.operator).$1,
-                                    borderRadius: BorderRadius.circular(8)),
+                                  color: appColors.getOperatorColor(busService.operator).$1,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
                                 child: Text(
                                   busService.operator.name,
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: appColors.getOperatorColor(busService.operator).$2),
+                                    fontWeight: FontWeight.w500,
+                                    color: appColors.getOperatorColor(busService.operator).$2,
+                                  ),
                                 ),
                               ),
                             ],
@@ -207,80 +216,81 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                             busStopInfo: busService.interchanges[1],
                                             searchMode: true,
                                           ),
-                                        ]
+                                        ],
                                       ],
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.max,
-                                      children: [
-                                        if (busService.isLoopService) ...[
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      if (busService.isLoopService) ...[
+                                        AppSymbol(
+                                          Symbols.sync_rounded,
+                                          color: appColors.notReallyYellow,
+                                          size: 28,
+                                        ),
+                                      ] else ...[
+                                        Padding(
+                                          padding: const EdgeInsets.only(bottom: 20),
+                                          child: AppSymbol(
+                                            Symbols.trip_origin_rounded,
+                                            color: appColors.prettyGreen,
+                                            size: 28,
+                                          ),
+                                        ),
+                                        if (busService.isSingleRoute) ...[
                                           AppSymbol(
-                                            Symbols.sync_rounded,
-                                            color: appColors.notReallyYellow,
+                                            Symbols.south_rounded,
+                                            color: Colors.white,
                                             size: 28,
                                           ),
                                         ] else ...[
-                                          Padding(
-                                            padding: const EdgeInsets.only(bottom: 20),
-                                            child: AppSymbol(
-                                              Symbols.trip_origin_rounded,
-                                              color: appColors.prettyGreen,
-                                              size: 28,
+                                          Ink(
+                                            height: 40,
+                                            width: 40,
+                                            decoration: BoxDecoration(
+                                              color: Theme.of(context).colorScheme.primary,
+                                              borderRadius: BorderRadius.circular(12),
                                             ),
-                                          ),
-                                          if (busService.isSingleRoute) ...[
-                                            AppSymbol(
-                                              Symbols.south_rounded,
-                                              color: Colors.white,
-                                              size: 28,
-                                            ),
-                                          ] else ...[
-                                            Ink(
-                                              height: 40,
-                                              width: 40,
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context).colorScheme.primary,
-                                                borderRadius: BorderRadius.circular(12),
-                                              ),
-                                              child: AnimatedRotation(
-                                                turns: _destinationIndex == 0 ? 0 : -0.5,
-                                                duration: const Duration(milliseconds: 200),
-                                                child: IconButton(
-                                                  padding: EdgeInsets.zero,
-                                                  iconSize: 30,
-                                                  splashRadius: 20,
-                                                  enableFeedback: true,
-                                                  icon: AppSymbol(
-                                                    Symbols.swap_vert_rounded,
-                                                    color: Theme.of(context).colorScheme.onPrimary,
-                                                    opticalSize: 30,
-                                                  ),
-                                                  onPressed: () {
-                                                    setState(
-                                                      () => _destinationIndex =
-                                                          (_destinationIndex + 1) % 2,
-                                                    );
-                                                  },
+                                            child: AnimatedRotation(
+                                              turns: _destinationIndex == 0 ? 0 : -0.5,
+                                              duration: const Duration(milliseconds: 200),
+                                              child: IconButton(
+                                                padding: EdgeInsets.zero,
+                                                iconSize: 30,
+                                                splashRadius: 20,
+                                                enableFeedback: true,
+                                                icon: AppSymbol(
+                                                  Symbols.swap_vert_rounded,
+                                                  color: Theme.of(context).colorScheme.onPrimary,
+                                                  opticalSize: 30,
                                                 ),
+                                                onPressed: () {
+                                                  setState(
+                                                    () => _destinationIndex =
+                                                        (_destinationIndex + 1) % 2,
+                                                  );
+                                                },
                                               ),
-                                            ),
-                                          ],
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 20),
-                                            child: AppSymbol(
-                                              Symbols.distance_rounded,
-                                              color: appColors.sortaRed,
-                                              fill: true,
-                                              size: 28,
                                             ),
                                           ),
                                         ],
-                                      ])
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 20),
+                                          child: AppSymbol(
+                                            Symbols.distance_rounded,
+                                            color: appColors.sortaRed,
+                                            fill: true,
+                                            size: 28,
+                                          ),
+                                        ),
+                                      ],
+                                    ],
+                                  ),
                                 ],
-                              )
+                              ),
                             ],
                           ),
                         ],
@@ -325,27 +335,28 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                   );
                                 },
                                 child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: FractionallySizedBox(
-                                      widthFactor: 0.2,
-                                      child: Container(
-                                        height: 6,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurfaceVariant
-                                              .withValues(alpha: 0.15),
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: FractionallySizedBox(
+                                    widthFactor: 0.2,
+                                    child: Container(
+                                      height: 6,
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(
+                                          context,
+                                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(12),
                                       ),
-                                    )),
+                                    ),
+                                  ),
+                                ),
                               ),
                               Expanded(
                                 child: FutureBuilder(
                                   future: futureBusServiceRoutes,
                                   builder: (context, snapshot) {
-                                    Widget routeResults =
-                                        const CircularProgressIndicator(strokeWidth: 3);
+                                    Widget routeResults = const CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                    );
 
                                     if (snapshot.hasData) {
                                       final routes = snapshot.data!;

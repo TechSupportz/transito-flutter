@@ -124,9 +124,10 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
                   height: 10,
                 ),
                 const Text(
-                    'We need your location to determine where you are to display nearby bus stops',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                  'We need your location to determine where you are to display nearby bus stops',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                ),
               ],
             ),
             Padding(

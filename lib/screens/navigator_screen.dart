@@ -53,23 +53,28 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       shadowColor: Theme.of(context).colorScheme.shadow,
       destinations: <NavigationDestination>[
         NavigationDestination(
-            icon: AppSymbol(Symbols.explore_rounded, fill: true), label: "Nearby"),
+          icon: AppSymbol(Symbols.explore_rounded, fill: true),
+          label: "Nearby",
+        ),
         NavigationDestination(
-            icon: AppSymbol(Symbols.favorite_rounded, fill: true), label: "Favourites"),
+          icon: AppSymbol(Symbols.favorite_rounded, fill: true),
+          label: "Favourites",
+        ),
         NavigationDestination(
-            icon: GestureDetector(
-              child: AppSymbol(Symbols.map_search_rounded, fill: true),
-              onTap: () => setState(() {
-                _pageIndex = 2;
-              }),
-              onDoubleTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => MrtMapScreen(),
-                  settings: RouteSettings(name: 'MrtMapScreen'),
-                ),
+          icon: GestureDetector(
+            child: AppSymbol(Symbols.map_search_rounded, fill: true),
+            onTap: () => setState(() {
+              _pageIndex = 2;
+            }),
+            onDoubleTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => MrtMapScreen(),
+                settings: RouteSettings(name: 'MrtMapScreen'),
               ),
             ),
-            label: "Search"),
+          ),
+          label: "Search",
+        ),
       ],
       selectedIndex: _pageIndex,
       height: 72,
@@ -77,8 +82,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       onDestinationSelected: (index) =>
           // updates _pageIndex and animates the page transition
           setState(() {
-        _pageIndex = index;
-      }),
+            _pageIndex = index;
+          }),
     );
 
     var nativeGlassNavBar = NativeGlassNavBar(
@@ -88,29 +93,30 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
         NativeGlassNavBarItem(label: 'Search', symbol: 'map.fill'),
       ],
       actionButton: TabBarActionButton(
-          symbol: _pageIndex == 0
-              ? 'arrow.clockwise'
-              : _pageIndex == 1
-                  ? 'square.and.pencil'
-                  : _pageIndex == 2
-                      ? isUserCenter
-                          ? 'location.fill'
-                          : 'location'
-                      : 'circle',
-          onTap: () {
-            switch (_pageIndex) {
-              case 0:
-                _nearbyScreenController.refresh();
-                break;
-              case 1:
-                _favouritesScreenController.manageFavourites();
-                break;
-              case 2:
-                _mapSearchScreenController.animateToUserLocation();
-                break;
-              default:
-            }
-          }),
+        symbol: _pageIndex == 0
+            ? 'arrow.clockwise'
+            : _pageIndex == 1
+            ? 'square.and.pencil'
+            : _pageIndex == 2
+            ? isUserCenter
+                  ? 'location.fill'
+                  : 'location'
+            : 'circle',
+        onTap: () {
+          switch (_pageIndex) {
+            case 0:
+              _nearbyScreenController.refresh();
+              break;
+            case 1:
+              _favouritesScreenController.manageFavourites();
+              break;
+            case 2:
+              _mapSearchScreenController.animateToUserLocation();
+              break;
+            default:
+          }
+        },
+      ),
       currentIndex: _pageIndex,
       tintColor: Theme.of(context).colorScheme.primary,
       fallback:
@@ -129,17 +135,18 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           countryCode: "SG",
         ),
         child: AnimatedIndexedStack(
-          transitionBuilder: (
-            Widget child,
-            Animation<double> animation,
-            Animation<double> secondaryAnimation,
-          ) {
-            return FadeThroughTransition(
-              animation: animation,
-              secondaryAnimation: secondaryAnimation,
-              child: child,
-            );
-          },
+          transitionBuilder:
+              (
+                Widget child,
+                Animation<double> animation,
+                Animation<double> secondaryAnimation,
+              ) {
+                return FadeThroughTransition(
+                  animation: animation,
+                  secondaryAnimation: secondaryAnimation,
+                  child: child,
+                );
+              },
           index: _pageIndex,
           children: _pages,
         ),
