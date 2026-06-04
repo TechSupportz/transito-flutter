@@ -18,6 +18,11 @@ UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
         unknownValue: AppThemeMode.SYSTEM,
       ) ??
       AppThemeMode.SYSTEM,
+  betaServer: json['betaServer'] == null
+      ? const BetaServerSettings()
+      : _betaServerSettingsFromJson(
+          json['betaServer'] as Map<String, dynamic>?,
+        ),
 );
 
 Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) => <String, dynamic>{
@@ -26,10 +31,21 @@ Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) => <String, dyn
   'isNearbyGrid': instance.isNearbyGrid,
   'showNearbyDistance': instance.showNearbyDistance,
   'themeMode': _$AppThemeModeEnumMap[instance.themeMode]!,
+  'betaServer': instance.betaServer.toJson(),
 };
 
 const _$AppThemeModeEnumMap = {
   AppThemeMode.LIGHT: 'LIGHT',
   AppThemeMode.DARK: 'DARK',
   AppThemeMode.SYSTEM: 'SYSTEM',
+};
+
+BetaServerSettings _$BetaServerSettingsFromJson(Map<String, dynamic> json) => BetaServerSettings(
+  enabled: json['enabled'] as bool? ?? false,
+  using: json['using'] as bool? ?? false,
+);
+
+Map<String, dynamic> _$BetaServerSettingsToJson(BetaServerSettings instance) => <String, dynamic>{
+  'enabled': instance.enabled,
+  'using': instance.using,
 };

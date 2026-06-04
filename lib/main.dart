@@ -17,6 +17,7 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/settings_service.dart';
+import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import 'package:transito/models/user/user_settings.dart';
@@ -109,6 +110,8 @@ class _MyAppState extends State<MyApp> {
       if (seedColor != appColors.accentColour || brightness != appColors.brightness) {
         appColors.updateLocalColorScheme(seedColor, brightness);
       }
+
+      TransitoApiService().updateUsingBetaServer(userSettings.betaServer.isUsingBetaServer);
     });
 
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
@@ -140,6 +143,7 @@ class _MyAppState extends State<MyApp> {
             title: "Transito",
             supportedLocales: const [Locale('en', 'US')],
             scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
+            debugShowCheckedModeBanner: false,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,

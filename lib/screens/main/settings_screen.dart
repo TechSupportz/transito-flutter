@@ -542,6 +542,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               SettingsCardOption(value: false, label: "Road name of bus stops")
                             ],
                           ),
+                          if (snapshot.data!.betaServer.enabled)
+                            BetaServerSettingsCard(
+                              usingBetaServer: snapshot.data!.betaServer.using,
+                              userId: user?.uid,
+                            ),
                         ],
                       );
 
@@ -665,6 +670,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             )
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class BetaServerSettingsCard extends StatelessWidget {
+  const BetaServerSettingsCard({
+    super.key,
+    required this.usingBetaServer,
+    required this.userId,
+  });
+
+  final bool usingBetaServer;
+  final String? userId;
+
+  @override
+  Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: SwitchListTile(
+        value: usingBetaServer,
+        onChanged: userId == null
+            ? null
+            : (bool value) {
+                SettingsService().updateBetaServerUsing(
+                  userId: userId,
+                  newValue: value,
+                );
+              },
+        activeThumbColor: AppColors().notReallyYellow,
+        secondary: AppSymbol(
+          Symbols.cloud_rounded,
+          fill: true,
+          color: AppColors().notReallyYellow,
+        ),
+        title: const Text(
+          "Beta Server",
+          style: TextStyle(
+            fontSize: 21,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        subtitle: const Text("Use preview Transito API for future requests."),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
       ),
     );

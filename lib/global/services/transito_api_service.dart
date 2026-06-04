@@ -15,7 +15,13 @@ class TransitoApiService extends BaseApiService {
 
   factory TransitoApiService() => _instance;
 
-  String get _baseUrl => Secret.API_URL;
+  bool _usingBetaServer = false;
+
+  void updateUsingBetaServer(bool usingBetaServer) {
+    _usingBetaServer = usingBetaServer;
+  }
+
+  String get _baseUrl => _usingBetaServer ? Secret.BETA_API_URL : Secret.API_URL;
 
   Future<List<String>> getBusStopServices(String code) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-stop/$code/services');
@@ -41,8 +47,7 @@ class TransitoApiService extends BaseApiService {
   }
 
   Future<OneMapSearch> searchPlaces(String query, int page) async {
-    final Uri uri =
-        Uri.parse('$_baseUrl/onemap/search?query=$query&page=$page');
+    final Uri uri = Uri.parse('$_baseUrl/onemap/search?query=$query&page=$page');
     final response = await get(uri);
     final Map<String, dynamic> data = decodeJson(response.body, uri);
     return OneMapSearch.fromJson(data);

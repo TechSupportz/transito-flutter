@@ -131,4 +131,20 @@ class SettingsService {
           );
     }
   }
+
+  Future<void> updateBetaServerUsing({String? userId, required bool newValue}) async {
+    if (userId != null) {
+      _settingsCollection
+          .doc(userId)
+          .update({
+            'betaServer.using': newValue,
+          })
+          .then(
+            (_) => debugPrint('✔️ Updated betaServer.using to $newValue'),
+          )
+          .catchError(
+            (error) => debugPrint('❌ Error updating betaServer.using in Firestore: $error'),
+          );
+    }
+  }
 }

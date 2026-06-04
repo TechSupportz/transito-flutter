@@ -16,12 +16,16 @@ class UserSettings {
   @JsonKey(defaultValue: AppThemeMode.SYSTEM, unknownEnumValue: AppThemeMode.SYSTEM)
   final AppThemeMode themeMode;
 
+  @JsonKey(fromJson: _betaServerSettingsFromJson)
+  final BetaServerSettings betaServer;
+
   UserSettings({
     required this.accentColour,
     required this.isETAminutes,
     required this.isNearbyGrid,
     required this.showNearbyDistance,
     required this.themeMode,
+    this.betaServer = const BetaServerSettings(),
   });
 
   factory UserSettings.fromFirestore(DocumentSnapshot doc) =>
@@ -30,3 +34,26 @@ class UserSettings {
   factory UserSettings.fromJson(Map<String, dynamic> json) => _$UserSettingsFromJson(json);
   Map<String, dynamic> toJson() => _$UserSettingsToJson(this);
 }
+
+@JsonSerializable(explicitToJson: true)
+class BetaServerSettings {
+  @JsonKey(defaultValue: false)
+  final bool enabled;
+
+  @JsonKey(defaultValue: false)
+  final bool using;
+
+  const BetaServerSettings({
+    this.enabled = false,
+    this.using = false,
+  });
+
+  bool get isUsingBetaServer => enabled && using;
+
+  factory BetaServerSettings.fromJson(Map<String, dynamic> json) =>
+      _$BetaServerSettingsFromJson(json);
+  Map<String, dynamic> toJson() => _$BetaServerSettingsToJson(this);
+}
+
+BetaServerSettings _betaServerSettingsFromJson(Map<String, dynamic>? json) =>
+    json == null ? const BetaServerSettings() : BetaServerSettings.fromJson(json);
