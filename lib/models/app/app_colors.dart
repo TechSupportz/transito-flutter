@@ -69,4 +69,33 @@ class AppColors with ChangeNotifier {
         return (_scheme.primary, _scheme.onPrimary);
     }
   }
+
+  (Color, Color) getNUSServiceColor(String serviceNo) {
+    switch (serviceNo.toUpperCase()) {
+      case 'A1':
+        return (const Color(0xFFFB0101), Colors.white);
+      case 'A2':
+        return (const Color(0xFFE3CF0E), Colors.black);
+      case 'D1':
+        return (const Color(0xFFC77DE0), Colors.white);
+      case 'D2':
+        return (const Color(0xFF6E1D72), Colors.white);
+      case 'K':
+        return (const Color(0xFF33599C), Colors.white);
+      case 'E':
+        return (const Color(0xFF02B050), Colors.white);
+      case 'BTC':
+        return (const Color(0xFFEF8135), Colors.white);
+      case 'L':
+        return (const Color(0xFFBFBFBF), Colors.black);
+      case 'R1':
+        return (const Color(0xFFEE8136), Colors.white);
+      case 'R2':
+        return (const Color(0xFF008000), Colors.white);
+      case 'P':
+        return (const Color(0xFFBEBEBE), Colors.black);
+      default:
+        return (_scheme.primary, _scheme.onPrimary);
+    }
+  }
 }

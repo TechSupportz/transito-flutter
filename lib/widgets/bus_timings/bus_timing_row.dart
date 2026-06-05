@@ -116,9 +116,26 @@ class _BusTimingRowState extends State<BusTimingRow> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 4.0),
-                  child: Text(
-                    widget.serviceInfo.serviceNum,
-                    style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      if (widget.serviceInfo.busOperator == .NUS)
+                        Container(
+                          width: 4,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: AppColors().getNUSServiceColor(widget.serviceInfo.serviceNum).$1,
+                            borderRadius: const BorderRadius.all(Radius.circular(2)),
+                          ),
+                        ),
+                      Text(
+                        widget.serviceInfo.serviceNum,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Text(
