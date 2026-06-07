@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/global/services/authentication_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/app/settings_card_options.dart';
 import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import 'package:transito/models/user/user_settings.dart';
@@ -21,6 +22,7 @@ import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
+import 'package:transito/widgets/common/icon_page_title.dart';
 import 'package:transito/widgets/settings/settings_others_card.dart';
 import 'package:transito/widgets/settings/settings_radio_card.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -37,7 +39,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _accentColourFieldKey = GlobalKey<FormBuilderFieldState>();
   bool _isNameFieldLoading = false;
   bool _isSettingsLoading = true;
-  final TextStyle titleStyle = const TextStyle(fontSize: 30, fontWeight: FontWeight.w700);
   late Future<PackageInfo> _appInfo;
 
   void updateDisplayName(User? user) async {
@@ -226,9 +227,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  "About you",
-                  style: titleStyle,
+                IconPageTitle(
+                  title: "Account",
+                  icon: Symbols.account_circle_rounded,
                 ),
                 const SizedBox(height: 16),
                 FormBuilderTextField(
@@ -404,252 +405,286 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
             const SizedBox(height: 24),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Aesthetics ✨",
-                  style: titleStyle,
-                ),
-                const SizedBox(height: 16),
-                StreamBuilder<UserSettings>(
-                  stream: SettingsService().streamSettings(user?.uid),
-                  builder: (context, AsyncSnapshot<UserSettings> snapshot) {
-                    Widget? settingsContentWidget;
+            StreamBuilder<UserSettings>(
+              stream: SettingsService().streamSettings(user?.uid),
+              builder: (context, AsyncSnapshot<UserSettings> snapshot) {
+                Widget? aestheticsContentWidget;
+                Widget? preferencesContentWidget;
 
-                    if (snapshot.hasData) {
-                      settingsContentWidget = Column(
-                        key: const ValueKey(1),
-                        spacing: 16,
-                        children: [
-                          SettingsRadioCard<AppThemeMode>(
-                            title: "Theme",
-                            initialValue: snapshot.data!.themeMode,
-                            firebaseFieldName: 'themeMode',
-                            options: [
-                              SettingsCardOption(value: AppThemeMode.LIGHT, label: "Light"),
-                              SettingsCardOption(value: AppThemeMode.DARK, label: "Dark"),
-                              SettingsCardOption(
-                                value: AppThemeMode.SYSTEM,
-                                label: "Follow System",
-                              ),
-                            ],
-                          ),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-                            decoration: BoxDecoration(
-                              color: appColors.scheme.surfaceContainer,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Column(
-                              spacing: 8,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  "Base Colour",
-                                  style: TextStyle(
-                                    fontSize: 21,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                                GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        content: SingleChildScrollView(
-                                          child: FormBuilderField(
-                                            key: _accentColourFieldKey,
-                                            name: "Accent Colour",
-                                            initialValue: Color(
-                                              int.parse(snapshot.data!.accentColour),
-                                            ),
-                                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                                            builder: (field) => ColorPicker(
-                                              paletteType: PaletteType.hueWheel,
-                                              displayThumbColor: true,
-                                              enableAlpha: false,
-                                              hexInputBar: true,
-                                              labelTypes: [],
-                                              colorPickerWidth: 300,
-                                              pickerColor:
-                                                  field.value ??
-                                                  Color(int.parse(snapshot.data!.accentColour)),
-                                              onColorChanged: (color) {
-                                                field.didChange(color);
-                                              },
-                                            ),
-                                          ),
-                                        ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.of(context).pop(),
-                                            child: const Text("Close"),
-                                          ),
-                                          FilledButton(
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                              updateAccentColour(user);
-                                            },
-                                            child: const Text("Apply"),
-                                          ),
-                                        ],
-                                      ),
-                                    );
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.only(
-                                      top: 8,
-                                      bottom: 8,
-                                      left: 16,
-                                      right: 8,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: appColors.scheme.surfaceContainerHighest,
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          colorToHex(
-                                            Color(int.parse(snapshot.data!.accentColour)),
-                                            includeHashSign: true,
-                                            enableAlpha: false,
-                                          ),
-                                          style: const TextStyle(fontSize: 18),
-                                        ),
-                                        AppSymbol(
-                                          Symbols.circle_rounded,
-                                          color: Color(int.parse(snapshot.data!.accentColour)),
-                                          fill: true,
-                                          size: 40,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    FilledButton.tonal(
-                                      onPressed: () => resetAccentColour(user),
-                                      child: const Text("Reset to default"),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          SettingsRadioCard<bool>(
-                            title: "ETA Format",
-                            initialValue: snapshot.data!.isETAminutes,
-                            firebaseFieldName: 'isETAminutes',
-                            options: [
-                              SettingsCardOption(value: true, label: "Minutes to arrival (2 mins)"),
-                              SettingsCardOption(value: false, label: "Time of arrival (18:21)"),
-                            ],
-                          ),
-                          SettingsRadioCard<bool>(
-                            title: "Nearby Layout",
-                            initialValue: snapshot.data!.isNearbyGrid,
-                            firebaseFieldName: 'isNearbyGrid',
-                            options: [
-                              SettingsCardOption(value: true, label: "Grid layout"),
-                              SettingsCardOption(value: false, label: "Column layout"),
-                            ],
-                          ),
-                          SettingsRadioCard<bool>(
-                            title: "Nearby Detail",
-                            initialValue: snapshot.data!.showNearbyDistance,
-                            firebaseFieldName: 'showNearbyDistance',
-                            options: [
-                              SettingsCardOption(value: true, label: "Distance to bus stops"),
-                              SettingsCardOption(value: false, label: "Road name of bus stops"),
-                            ],
-                          ),
-                          if (snapshot.data!.betaServer.enabled)
-                            BetaServerSettingsCard(
-                              usingBetaServer: snapshot.data!.betaServer.using,
-                              userId: user?.uid,
-                            ),
-                        ],
-                      );
-
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        setState(() {
-                          _isSettingsLoading = false;
-                        });
-                      });
-                    }
-
-                    if (snapshot.hasError) {
-                      debugPrint("<=== ERROR ${snapshot.error} ===>");
-                      settingsContentWidget = const ErrorText(
-                        enableBackground: true,
-                        icon: Symbols.settings_alert_rounded,
-                      );
-                      WidgetsBinding.instance.addPostFrameCallback((_) {
-                        setState(() {
-                          _isSettingsLoading = false;
-                        });
-                      });
-                    }
-
-                    return Skeleton(
-                      isLoading: _isSettingsLoading || settingsContentWidget == null,
-                      skeleton: Column(
-                        key: const ValueKey(0),
-                        spacing: 16,
-                        children: [
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                              height: 234,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                              height: 178,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                              height: 186,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                              height: 186,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          SkeletonLine(
-                            style: SkeletonLineStyle(
-                              height: 186,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                if (snapshot.hasData) {
+                  aestheticsContentWidget = Column(
+                    key: const ValueKey(1),
+                    spacing: 16,
+                    children: [
+                      SettingsRadioCard<AppThemeMode>(
+                        title: "Theme",
+                        initialValue: snapshot.data!.themeMode,
+                        firebaseFieldName: 'themeMode',
+                        options: [
+                          SettingsCardOption(value: AppThemeMode.LIGHT, label: "Light"),
+                          SettingsCardOption(value: AppThemeMode.DARK, label: "Dark"),
+                          SettingsCardOption(
+                            value: AppThemeMode.SYSTEM,
+                            label: "Follow System",
                           ),
                         ],
                       ),
-                      child: settingsContentWidget ?? const SizedBox.shrink(),
-                    );
-                  },
-                ),
-              ],
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: appColors.scheme.surfaceContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          spacing: 8,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              "Base Colour",
+                              style: AppTypography.sectionTitleMedium,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    content: SingleChildScrollView(
+                                      child: FormBuilderField(
+                                        key: _accentColourFieldKey,
+                                        name: "Accent Colour",
+                                        initialValue: Color(
+                                          int.parse(snapshot.data!.accentColour),
+                                        ),
+                                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                                        builder: (field) => ColorPicker(
+                                          paletteType: PaletteType.hueWheel,
+                                          displayThumbColor: true,
+                                          enableAlpha: false,
+                                          hexInputBar: true,
+                                          labelTypes: [],
+                                          colorPickerWidth: 300,
+                                          pickerColor:
+                                              field.value ??
+                                              Color(int.parse(snapshot.data!.accentColour)),
+                                          onColorChanged: (color) {
+                                            field.didChange(color);
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.of(context).pop(),
+                                        child: const Text("Close"),
+                                      ),
+                                      FilledButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                          updateAccentColour(user);
+                                        },
+                                        child: const Text("Apply"),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 8,
+                                  left: 16,
+                                  right: 8,
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: appColors.scheme.surfaceContainerHighest,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      colorToHex(
+                                        Color(int.parse(snapshot.data!.accentColour)),
+                                        includeHashSign: true,
+                                        enableAlpha: false,
+                                      ),
+                                      style: const TextStyle(fontSize: 18),
+                                    ),
+                                    AppSymbol(
+                                      Symbols.circle_rounded,
+                                      color: Color(int.parse(snapshot.data!.accentColour)),
+                                      fill: true,
+                                      size: 40,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                FilledButton.tonal(
+                                  onPressed: () => resetAccentColour(user),
+                                  child: const Text("Reset to default"),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+
+                  preferencesContentWidget = Column(
+                    key: const ValueKey(2),
+                    spacing: 16,
+                    children: [
+                      SettingsRadioCard<bool>(
+                        title: "ETA Format",
+                        initialValue: snapshot.data!.isETAminutes,
+                        firebaseFieldName: 'isETAminutes',
+                        options: [
+                          SettingsCardOption(value: true, label: "Minutes to arrival (2 mins)"),
+                          SettingsCardOption(value: false, label: "Time of arrival (18:21)"),
+                        ],
+                      ),
+                      SettingsRadioCard<bool>(
+                        title: "Nearby Layout",
+                        initialValue: snapshot.data!.isNearbyGrid,
+                        firebaseFieldName: 'isNearbyGrid',
+                        options: [
+                          SettingsCardOption(value: true, label: "Grid layout"),
+                          SettingsCardOption(value: false, label: "Column layout"),
+                        ],
+                      ),
+                      SettingsRadioCard<bool>(
+                        title: "Nearby Detail",
+                        initialValue: snapshot.data!.showNearbyDistance,
+                        firebaseFieldName: 'showNearbyDistance',
+                        options: [
+                          SettingsCardOption(value: true, label: "Distance to bus stops"),
+                          SettingsCardOption(value: false, label: "Road name of bus stops"),
+                        ],
+                      ),
+                      if (snapshot.data!.betaServer.enabled)
+                        BetaServerSettingsCard(
+                          usingBetaServer: snapshot.data!.betaServer.using,
+                          userId: user?.uid,
+                        ),
+                    ],
+                  );
+
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _isSettingsLoading = false;
+                    });
+                  });
+                }
+
+                if (snapshot.hasError) {
+                  debugPrint("<=== ERROR ${snapshot.error} ===>");
+                  aestheticsContentWidget = const ErrorText(
+                    enableBackground: true,
+                    icon: Symbols.settings_alert_rounded,
+                  );
+                  preferencesContentWidget = const ErrorText(
+                    enableBackground: true,
+                    icon: Symbols.settings_alert_rounded,
+                  );
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    setState(() {
+                      _isSettingsLoading = false;
+                    });
+                  });
+                }
+
+                return Column(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        IconPageTitle(
+                          title: "Aesthetics",
+                          icon: Symbols.palette_rounded,
+                        ),
+                        const SizedBox(height: 8),
+                        Skeleton(
+                          isLoading: _isSettingsLoading || aestheticsContentWidget == null,
+                          skeleton: Column(
+                            key: const ValueKey(0),
+                            spacing: 16,
+                            children: [
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 234,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 178,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: aestheticsContentWidget ?? const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        IconPageTitle(
+                          title: "Preferences",
+                          icon: Symbols.tune_rounded,
+                        ),
+                        const SizedBox(height: 8),
+                        Skeleton(
+                          isLoading: _isSettingsLoading || preferencesContentWidget == null,
+                          skeleton: Column(
+                            key: const ValueKey(0),
+                            spacing: 16,
+                            children: [
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 186,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 186,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                              SkeletonLine(
+                                style: SkeletonLineStyle(
+                                  height: 186,
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                              ),
+                            ],
+                          ),
+                          child: preferencesContentWidget ?? const SizedBox.shrink(),
+                        ),
+                      ],
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 24),
             Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  "Others",
-                  style: titleStyle,
+                IconPageTitle(
+                  title: "Others",
+                  icon: Symbols.list_rounded,
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 8),
                 SettingsOthersCard(
                   title: "View Quick Start",
                   icon: AppSymbol(Symbols.quick_reference_rounded, fill: true),
@@ -759,10 +794,7 @@ class BetaServerSettingsCard extends StatelessWidget {
         ),
         title: const Text(
           "Beta Server",
-          style: TextStyle(
-            fontSize: 21,
-            fontWeight: FontWeight.w500,
-          ),
+          style: AppTypography.sectionTitleMedium,
         ),
         subtitle: const Text("Use preview Transito API for future requests."),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

@@ -15,6 +15,7 @@ import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/main/settings_screen.dart';
@@ -323,7 +324,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       children: [
         const Text(
           "Nearby Favourites",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          style: AppTypography.sectionHero,
         ),
         const SizedBox(
           height: 12,
@@ -349,7 +350,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                     child: const Center(
                       child: Text(
                         "No favourites nearby",
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                        style: AppTypography.cardTitleMedium,
                       ),
                     ),
                   );
@@ -410,7 +411,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       children: [
         const Text(
           "Nearby",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+          style: AppTypography.sectionHero,
         ),
         const SizedBox(
           height: 12,

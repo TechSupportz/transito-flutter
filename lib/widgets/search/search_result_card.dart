@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/onemap/onemap_search.dart';
+import 'package:transito/models/app/app_typography.dart';
 
 class SearchResultCard extends StatelessWidget {
   const SearchResultCard({super.key, required this.searchData, this.onTap});
@@ -36,16 +37,13 @@ class SearchResultCard extends StatelessWidget {
               overflow: TextOverflow.fade,
               maxLines: 1,
               softWrap: false,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-              ),
+              style: AppTypography.cardTitle,
             ),
             const SizedBox(height: 4),
             Text(
               searchData.address,
               maxLines: 2,
-              style: const TextStyle(fontSize: 12),
+              style: AppTypography.labelSmall,
             ),
           ],
         ),

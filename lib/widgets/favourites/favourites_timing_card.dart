@@ -12,6 +12,7 @@ import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
@@ -96,7 +97,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
           return Tooltip(
             preferBelow: false,
             decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
-            textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            textStyle: AppBusTypography.favouriteTooltip, // FIXME - This should have a better implementation. Possibly expanding from where the bus stop name actually is
             showDuration: const Duration(milliseconds: 350),
             message: widget.name,
             child: GestureDetector(
@@ -129,9 +130,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         softWrap: false,
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w600,
+                        style: AppBusTypography.favouriteStopName.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -173,10 +172,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                       Jiffy.now().hour > 5
                                           ? '🦥 Your favourites are lepaking 🦥'
                                           : "💤 Buses are sleeping 💤",
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                      style: AppBusTypography.emptyTimings,
                                       textAlign: TextAlign.center,
                                     ),
                                   ),

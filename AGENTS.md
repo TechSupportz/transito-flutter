@@ -111,7 +111,7 @@ CommonProvider.scaffoldMessengerKey.currentState?.showSnackBar(...);
 
 ### UI Guidelines
 - Use Material 3 design system
-- Custom font: Poppins (primary), Itim (secondary)
+- Custom font: DM Sans (primary), Itim (secondary)
 - Use `AppSymbol` widget instead of direct Icon for Material Symbols
 - Support both Material and iOS-style navigation (Liquid Glass)
 - Use `Theme.of(context).colorScheme` for colors

@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -160,7 +161,7 @@ class BusStopCard extends StatelessWidget {
                               busStopInfo.code,
                               style: TextStyle(
                                 color: Theme.of(context).colorScheme.onPrimary,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -184,12 +185,17 @@ class BusStopCard extends StatelessWidget {
                   ),
                 ),
                 if (routeMode && busSchedule != null) ...[
-                  IconButton(
+                  IconButton.filledTonal(
+                    style: IconButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
                     onPressed: () => showDialog(
                       context: context,
                       builder: (context) => busScheduleDialog(context),
                     ),
-                    icon: const AppSymbol(Symbols.info_rounded),
+                    icon: const AppSymbol(Symbols.calendar_clock_rounded, fill: true),
                   ),
                 ],
               ],
@@ -207,20 +213,6 @@ class BusStopCard extends StatelessWidget {
         : currentDay == "Sun"
         ? 2
         : 0;
-
-    TextStyle titleStyle = TextStyle(
-      fontWeight: FontWeight.w400,
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
-      fontFamily: 'Poppins',
-      fontSize: 18.0,
-    );
-
-    TextStyle timeStyle = TextStyle(
-      fontWeight: FontWeight.w600,
-      color: Theme.of(context).colorScheme.onSurface,
-      fontFamily: 'Poppins',
-      fontSize: 30.0,
-    );
 
     return StatefulBuilder(
       builder: (context, setState) => AlertDialog(
@@ -284,7 +276,7 @@ class BusStopCard extends StatelessWidget {
                       const SizedBox(width: 6.0),
                       Text(
                         "First Bus",
-                        style: titleStyle,
+                        style: AppTypography.body,
                       ),
                     ],
                   ),
@@ -294,7 +286,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.firstBus.weekdays,
                         pattern: 'Hm',
                       ).jm,
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     )
                   else if (selectedDay == 1 && busSchedule!.firstBus.saturday != "-:")
                     Text(
@@ -302,7 +294,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.firstBus.saturday,
                         pattern: 'Hm',
                       ).jm,
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     )
                   else if (selectedDay == 2 && busSchedule!.firstBus.sunday != "-:")
                     Text(
@@ -310,12 +302,12 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.firstBus.sunday,
                         pattern: 'Hm',
                       ).jm,
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     )
                   else
                     Text(
                       "never o'clock",
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     ),
                 ],
               ),
@@ -329,7 +321,7 @@ class BusStopCard extends StatelessWidget {
                       const SizedBox(width: 6.0),
                       Text(
                         "Last Bus",
-                        style: titleStyle,
+                        style: AppTypography.body,
                       ),
                     ],
                   ),
@@ -339,7 +331,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.lastBus.weekdays,
                         pattern: 'Hm',
                       ).jm,
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     )
                   else if (selectedDay == 1 && busSchedule!.lastBus.saturday != "-:")
                     Text(
@@ -347,7 +339,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.lastBus.saturday,
                         pattern: 'Hm',
                       ).jm,
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     )
                   else if (selectedDay == 2 && busSchedule!.lastBus.sunday != "-:")
                     Text(
@@ -355,12 +347,12 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.lastBus.sunday,
                         pattern: 'Hm',
                       ).jm,
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     )
                   else
                     Text(
                       "never o'clock",
-                      style: timeStyle,
+                      style: AppTypography.sectionHero,
                     ),
                 ],
               ),
@@ -373,7 +365,7 @@ class BusStopCard extends StatelessWidget {
             child: const Text('Close'),
           ),
         ],
-        actionsPadding: const EdgeInsets.only(bottom: 8.0, right: 16.0),
+        actionsPadding: const EdgeInsets.only(bottom: 12.0, right: 16.0),
       ),
     );
   }

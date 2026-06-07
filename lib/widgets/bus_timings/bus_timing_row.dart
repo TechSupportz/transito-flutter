@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/enums/bus_type_enum.dart';
 import 'package:transito/models/enums/crowd_lvl_enum.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
@@ -130,20 +131,16 @@ class _BusTimingRowState extends State<BusTimingRow> {
                         ),
                       Text(
                         widget.serviceInfo.serviceNum,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: AppBusTypography.serviceNumber,
                       ),
                     ],
                   ),
                 ),
                 Text(
                   '~ ${calculateDistanceAway()} away',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontStyle: FontStyle.italic,
+                  style: AppTypography.caption.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    fontStyle: FontStyle.italic,
                   ),
                 ),
               ],
@@ -238,26 +235,29 @@ class _ArrivalCardState extends State<ArrivalCard> {
                   // changes colour based on crowd level
                   Text(
                     widget.eta,
-                    style: TextStyle(
-                      fontSize: widget.isETAminutes ? 30 : 18,
-                      fontWeight: FontWeight.w500,
-                      fontStyle: widget.isMonitored ? FontStyle.normal : FontStyle.italic,
-                      color: (() {
-                        switch (widget.crowdLvl) {
-                          case CrowdLvl.SEA:
-                            return appColors.prettyGreen;
-                          case CrowdLvl.SDA:
-                            return appColors.notReallyYellow;
-                          case CrowdLvl.LSD:
-                            return appColors.sortaRed;
-                          case CrowdLvl.NA:
-                            return Theme.of(context).colorScheme.onSurface;
-                        }
-                      })(),
-                    ),
+                    style:
+                        (widget.isETAminutes
+                                ? AppBusTypography.etaMinutes
+                                : AppBusTypography.etaClock)
+                            .copyWith(
+                              fontStyle: widget.isMonitored ? FontStyle.normal : FontStyle.italic,
+                              fontWeight: widget.isMonitored ? FontWeight.w600 : FontWeight.w500,
+                              color: (() {
+                                switch (widget.crowdLvl) {
+                                  case CrowdLvl.SEA:
+                                    return appColors.prettyGreen;
+                                  case CrowdLvl.SDA:
+                                    return appColors.notReallyYellow;
+                                  case CrowdLvl.LSD:
+                                    return appColors.sortaRed;
+                                  case CrowdLvl.NA:
+                                    return Theme.of(context).colorScheme.onSurface;
+                                }
+                              })(),
+                            ),
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 2.5, vertical: 1.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 1.0),
                     decoration: BoxDecoration(
                       border: Border.all(color: Theme.of(context).colorScheme.onSurfaceVariant),
                       borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -276,8 +276,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                             return "Error";
                         }
                       })(),
-                      style: TextStyle(
-                        fontSize: widget.isETAminutes ? 11.5 : 10,
+                      style: AppBusTypography.busTypeTagMinutes.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
@@ -290,9 +289,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
         : Center(
             child: Text(
               '    -  ',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w500,
+              style: AppBusTypography.etaUnavailable.copyWith(
                 color: Theme.of(context).colorScheme.onSurfaceVariant,
               ),
             ),

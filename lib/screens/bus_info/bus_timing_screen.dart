@@ -17,6 +17,7 @@ import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/global/utils/scroll_to_content.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
@@ -331,10 +332,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                 Jiffy.now().hour >= 5
                                     ? '🦥 All the buses are lepaking 🦥'
                                     : "💤 Buses are sleeping 💤",
-                                style: const TextStyle(
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                                style: AppTypography.sectionTitleMedium,
                                 textAlign: TextAlign.center,
                               ),
                             ),

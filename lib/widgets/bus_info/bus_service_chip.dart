@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceChip extends StatelessWidget {
@@ -36,18 +37,23 @@ class BusServiceChip extends StatelessWidget {
       child: InkWell(
         onTap: () => goToBusServiceInfoScreen(context),
         borderRadius: BorderRadius.circular(12),
-        splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.6),
+        splashColor: isOperating
+            ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.6)
+            : Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 7.5, vertical: 0.5),
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1.5),
+            border: Border.all(
+              color: isOperating
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+              width: 2,
+            ),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Text(
             busServiceNumber,
-            style: const TextStyle(
-              fontSize: 18,
-            ),
+            style: AppTypography.bodyLarge.copyWith(fontWeight: FontWeight.w500),
           ),
         ),
       ),

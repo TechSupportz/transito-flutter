@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
 
@@ -92,6 +93,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
     checkIfFirstRun();
   }
 
+  // TODO - This page's UI can be improved
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,13 +106,9 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text(
+            Text(
               'We need to access your location',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w600,
-                height: 1.25,
-              ),
+              style: AppTypography.pageTitle.copyWith(height: 1.25),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -126,7 +124,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
                 const Text(
                   'We need your location to determine where you are to display nearby bus stops',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                  style: AppTypography.cardTitleMedium,
                 ),
               ],
             ),

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/app/settings_card_options.dart';
 import 'package:transito/models/enums/app_theme_mode_enum.dart';
 
@@ -20,15 +21,6 @@ class SettingsRadioCard<T> extends StatelessWidget {
   final T initialValue;
   final String firebaseFieldName;
   final List<SettingsCardOption<T>> options;
-
-  final TextStyle titleStyle = const TextStyle(
-    fontSize: 21,
-    fontWeight: FontWeight.w500,
-  );
-
-  final TextStyle optionTextStyle = const TextStyle(
-    fontSize: 18,
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +61,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
@@ -78,7 +70,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
-          Text(title, style: titleStyle),
+          Text(title, style: AppTypography.sectionTitleMedium),
           FormBuilderRadioGroup<T>(
             name: firebaseFieldName,
             initialValue: initialValue,
@@ -104,7 +96,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
                 .map(
                   (option) => FormBuilderFieldOption(
                     value: option.value,
-                    child: Text(option.label, style: optionTextStyle),
+                    child: Text(option.label, style: AppTypography.bodyLarge),
                   ),
                 )
                 .toList(),

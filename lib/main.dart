@@ -151,7 +151,10 @@ class _MyAppState extends State<MyApp> {
             ],
             navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
             theme: ThemeData(
-              fontFamily: 'Poppins',
+              fontFamily: "DMSans",
+              textTheme: const TextTheme(
+                bodyMedium: TextStyle(letterSpacing: -0.25),
+              ),
               colorScheme: appColors.scheme,
               splashFactory: InkSparkle.splashFactory,
               tooltipTheme: TooltipThemeData(
@@ -177,7 +180,6 @@ class _MyAppState extends State<MyApp> {
               dialogTheme: DialogThemeData(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                 titleTextStyle: TextStyle(
-                  fontFamily: 'Poppins',
                   color: appColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                   fontSize: 24,
@@ -189,7 +191,6 @@ class _MyAppState extends State<MyApp> {
                 behavior: SnackBarBehavior.floating,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 contentTextStyle: TextStyle(
-                  fontFamily: 'Poppins',
                   color: appColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                 ),

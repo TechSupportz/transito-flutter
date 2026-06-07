@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/bus_timing_guide.dart';
 
+// TODO: Quick start flow should be revamped to be more interactive and engaging, with animations and better design.
 class QuickStartScreen extends StatelessWidget {
   const QuickStartScreen({super.key});
 
@@ -19,13 +21,9 @@ class QuickStartScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text(
+                Text(
                   'How to I decipher the details?',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w600,
-                    height: 1.25,
-                  ),
+                  style: AppTypography.pageTitle.copyWith(height: 1.25),
                 ),
                 const BusTimingGuide(),
               ],

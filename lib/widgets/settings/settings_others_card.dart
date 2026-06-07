@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
 class SettingsOthersCard extends StatelessWidget {
@@ -12,10 +13,6 @@ class SettingsOthersCard extends StatelessWidget {
   final String title;
   final AppSymbol icon;
   final void Function() onTap;
-
-  final TextStyle titleTextStyle = const TextStyle(
-    fontSize: 18,
-  );
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +32,7 @@ class SettingsOthersCard extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(title, style: titleTextStyle),
+              Text(title, style: AppTypography.bodyLarge),
               icon,
             ],
           ),

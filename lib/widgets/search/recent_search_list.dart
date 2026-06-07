@@ -4,6 +4,7 @@ import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/onemap/onemap_search.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/bus_info/bus_service_card.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/search/search_result_card.dart';
@@ -65,14 +66,10 @@ class RecentSearchList extends StatelessWidget {
 
   // widget to display a message when the user has no recent searches
   Center _noRecentSearches() {
-    return const Center(
+    return Center(
       child: Text(
         "No recent searches",
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-          color: Colors.white,
-        ),
+        style: AppTypography.cardTitleMedium,
       ),
     );
   }

@@ -8,6 +8,7 @@ import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
+import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class FavouritesScreenController extends ChangeNotifier {
@@ -103,25 +104,10 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     ),
                   )
                 // if the user has no favourites display a message
-                : const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "This place is real empty",
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        Text(
-                          "Try adding some favourites!",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
+                : const ErrorText(
+                    title: "This place is real empty",
+                    message: "Try adding some favourites!",
+                    icon: Symbols.heart_plus_rounded,
                   );
           } else if (snapshot.hasError) {
             return Center(

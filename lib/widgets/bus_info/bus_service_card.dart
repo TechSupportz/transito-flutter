@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/bus_info/bus_service_info_screen.dart';
 
 class BusServiceCard extends StatelessWidget {
@@ -49,10 +50,7 @@ class BusServiceCard extends StatelessWidget {
                 overflow: TextOverflow.fade,
                 maxLines: 1,
                 softWrap: false,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: AppTypography.sectionHero,
               ),
               const SizedBox(height: 4),
               Container(

@@ -15,6 +15,7 @@ import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
@@ -226,19 +227,16 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           overflow: TextOverflow.fade,
                           maxLines: 1,
                           softWrap: false,
-                          style: const TextStyle(
-                            fontSize: 30,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTypography.pageTitle,
                         ),
                         const SizedBox(
-                          height: 8,
+                          height: 4,
                         ),
                         Row(
+                          spacing: 8,
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              margin: const EdgeInsets.only(right: 8),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.primary,
                                 borderRadius: BorderRadius.circular(8),
@@ -246,7 +244,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               child: Text(
                                 widget.code,
                                 style: TextStyle(
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
                                   color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               ),
@@ -273,10 +271,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                       children: [
                         const Text(
                           'Bus Services',
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTypography.sectionTitle,
                         ),
                         const SizedBox(
                           height: 8,
@@ -339,8 +334,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                             ),
                                             Text(
                                               "Not all services may be operating at the moment",
-                                              style: TextStyle(
-                                                fontSize: 12,
+                                              style: AppTypography.labelSmall.copyWith(
                                                 fontStyle: FontStyle.italic,
                                                 color: appColors.scheme.error,
                                               ),
@@ -383,10 +377,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                       children: [
                         const Text(
                           'Location',
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: AppTypography.sectionTitle,
                         ),
                         const SizedBox(
                           height: 8,
@@ -474,11 +465,10 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                             ),
                                             Text(
                                               "OneMap © contributors",
-                                              style: TextStyle(
+                                              style: AppTypography.labelSmall.copyWith(
                                                 color: Theme.of(
                                                   context,
                                                 ).colorScheme.onSurfaceVariant,
-                                                fontSize: 12,
                                               ),
                                             ),
                                           ],

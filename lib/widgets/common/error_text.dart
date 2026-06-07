@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
 enum ErrorTextStyle {
@@ -48,18 +49,14 @@ class ErrorText extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(
-                fontSize: 16,
+              style: AppTypography.body.copyWith(
                 fontWeight: FontWeight.w600,
                 color: textColor,
               ),
             ),
             Text(
               message,
-              style: TextStyle(
-                fontSize: 14,
-                color: textColor,
-              ),
+              style: AppTypography.caption.copyWith(color: textColor),
             ),
           ],
         ),
@@ -81,21 +78,14 @@ class ErrorText extends StatelessWidget {
         Text(
           title,
           textAlign: TextAlign.center,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-          ),
+          style: AppTypography.cardTitle.copyWith(color: textColor),
         ),
         if (message.isNotEmpty) ...[
           SizedBox(height: 2),
           Text(
             message,
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: textColor,
-            ),
+            style: AppTypography.caption.copyWith(color: textColor),
           ),
         ],
       ],

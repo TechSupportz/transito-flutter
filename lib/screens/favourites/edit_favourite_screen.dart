@@ -11,6 +11,7 @@ import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -304,16 +305,16 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               children: [
                 Text(
                   widget.busStopName,
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: AppTypography.pageTitle,
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 4,
                 ),
                 Row(
+                  spacing: 8,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      margin: const EdgeInsets.only(right: 12),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.primary,
                         borderRadius: BorderRadius.circular(8),
@@ -321,8 +322,8 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                       child: Text(
                         widget.busStopCode,
                         style: TextStyle(
-                          fontSize: 16,
                           color: Theme.of(context).colorScheme.onPrimary,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),

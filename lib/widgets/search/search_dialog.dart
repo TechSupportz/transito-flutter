@@ -178,8 +178,8 @@ class _SearchDialogState extends State<SearchDialog> {
 
   Widget searchErrorText() {
     return const ErrorText(
-      title: 'Search failed',
-      message: 'Try again later',
+      title: 'Search is taking a break',
+      message: 'Give it another try in a moment.',
       icon: Symbols.search_off_rounded,
     );
   }
@@ -411,31 +411,10 @@ class _SearchDialogState extends State<SearchDialog> {
           OneMapSearch res = snapshot.data!;
 
           if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "We can't find that place 🤔",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Try checking for typos or searching for a landmark or address nearby instead.",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+            return const ErrorText(
+              title: 'No places found',
+              message: 'Try a nearby landmark or address instead.',
+              icon: Symbols.not_listed_location_rounded,
             );
           }
 
@@ -486,31 +465,10 @@ class _SearchDialogState extends State<SearchDialog> {
           BusStopSearchApiResponse res = snapshot.data!;
 
           if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "🔍 We couldn't find any bus stops 🤔",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Try checking search for typos or use a different search term",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+            return const ErrorText(
+              title: 'No bus stops found',
+              message: 'Try another stop name, or check for typos.',
+              icon: Symbols.bus_map_pin_rounded, // TODO - find a better icon for this
             );
           }
 
@@ -555,31 +513,10 @@ class _SearchDialogState extends State<SearchDialog> {
           BusServiceSearchApiResponse res = snapshot.data!;
 
           if (res.count == 0 && snapshot.connectionState == ConnectionState.done) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "🔍 We couldn't find any bus services 🤔",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 20,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    "Are you sure you typed the correct bus service number?",
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+            return const ErrorText(
+              title: 'No bus services found',
+              message: 'Are you sure the service exists?',
+              icon: Symbols.no_transfer_rounded,
             );
           }
 

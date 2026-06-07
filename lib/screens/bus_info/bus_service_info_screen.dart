@@ -9,6 +9,7 @@ import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/bus_info/bus_routes_list.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -98,10 +99,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                       overflow: TextOverflow.fade,
                       maxLines: 1,
                       softWrap: false,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: AppTypography.pageTitle,
                     ),
                     SkeletonLine(
                       style: SkeletonLineStyle(
@@ -166,10 +164,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 overflow: TextOverflow.fade,
                                 maxLines: 1,
                                 softWrap: false,
-                                style: const TextStyle(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                                style: AppTypography.pageTitle,
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
@@ -194,7 +189,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                             children: [
                               Text(
                                 "Interchange${busService.isLoopService ? "" : "s"}",
-                                style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w600),
+                                style: AppTypography.sectionTitle,
                                 textAlign: TextAlign.start,
                               ),
                               const SizedBox(height: 8),
