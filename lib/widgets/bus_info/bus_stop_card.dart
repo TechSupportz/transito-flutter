@@ -280,7 +280,7 @@ class BusStopCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (selectedDay == 0 && busSchedule!.firstBus.weekdays != "-:")
+                  if (selectedDay == 0 && busSchedule!.firstBus.weekdays != "-")
                     Text(
                       Jiffy.parse(
                         busSchedule!.firstBus.weekdays,
@@ -288,7 +288,7 @@ class BusStopCard extends StatelessWidget {
                       ).jm,
                       style: AppTypography.sectionHero,
                     )
-                  else if (selectedDay == 1 && busSchedule!.firstBus.saturday != "-:")
+                  else if (selectedDay == 1 && busSchedule!.firstBus.saturday != "-")
                     Text(
                       Jiffy.parse(
                         busSchedule!.firstBus.saturday,
@@ -296,7 +296,7 @@ class BusStopCard extends StatelessWidget {
                       ).jm,
                       style: AppTypography.sectionHero,
                     )
-                  else if (selectedDay == 2 && busSchedule!.firstBus.sunday != "-:")
+                  else if (selectedDay == 2 && busSchedule!.firstBus.sunday != "-")
                     Text(
                       Jiffy.parse(
                         busSchedule!.firstBus.sunday,
@@ -325,7 +325,7 @@ class BusStopCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (selectedDay == 0 && busSchedule!.lastBus.weekdays != "-:")
+                  if (selectedDay == 0 && busSchedule!.lastBus.weekdays != "-")
                     Text(
                       Jiffy.parse(
                         busSchedule!.lastBus.weekdays,
@@ -333,7 +333,7 @@ class BusStopCard extends StatelessWidget {
                       ).jm,
                       style: AppTypography.sectionHero,
                     )
-                  else if (selectedDay == 1 && busSchedule!.lastBus.saturday != "-:")
+                  else if (selectedDay == 1 && busSchedule!.lastBus.saturday != "-")
                     Text(
                       Jiffy.parse(
                         busSchedule!.lastBus.saturday,
@@ -341,7 +341,7 @@ class BusStopCard extends StatelessWidget {
                       ).jm,
                       style: AppTypography.sectionHero,
                     )
-                  else if (selectedDay == 2 && busSchedule!.lastBus.sunday != "-:")
+                  else if (selectedDay == 2 && busSchedule!.lastBus.sunday != "-")
                     Text(
                       Jiffy.parse(
                         busSchedule!.lastBus.sunday,
