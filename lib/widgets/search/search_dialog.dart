@@ -241,88 +241,99 @@ class _SearchDialogState extends State<SearchDialog> {
                   bottomRight: Radius.circular(12),
                 ),
               ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
-                child: Row(
-                  spacing: 8,
-                  mainAxisSize: MainAxisSize.max,
-                  children: [
-                    ChoiceChip(
-                      label: Text("Places"),
-                      selected: _searchMode == SearchMode.PLACES,
-                      onSelected: (value) {
-                        if (_searchMode == SearchMode.SERVICES) _textFieldController.clear();
+              child: ShaderMask(
+                shaderCallback: (Rect bounds) {
+                  return LinearGradient(
+                    begin: Alignment(0.8, 0.0),
+                    end: Alignment(1.0, 0.0),
+                    colors: [Colors.white, Colors.transparent],
+                    stops: [0.0, 1.0],
+                  ).createShader(bounds);
+                },
+                blendMode: BlendMode.dstIn,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.only(bottom: 8, left: 16, right: 16),
+                  child: Row(
+                    spacing: 8,
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      ChoiceChip(
+                        label: Text("Places"),
+                        selected: _searchMode == SearchMode.PLACES,
+                        onSelected: (value) {
+                          if (_searchMode == SearchMode.SERVICES) _textFieldController.clear();
 
-                        setState(() => _searchMode = SearchMode.PLACES);
-                        _onSearchChanged(_textFieldController.text, 1);
+                          setState(() => _searchMode = SearchMode.PLACES);
+                          _onSearchChanged(_textFieldController.text, 1);
 
-                        if (_textFieldController.text.isEmpty) {
+                          if (_textFieldController.text.isEmpty) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _searchFocusNode.requestFocus();
+                            });
+                          }
+                        },
+                        avatar: AnimatedOpacity(
+                          opacity: _searchMode == SearchMode.PLACES ? 0.2 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Easing.standard,
+                          child: AppSymbol(
+                            Symbols.place_rounded,
+                            fill: true,
+                          ),
+                        ),
+                      ),
+                      ChoiceChip(
+                        label: Text("Bus Stops"),
+                        selected: _searchMode == SearchMode.STOPS,
+                        onSelected: (value) {
+                          if (_searchMode == SearchMode.SERVICES) _textFieldController.clear();
+
+                          setState(() => _searchMode = SearchMode.STOPS);
+                          _onSearchChanged(_textFieldController.text, 1);
+
+                          if (_textFieldController.text.isEmpty) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              _searchFocusNode.requestFocus();
+                            });
+                          }
+                        },
+                        avatar: AnimatedOpacity(
+                          opacity: _searchMode == SearchMode.STOPS ? 0.2 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Easing.standard,
+                          child: AppSymbol(
+                            Symbols.signpost_rounded,
+                            fill: true,
+                          ),
+                        ),
+                      ),
+                      ChoiceChip(
+                        label: Text("Bus Services"),
+                        selected: _searchMode == SearchMode.SERVICES,
+                        onSelected: (value) {
+                          _textFieldController.clear();
+
+                          setState(() {
+                            _searchMode = SearchMode.SERVICES;
+                          });
+
                           WidgetsBinding.instance.addPostFrameCallback((_) {
                             _searchFocusNode.requestFocus();
                           });
-                        }
-                      },
-                      avatar: AnimatedOpacity(
-                        opacity: _searchMode == SearchMode.PLACES ? 0.2 : 1.0,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Easing.standard,
-                        child: AppSymbol(
-                          Symbols.place_rounded,
-                          fill: true,
+                        },
+                        avatar: AnimatedOpacity(
+                          opacity: _searchMode == SearchMode.SERVICES ? 0.2 : 1.0,
+                          duration: const Duration(milliseconds: 300),
+                          curve: Easing.standard,
+                          child: AppSymbol(
+                            Symbols.directions_bus_rounded,
+                            fill: true,
+                          ),
                         ),
                       ),
-                    ),
-                    ChoiceChip(
-                      label: Text("Bus Stops"),
-                      selected: _searchMode == SearchMode.STOPS,
-                      onSelected: (value) {
-                        if (_searchMode == SearchMode.SERVICES) _textFieldController.clear();
-
-                        setState(() => _searchMode = SearchMode.STOPS);
-                        _onSearchChanged(_textFieldController.text, 1);
-
-                        if (_textFieldController.text.isEmpty) {
-                          WidgetsBinding.instance.addPostFrameCallback((_) {
-                            _searchFocusNode.requestFocus();
-                          });
-                        }
-                      },
-                      avatar: AnimatedOpacity(
-                        opacity: _searchMode == SearchMode.STOPS ? 0.2 : 1.0,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Easing.standard,
-                        child: AppSymbol(
-                          Symbols.signpost_rounded,
-                          fill: true,
-                        ),
-                      ),
-                    ),
-                    ChoiceChip(
-                      label: Text("Bus Services"),
-                      selected: _searchMode == SearchMode.SERVICES,
-                      onSelected: (value) {
-                        _textFieldController.clear();
-
-                        setState(() {
-                          _searchMode = SearchMode.SERVICES;
-                        });
-
-                        WidgetsBinding.instance.addPostFrameCallback((_) {
-                          _searchFocusNode.requestFocus();
-                        });
-                      },
-                      avatar: AnimatedOpacity(
-                        opacity: _searchMode == SearchMode.SERVICES ? 0.2 : 1.0,
-                        duration: const Duration(milliseconds: 300),
-                        curve: Easing.standard,
-                        child: AppSymbol(
-                          Symbols.directions_bus_rounded,
-                          fill: true,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
