@@ -14,8 +14,10 @@ import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
+import 'package:transito/global/utils/bus_service_utils.dart';
 import 'package:transito/global/utils/scroll_to_content.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/user/user_settings.dart';
@@ -54,7 +56,7 @@ class BusTimingScreen extends StatefulWidget {
 
 class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProviderStateMixin {
   late Future<BusArrivalInfo> futureBusArrivalInfo;
-  late Future<List<String>> futureServices;
+  late Future<List<BusStopServiceDetailed>> futureServices;
   late AnimationController _animationController;
 
   final ScrollController _scrollController = ScrollController();
@@ -75,16 +77,20 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   }
 
   // function to fetch all services of a bus stop
-  Future<List<String>> fetchServices() async {
-    if (widget.services != null) {
-      debugPrint("Retrieving services from props");
-      return widget.services!;
+  Future<List<BusStopServiceDetailed>> fetchServices() async {
+    final List<BusStopServiceDetailed> services = await TransitoApiService().getBusStopServices(
+      widget.code,
+    );
+    return services;
+  }
+
+  Future<List<String>> getAvailableServiceNumbers() async {
+    final services = widget.services;
+    if (services != null && services.isNotEmpty) {
+      return services;
     }
 
-    debugPrint("Fetching all services");
-    final List<String> services = await TransitoApiService().getBusStopServices(widget.code);
-    debugPrint("Services fetched");
-    return services;
+    return getBusStopServiceNumbers(await futureServices);
   }
 
   // function to fetch bus arrival info
@@ -129,7 +135,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
   Future<void> goToAddFavouritesScreen(BuildContext context) async {
-    List<String> busServicesList = await futureServices;
+    List<String> busServicesList = await getAvailableServiceNumbers();
     // debugPrint('$busServicesList');
     if (!context.mounted) return;
     Navigator.push(
@@ -152,7 +158,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   Future<void> goToEditFavouritesScreen(BuildContext context) async {
     List<String>? busServicesList;
     try {
-      busServicesList = await futureServices;
+      busServicesList = await getAvailableServiceNumbers();
     } catch (error) {
       debugPrint('Failed to fetch bus services before editing favourite: $error');
     }
@@ -186,7 +192,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   }
 
   Future<void> goToBusStopInfoScreen(BuildContext context) async {
-    List<String> services = await futureServices;
+    List<String> services = await getAvailableServiceNumbers();
 
     if (!context.mounted) return;
     Navigator.push(
@@ -349,7 +355,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                               controller: _scrollController,
                               padding: const EdgeInsets.only(
                                 top: 12,
-                                bottom: 32,
+                                bottom: 48,
                                 left: 12,
                                 right: 12,
                               ),
@@ -357,6 +363,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                 ListView.separated(
                                   shrinkWrap: true,
                                   physics: const NeverScrollableScrollPhysics(),
+                                  padding: EdgeInsets.zero,
                                   itemBuilder: (context, int index) {
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 8.0),
@@ -372,7 +379,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                       const Divider(),
                                   itemCount: busArrivalInfoSnapshot.data!.services.length,
                                 ),
-                                FutureBuilder(
+                                FutureBuilder<List<BusStopServiceDetailed>>(
                                   future: futureServices,
                                   builder: (context, servicesSnapshot) {
                                     Widget nonOperationalServicesResults = Container();
@@ -383,10 +390,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                         .toList();
 
                                     if (servicesSnapshot.hasData) {
-                                      final services = servicesSnapshot.data as List<String>;
+                                      final services = servicesSnapshot.data!;
                                       final nonOperatingServices = services
                                           .where(
-                                            (element) => !currOperatingServices.contains(element),
+                                            (element) => !currOperatingServices.contains(
+                                              element.serviceNo,
+                                            ),
                                           )
                                           .toList();
 
@@ -422,22 +431,27 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                                   }
                                                 },
                                                 shape: const Border(),
+                                                expandedAlignment: Alignment.topLeft,
+                                                childrenPadding: const EdgeInsets.only(left: 12),
+                                                tilePadding: EdgeInsets.symmetric(horizontal: 8),
                                                 children: [
                                                   Wrap(
                                                     spacing: 8,
                                                     runSpacing: 8,
                                                     direction: Axis.horizontal,
                                                     alignment: WrapAlignment.start,
-                                                    children:
-                                                        nonOperatingServices //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
-                                                            .map(
-                                                              (service) => BusServiceChip(
-                                                                busServiceNumber: service,
-                                                                currentStopCode: widget.code,
-                                                                isOperating: true,
-                                                              ),
-                                                            )
-                                                            .toList(),
+                                                    children: nonOperatingServices
+                                                        .map(
+                                                          (service) => BusServiceChip(
+                                                            busServiceNumber: service.serviceNo,
+                                                            originStopCode: service.originStopCode,
+                                                            destinationStopCode:
+                                                                service.destinationStopCode,
+                                                            currentStopCode: widget.code,
+                                                            isOperating: true,
+                                                          ),
+                                                        )
+                                                        .toList(),
                                                   ),
                                                 ],
                                               ),

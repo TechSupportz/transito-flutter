@@ -20,12 +20,14 @@ class BusServiceInfoScreen extends StatefulWidget {
     super.key,
     required this.serviceNo,
     this.originStopCode,
+    this.destinationStopCode,
     this.currentStopCode,
     this.busService,
   });
 
   final String serviceNo;
   final String? originStopCode;
+  final String? destinationStopCode;
   final String? currentStopCode;
   final BusService? busService;
 
@@ -55,6 +57,26 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     );
     debugPrint("Service info fetched");
     return routes;
+  }
+
+  int getDestinationIndex(BusService busService) {
+    if (widget.originStopCode == busService.interchanges[0].code) {
+      return 0;
+    }
+
+    if (widget.originStopCode == busService.interchanges[1].code) {
+      return 1;
+    }
+
+    if (widget.destinationStopCode == busService.interchanges[1].code) {
+      return 0;
+    }
+
+    if (widget.destinationStopCode == busService.interchanges[0].code) {
+      return 1;
+    }
+
+    return _destinationIndex;
   }
 
   @override
@@ -126,13 +148,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
             if (snapshot.hasData || widget.busService != null) {
               final busService = snapshot.data as BusService;
 
-              if (widget.originStopCode != null &&
-                  !initialisedDestinationIndex &&
+              if (!initialisedDestinationIndex &&
                   !busService.isLoopService &&
                   !busService.isSingleRoute) {
-                if (widget.originStopCode != busService.interchanges[0].code) {
-                  _destinationIndex = 1;
-                }
+                _destinationIndex = getDestinationIndex(busService);
               }
 
               initialisedDestinationIndex = true;

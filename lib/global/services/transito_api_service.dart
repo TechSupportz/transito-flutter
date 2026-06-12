@@ -23,7 +23,7 @@ class TransitoApiService extends BaseApiService {
 
   String get _baseUrl => _usingBetaServer ? Secret.BETA_API_URL : Secret.API_URL;
 
-  Future<List<String>> getBusStopServices(String code) async {
+  Future<List<BusStopServiceDetailed>> getBusStopServices(String code) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-stop/$code/services');
     final response = await get(uri);
     final Map<String, dynamic> data = decodeJson(response.body, uri);

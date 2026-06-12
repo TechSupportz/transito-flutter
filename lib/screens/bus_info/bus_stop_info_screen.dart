@@ -12,7 +12,9 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
+import 'package:transito/global/utils/bus_service_utils.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/app_typography.dart';
@@ -50,20 +52,14 @@ class BusStopInfoScreen extends StatefulWidget {
 
 class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   late Future<List<String>> futureCurrOperatingServices;
-  late Future<List<String>> futureServices;
+  late Future<List<BusStopServiceDetailed>> futureServices;
   bool isAddedToFavourites = false;
 
   // function to fetch all services of a bus stop
-  Future<List<String>> fetchServices() async {
-    if (widget.services != null) {
-      debugPrint("Retrieving services from props");
-      return widget.services!;
-    }
-
-    debugPrint("Fetching all services");
-
-    final List<String> services = await TransitoApiService().getBusStopServices(widget.code);
-    debugPrint("Services fetched");
+  Future<List<BusStopServiceDetailed>> fetchServices() async {
+    final List<BusStopServiceDetailed> services = await TransitoApiService().getBusStopServices(
+      widget.code,
+    );
     return services;
   }
 
@@ -128,9 +124,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
   Future<void> goToAddFavouritesScreen() async {
-    List<String> busServicesList = await futureServices;
+    List<String> busServicesList = getBusStopServiceNumbers(await futureServices);
     // debugPrint('$busServicesList');
-    if (!context.mounted) return;
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -151,12 +147,12 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   Future<void> goToEditFavouritesScreen() async {
     List<String>? busServicesList;
     try {
-      busServicesList = await futureServices;
+      busServicesList = getBusStopServiceNumbers(await futureServices);
     } catch (error) {
       debugPrint('Failed to fetch bus services before editing favourite: $error');
     }
     // debugPrint('$busServicesList');
-    if (!context.mounted) return;
+    if (!mounted) return;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -276,7 +272,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                         const SizedBox(
                           height: 8,
                         ),
-                        FutureBuilder<List<String>>(
+                        FutureBuilder<List<BusStopServiceDetailed>>(
                           future: futureServices,
                           builder: (context, servicesSnapshot) {
                             if (servicesSnapshot.hasData) {
@@ -298,7 +294,8 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                   }
 
                                   // If operating services fail, display all services but show a warning that not all services may be operating
-                                  final currOperatingServices = operatingSnapshot.data ?? services;
+                                  final currOperatingServices =
+                                      operatingSnapshot.data ?? getBusStopServiceNumbers(services);
 
                                   return Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,18 +303,19 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                                       Wrap(
                                         spacing: 8,
                                         runSpacing: 8,
-                                        children:
-                                            services //TODO - This list should contain the origin and destination of the bus service. (Minimally the origin)
-                                                .map(
-                                                  (service) => BusServiceChip(
-                                                    busServiceNumber: service,
-                                                    currentStopCode: widget.code,
-                                                    isOperating: currOperatingServices.contains(
-                                                      service,
-                                                    ),
-                                                  ),
-                                                )
-                                                .toList(),
+                                        children: services
+                                            .map(
+                                              (service) => BusServiceChip(
+                                                busServiceNumber: service.serviceNo,
+                                                currentStopCode: widget.code,
+                                                originStopCode: service.originStopCode,
+                                                destinationStopCode: service.destinationStopCode,
+                                                isOperating: currOperatingServices.contains(
+                                                  service.serviceNo,
+                                                ),
+                                              ),
+                                            )
+                                            .toList(),
                                       ),
                                       if (operatingSnapshot.data == null) ...[
                                         SizedBox(

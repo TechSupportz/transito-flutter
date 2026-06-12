@@ -8,12 +8,14 @@ class BusServiceChip extends StatelessWidget {
     required this.busServiceNumber,
     required this.isOperating,
     this.originStopCode,
+    this.destinationStopCode,
     this.currentStopCode,
   });
 
   final String busServiceNumber;
   final bool isOperating;
   final String? originStopCode;
+  final String? destinationStopCode;
   final String? currentStopCode;
 
   Future<void> goToBusServiceInfoScreen(BuildContext context) async {
@@ -24,6 +26,7 @@ class BusServiceChip extends StatelessWidget {
         builder: (context) => BusServiceInfoScreen(
           serviceNo: busServiceNumber,
           originStopCode: originStopCode,
+          destinationStopCode: destinationStopCode,
           currentStopCode: currentStopCode,
         ),
       ),

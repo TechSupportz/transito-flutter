@@ -94,6 +94,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
         builder: (context) => BusServiceInfoScreen(
           serviceNo: widget.serviceInfo.serviceNum,
           originStopCode: widget.serviceInfo.nextBus.originCode,
+          destinationStopCode: widget.serviceInfo.nextBus.destinationCode,
           currentStopCode: widget.busStopCode,
         ),
       ),
