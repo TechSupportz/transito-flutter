@@ -338,7 +338,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                 Jiffy.now().hour >= 5
                                     ? '🦥 All the buses are lepaking 🦥'
                                     : "💤 Buses are sleeping 💤",
-                                style: AppTypography.sectionTitleMedium,
+                                style: AppTypography.sectionSubtitle,
                                 textAlign: TextAlign.center,
                               ),
                             ),

@@ -38,10 +38,6 @@ class EditFavouritesScreen extends StatefulWidget {
   State<EditFavouritesScreen> createState() => _EditFavouritesScreenState();
 }
 
-const checkBoxFontStyle = TextStyle(
-  fontSize: 24,
-);
-
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   late Future<Map<String?, List<String?>>> futureFavouriteServicesList;
   late Future<List<String>> futureBusServicesList;
@@ -305,7 +301,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
               children: [
                 Text(
                   widget.busStopName,
-                  style: AppTypography.pageTitle,
+                  style: AppTypography.screenHeading,
                 ),
                 const SizedBox(
                   height: 4,
@@ -321,16 +317,14 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                       ),
                       child: Text(
                         widget.busStopCode,
-                        style: TextStyle(
+                        style: AppBusTypography.busInfoChipLabel.copyWith(
                           color: Theme.of(context).colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     Text(
                       widget.busStopAddress,
-                      style: TextStyle(
-                        fontSize: 16,
+                      style: AppTypography.body.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                         fontStyle: FontStyle.italic,
                       ),
@@ -342,8 +336,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 ),
                 Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: AppTypography.body.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -352,8 +345,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                 ),
                 Text(
                   "Unselecting all the bus services will remove this bus stop from your favourites",
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: AppTypography.body.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -405,7 +397,10 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                         child: Column(
                           children: [
                             ParentChildCheckbox(
-                              parent: const Text("Bus Services", style: checkBoxFontStyle),
+                              parent: const Text(
+                                "Bus Services",
+                                style: AppTypography.checkboxLabel,
+                              ),
                               // initialParentValue: {'Bus Services': true},
                               initialChildrenValue: initialChildrenValue,
                               parentCheckboxScale: 1.35,
@@ -413,7 +408,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                               gap: 2,
                               children: [
                                 for (var service in busServicesList)
-                                  Text(service, style: checkBoxFontStyle),
+                                  Text(service, style: AppTypography.checkboxLabel),
                               ],
                             ),
                           ],

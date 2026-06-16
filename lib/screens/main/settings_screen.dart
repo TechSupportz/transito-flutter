@@ -294,9 +294,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               child: FilledButton.tonal(
                                 onPressed: () => showResetPasswordDialog(user.email),
                                 child: Text(
-                                  'Reset password',
-                                  textAlign: TextAlign.center,
-                                ),
+                                  'Reset password',                                ),
                               ),
                             )
                           : const SizedBox(),
@@ -332,11 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ],
                                   ),
                                 ),
-                                child: const Text(
-                                  'Logout',
-                                  style: TextStyle(fontSize: 14),
-                                  textAlign: TextAlign.center,
-                                ),
+                                child: const Text('Logout'),
                               ),
                             )
                           : const SizedBox(),
@@ -442,7 +436,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           children: [
                             const Text(
                               "Base Colour",
-                              style: AppTypography.sectionTitleMedium,
+                              style: AppTypography.sectionSubtitle,
                             ),
                             GestureDetector(
                               onTap: () {
@@ -509,7 +503,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         includeHashSign: true,
                                         enableAlpha: false,
                                       ),
-                                      style: const TextStyle(fontSize: 18),
+                                      style: AppTypography.bodyLarge,
                                     ),
                                     AppSymbol(
                                       Symbols.circle_rounded,
@@ -719,17 +713,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           applicationName: "Transito",
                           applicationVersion: "v${snapshot.data!.version}",
-                          applicationLegalese: "© 2023 Transito",
+                          applicationLegalese: "© 2023-2026 Nitish Thiyagarajan",
                           children: const [
                             SizedBox(height: 16),
                             Text(
                               "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
-                              style: TextStyle(fontSize: 14),
+                              style: AppTypography.caption,
                             ),
                             SizedBox(height: 8),
                             Text(
                               "Transito is not responsible for any inaccuracies in the data.",
-                              style: TextStyle(fontSize: 14),
+                              style: AppTypography.caption,
                             ),
                           ],
                         ),
@@ -794,7 +788,7 @@ class BetaServerSettingsCard extends StatelessWidget {
         ),
         title: const Text(
           "Beta Server",
-          style: AppTypography.sectionTitleMedium,
+          style: AppTypography.sectionSubtitle,
         ),
         subtitle: const Text("Use preview Transito API for future requests."),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

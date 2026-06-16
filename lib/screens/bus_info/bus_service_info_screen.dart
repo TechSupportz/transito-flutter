@@ -121,7 +121,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                       overflow: TextOverflow.fade,
                       maxLines: 1,
                       softWrap: false,
-                      style: AppTypography.pageTitle,
+                      style: AppTypography.screenHeading,
                     ),
                     SkeletonLine(
                       style: SkeletonLineStyle(
@@ -183,7 +183,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 overflow: TextOverflow.fade,
                                 maxLines: 1,
                                 softWrap: false,
-                                style: AppTypography.pageTitle,
+                                style: AppTypography.screenHeading,
                               ),
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
@@ -194,8 +194,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 ),
                                 child: Text(
                                   busService.operator.name,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
+                                  style: AppBusTypography.busInfoChipLabel.copyWith(
                                     color: appColors.getOperatorColor(busService.operator).$2,
                                   ),
                                 ),

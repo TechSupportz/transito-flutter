@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
@@ -184,8 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               'The last bus timing app you\'ll ever need.',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontSize: 18,
+                              style: AppTypography.bodyLarge.copyWith(
                                 color: Theme.of(context).colorScheme.onSurfaceVariant,
                                 fontWeight: FontWeight.w200,
                               ),

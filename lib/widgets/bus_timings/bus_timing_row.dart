@@ -277,7 +277,7 @@ class _ArrivalCardState extends State<ArrivalCard> {
                             return "Error";
                         }
                       })(),
-                      style: AppBusTypography.busTypeTagMinutes.copyWith(
+                      style: AppBusTypography.busTypeTag.copyWith(
                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),

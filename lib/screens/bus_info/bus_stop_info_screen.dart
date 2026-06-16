@@ -223,7 +223,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                           overflow: TextOverflow.fade,
                           maxLines: 1,
                           softWrap: false,
-                          style: AppTypography.pageTitle,
+                          style: AppTypography.screenHeading,
                         ),
                         const SizedBox(
                           height: 4,
@@ -239,8 +239,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               ),
                               child: Text(
                                 widget.code,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
+                                style: AppBusTypography.busInfoChipLabel.copyWith(
                                   color: Theme.of(context).colorScheme.onPrimary,
                                 ),
                               ),

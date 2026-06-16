@@ -4,6 +4,7 @@ import 'package:flutter/rendering.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
 import 'package:transito/widgets/favourites/favourite_name_card.dart';
@@ -68,6 +69,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
       body: Padding(
         padding: const EdgeInsets.only(top: 12.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 12.0),
@@ -76,16 +78,14 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                 children: [
                   Text(
                     "Drag and drop to reorder your favourites",
-                    style: TextStyle(
-                      fontSize: 16,
+                    style: AppTypography.body.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "Click the pencil icon to modify or delete your favourites",
-                    style: TextStyle(
-                      fontSize: 16,
+                    style: AppTypography.body.copyWith(
                       color: Theme.of(context).colorScheme.onSurfaceVariant,
                     ),
                   ),

@@ -159,9 +159,8 @@ class BusStopCard extends StatelessWidget {
                             ),
                             child: Text(
                               busStopInfo.code,
-                              style: TextStyle(
+                              style: AppBusTypography.busInfoChipLabel.copyWith(
                                 color: Theme.of(context).colorScheme.onPrimary,
-                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ),
@@ -286,7 +285,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.firstBus.weekdays,
                         pattern: 'Hm',
                       ).jm,
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     )
                   else if (selectedDay == 1 && busSchedule!.firstBus.saturday != "-")
                     Text(
@@ -294,7 +293,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.firstBus.saturday,
                         pattern: 'Hm',
                       ).jm,
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     )
                   else if (selectedDay == 2 && busSchedule!.firstBus.sunday != "-")
                     Text(
@@ -302,12 +301,12 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.firstBus.sunday,
                         pattern: 'Hm',
                       ).jm,
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     )
                   else
                     Text(
                       "never o'clock",
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     ),
                 ],
               ),
@@ -331,7 +330,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.lastBus.weekdays,
                         pattern: 'Hm',
                       ).jm,
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     )
                   else if (selectedDay == 1 && busSchedule!.lastBus.saturday != "-")
                     Text(
@@ -339,7 +338,7 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.lastBus.saturday,
                         pattern: 'Hm',
                       ).jm,
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     )
                   else if (selectedDay == 2 && busSchedule!.lastBus.sunday != "-")
                     Text(
@@ -347,12 +346,12 @@ class BusStopCard extends StatelessWidget {
                         busSchedule!.lastBus.sunday,
                         pattern: 'Hm',
                       ).jm,
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     )
                   else
                     Text(
                       "never o'clock",
-                      style: AppTypography.sectionHero,
+                      style: AppTypography.sectionHeading,
                     ),
                 ],
               ),

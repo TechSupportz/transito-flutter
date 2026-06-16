@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 class AppTypography {
-  static const TextStyle pageTitle = TextStyle(
+  static const TextStyle screenHeading = TextStyle(
     fontSize: 32,
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle sectionHero = TextStyle(
+  static const TextStyle sectionHeading = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w800,
   );
@@ -16,7 +16,7 @@ class AppTypography {
     fontWeight: FontWeight.w600,
   );
 
-  static const TextStyle sectionTitleMedium = TextStyle(
+  static const TextStyle sectionSubtitle = TextStyle(
     fontSize: 21,
     fontWeight: FontWeight.w500,
   );
@@ -26,7 +26,7 @@ class AppTypography {
     fontWeight: FontWeight.w600,
   );
 
-  static const TextStyle cardTitleMedium = TextStyle(
+  static const TextStyle cardSubtitle = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
   );
@@ -43,17 +43,17 @@ class AppTypography {
 }
 
 class AppBusTypography {
-  static const TextStyle favouriteStopName = TextStyle(
+  static const TextStyle favouriteStopTitle = TextStyle(
     fontSize: 28,
     fontWeight: FontWeight.w700,
   );
 
-  static const TextStyle favouriteTooltip = TextStyle(
+  static const TextStyle favouriteStopTooltip = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
   );
 
-  static const TextStyle emptyTimings = TextStyle(
+  static const TextStyle emptyTimingsMessage = TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w500,
   );
@@ -78,9 +78,14 @@ class AppBusTypography {
     fontWeight: FontWeight.w500,
   );
 
-  static const TextStyle busTypeTagMinutes = TextStyle(
+  static const TextStyle busTypeTag = TextStyle(
     fontSize: 11,
     fontWeight: FontWeight.w500,
     letterSpacing: 0,
+  );
+
+  static const TextStyle busInfoChipLabel = TextStyle(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
   );
 }

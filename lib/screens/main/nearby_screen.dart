@@ -324,7 +324,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       children: [
         const Text(
           "Nearby Favourites",
-          style: AppTypography.sectionHero,
+          style: AppTypography.sectionHeading,
         ),
         const SizedBox(
           height: 12,
@@ -350,7 +350,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                     child: const Center(
                       child: Text(
                         "No favourites nearby",
-                        style: AppTypography.cardTitleMedium,
+                        style: AppTypography.cardSubtitle,
                       ),
                     ),
                   );
@@ -411,7 +411,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       children: [
         const Text(
           "Nearby",
-          style: AppTypography.sectionHero,
+          style: AppTypography.sectionHeading,
         ),
         const SizedBox(
           height: 12,

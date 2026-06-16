@@ -50,7 +50,7 @@ class BusServiceCard extends StatelessWidget {
                 overflow: TextOverflow.fade,
                 maxLines: 1,
                 softWrap: false,
-                style: AppTypography.sectionHero,
+                style: AppTypography.sectionHeading,
               ),
               const SizedBox(height: 4),
               Container(
@@ -62,9 +62,8 @@ class BusServiceCard extends StatelessWidget {
                 ),
                 child: Text(
                   busServiceInfo.operator.name,
-                  style: TextStyle(
+                  style: AppBusTypography.busInfoChipLabel.copyWith(
                     color: appColors.getOperatorColor(busServiceInfo.operator).$2,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),

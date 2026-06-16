@@ -61,7 +61,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.only(left: 16, right:16, top: 12, bottom: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),
@@ -70,7 +70,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 8,
         children: [
-          Text(title, style: AppTypography.sectionTitleMedium),
+          Text(title, style: AppTypography.sectionSubtitle),
           FormBuilderRadioGroup<T>(
             name: firebaseFieldName,
             initialValue: initialValue,
@@ -85,7 +85,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
               border: InputBorder.none,
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(12),
+                  Radius.circular(8),
                 ),
                 borderSide: BorderSide.none,
               ),

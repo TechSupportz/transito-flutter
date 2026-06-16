@@ -23,7 +23,7 @@ class QuickStartScreen extends StatelessWidget {
               children: [
                 Text(
                   'How to I decipher the details?',
-                  style: AppTypography.pageTitle.copyWith(height: 1.25),
+                  style: AppTypography.screenHeading.copyWith(height: 1.25),
                 ),
                 const BusTimingGuide(),
               ],

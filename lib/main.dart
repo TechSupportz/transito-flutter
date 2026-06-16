@@ -153,7 +153,21 @@ class _MyAppState extends State<MyApp> {
             theme: ThemeData(
               fontFamily: "DMSans",
               textTheme: const TextTheme(
-                bodyMedium: TextStyle(letterSpacing: -0.25),
+                displayLarge: TextStyle(letterSpacing: -0.5),
+                displayMedium: TextStyle(letterSpacing: -0.5),
+                displaySmall: TextStyle(letterSpacing: -0.5),
+                headlineLarge: TextStyle(letterSpacing: -0.5),
+                headlineMedium: TextStyle(letterSpacing: -0.5),
+                headlineSmall: TextStyle(letterSpacing: -0.5),
+                titleLarge: TextStyle(letterSpacing: -0.5),
+                titleMedium: TextStyle(letterSpacing: -0.5),
+                titleSmall: TextStyle(letterSpacing: -0.5),
+                bodyLarge: TextStyle(letterSpacing: -0.5),
+                bodyMedium: TextStyle(letterSpacing: -0.5),
+                bodySmall: TextStyle(letterSpacing: -0.5),
+                labelLarge: TextStyle(letterSpacing: -0.5),
+                labelMedium: TextStyle(letterSpacing: -0.5),
+                labelSmall: TextStyle(letterSpacing: -0.5),
               ),
               colorScheme: appColors.scheme,
               splashFactory: InkSparkle.splashFactory,
@@ -177,12 +191,41 @@ class _MyAppState extends State<MyApp> {
               checkboxTheme: CheckboxThemeData(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
               ),
+              textButtonTheme: TextButtonThemeData(
+                style: ButtonStyle(
+                  textStyle: WidgetStateProperty.all(
+                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+                  ),
+                ),
+              ),
+              filledButtonTheme: FilledButtonThemeData(
+                style: ButtonStyle(
+                  textStyle: WidgetStateProperty.all(
+                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+                  ),
+                ),
+              ),
+              elevatedButtonTheme: ElevatedButtonThemeData(
+                style: ButtonStyle(
+                  textStyle: WidgetStateProperty.all(
+                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+                  ),
+                ),
+              ),
+              outlinedButtonTheme: OutlinedButtonThemeData(
+                style: ButtonStyle(
+                  textStyle: WidgetStateProperty.all(
+                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+                  ),
+                ),
+              ),
               dialogTheme: DialogThemeData(
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
                 titleTextStyle: TextStyle(
                   color: appColors.scheme.onSurface,
                   fontWeight: FontWeight.w500,
                   fontSize: 24,
+                  letterSpacing: -0.5,
                 ),
               ),
               snackBarTheme: SnackBarThemeData(

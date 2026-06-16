@@ -1,9 +1,9 @@
 name: transito
-description: Get on board with Transito and catch your bus right on time!
+description: The last bus timing app you'll ever need!
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 5.0.0+47
+version: 5.0.0+48
 
 environment:
     sdk: ">=3.10.0 <4.0.0"

@@ -20,6 +20,7 @@ import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
@@ -474,10 +475,9 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                         ),
                         TextSourceAttribution(
                           "Powered by 'flutter_map'",
-                          textStyle: TextStyle(
+                          textStyle: AppTypography.labelSmall.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontStyle: FontStyle.italic,
-                            fontSize: 12,
                           ),
                           prependCopyright: false,
                         ),

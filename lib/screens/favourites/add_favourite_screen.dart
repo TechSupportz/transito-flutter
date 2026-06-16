@@ -32,10 +32,6 @@ class AddFavouritesScreen extends StatefulWidget {
   State<AddFavouritesScreen> createState() => _AddFavouritesScreenState();
 }
 
-const checkBoxFontStyle = TextStyle(
-  fontSize: 24,
-);
-
 class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
   bool _isAddingFavourite = false;
 
@@ -159,7 +155,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               children: [
                 Text(
                   widget.busStopName,
-                  style: AppTypography.pageTitle,
+                  style: AppTypography.screenHeading,
                 ),
                 const SizedBox(
                   height: 4,
@@ -175,9 +171,8 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                       ),
                       child: Text(
                         widget.busStopCode,
-                        style: TextStyle(
+                        style: AppBusTypography.busInfoChipLabel.copyWith(
                           color: Theme.of(context).colorScheme.onPrimary,
-                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -195,8 +190,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                 ),
                 Text(
                   "Select the bus services you would like to add to your favourites in this bus stop",
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: AppTypography.body.copyWith(
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
                 ),
@@ -226,13 +220,13 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                   child: Column(
                     children: [
                       ParentChildCheckbox(
-                        parent: const Text("Bus Services", style: checkBoxFontStyle),
+                        parent: const Text("Bus Services", style: AppTypography.checkboxLabel),
                         parentCheckboxScale: 1.35,
                         childrenCheckboxScale: 1.35,
                         gap: 2,
                         children: [
                           for (var service in widget.busServicesList)
-                            Text(service, style: checkBoxFontStyle),
+                            Text(service, style: AppTypography.checkboxLabel),
                         ],
                       ),
                     ],

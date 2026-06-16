@@ -97,7 +97,8 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
           return Tooltip(
             preferBelow: false,
             decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
-            textStyle: AppBusTypography.favouriteTooltip, // FIXME - This should have a better implementation. Possibly expanding from where the bus stop name actually is
+            // FIXME - This should have a better implementation. Possibly expanding from where the bus stop name actually is
+            textStyle: AppBusTypography.favouriteStopTooltip,
             showDuration: const Duration(milliseconds: 350),
             message: widget.name,
             child: GestureDetector(
@@ -130,7 +131,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                         softWrap: false,
-                        style: AppBusTypography.favouriteStopName.copyWith(
+                        style: AppBusTypography.favouriteStopTitle.copyWith(
                           color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
                       ),
@@ -172,7 +173,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                                       Jiffy.now().hour > 5
                                           ? '🦥 Your favourites are lepaking 🦥'
                                           : "💤 Buses are sleeping 💤",
-                                      style: AppBusTypography.emptyTimings,
+                                      style: AppBusTypography.emptyTimingsMessage,
                                       textAlign: TextAlign.center,
                                     ),
                                   ),

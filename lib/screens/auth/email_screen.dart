@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
 import '../../global/services/authentication_service.dart';
@@ -224,8 +225,7 @@ class _EmailScreenState extends State<EmailScreen> {
                         Text(
                           'The last bus timing app you\'ll ever need.',
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
+                          style: AppTypography.bodyLarge.copyWith(
                             color: Theme.of(context).colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w200,
                           ),
@@ -269,8 +269,7 @@ class _EmailScreenState extends State<EmailScreen> {
                                   children: [
                                     Text(
                                       'New Here?',
-                                      style: TextStyle(
-                                        fontSize: 14,
+                                      style: AppTypography.caption.copyWith(
                                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
@@ -291,8 +290,7 @@ class _EmailScreenState extends State<EmailScreen> {
                                   children: [
                                     Text(
                                       'Already have an account?',
-                                      style: TextStyle(
-                                        fontSize: 14,
+                                      style: AppTypography.caption.copyWith(
                                         color: Theme.of(context).colorScheme.onSurfaceVariant,
                                       ),
                                     ),
@@ -488,7 +486,7 @@ class _EmailScreenState extends State<EmailScreen> {
             onTap: () => showForgetPasswordDialog(),
             child: Text(
               'Forgot password?',
-              style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.primary),
+              style: AppTypography.caption.copyWith(color: Theme.of(context).colorScheme.primary),
               textAlign: TextAlign.center,
             ),
           ),
@@ -505,8 +503,7 @@ class _EmailScreenState extends State<EmailScreen> {
         children: [
           Text(
             'Please enter your email address and we will send you a link to reset your password.',
-            style: TextStyle(
-              fontSize: 16,
+            style: AppTypography.body.copyWith(
               color: Theme.of(context).colorScheme.onSurfaceVariant,
             ),
           ),

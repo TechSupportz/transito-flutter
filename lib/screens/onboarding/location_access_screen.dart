@@ -108,7 +108,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
           children: [
             Text(
               'We need to access your location',
-              style: AppTypography.pageTitle.copyWith(height: 1.25),
+              style: AppTypography.screenHeading.copyWith(height: 1.25),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -124,7 +124,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
                 const Text(
                   'We need your location to determine where you are to display nearby bus stops',
                   textAlign: TextAlign.center,
-                  style: AppTypography.cardTitleMedium,
+                  style: AppTypography.cardSubtitle,
                 ),
               ],
             ),

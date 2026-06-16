@@ -21,7 +21,7 @@ class IconPageTitle extends StatelessWidget {
       children: [
         Text(
           title,
-          style: AppTypography.pageTitle,
+          style: AppTypography.screenHeading,
         ),
         Padding(
           padding: const EdgeInsets.only(top: 4, right: 4),

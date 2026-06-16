@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
 class FavouriteNameCard extends StatelessWidget {
@@ -28,16 +29,23 @@ class FavouriteNameCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Text(
-                busStopName,
-                overflow: TextOverflow.fade,
-                maxLines: 1,
-                softWrap: false,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                ),
+              child: Row(
+                children: [
+                  Icon(
+                    Symbols.drag_indicator_rounded,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    busStopName,
+                    overflow: TextOverflow.fade,
+                    maxLines: 1,
+                    softWrap: false,
+                    style: AppBusTypography.favouriteStopTitle.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ],
               ),
             ),
             IconButton(

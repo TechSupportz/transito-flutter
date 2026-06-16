@@ -69,7 +69,7 @@ class RecentSearchList extends StatelessWidget {
     return Center(
       child: Text(
         "No recent searches",
-        style: AppTypography.cardTitleMedium,
+        style: AppTypography.cardSubtitle,
       ),
     );
   }
