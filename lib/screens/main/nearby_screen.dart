@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +11,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/location_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
@@ -42,8 +42,7 @@ const distance = Distance();
 class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver {
   late Future<List<NearbyBusStop>> nearbyBusStops;
   late Future<List<NearbyFavourites>> nearbyFavourites;
-  late Future<bool> _isLocationPermissionGranted;
-  late StreamSubscription<Position> userLocationStream;
+  StreamSubscription<Position?>? userLocationStream;
   bool _isFabVisible = true;
 
   LatLng _prevUserLocation = LatLng(0, 0);
@@ -59,45 +58,15 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
     return true;
   }
 
-  // checks if the user has granted access to their location
-  Future<bool> checkLocationPermissions() async {
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever ||
-        permission == LocationPermission.unableToDetermine) {
-      return false;
-    } else {
-      return true;
-    }
-  }
-
-  // gets the user's current location
-  Future<Position> getUserLocation() async {
-    debugPrint("Fetching user location");
-
-    if (Platform.isIOS) {
-      userLocationStream.cancel();
-    }
-
-    Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-      ),
-    );
-    debugPrint('Refetched user location');
-
-    if (Platform.isIOS) {
-      streamUserLocation();
-    }
-
-    return position;
-  }
-
   Future<List<NearbyBusStop>> getNearbyBusStops({
     Position? currentLocation,
   }) async {
     debugPrint("Fetching nearby bus stops");
-    Position userLocation = currentLocation ?? await getUserLocation();
+    final Position? userLocation = currentLocation ?? await LocationService().getCurrentPosition();
+    if (userLocation == null) {
+      return [];
+    }
+
     final List<NearbyBusStop> stops = await TransitoApiService().getNearbyBusStops(
       LatLng(userLocation.latitude, userLocation.longitude),
     );
@@ -114,7 +83,10 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
     List<Favourite> favouritesList = await FavouritesService().getFavourites(
       context.read<User>().uid,
     );
-    Position userLocation = currentLocation ?? await getUserLocation();
+    final Position? userLocation = currentLocation ?? await LocationService().getCurrentPosition();
+    if (userLocation == null) {
+      return [];
+    }
 
     // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
     for (var favourite in favouritesList) {
@@ -137,48 +109,64 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   }
 
   // function to get the list of all nearby bus stops
-  void getAllNearby() async {
+  void getAllNearby({bool userInitiated = false}) async {
     debugPrint("Getting all nearby");
-    Position userLocation = await getUserLocation();
+    final Position? userLocation = await LocationService().getCurrentPosition(
+      userInitiated: userInitiated,
+    );
+    if (userLocation == null) {
+      return;
+    }
 
     setState(() {
       nearbyBusStops = getNearbyBusStops(currentLocation: userLocation);
       nearbyFavourites = getNearbyFavourites(currentLocation: userLocation);
     });
+
+    if (userInitiated) {
+      streamUserLocation(userInitiated: true);
+    }
   }
 
-  void streamUserLocation() {
-    userLocationStream =
-        Geolocator.getPositionStream(
-          locationSettings: const LocationSettings(
-            accuracy: LocationAccuracy.best,
-            distanceFilter: 50,
-          ),
-        ).listen((Position position) {
-          if (_prevUserLocation.latitude == position.latitude &&
-              _prevUserLocation.longitude == position.longitude) {
-            return;
-          }
-          setState(() {
-            nearbyBusStops = getNearbyBusStops(currentLocation: position);
-            nearbyFavourites = getNearbyFavourites(currentLocation: position);
-            _prevUserLocation = LatLng(position.latitude, position.longitude);
-          });
-        });
+  void streamUserLocation({bool userInitiated = false}) async {
+    final canUseLocation = await LocationService().canUseLocation(userInitiated: userInitiated);
+    if (!canUseLocation) {
+      return;
+    }
+
+    await userLocationStream?.cancel();
+    userLocationStream = LocationService().positionStream.listen((Position? position) {
+      if (position == null) {
+        return;
+      }
+
+      if (_prevUserLocation.latitude == position.latitude &&
+          _prevUserLocation.longitude == position.longitude) {
+        return;
+      }
+      setState(() {
+        nearbyBusStops = getNearbyBusStops(currentLocation: position);
+        nearbyFavourites = getNearbyFavourites(currentLocation: position);
+        _prevUserLocation = LatLng(position.latitude, position.longitude);
+      });
+    });
   }
 
   @override
   void initState() {
     super.initState();
     debugPrint("Initializing bus stops");
-    _isLocationPermissionGranted = checkLocationPermissions();
     nearbyBusStops = getNearbyBusStops();
     nearbyFavourites = getNearbyFavourites();
     streamUserLocation();
 
     WidgetsBinding.instance.addObserver(this);
 
-    widget.controller?.addListener(getAllNearby);
+    widget.controller?.addListener(_handleControllerRefresh);
+  }
+
+  void _handleControllerRefresh() {
+    getAllNearby(userInitiated: true);
   }
 
   @override
@@ -190,11 +178,11 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
 
   @override
   void dispose() {
-    userLocationStream.cancel();
+    userLocationStream?.cancel();
     debugPrint("Cancelling user location stream");
 
     WidgetsBinding.instance.removeObserver(this);
-    widget.controller?.removeListener(getAllNearby);
+    widget.controller?.removeListener(_handleControllerRefresh);
     super.dispose();
   }
 
@@ -231,74 +219,28 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
             return Future.delayed(
               const Duration(seconds: 0),
               () {
-                getAllNearby();
+                getAllNearby(userInitiated: true);
               },
             );
           },
           child: SingleChildScrollView(
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
-            child: FutureBuilder(
-              future: _isLocationPermissionGranted,
-              builder: (context, AsyncSnapshot<bool> snapshot) {
-                // display a loading indicator while the user's location is being fetched
-                if (snapshot.hasData) {
-                  // if the user has granted access to their location, display the list of nearby bus stops
-                  if (snapshot.data!) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 16,
-                      children: [
-                        nearbyFavouritesList(),
-                        nearbyBusStopsGrid(),
-                      ],
-                    );
-                  } else {
-                    // if the user has not granted access to their location, display a message to the user and a button to open the location access screen
-                    return Material(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        child: Center(
-                          child: Column(
-                            children: [
-                              const Text(
-                                "Please grant location permission to use this feature",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              TextButton(
-                                onPressed: () => Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LocationAccessScreen(),
-                                    settings: const RouteSettings(name: 'LocationAccessScreen'),
-                                  ),
-                                  (route) => false,
-                                ),
-                                child: const Text("Grant permission"),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }
-                } else if (snapshot.hasError) {
-                  return Text("${snapshot.error}");
-                } else if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(strokeWidth: 3),
-                  );
-                } else {
-                  return const SizedBox(height: 0);
+            child: ValueListenableBuilder<bool>(
+              valueListenable: LocationService().automaticRequestsSuppressed,
+              builder: (context, automaticRequestsSuppressed, child) {
+                if (automaticRequestsSuppressed) {
+                  return locationUnavailableMessage();
                 }
+
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  spacing: 16,
+                  children: [
+                    nearbyFavouritesList(),
+                    nearbyBusStopsGrid(),
+                  ],
+                );
               },
             ),
           ),
@@ -309,12 +251,49 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
           ? FloatingActionButton(
               heroTag: "homeFAB",
               onPressed: () {
-                getAllNearby();
+                getAllNearby(userInitiated: true);
                 HapticFeedback.selectionClick();
               },
               child: const AppSymbol(Symbols.refresh_rounded),
             )
           : null,
+    );
+  }
+
+  Widget locationUnavailableMessage() {
+    return Material(
+      color: Theme.of(context).colorScheme.surfaceContainer,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Center(
+          child: Column(
+            children: [
+              const Text(
+                "Please grant location permission to use this feature",
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextButton(
+                onPressed: () => Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LocationAccessScreen(),
+                    settings: const RouteSettings(name: 'LocationAccessScreen'),
+                  ),
+                  (route) => false,
+                ),
+                child: const Text("Grant permission"),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

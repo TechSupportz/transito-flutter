@@ -9,13 +9,13 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:form_builder_validators/localization/l10n.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
+import 'package:transito/global/services/location_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/app/app_colors.dart';
@@ -34,9 +34,8 @@ void main() async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   bool isFirstRun = await IsFirstRun.isFirstRun();
-  LocationPermission permission = await Geolocator.checkPermission();
-  if (!isFirstRun && permission == LocationPermission.always ||
-      permission == LocationPermission.whileInUse) {
+  bool hasLocationPermission = await LocationService().hasLocationPermission();
+  if (!isFirstRun && hasLocationPermission) {
     defaultHome = const NavigatorScreen();
   }
 

@@ -16,6 +16,7 @@ import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/location_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/api/transito/nearby_bus_stops.dart';
@@ -41,6 +42,8 @@ class MapSearchScreen extends StatefulWidget {
 }
 
 class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderStateMixin {
+  static final LatLng _defaultCameraCenter = LatLng(1.3521, 103.8198);
+
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
   final ValueNotifier<double> mapRotation = ValueNotifier<double>(0.0);
   late Future<LatLng> _initialCameraCenter;
@@ -214,19 +217,13 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     );
   }
 
-  // gets the user's current location
-  Future<Position> getUserLocation({bool? populateMarkers}) async {
-    Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-      ),
-    );
-
-    return position;
-  }
-
   Future<void> animateToUserLocation() async {
-    Position position = await getUserLocation();
+    final Position? position = await LocationService().getCurrentPosition(userInitiated: true);
+    if (position == null) {
+      if (mounted) context.read<CommonProvider>().setIsUserCenter(false);
+      return;
+    }
+
     _animatedMapController.animateTo(
       dest: LatLng(position.latitude, position.longitude),
       zoom: 17.5,
@@ -236,9 +233,14 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   }
 
   void updateIsUserCenter(LatLng position) async {
-    Position userPosition = await getUserLocation();
+    final Position? userPosition = await LocationService().getCurrentPosition();
     if (!mounted) return;
     final common = context.read<CommonProvider>();
+    if (userPosition == null) {
+      common.setIsUserCenter(false);
+      return;
+    }
+
     final isCentered =
         userPosition.latitude == position.latitude && userPosition.longitude == position.longitude;
 
@@ -279,7 +281,11 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     if (initialMapPinLocation != null) {
       _initialCameraCenter = Future.value(initialMapPinLocation);
     } else {
-      _initialCameraCenter = getUserLocation().then((position) {
+      _initialCameraCenter = LocationService().getCurrentPosition().then((position) {
+        if (position == null) {
+          return _defaultCameraCenter;
+        }
+
         return LatLng(position.latitude, position.longitude);
       });
     }
@@ -356,6 +362,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                       errorImage: const AssetImage('assets/images/mapError.png'),
                     ),
                     CurrentLocationLayer(
+                      positionStream: const LocationMarkerDataStreamFactory()
+                          .fromGeolocatorPositionStream(
+                            stream: LocationService().positionStream,
+                          ),
                       style: LocationMarkerStyle(),
                     ),
                     // Regular bus stop markers

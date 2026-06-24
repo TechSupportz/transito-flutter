@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
+import 'package:transito/global/services/location_service.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
@@ -45,11 +46,11 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
 
   // function to check and request for the user's location permission in order to access their location
   Future<void> requestLocationPermission(BuildContext context) async {
-    LocationPermission permission = await Geolocator.checkPermission();
+    LocationPermission permission = await LocationService().checkPermission();
     if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
+      permission = await LocationService().requestPermission();
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+        permission = await LocationService().requestPermission();
       }
       if (permission == LocationPermission.deniedForever) {
         // if the user has denied location permission forever, show a dialog (which is not dismissible) to the user to open the settings app
@@ -70,7 +71,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
               TextButton(
                 child: const Text('Open Settings'),
                 onPressed: () {
-                  Geolocator.openAppSettings();
+                  LocationService().openAppSettings();
                   Navigator.pop(context);
                 },
               ),

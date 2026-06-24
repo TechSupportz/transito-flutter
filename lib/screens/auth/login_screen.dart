@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:transito/global/services/location_service.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/screens/auth/email_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -118,9 +118,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   initialiseDefaultHome() async {
     bool isFirstRun = await IsFirstRun.isFirstRun();
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (!isFirstRun && permission == LocationPermission.always ||
-        permission == LocationPermission.whileInUse) {
+    bool hasLocationPermission = await LocationService().hasLocationPermission();
+    if (!isFirstRun && hasLocationPermission) {
       _defaultHome = const NavigatorScreen();
     }
   }

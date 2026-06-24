@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -65,16 +64,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   bool isAddedToFavourites = false;
   bool sortByArrivalTime = false;
   late Timer timer;
-
-  // function to get the user's location
-  Future<Position> getUserLocation() async {
-    debugPrint("Fetching user location");
-    Position position = await Geolocator.getCurrentPosition(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.best),
-    );
-    debugPrint('$position');
-    return position;
-  }
 
   // function to fetch all services of a bus stop
   Future<List<BusStopServiceDetailed>> fetchServices() async {
