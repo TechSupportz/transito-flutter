@@ -17,6 +17,7 @@ class ErrorText extends StatelessWidget {
     this.message = "Try again in a moment",
     this.icon = Symbols.bus_alert_rounded,
     this.showIcon = true,
+    this.action,
   });
 
   final bool enableBackground;
@@ -25,6 +26,7 @@ class ErrorText extends StatelessWidget {
   final String message;
   final IconData? icon;
   final bool showIcon;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -91,8 +93,18 @@ class ErrorText extends StatelessWidget {
       ],
     );
 
+    final Widget errorContent = style == ErrorTextStyle.inline ? inlineErrorText : stackedErrorText;
     final Widget errorText = Center(
-      child: style == ErrorTextStyle.inline ? inlineErrorText : stackedErrorText,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          errorContent,
+          if (action != null) ...[
+            SizedBox(height: 12),
+            action!,
+          ],
+        ],
+      ),
     );
 
     if (enableBackground) {

@@ -261,39 +261,32 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   }
 
   Widget locationUnavailableMessage() {
-    return Material(
-      color: Theme.of(context).colorScheme.surfaceContainer,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Center(
-          child: Column(
-            children: [
-              const Text(
-                "Please grant location permission to use this feature",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextButton(
-                onPressed: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LocationAccessScreen(),
-                    settings: const RouteSettings(name: 'LocationAccessScreen'),
+    return FutureBuilder<bool>(
+      future: LocationService().hasLocationPermission(),
+      builder: (context, snapshot) {
+        final bool hasLocationPermission = snapshot.data ?? true;
+
+        return ErrorText(
+          enableBackground: true,
+          title: "No clue where you are",
+          message:
+              'Turn on location and nearby stops can show up here. Otherwise, search works too.',
+          icon: Symbols.location_off_rounded,
+          action: hasLocationPermission
+              ? null
+              : TextButton(
+                  onPressed: () => Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const LocationAccessScreen(),
+                      settings: const RouteSettings(name: 'LocationAccessScreen'),
+                    ),
+                    (route) => false,
                   ),
-                  (route) => false,
+                  child: const Text('Grant permission'),
                 ),
-                child: const Text("Grant permission"),
-              ),
-            ],
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 

@@ -43,10 +43,13 @@ class MapSearchScreen extends StatefulWidget {
 
 class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderStateMixin {
   static final LatLng _defaultCameraCenter = LatLng(1.3521, 103.8198);
+  static const double _defaultZoom = 17.5;
+  static const double _minZoom = 12;
 
   late final AnimatedMapController _animatedMapController = AnimatedMapController(vsync: this);
   final ValueNotifier<double> mapRotation = ValueNotifier<double>(0.0);
   late Future<LatLng> _initialCameraCenter;
+  late Future<double> _initialCameraZoom;
 
   final ValueNotifier<Set<Marker>> busStopMarkers = ValueNotifier<Set<Marker>>({});
   final ValueNotifier<Set<Marker>> favouriteBusStopMarkers = ValueNotifier<Set<Marker>>({});
@@ -226,7 +229,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
 
     _animatedMapController.animateTo(
       dest: LatLng(position.latitude, position.longitude),
-      zoom: 17.5,
+      zoom: _defaultZoom,
       rotation: 0,
     );
     if (mounted) context.read<CommonProvider>().setIsUserCenter(true);
@@ -280,6 +283,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
 
     if (initialMapPinLocation != null) {
       _initialCameraCenter = Future.value(initialMapPinLocation);
+      _initialCameraZoom = Future.value(_defaultZoom);
     } else {
       _initialCameraCenter = LocationService().getCurrentPosition().then((position) {
         if (position == null) {
@@ -287,6 +291,13 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
         }
 
         return LatLng(position.latitude, position.longitude);
+      });
+      _initialCameraZoom = LocationService().getCurrentPosition().then((position) {
+        if (position == null) {
+          return _minZoom;
+        }
+
+        return _defaultZoom;
       });
     }
 
@@ -322,11 +333,16 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
       backgroundColor: appColors.scheme.surfaceContainer,
       // displays the recent search list widget
       body: FutureBuilder(
-        future: _initialCameraCenter,
+        future: Future.wait([_initialCameraCenter, _initialCameraZoom]),
         builder: (context, snapshot) {
+          final LatLng? initialCameraCenter = snapshot.data?[0] as LatLng?;
+          final double? initialCameraZoom = snapshot.data?[1] as double?;
+
           return Stack(
             children: [
-              if (snapshot.connectionState == ConnectionState.waiting || snapshot.data == null)
+              if (snapshot.connectionState == ConnectionState.waiting ||
+                  initialCameraCenter == null ||
+                  initialCameraZoom == null)
                 SkeletonLine(
                   style: SkeletonLineStyle(height: double.infinity),
                 )
@@ -335,11 +351,11 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                   mapController: _animatedMapController.mapController,
                   options: MapOptions(
                     initialCenter: LatLng(
-                      snapshot.data!.latitude,
-                      snapshot.data!.longitude,
+                      initialCameraCenter.latitude,
+                      initialCameraCenter.longitude,
                     ),
-                    minZoom: 12,
-                    initialZoom: 17.5,
+                    minZoom: _minZoom,
+                    initialZoom: initialCameraZoom,
                     maxZoom: 19,
                     interactionOptions: const InteractionOptions(
                       flags: InteractiveFlag.all & ~InteractiveFlag.pinchMove,
