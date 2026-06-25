@@ -219,542 +219,539 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.only(top: 12, bottom: 64, left: 12, right: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                IconPageTitle(
-                  title: "Account",
-                  icon: Symbols.account_circle_rounded,
-                ),
-                const SizedBox(height: 16),
-                FormBuilderTextField(
-                  key: _nameFieldKey,
-                  name: 'name',
-                  scrollPadding: const EdgeInsets.symmetric(vertical: 50),
-                  initialValue: user?.displayName,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                  ]),
-                  decoration: InputDecoration(
-                    labelText: 'Name',
-                    suffixIcon: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(12),
-                        color: appColors.scheme.primary,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconPageTitle(
+                title: "Account",
+                icon: Symbols.account_circle_rounded,
+              ),
+              const SizedBox(height: 16),
+              FormBuilderTextField(
+                key: _nameFieldKey,
+                name: 'name',
+                scrollPadding: const EdgeInsets.symmetric(vertical: 50),
+                initialValue: user?.displayName,
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                ]),
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  suffixIcon: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: appColors.scheme.primary,
+                    ),
+                    child: AnimatedSwitcher(
+                      transitionBuilder: (child, animation) => ScaleTransition(
+                        scale: animation,
+                        child: child,
                       ),
-                      child: AnimatedSwitcher(
-                        transitionBuilder: (child, animation) => ScaleTransition(
-                          scale: animation,
-                          child: child,
-                        ),
-                        duration: const Duration(milliseconds: 175),
-                        child: _isNameFieldLoading
-                            ? SizedBox(
-                                height: 16,
-                                width: 16,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: appColors.scheme.onPrimary,
-                                  ),
-                                ),
-                              )
-                            : IconButton(
-                                splashRadius: 1,
-                                onPressed: () {
-                                  HapticFeedback.mediumImpact();
-                                  updateDisplayName(user);
-                                },
-                                icon: AppSymbol(
-                                  Symbols.check_rounded,
-                                  size: 21,
+                      duration: const Duration(milliseconds: 175),
+                      child: _isNameFieldLoading
+                          ? SizedBox(
+                              height: 16,
+                              width: 16,
+                              child: Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
                                   color: appColors.scheme.onPrimary,
                                 ),
                               ),
-                      ),
+                            )
+                          : IconButton(
+                              splashRadius: 1,
+                              onPressed: () {
+                                HapticFeedback.mediumImpact();
+                                updateDisplayName(user);
+                              },
+                              icon: AppSymbol(
+                                Symbols.check_rounded,
+                                size: 21,
+                                color: appColors.scheme.onPrimary,
+                              ),
+                            ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      (user != null &&
-                              user.providerData.map((e) => e.providerId).contains('password'))
-                          ? Padding(
-                              padding: const EdgeInsets.only(bottom: 6.0),
-                              child: FilledButton.tonal(
-                                onPressed: () => showResetPasswordDialog(user.email),
-                                child: Text(
-                                  'Reset password',
-                                ),
+              ),
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    (user != null &&
+                            user.providerData.map((e) => e.providerId).contains('password'))
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: FilledButton.tonal(
+                              onPressed: () => showResetPasswordDialog(user.email),
+                              child: Text(
+                                'Reset password',
                               ),
-                            )
-                          : const SizedBox(),
-                      (user != null && !user.isAnonymous)
-                          ? Padding(
-                              padding: const EdgeInsets.only(bottom: 6.0),
-                              child: FilledButton(
-                                onPressed: () => showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    title: const Text('Logout'),
-                                    content: const Text('Are you sure you want to logout?'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text('No'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () {
-                                          AuthenticationService().logout().then(
-                                            (value) => Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => const LoginScreen(),
-                                                settings: const RouteSettings(name: 'LoginScreen'),
-                                              ),
-                                              (Route<dynamic> route) => false,
+                            ),
+                          )
+                        : const SizedBox(),
+                    (user != null && !user.isAnonymous)
+                        ? Padding(
+                            padding: const EdgeInsets.only(bottom: 6.0),
+                            child: FilledButton(
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  title: const Text('Logout'),
+                                  content: const Text('Are you sure you want to logout?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: const Text('No'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () {
+                                        AuthenticationService().logout().then(
+                                          (value) => Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => const LoginScreen(),
+                                              settings: const RouteSettings(name: 'LoginScreen'),
                                             ),
-                                          );
-                                        },
-                                        child: const Text('Yes'),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                child: const Text('Logout'),
-                              ),
-                            )
-                          : const SizedBox(),
-                      FilledButton(
-                        onPressed: () => showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text('Delete account'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Text(
-                                  'Are you sure you want to delete your account and all the data related to it?',
-                                ),
-                                const SizedBox(height: 12),
-                                Text.rich(
-                                  TextSpan(
-                                    text: 'This action is ',
-                                    children: [
-                                      TextSpan(
-                                        text: 'PERMANENT',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: Theme.of(context).colorScheme.error,
-                                        ),
-                                      ),
-                                      const TextSpan(text: ' and cannot be undone.'),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('No'),
-                              ),
-                              TextButton(
-                                onPressed: () {
-                                  AuthenticationService().deleteAccount();
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const LoginScreen(),
-                                      settings: const RouteSettings(name: 'LoginScreen'),
-                                    ),
-                                    (Route<dynamic> route) => false,
-                                  );
-                                },
-                                child: const Text('Yes'),
-                              ),
-                            ],
-                          ),
-                        ),
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all(appColors.scheme.error),
-                        ),
-                        child: Text(
-                          "Delete account",
-                          style: TextStyle(color: appColors.scheme.onError),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            StreamBuilder<UserSettings>(
-              stream: SettingsService().streamSettings(user?.uid),
-              builder: (context, AsyncSnapshot<UserSettings> snapshot) {
-                Widget? aestheticsContentWidget;
-                Widget? preferencesContentWidget;
-
-                if (snapshot.hasData) {
-                  aestheticsContentWidget = Column(
-                    key: const ValueKey(1),
-                    spacing: 16,
-                    children: [
-                      SettingsRadioCard<AppThemeMode>(
-                        title: "Theme",
-                        initialValue: snapshot.data!.themeMode,
-                        firebaseFieldName: 'themeMode',
-                        options: [
-                          SettingsCardOption(value: AppThemeMode.LIGHT, label: "Light"),
-                          SettingsCardOption(value: AppThemeMode.DARK, label: "Dark"),
-                          SettingsCardOption(
-                            value: AppThemeMode.SYSTEM,
-                            label: "Follow System",
-                          ),
-                        ],
-                      ),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        decoration: BoxDecoration(
-                          color: appColors.scheme.surfaceContainer,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
-                          spacing: 8,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              "Base Colour",
-                              style: AppTypography.sectionSubtitle,
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => AlertDialog(
-                                    content: SingleChildScrollView(
-                                      child: FormBuilderField(
-                                        key: _accentColourFieldKey,
-                                        name: "Accent Colour",
-                                        initialValue: Color(
-                                          int.parse(snapshot.data!.accentColour),
-                                        ),
-                                        autovalidateMode: AutovalidateMode.onUserInteraction,
-                                        builder: (field) => ColorPicker(
-                                          paletteType: PaletteType.hueWheel,
-                                          displayThumbColor: true,
-                                          enableAlpha: false,
-                                          hexInputBar: true,
-                                          labelTypes: [],
-                                          colorPickerWidth: 300,
-                                          pickerColor:
-                                              field.value ??
-                                              Color(int.parse(snapshot.data!.accentColour)),
-                                          onColorChanged: (color) {
-                                            field.didChange(color);
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text("Close"),
-                                      ),
-                                      FilledButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                          updateAccentColour(user);
-                                        },
-                                        child: const Text("Apply"),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.only(
-                                  top: 8,
-                                  bottom: 8,
-                                  left: 16,
-                                  right: 8,
-                                ),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: appColors.scheme.surfaceContainerHighest,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      colorToHex(
-                                        Color(int.parse(snapshot.data!.accentColour)),
-                                        includeHashSign: true,
-                                        enableAlpha: false,
-                                      ),
-                                      style: AppTypography.bodyLarge,
-                                    ),
-                                    AppSymbol(
-                                      Symbols.circle_rounded,
-                                      color: Color(int.parse(snapshot.data!.accentColour)),
-                                      fill: true,
-                                      size: 40,
+                                            (Route<dynamic> route) => false,
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Yes'),
                                     ),
                                   ],
                                 ),
                               ),
+                              child: const Text('Logout'),
                             ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                FilledButton.tonal(
-                                  onPressed: () => resetAccentColour(user),
-                                  child: const Text("Reset to default"),
+                          )
+                        : const SizedBox(),
+                    FilledButton(
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete account'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text(
+                                'Are you sure you want to delete your account and all the data related to it?',
+                              ),
+                              const SizedBox(height: 12),
+                              Text.rich(
+                                TextSpan(
+                                  text: 'This action is ',
+                                  children: [
+                                    TextSpan(
+                                      text: 'PERMANENT',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Theme.of(context).colorScheme.error,
+                                      ),
+                                    ),
+                                    const TextSpan(text: ' and cannot be undone.'),
+                                  ],
                                 ),
-                              ],
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.of(context).pop(),
+                              child: const Text('No'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                AuthenticationService().deleteAccount();
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginScreen(),
+                                    settings: const RouteSettings(name: 'LoginScreen'),
+                                  ),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: const Text('Yes'),
                             ),
                           ],
                         ),
                       ),
-                    ],
-                  );
-
-                  preferencesContentWidget = Column(
-                    key: const ValueKey(2),
-                    spacing: 16,
-                    children: [
-                      SettingsRadioCard<bool>(
-                        title: "ETA Format",
-                        initialValue: snapshot.data!.isETAminutes,
-                        firebaseFieldName: 'isETAminutes',
-                        options: [
-                          SettingsCardOption(value: true, label: "Minutes to arrival (2 mins)"),
-                          SettingsCardOption(value: false, label: "Time of arrival (18:21)"),
-                        ],
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(appColors.scheme.error),
                       ),
-                      SettingsRadioCard<bool>(
-                        title: "Nearby Layout",
-                        initialValue: snapshot.data!.isNearbyGrid,
-                        firebaseFieldName: 'isNearbyGrid',
-                        options: [
-                          SettingsCardOption(value: true, label: "Grid layout"),
-                          SettingsCardOption(value: false, label: "Column layout"),
-                        ],
+                      child: Text(
+                        "Delete account",
+                        style: TextStyle(color: appColors.scheme.onError),
                       ),
-                      SettingsRadioCard<bool>(
-                        title: "Nearby Detail",
-                        initialValue: snapshot.data!.showNearbyDistance,
-                        firebaseFieldName: 'showNearbyDistance',
-                        options: [
-                          SettingsCardOption(value: true, label: "Distance to bus stops"),
-                          SettingsCardOption(value: false, label: "Road name of bus stops"),
-                        ],
-                      ),
-                      if (snapshot.data!.betaServer.enabled)
-                        BetaServerSettingsCard(
-                          usingBetaServer: snapshot.data!.betaServer.using,
-                          userId: user?.uid,
-                        ),
-                    ],
-                  );
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          StreamBuilder<UserSettings>(
+            stream: SettingsService().streamSettings(user?.uid),
+            builder: (context, AsyncSnapshot<UserSettings> snapshot) {
+              Widget? aestheticsContentWidget;
+              Widget? preferencesContentWidget;
 
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      _isSettingsLoading = false;
-                    });
-                  });
-                }
-
-                if (snapshot.hasError) {
-                  debugPrint("<=== ERROR ${snapshot.error} ===>");
-                  aestheticsContentWidget = const ErrorText(
-                    enableBackground: true,
-                    icon: Symbols.settings_alert_rounded,
-                  );
-                  preferencesContentWidget = const ErrorText(
-                    enableBackground: true,
-                    icon: Symbols.settings_alert_rounded,
-                  );
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    setState(() {
-                      _isSettingsLoading = false;
-                    });
-                  });
-                }
-
-                return Column(
+              if (snapshot.hasData) {
+                aestheticsContentWidget = Column(
+                  key: const ValueKey(1),
+                  spacing: 16,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconPageTitle(
-                          title: "Aesthetics",
-                          icon: Symbols.palette_rounded,
-                        ),
-                        const SizedBox(height: 8),
-                        Skeleton(
-                          isLoading: _isSettingsLoading || aestheticsContentWidget == null,
-                          skeleton: Column(
-                            key: const ValueKey(0),
-                            spacing: 16,
-                            children: [
-                              SkeletonLine(
-                                style: SkeletonLineStyle(
-                                  height: 234,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              SkeletonLine(
-                                style: SkeletonLineStyle(
-                                  height: 178,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                            ],
-                          ),
-                          child: aestheticsContentWidget ?? const SizedBox.shrink(),
+                    SettingsRadioCard<AppThemeMode>(
+                      title: "Theme",
+                      initialValue: snapshot.data!.themeMode,
+                      firebaseFieldName: 'themeMode',
+                      options: [
+                        SettingsCardOption(value: AppThemeMode.LIGHT, label: "Light"),
+                        SettingsCardOption(value: AppThemeMode.DARK, label: "Dark"),
+                        SettingsCardOption(
+                          value: AppThemeMode.SYSTEM,
+                          label: "Follow System",
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        IconPageTitle(
-                          title: "Preferences",
-                          icon: Symbols.tune_rounded,
-                        ),
-                        const SizedBox(height: 8),
-                        Skeleton(
-                          isLoading: _isSettingsLoading || preferencesContentWidget == null,
-                          skeleton: Column(
-                            key: const ValueKey(0),
-                            spacing: 16,
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: appColors.scheme.surfaceContainer,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        spacing: 8,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Base Colour",
+                            style: AppTypography.sectionSubtitle,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  content: SingleChildScrollView(
+                                    child: FormBuilderField(
+                                      key: _accentColourFieldKey,
+                                      name: "Accent Colour",
+                                      initialValue: Color(
+                                        int.parse(snapshot.data!.accentColour),
+                                      ),
+                                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                                      builder: (field) => ColorPicker(
+                                        paletteType: PaletteType.hueWheel,
+                                        displayThumbColor: true,
+                                        enableAlpha: false,
+                                        hexInputBar: true,
+                                        labelTypes: [],
+                                        colorPickerWidth: 300,
+                                        pickerColor:
+                                            field.value ??
+                                            Color(int.parse(snapshot.data!.accentColour)),
+                                        onColorChanged: (color) {
+                                          field.didChange(color);
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(context).pop(),
+                                      child: const Text("Close"),
+                                    ),
+                                    FilledButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                        updateAccentColour(user);
+                                      },
+                                      child: const Text("Apply"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.only(
+                                top: 8,
+                                bottom: 8,
+                                left: 16,
+                                right: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                color: appColors.scheme.surfaceContainerHighest,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    colorToHex(
+                                      Color(int.parse(snapshot.data!.accentColour)),
+                                      includeHashSign: true,
+                                      enableAlpha: false,
+                                    ),
+                                    style: AppTypography.bodyLarge,
+                                  ),
+                                  AppSymbol(
+                                    Symbols.circle_rounded,
+                                    color: Color(int.parse(snapshot.data!.accentColour)),
+                                    fill: true,
+                                    size: 40,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              SkeletonLine(
-                                style: SkeletonLineStyle(
-                                  height: 186,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              SkeletonLine(
-                                style: SkeletonLineStyle(
-                                  height: 186,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                              ),
-                              SkeletonLine(
-                                style: SkeletonLineStyle(
-                                  height: 186,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                              FilledButton.tonal(
+                                onPressed: () => resetAccentColour(user),
+                                child: const Text("Reset to default"),
                               ),
                             ],
                           ),
-                          child: preferencesContentWidget ?? const SizedBox.shrink(),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 );
-              },
-            ),
-            const SizedBox(height: 24),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                IconPageTitle(
-                  title: "Others",
-                  icon: Symbols.list_rounded,
-                ),
-                const SizedBox(height: 8),
-                SettingsOthersCard(
-                  title: "View Quick Start",
-                  icon: AppSymbol(Symbols.quick_reference_rounded, fill: true),
-                  onTap: () => goToQuickStart(),
-                ),
-                const SizedBox(height: 16),
-                SettingsOthersCard(
-                  title: "Feedback Form",
-                  icon: AppSymbol(Symbols.feedback_rounded, fill: true),
-                  onTap: () => launchUrl(
-                    Uri.parse("https://transito.tnitish.com/feedback"),
-                    mode: LaunchMode.inAppWebView,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                FutureBuilder(
-                  future: _appInfo,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      return SettingsOthersCard(
-                        title: "About",
-                        icon: AppSymbol(Symbols.info_rounded, fill: true),
-                        onTap: () => showAboutDialog(
-                          context: context,
-                          applicationIcon: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Image.asset(
-                              "assets/icons/Icon-1024x1024.png",
-                              width: 64,
-                              height: 64,
-                            ),
-                          ),
-                          applicationName: "Transito",
-                          applicationVersion: "v${snapshot.data!.version}",
-                          applicationLegalese: "© 2023-2026 Nitish Thiyagarajan",
+
+                preferencesContentWidget = Column(
+                  key: const ValueKey(2),
+                  spacing: 16,
+                  children: [
+                    SettingsRadioCard<bool>(
+                      title: "ETA Format",
+                      initialValue: snapshot.data!.isETAminutes,
+                      firebaseFieldName: 'isETAminutes',
+                      options: [
+                        SettingsCardOption(value: true, label: "Minutes to arrival (2 mins)"),
+                        SettingsCardOption(value: false, label: "Time of arrival (18:21)"),
+                      ],
+                    ),
+                    SettingsRadioCard<bool>(
+                      title: "Nearby Layout",
+                      initialValue: snapshot.data!.isNearbyGrid,
+                      firebaseFieldName: 'isNearbyGrid',
+                      options: [
+                        SettingsCardOption(value: true, label: "Grid layout"),
+                        SettingsCardOption(value: false, label: "Column layout"),
+                      ],
+                    ),
+                    SettingsRadioCard<bool>(
+                      title: "Nearby Detail",
+                      initialValue: snapshot.data!.showNearbyDistance,
+                      firebaseFieldName: 'showNearbyDistance',
+                      options: [
+                        SettingsCardOption(value: true, label: "Distance to bus stops"),
+                        SettingsCardOption(value: false, label: "Road name of bus stops"),
+                      ],
+                    ),
+                    if (snapshot.data!.betaServer.enabled)
+                      BetaServerSettingsCard(
+                        usingBetaServer: snapshot.data!.betaServer.using,
+                        userId: user?.uid,
+                      ),
+                  ],
+                );
+
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _isSettingsLoading = false;
+                  });
+                });
+              }
+
+              if (snapshot.hasError) {
+                debugPrint("<=== ERROR ${snapshot.error} ===>");
+                aestheticsContentWidget = const ErrorText(
+                  enableBackground: true,
+                  icon: Symbols.settings_alert_rounded,
+                );
+                preferencesContentWidget = const ErrorText(
+                  enableBackground: true,
+                  icon: Symbols.settings_alert_rounded,
+                );
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    _isSettingsLoading = false;
+                  });
+                });
+              }
+
+              return Column(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconPageTitle(
+                        title: "Aesthetics",
+                        icon: Symbols.palette_rounded,
+                      ),
+                      const SizedBox(height: 8),
+                      Skeleton(
+                        isLoading: _isSettingsLoading || aestheticsContentWidget == null,
+                        skeleton: Column(
+                          key: const ValueKey(0),
+                          spacing: 16,
                           children: [
-                            SizedBox(height: 16),
-                            Text(
-                              "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
-                              style: AppTypography.caption,
+                            SkeletonLine(
+                              style: SkeletonLineStyle(
+                                height: 234,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
-                            SizedBox(height: 8),
-                            Text(
-                              "Transito is not responsible for any inaccuracies in the data.",
-                              style: AppTypography.caption,
-                            ),
-                            SizedBox(height: 12),
-                            Text(
-                              "User ID:",
-                              style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
-                            ),
-                            Text(
-                              FirebaseAuth.instance.currentUser?.uid ?? "N/A",
-                              style: TextStyle(letterSpacing: 1, fontWeight: .bold),
+                            SkeletonLine(
+                              style: SkeletonLineStyle(
+                                height: 178,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
                             ),
                           ],
                         ),
-                      );
-                    } else if (snapshot.hasError) {
-                      debugPrint("Error fetching app info: ${snapshot.error}");
-                    }
-                    return SkeletonItem(
-                      child: SkeletonLine(
-                        style: SkeletonLineStyle(
-                          height: 45,
-                          borderRadius: BorderRadius.circular(12),
+                        child: aestheticsContentWidget ?? const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconPageTitle(
+                        title: "Preferences",
+                        icon: Symbols.tune_rounded,
+                      ),
+                      const SizedBox(height: 8),
+                      Skeleton(
+                        isLoading: _isSettingsLoading || preferencesContentWidget == null,
+                        skeleton: Column(
+                          key: const ValueKey(0),
+                          spacing: 16,
+                          children: [
+                            SkeletonLine(
+                              style: SkeletonLineStyle(
+                                height: 186,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            SkeletonLine(
+                              style: SkeletonLineStyle(
+                                height: 186,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            SkeletonLine(
+                              style: SkeletonLineStyle(
+                                height: 186,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ],
                         ),
+                        child: preferencesContentWidget ?? const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            },
+          ),
+          const SizedBox(height: 24),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              IconPageTitle(
+                title: "Others",
+                icon: Symbols.list_rounded,
+              ),
+              const SizedBox(height: 8),
+              SettingsOthersCard(
+                title: "View Quick Start",
+                icon: AppSymbol(Symbols.quick_reference_rounded, fill: true),
+                onTap: () => goToQuickStart(),
+              ),
+              const SizedBox(height: 16),
+              SettingsOthersCard(
+                title: "Feedback Form",
+                icon: AppSymbol(Symbols.feedback_rounded, fill: true),
+                onTap: () => launchUrl(
+                  Uri.parse("https://transito.tnitish.com/feedback"),
+                  mode: LaunchMode.inAppWebView,
+                ),
+              ),
+              const SizedBox(height: 16),
+              FutureBuilder(
+                future: _appInfo,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return SettingsOthersCard(
+                      title: "About",
+                      icon: AppSymbol(Symbols.info_rounded, fill: true),
+                      onTap: () => showAboutDialog(
+                        context: context,
+                        applicationIcon: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            "assets/icons/Icon-1024x1024.png",
+                            width: 64,
+                            height: 64,
+                          ),
+                        ),
+                        applicationName: "Transito",
+                        applicationVersion: "v${snapshot.data!.version}",
+                        applicationLegalese: "© 2023-2026 Nitish Thiyagarajan",
+                        children: [
+                          SizedBox(height: 16),
+                          Text(
+                            "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
+                            style: AppTypography.caption,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Transito is not responsible for any inaccuracies in the data.",
+                            style: AppTypography.caption,
+                          ),
+                          SizedBox(height: 12),
+                          Text(
+                            "User ID:",
+                            style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            FirebaseAuth.instance.currentUser?.uid ?? "N/A",
+                            style: TextStyle(letterSpacing: 1, fontWeight: .bold),
+                          ),
+                        ],
                       ),
                     );
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
+                  } else if (snapshot.hasError) {
+                    debugPrint("Error fetching app info: ${snapshot.error}");
+                  }
+                  return SkeletonItem(
+                    child: SkeletonLine(
+                      style: SkeletonLineStyle(
+                        height: 45,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
