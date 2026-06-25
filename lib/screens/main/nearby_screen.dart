@@ -307,12 +307,12 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
           child: FutureBuilder(
             future: nearbyFavourites,
             builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-              Widget _favouritesListWidget = const SizedBox();
+              Widget favouritesListWidget = const SizedBox();
 
               if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
                 // checks if user has any favourites within 750m of their current location and displays them if they do
                 if (snapshot.data!.isEmpty) {
-                  _favouritesListWidget = Container(
+                  favouritesListWidget = Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -327,9 +327,10 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                     ),
                   );
                 } else {
-                  _favouritesListWidget = ListView.separated(
+                  favouritesListWidget = ListView.separated(
                     itemBuilder: (context, int index) {
                       return FavouritesTimingCard(
+                        key: ValueKey(snapshot.data![index].busStopInfo.busStopCode),
                         code: snapshot.data![index].busStopInfo.busStopCode,
                         name: snapshot.data![index].busStopInfo.busStopName,
                         address: snapshot.data![index].busStopInfo.busStopAddress,
@@ -352,7 +353,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
               if (snapshot.hasError) {
                 // return Text("${snapshot.error}");
                 debugPrint("<=== ERROR ${snapshot.error} ===>");
-                _favouritesListWidget = const ErrorText(
+                favouritesListWidget = const ErrorText(
                   enableBackground: true,
                   icon: Symbols.heart_broken_rounded,
                   title: "Couldn't load favourites",
@@ -364,7 +365,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                 skeleton: SkeletonLine(
                   style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(12)),
                 ),
-                child: _favouritesListWidget,
+                child: favouritesListWidget,
               );
               // display a loading indicator while the list of nearby favourites is being fetched
             },
@@ -420,11 +421,11 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                       BuildContext context,
                       AsyncSnapshot<List<NearbyBusStop>> nearbyBusStopList,
                     ) {
-                      Widget _busStopsResultsWidget = const SizedBox();
+                      Widget busStopsResultsWidget = const SizedBox();
                       // display a loading indicator while the list of nearby bus stops is being fetched
                       if (nearbyBusStopList.hasData && nearbyBusStopList.data != null) {
                         if (nearbyBusStopList.data!.isNotEmpty) {
-                          _busStopsResultsWidget = renderGridView(
+                          busStopsResultsWidget = renderGridView(
                             [
                               // loop through nearby bus stops and send their data to the BusStopCard widget to display them
                               for (var data in nearbyBusStopList.data!)
@@ -436,7 +437,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                             ],
                           );
                         } else {
-                          _busStopsResultsWidget = const ErrorText(
+                          busStopsResultsWidget = const ErrorText(
                             enableBackground: true,
                             icon: Symbols.bus_map_pin_rounded,
                             title: "No bus stops nearby",
@@ -448,7 +449,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                       if (nearbyBusStopList.hasError) {
                         // return Text("${snapshot.error}");
                         debugPrint("<=== ERROR ${nearbyBusStopList.error} ===>");
-                        _busStopsResultsWidget = Padding(
+                        busStopsResultsWidget = Padding(
                           padding: EdgeInsets.only(bottom: supportsLiquidGlass ? 80.0 : 0),
                           child: const ErrorText(
                             enableBackground: true,
@@ -470,7 +471,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                               ),
                           ],
                         ),
-                        child: _busStopsResultsWidget,
+                        child: busStopsResultsWidget,
                       );
                     },
               );

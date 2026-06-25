@@ -42,41 +42,75 @@ class FavouritesTimingCard extends StatefulWidget {
 
 class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   late Future<List<ServiceInfo>> futureBusArrivalInfo;
-  late Timer timer;
+  late final Timer timer;
 
   // function to fetch bus arrival info
-  Future<BusArrivalInfo> fetchArrivalTimings() async {
+  Future<BusArrivalInfo> fetchArrivalTimings({
+    required String code,
+    required BusStopProviderSources? sources,
+  }) async {
     debugPrint("Fetching favourite arrival timings");
     final BusArrivalInfo info = await BusArrivalService().getBusArrival(
-      widget.code,
-      sources: widget.sources,
+      code,
+      sources: sources,
     );
     debugPrint("Favourites Timing fetched");
     return info;
   }
 
   // function to properly sort the bus arrival info according to the Bus Service number and to filter it based on users favourite services
-  List<ServiceInfo> filterBusArrivalInfo(BusArrivalInfo value) {
-    var _value = value;
-    var filteredList = _value.services
-        .where((value) => widget.services.contains(value.serviceNum))
+  List<ServiceInfo> filterBusArrivalInfo(BusArrivalInfo value, List<String?> services) {
+    final List<ServiceInfo> filteredList = value.services
+        .where((serviceInfo) => services.contains(serviceInfo.serviceNum))
         .toList();
     filteredList.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
 
     return filteredList;
   }
 
-  // function to fetch bus arrival info and update the state of the widget, and to set a timer to fetch bus arrival info again after 30 seconds
+  Future<List<ServiceInfo>> _getFilteredArrivalTimings() {
+    final String code = widget.code;
+    final BusStopProviderSources? sources = widget.sources;
+    final List<String?> services = List.unmodifiable(widget.services);
+
+    return fetchArrivalTimings(
+      code: code,
+      sources: sources,
+    ).then((value) => filterBusArrivalInfo(value, services));
+  }
+
+  void _refreshArrivalTimings() {
+    if (!mounted) return;
+
+    setState(() {
+      futureBusArrivalInfo = _getFilteredArrivalTimings();
+    });
+  }
+
+  bool _arrivalQueryChanged(FavouritesTimingCard oldWidget) {
+    return oldWidget.code != widget.code ||
+        !const ListEquality<String?>().equals(oldWidget.services, widget.services) ||
+        oldWidget.sources?.lta != widget.sources?.lta ||
+        oldWidget.sources?.nus != widget.sources?.nus;
+  }
+
+  // function to fetch bus arrival info and update the state of the widget, and to set a timer to refresh it periodically
   @override
   void initState() {
     super.initState();
-    futureBusArrivalInfo = fetchArrivalTimings().then((value) => filterBusArrivalInfo(value));
+    futureBusArrivalInfo = _getFilteredArrivalTimings();
     timer = Timer.periodic(
       const Duration(seconds: 20),
-      (Timer t) => setState(() {
-        futureBusArrivalInfo = fetchArrivalTimings().then((value) => filterBusArrivalInfo(value));
-      }),
+      (Timer t) => _refreshArrivalTimings(),
     );
+  }
+
+  @override
+  void didUpdateWidget(covariant FavouritesTimingCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_arrivalQueryChanged(oldWidget)) {
+      futureBusArrivalInfo = _getFilteredArrivalTimings();
+    }
   }
 
   @override

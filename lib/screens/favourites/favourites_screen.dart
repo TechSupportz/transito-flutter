@@ -25,6 +25,7 @@ class FavouritesScreen extends StatefulWidget {
 
 class _FavouritesScreenState extends State<FavouritesScreen> {
   bool isFabVisible = true;
+  late final VoidCallback _controllerListener;
 
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
@@ -50,12 +51,22 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   void initState() {
     super.initState();
-    widget.controller?.addListener(() => goToManageFavouritesScreen(context));
+    _controllerListener = () => goToManageFavouritesScreen(context);
+    widget.controller?.addListener(_controllerListener);
+  }
+
+  @override
+  void didUpdateWidget(covariant FavouritesScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_controllerListener);
+      widget.controller?.addListener(_controllerListener);
+    }
   }
 
   @override
   void dispose() {
-    widget.controller?.removeListener(() => goToManageFavouritesScreen(context));
+    widget.controller?.removeListener(_controllerListener);
     super.dispose();
   }
 
@@ -82,6 +93,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                     child: ListView.separated(
                       itemBuilder: (context, int index) {
                         return FavouritesTimingCard(
+                          key: ValueKey(favouritesList[index].busStopCode),
                           code: favouritesList[index].busStopCode,
                           name: favouritesList[index].busStopName,
                           address: favouritesList[index].busStopAddress,
@@ -100,7 +112,6 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                         height: 16,
                       ),
                       itemCount: favouritesList.length,
-                      cacheExtent: favouritesList.length.toDouble() * 250,
                     ),
                   )
                 // if the user has no favourites display a message
