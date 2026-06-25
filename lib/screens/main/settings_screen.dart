@@ -294,7 +294,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               child: FilledButton.tonal(
                                 onPressed: () => showResetPasswordDialog(user.email),
                                 child: Text(
-                                  'Reset password',                                ),
+                                  'Reset password',
+                                ),
                               ),
                             )
                           : const SizedBox(),
@@ -714,7 +715,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           applicationName: "Transito",
                           applicationVersion: "v${snapshot.data!.version}",
                           applicationLegalese: "© 2023-2026 Nitish Thiyagarajan",
-                          children: const [
+                          children: [
                             SizedBox(height: 16),
                             Text(
                               "Bus arrival data is provided via Land Transport Authority's (LTA) datasets.",
@@ -724,6 +725,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             Text(
                               "Transito is not responsible for any inaccuracies in the data.",
                               style: AppTypography.caption,
+                            ),
+                            SizedBox(height: 12),
+                            Text(
+                              "User ID:",
+                              style: AppTypography.caption.copyWith(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              FirebaseAuth.instance.currentUser?.uid ?? "N/A",
+                              style: TextStyle(letterSpacing: 1, fontWeight: .bold),
                             ),
                           ],
                         ),
