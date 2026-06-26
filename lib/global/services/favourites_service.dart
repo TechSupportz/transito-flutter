@@ -1,18 +1,21 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:transito/global/services/user_provisioning_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
 
 class FavouritesService {
   final CollectionReference _favouritesCollection = FirebaseFirestore.instance.collection(
     'favourites',
   );
+  final UserProvisioningService _userProvisioningService = UserProvisioningService();
 
   Stream<List<Favourite>> streamFavourites(String? userId) {
     if (userId != null) {
-      return _favouritesCollection.doc(userId).snapshots().map((snapshot) {
+      return _favouritesCollection.doc(userId).snapshots().asyncMap((snapshot) async {
         if (snapshot.exists) {
           return FavouritesList.fromFirestore(snapshot).favouritesList;
         } else {
+          await _userProvisioningService.ensureFavouritesDocumentExists(userId);
           return [];
         }
       });
@@ -22,6 +25,7 @@ class FavouritesService {
   }
 
   Future<List<Favourite>> getFavourites(String userId) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     return _favouritesCollection.doc(userId).get().then((snapshot) {
       if (snapshot.exists) {
         return FavouritesList.fromFirestore(snapshot).favouritesList;
@@ -35,6 +39,7 @@ class FavouritesService {
     String userId,
     String busStopCode,
   ) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     var favouritesList = FavouritesList.fromFirestore(
       await _favouritesCollection.doc(userId).get(),
     ).favouritesList;
@@ -48,7 +53,8 @@ class FavouritesService {
     return initialSelectedChildren;
   }
 
-  Future<void> addFavourite(Favourite favourite, String userId) {
+  Future<void> addFavourite(Favourite favourite, String userId) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     return _favouritesCollection
         .doc(userId)
         .update({
@@ -67,6 +73,7 @@ class FavouritesService {
   }
 
   Future<void> removeFavouriteByBusStopCode(String busStopCode, String userId) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     _favouritesCollection.doc(userId).get().then(
       (snapshot) {
         if (snapshot.exists) {
@@ -90,6 +97,7 @@ class FavouritesService {
   }
 
   Future<void> reorderFavourites(List<Favourite> favourites, String userId) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     if (favourites.isNotEmpty) {
       _favouritesCollection
           .doc(userId)
@@ -108,6 +116,7 @@ class FavouritesService {
   }
 
   Future<void> updateFavourite(Favourite favourite, String userId) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     _favouritesCollection.doc(userId).get().then(
       (snapshot) {
         if (snapshot.exists) {
@@ -140,6 +149,7 @@ class FavouritesService {
   }
 
   Future<bool> isAddedToFavourites(String busStopCode, String userId) async {
+    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     final favouritesList = await _favouritesCollection
         .doc(userId)
         .get()

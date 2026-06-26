@@ -1,40 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:transito/global/services/user_provisioning_service.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/app_theme_mode_enum.dart';
 import 'package:transito/models/user/user_settings.dart';
 
 class SettingsService {
   final CollectionReference _settingsCollection = FirebaseFirestore.instance.collection('settings');
+  final UserProvisioningService _userProvisioningService = UserProvisioningService();
 
   Stream<UserSettings> streamSettings(String? userId) {
     if (userId != null) {
-      return _settingsCollection.doc(userId).snapshots().map((snapshot) {
+      return _settingsCollection.doc(userId).snapshots().asyncMap((snapshot) async {
         if (snapshot.exists) {
           UserSettings userSettings = UserSettings.fromFirestore(snapshot);
           AppColors().updateLocalAccentColour(Color(int.parse(userSettings.accentColour)));
 
           return userSettings;
         } else {
-          return UserSettings(
-            accentColour: '0xFF7E6BFF',
-            isETAminutes: true,
-            isNearbyGrid: true,
-            showNearbyDistance: true,
-            themeMode: AppThemeMode.SYSTEM,
-          );
+          await _userProvisioningService.ensureSettingsDocumentExists(userId);
+          return UserProvisioningService.defaultUserSettings();
         }
       });
     } else {
-      return Stream.value(
-        UserSettings(
-          accentColour: '0xFF7E6BFF',
-          isETAminutes: true,
-          isNearbyGrid: true,
-          showNearbyDistance: true,
-          themeMode: AppThemeMode.SYSTEM,
-        ),
-      );
+      return Stream.value(UserProvisioningService.defaultUserSettings());
     }
   }
 
@@ -44,6 +33,7 @@ class SettingsService {
     required BuildContext context,
   }) async {
     if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
       _settingsCollection
           .doc(userId)
           .update({
@@ -73,6 +63,7 @@ class SettingsService {
 
   Future<void> updateAccentColour({String? userId, required String newValue}) async {
     if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
       _settingsCollection
           .doc(userId)
           .update({
@@ -94,6 +85,7 @@ class SettingsService {
 
   Future<void> updateIsETAminutes({String? userId, required bool newValue}) async {
     if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
       _settingsCollection
           .doc(userId)
           .update({
@@ -110,6 +102,7 @@ class SettingsService {
 
   Future<void> updateIsNearbyGrid({String? userId, required bool newValue}) async {
     if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
       _settingsCollection
           .doc(userId)
           .update({
@@ -126,6 +119,7 @@ class SettingsService {
 
   Future<void> updateShowNearbyDistance({String? userId, required bool newValue}) async {
     if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
       _settingsCollection
           .doc(userId)
           .update({
@@ -142,6 +136,7 @@ class SettingsService {
 
   Future<void> updateBetaServerUsing({String? userId, required bool newValue}) async {
     if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
       _settingsCollection
           .doc(userId)
           .update({

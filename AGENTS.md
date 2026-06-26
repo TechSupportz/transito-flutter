@@ -45,13 +45,7 @@ format checked-in `.g.dart` files; regenerate them with `flutter pub run build_r
 - Prefer single quotes for strings
 - Use `super.key` in widget constructors
 - Explicit types preferred over `var`/`dynamic`
-
-### Imports Order
-1. Dart SDK imports (`dart:async`, `dart:convert`, etc.)
-2. Flutter imports (`package:flutter/material.dart`)
-3. Third-party packages (alphabetical)
-4. Project imports (`package:transito/...`)
-5. Relative imports (within same directory)
+- Do not add pass-through wrapper functions that only delegate to an already available dependency. Introduce an abstraction only when it adds behavior, enforces a boundary, or meaningfully improves reuse.
 
 ### Naming Conventions
 - **Files**: `snake_case.dart` (e.g., `bus_stop_card.dart`)
@@ -127,6 +121,7 @@ lib/
 ├── global/
 │   ├── providers/           # ChangeNotifier providers
 │   ├── services/            # Business logic services
+│   │   └── user_provisioning_service.dart # Shared Firestore user doc provisioning
 │   └── utils/               # Utility functions
 ├── models/
 │   ├── api/

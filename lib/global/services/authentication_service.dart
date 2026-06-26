@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:transito/global/services/user_provisioning_service.dart';
 
 class AuthenticationService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -13,40 +14,12 @@ class AuthenticationService {
 
   final GoogleSignIn _googleSignIn = GoogleSignIn.instance;
   bool _isGoogleSignInInitialized = false;
+  final UserProvisioningService _userProvisioningService = UserProvisioningService();
   final CollectionReference _favourites = FirebaseFirestore.instance.collection('favourites');
   final CollectionReference _settings = FirebaseFirestore.instance.collection('settings');
 
   List<String> get _userProviders =>
       _auth.currentUser?.providerData.map((e) => e.providerId).toList() ?? [];
-
-  // Used by all login methods to initialise user in Firestore on first login
-  Future<void> addNewUser({required String userId}) async {
-    _favourites
-        .doc(userId)
-        .set({
-          'favouritesList': [],
-        })
-        .then(
-          (_) => debugPrint('✔️ Created favourites for new user'),
-        )
-        .catchError(
-          (error) => debugPrint('❌ Error creating favourites document in Firestore: $error'),
-        );
-
-    _settings
-        .doc(userId)
-        .set({
-          'accentColour': '0xFF7E6BFF',
-          'isETAminutes': true,
-          'isNearbyGrid': true,
-        })
-        .then(
-          (_) => debugPrint('✔️ Created settings for new user'),
-        )
-        .catchError(
-          (error) => debugPrint('❌ Error creating settings document in Firestore: $error'),
-        );
-  }
 
   // Google login
   Future<void> _initializeGoogleSignIn() async {
@@ -61,7 +34,7 @@ class AuthenticationService {
       );
       _isGoogleSignInInitialized = true;
     } catch (e) {
-      print('Failed to initialize Google Sign-In: $e');
+      debugPrint('Failed to initialize Google Sign-In: $e');
     }
   }
 
@@ -75,21 +48,22 @@ class AuthenticationService {
     await _ensureGoogleSignInInitialized();
 
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.authenticate();
+      final GoogleSignInAccount googleUser = await _googleSignIn.authenticate();
       final GoogleSignInClientAuthorization? googleAuth = await _googleSignIn.authorizationClient
-          .authorizationForScopes(["email", "profile"]);
+          .authorizationForScopes(['email', 'profile']);
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth?.accessToken,
-        idToken: googleUser?.authentication.idToken,
+        idToken: googleUser.authentication.idToken,
       );
       UserCredential result = await _auth.signInWithCredential(credential);
-      User? user = result.user;
+      final User user = result.user!;
+      await _userProvisioningService
+          .ensureUserProvisioned(userId: user.uid)
+          .then(
+            (_) => debugPrint('✔️ Initialised user in Firestore'),
+          );
       if (result.additionalUserInfo?.isNewUser ?? false) {
-        await addNewUser(userId: user!.uid).then(
-          (_) => debugPrint('✔️ Initialised user in Firestore'),
-        );
-
         posthog.capture(eventName: 'sign_up', properties: {'method': 'Google'});
       }
       debugPrint('✔️ Signed in with google');
@@ -122,14 +96,19 @@ class AuthenticationService {
       );
 
       UserCredential result = await _auth.signInWithCredential(credential);
-      User? user = result.user;
-      await user?.updateDisplayName(appleAuth.givenName);
-      await user?.verifyBeforeUpdateEmail(appleAuth.email ?? '');
-      if (result.additionalUserInfo?.isNewUser ?? false) {
-        await addNewUser(userId: user!.uid).then(
-          (_) => debugPrint('✔️ Initialised user in Firestore'),
-        );
+      final User user = result.user!;
+      await _userProvisioningService
+          .ensureUserProvisioned(userId: user.uid)
+          .then(
+            (_) => debugPrint('✔️ Initialised user in Firestore'),
+          );
 
+      final String? displayName = appleAuth.givenName?.trim();
+      if (displayName != null && (user.displayName == null || user.displayName!.isEmpty)) {
+        await user.updateDisplayName(displayName);
+      }
+
+      if (result.additionalUserInfo?.isNewUser ?? false) {
         posthog.capture(eventName: 'sign_up', properties: {'method': 'Apple'});
       }
       debugPrint('✔️ Signed in with apple');
@@ -146,13 +125,14 @@ class AuthenticationService {
   Future<String?> signInAnonymously() async {
     try {
       UserCredential result = await _auth.signInAnonymously();
-      User? user = result.user;
-      await user?.updateDisplayName("Guest");
+      final User user = result.user!;
+      await user.updateDisplayName('Guest');
+      await _userProvisioningService
+          .ensureUserProvisioned(userId: user.uid)
+          .then(
+            (_) => debugPrint('✔️ Initialised user in Firestore'),
+          );
       if (result.additionalUserInfo?.isNewUser ?? false) {
-        await addNewUser(userId: user!.uid).then(
-          (_) => debugPrint('✔️ Initialised user in Firestore'),
-        );
-
         posthog.capture(eventName: 'sign_up', properties: {'method': 'Guest'});
       }
       debugPrint("✔️ Signed in anonymously");
@@ -185,10 +165,10 @@ class AuthenticationService {
         email: email,
         password: password,
       );
-      User? user = result.user;
-      await user?.updateDisplayName(name);
-      await user?.sendEmailVerification();
-      await addNewUser(userId: user!.uid);
+      final User user = result.user!;
+      await user.updateDisplayName(name);
+      await user.sendEmailVerification();
+      await _userProvisioningService.ensureUserProvisioned(userId: user.uid);
 
       posthog.capture(eventName: 'sign_up', properties: {'method': 'Email'});
       // user?.reload();
@@ -233,6 +213,6 @@ class AuthenticationService {
 
     await _auth.currentUser!.delete();
 
-    posthog.capture(eventName: "delete_account");
+    posthog.capture(eventName: 'delete_account');
   }
 }
