@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/utils/bus_arrival_time.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/app_typography.dart';
@@ -35,33 +35,20 @@ class _BusTimingRowState extends State<BusTimingRow> {
   // formats the arrival time into minutes or exact time depending on user's settings
   String formatArrivalTime(String? arrivalTime) {
     if (!widget.isETAminutes) {
-      if (arrivalTime != null && arrivalTime != '') {
-        String formattedArrivalTime = Jiffy.parse(arrivalTime.split("+")[0]).Hm;
-        return formattedArrivalTime;
-      } else {
-        return '-';
-      }
+      return formatBusArrivalTime(arrivalTime) ?? '-';
+    }
+
+    final int? minutesToArrival = minutesUntilBusArrival(arrivalTime);
+    if (minutesToArrival == null) {
+      return '-';
+    } else if (minutesToArrival < -1) {
+      return 'left';
+    } else if (minutesToArrival <= 1) {
+      return 'arr';
+    } else if (minutesToArrival > 99) {
+      return '${minutesToArrival ~/ 60}h';
     } else {
-      if (arrivalTime != null && arrivalTime != '') {
-        num minutesToArrival = Jiffy.parse(arrivalTime.split("+")[0])
-            .diff(
-              Jiffy.now(),
-              unit: Unit.minute,
-              asFloat: false,
-            ) // NOTE - for some reason asFloat: false is how you return a decimal (https://github.com/jama5262/jiffy/blob/master/doc/README.md#difference)
-            .floor();
-        if (minutesToArrival < -1) {
-          return "left";
-        } else if (minutesToArrival <= 1) {
-          return "arr";
-        } else if (minutesToArrival > 99) {
-          return '${minutesToArrival ~/ 60}h';
-        } else {
-          return minutesToArrival.toString();
-        }
-      } else {
-        return '-';
-      }
+      return minutesToArrival.toString();
     }
   }
 

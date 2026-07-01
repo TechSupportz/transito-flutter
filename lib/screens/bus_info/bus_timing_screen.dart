@@ -5,7 +5,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +12,7 @@ import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
+import 'package:transito/global/utils/bus_arrival_time.dart';
 import 'package:transito/global/utils/bus_service_utils.dart';
 import 'package:transito/global/utils/scroll_to_content.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
@@ -100,18 +100,16 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
 
     if (sortByArrivalTime) {
       _value.services.sort((a, b) {
-        if (a.nextBus.estimatedArrival == null ||
-            b.nextBus.estimatedArrival == null ||
-            a.nextBus.estimatedArrival == "" ||
-            b.nextBus.estimatedArrival == "") {
-          return 0;
-        }
+        final DateTime? aArrival = parseBusArrivalTime(a.nextBus.estimatedArrival);
+        final DateTime? bArrival = parseBusArrivalTime(b.nextBus.estimatedArrival);
 
-        return Jiffy.parse(a.nextBus.estimatedArrival!.split("+")[0]).isAfter(
-              Jiffy.parse(b.nextBus.estimatedArrival!.split("+")[0]),
-            )
-            ? 1
-            : 0;
+        if (aArrival == null) {
+          return bArrival == null ? 0 : 1;
+        }
+        if (bArrival == null) {
+          return -1;
+        }
+        return aArrival.compareTo(bArrival);
       });
 
       return _value;
@@ -324,7 +322,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Text(
-                                Jiffy.now().hour >= 5
+                                toSingaporeTime(DateTime.now()).hour >= 5
                                     ? '🦥 All the buses are lepaking 🦥'
                                     : "💤 Buses are sleeping 💤",
                                 style: AppTypography.sectionSubtitle,
