@@ -28,19 +28,68 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
   final NearbyScreenController _nearbyScreenController = NearbyScreenController();
   final FavouritesScreenController _favouritesScreenController = FavouritesScreenController();
   final MapSearchScreenController _mapSearchScreenController = MapSearchScreenController();
+  final List<ValueNotifier<bool>> _pageActivity = List<ValueNotifier<bool>>.generate(
+    3,
+    (_) => ValueNotifier<bool>(false),
+  );
 
-  late final List<Widget> _pages;
+  late final List<Widget?> _pages;
 
   @override
   void initState() {
     super.initState();
     _pageIndex = widget.initialPageIndex;
+    _pageActivity[_pageIndex].value = true;
 
-    _pages = [
-      NearbyScreen(controller: _nearbyScreenController),
-      FavouritesScreen(controller: _favouritesScreenController),
-      MapSearchScreen(controller: _mapSearchScreenController),
+    _pages = <Widget?>[
+      _createPage(0),
+      null,
+      _createPage(2),
     ];
+    if (_pageIndex == 1) {
+      _pages[1] = _createPage(1);
+    }
+  }
+
+  Widget _createPage(int index) {
+    return switch (index) {
+      0 => NearbyScreen(
+        controller: _nearbyScreenController,
+        isActive: _pageActivity[0],
+      ),
+      1 => FavouritesScreen(
+        controller: _favouritesScreenController,
+        isActive: _pageActivity[1],
+      ),
+      2 => MapSearchScreen(controller: _mapSearchScreenController),
+      _ => throw RangeError.index(index, _pages),
+    };
+  }
+
+  void _selectPage(int index) {
+    if (index == _pageIndex) return;
+
+    setState(() {
+      _pages[index] ??= _createPage(index);
+      _pageIndex = index;
+    });
+
+    for (int page = 0; page < _pageActivity.length; page++) {
+      _pageActivity[page].value = page == index;
+    }
+  }
+
+  List<Widget> get _mountedPages => List<Widget>.generate(
+    _pages.length,
+    (int index) => _pages[index] ?? SizedBox.shrink(key: ValueKey<String>('unmounted-page-$index')),
+  );
+
+  @override
+  void dispose() {
+    for (final ValueNotifier<bool> activity in _pageActivity) {
+      activity.dispose();
+    }
+    super.dispose();
   }
 
   @override
@@ -63,9 +112,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
         NavigationDestination(
           icon: GestureDetector(
             child: AppSymbol(Symbols.map_search_rounded, fill: true),
-            onTap: () => setState(() {
-              _pageIndex = 2;
-            }),
+            onTap: () => _selectPage(2),
             onDoubleTap: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => MrtMapScreen(),
@@ -79,11 +126,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       selectedIndex: _pageIndex,
       height: 72,
       labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-      onDestinationSelected: (index) =>
-          // updates _pageIndex and animates the page transition
-          setState(() {
-            _pageIndex = index;
-          }),
+      // updates _pageIndex and animates the page transition
+      onDestinationSelected: _selectPage,
     );
 
     var nativeGlassNavBar = NativeGlassNavBar(
@@ -121,11 +165,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       tintColor: Theme.of(context).colorScheme.primary,
       fallback:
           materialNavigationBar, // Fallback to material nav bar if liquid glass is not supported
-      onTap: (index) {
-        setState(() {
-          _pageIndex = index;
-        });
-      },
+      onTap: _selectPage,
     );
 
     return Scaffold(
@@ -148,7 +188,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
                 );
               },
           index: _pageIndex,
-          children: _pages,
+          children: _mountedPages,
         ),
       ),
       bottomNavigationBar: Platform.isIOS ? nativeGlassNavBar : materialNavigationBar,

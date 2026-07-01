@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:jiffy/jiffy.dart';
@@ -27,6 +28,7 @@ class FavouritesTimingCard extends StatefulWidget {
     required this.services,
     required this.busStopLocation,
     required this.sources,
+    required this.isActive,
   });
 
   final String code;
@@ -35,6 +37,7 @@ class FavouritesTimingCard extends StatefulWidget {
   final List<String?> services;
   final LatLng busStopLocation;
   final BusStopProviderSources? sources;
+  final ValueListenable<bool> isActive;
 
   @override
   State<FavouritesTimingCard> createState() => _FavouritesTimingCardState();
@@ -42,7 +45,7 @@ class FavouritesTimingCard extends StatefulWidget {
 
 class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   late Future<List<ServiceInfo>> futureBusArrivalInfo;
-  late final Timer timer;
+  Timer? _timer;
 
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings({
@@ -87,6 +90,24 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     });
   }
 
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(
+      const Duration(seconds: 20),
+      (Timer timer) => _refreshArrivalTimings(),
+    );
+  }
+
+  void _handleActivityChanged() {
+    if (widget.isActive.value) {
+      _refreshArrivalTimings();
+      _startTimer();
+    } else {
+      _timer?.cancel();
+      _timer = null;
+    }
+  }
+
   bool _arrivalQueryChanged(FavouritesTimingCard oldWidget) {
     return oldWidget.code != widget.code ||
         !const ListEquality<String?>().equals(oldWidget.services, widget.services) ||
@@ -98,24 +119,33 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   @override
   void initState() {
     super.initState();
-    futureBusArrivalInfo = _getFilteredArrivalTimings();
-    timer = Timer.periodic(
-      const Duration(seconds: 20),
-      (Timer t) => _refreshArrivalTimings(),
-    );
+    futureBusArrivalInfo = widget.isActive.value
+        ? _getFilteredArrivalTimings()
+        : Future<List<ServiceInfo>>.value(const <ServiceInfo>[]);
+    widget.isActive.addListener(_handleActivityChanged);
+    if (widget.isActive.value) {
+      _startTimer();
+    }
   }
 
   @override
   void didUpdateWidget(covariant FavouritesTimingCard oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_arrivalQueryChanged(oldWidget)) {
+    if (oldWidget.isActive != widget.isActive) {
+      oldWidget.isActive.removeListener(_handleActivityChanged);
+      widget.isActive.addListener(_handleActivityChanged);
+      _handleActivityChanged();
+    }
+
+    if (_arrivalQueryChanged(oldWidget) && widget.isActive.value) {
       futureBusArrivalInfo = _getFilteredArrivalTimings();
     }
   }
 
   @override
   void dispose() {
-    timer.cancel();
+    widget.isActive.removeListener(_handleActivityChanged);
+    _timer?.cancel();
     super.dispose();
   }
 

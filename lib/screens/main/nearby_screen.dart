@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -30,8 +31,9 @@ class NearbyScreenController extends ChangeNotifier {
 }
 
 class NearbyScreen extends StatefulWidget {
-  const NearbyScreen({super.key, this.controller});
+  const NearbyScreen({super.key, this.controller, required this.isActive});
   final NearbyScreenController? controller;
+  final ValueListenable<bool> isActive;
 
   @override
   State<NearbyScreen> createState() => _NearbyScreenState();
@@ -331,6 +333,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                     itemBuilder: (context, int index) {
                       return FavouritesTimingCard(
                         key: ValueKey(snapshot.data![index].busStopInfo.busStopCode),
+                        isActive: widget.isActive,
                         code: snapshot.data![index].busStopInfo.busStopCode,
                         name: snapshot.data![index].busStopInfo.busStopName,
                         address: snapshot.data![index].busStopInfo.busStopAddress,

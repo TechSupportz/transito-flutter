@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -16,8 +17,9 @@ class FavouritesScreenController extends ChangeNotifier {
 }
 
 class FavouritesScreen extends StatefulWidget {
-  const FavouritesScreen({super.key, this.controller});
+  const FavouritesScreen({super.key, this.controller, required this.isActive});
   final FavouritesScreenController? controller;
+  final ValueListenable<bool> isActive;
 
   @override
   State<FavouritesScreen> createState() => _FavouritesScreenState();
@@ -94,6 +96,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
                       itemBuilder: (context, int index) {
                         return FavouritesTimingCard(
                           key: ValueKey(favouritesList[index].busStopCode),
+                          isActive: widget.isActive,
                           code: favouritesList[index].busStopCode,
                           name: favouritesList[index].busStopName,
                           address: favouritesList[index].busStopAddress,
