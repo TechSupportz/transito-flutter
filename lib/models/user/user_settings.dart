@@ -13,6 +13,9 @@ class UserSettings {
   @JsonKey(defaultValue: true)
   final bool showNearbyDistance;
 
+  @JsonKey(defaultValue: false)
+  final bool defaultCollapsedFavourites;
+
   @JsonKey(defaultValue: AppThemeMode.SYSTEM, unknownEnumValue: AppThemeMode.SYSTEM)
   final AppThemeMode themeMode;
 
@@ -24,6 +27,7 @@ class UserSettings {
     required this.isETAminutes,
     required this.isNearbyGrid,
     required this.showNearbyDistance,
+    required this.defaultCollapsedFavourites,
     required this.themeMode,
     this.betaServer = const BetaServerSettings(),
   });

@@ -22,9 +22,14 @@ class FavouritesList {
 
 @JsonSerializable(explicitToJson: true)
 class Favourite {
+  static const int aliasMaxLength = 40;
+
   String busStopCode;
   String busStopName;
   String busStopAddress;
+
+  @JsonKey(includeIfNull: false)
+  String? alias;
 
   @JsonKey(fromJson: decodeBusStopLocation, toJson: encodeBusStopLocation)
   LatLng busStopLocation;
@@ -47,8 +52,30 @@ class Favourite {
     required this.busStopAddress,
     required this.busStopLocation,
     required this.services,
+    this.alias,
     this.sources,
   });
+
+  String get displayName => alias ?? busStopName;
+
+  static String? normalizeAlias(String? value) {
+    final String? normalizedValue = value?.trim();
+    return normalizedValue == null || normalizedValue.isEmpty ? null : normalizedValue;
+  }
+
+  static bool isAliasInUse({
+    required Iterable<Favourite> favourites,
+    required String? alias,
+    String? excludingBusStopCode,
+  }) {
+    final String? normalizedAlias = normalizeAlias(alias);
+    if (normalizedAlias == null) return false;
+
+    return favourites.any(
+      (Favourite favourite) =>
+          favourite.busStopCode != excludingBusStopCode && favourite.alias == normalizedAlias,
+    );
+  }
 
   factory Favourite.fromJson(Map<String, dynamic> json) => _$FavouriteFromJson(json);
   Map<String, dynamic> toJson() => _$FavouriteToJson(this);

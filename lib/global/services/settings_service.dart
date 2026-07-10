@@ -134,6 +134,30 @@ class SettingsService {
     }
   }
 
+  Future<void> updateDefaultCollapsedFavourites({
+    String? userId,
+    required bool newValue,
+  }) async {
+    if (userId != null) {
+      await _userProvisioningService.ensureSettingsDocumentExists(userId);
+      _settingsCollection
+          .doc(userId)
+          .update({
+            'defaultCollapsedFavourites': newValue,
+          })
+          .then(
+            (_) => debugPrint(
+              '✔️ Updated defaultCollapsedFavourites to $newValue',
+            ),
+          )
+          .catchError(
+            (error) => debugPrint(
+              '❌ Error updating defaultCollapsedFavourites in Firestore: $error',
+            ),
+          );
+    }
+  }
+
   Future<void> updateBetaServerUsing({String? userId, required bool newValue}) async {
     if (userId != null) {
       await _userProvisioningService.ensureSettingsDocumentExists(userId);

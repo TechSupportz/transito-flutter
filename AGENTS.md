@@ -9,8 +9,11 @@ Guidelines for AI coding agents working on this Flutter bus timing application.
 flutter --version
 
 # Development server (DO NOT RUN - use transito-dev alias instead)
-# The user has a fish alias `transito-dev` that starts Firebase emulators + Flutter in tmux
-# ALWAYS ask the user: "Is transito-dev running?" before making changes that need hot reload
+# The user has a fish alias `transito-dev` that starts the Transito server, Firebase emulators,
+# and Flutter in tmux. Before asking the user to run it, check that ports 8080 (transito-server)
+# and 4000 (Firebase emulator UI) are listening; only ask if either port is unavailable.
+# Example check: `lsof -nP -iTCP:8080 -sTCP:LISTEN` and
+# `lsof -nP -iTCP:4000 -sTCP:LISTEN`.
 
 # Code generation (for JSON models)
 flutter pub run build_runner build
@@ -18,9 +21,9 @@ flutter pub run build_runner build
 # Linting
 flutter analyze
 
-# Testing (no test/ directory currently exists in this project)
+# Testing (only for substantial data-processing or algorithmic behavior)
 flutter test
-flutter test test/widget_test.dart  # Run single test file once tests are added
+flutter test test/specific_test.dart  # Run a specific logic-heavy test when one exists
 
 # Building
 flutter build apk
@@ -115,6 +118,8 @@ CommonProvider.scaffoldMessengerKey.currentState?.showSnackBar(...);
 **Note:** This section should be updated whenever new folders or files are added to the project to always reflect the most current state.
 
 ```
+docs/
+└── adr/                      # Architecture decision records
 lib/
 ├── main.dart                 # App entry point
 ├── firebase_options.dart     # Firebase configuration
@@ -168,10 +173,15 @@ lib/
 
 ## Development Notes
 
-- Firebase emulators run on ports 9099 (auth) and 8088 (firestore)
+- `transito-dev` should be considered running when ports 8080 (transito-server) and 4000
+  (Firebase emulator UI) are listening. Check both ports before asking the user to start it.
+- Firebase emulators run on ports 9099 (auth), 8088 (firestore), and 4000 (emulator UI)
 - Backend API (Node.js/Koa) runs on localhost port 8080
 - Use Shorebird for over-the-air updates (user runs these commands)
-- No `test/` directory exists yet - add tests there when needed
+- Do not add unit or widget tests for routine UI, model, persistence, or serialization changes.
+  Tests are only worthwhile when a feature contains substantial data processing, complex
+  algorithms, or similarly logic-heavy behavior. Prefer widget previews, hot reload, formatting,
+  and static analysis for normal application work.
 - Assets located in `assets/` (images, icons, fonts)
 - Supports both phone and tablet layouts (isTablet check in CommonProvider)
 - FVM manages Flutter version (3.41.0) - commands work without `fvm` prefix in this project

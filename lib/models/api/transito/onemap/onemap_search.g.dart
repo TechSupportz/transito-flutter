@@ -16,26 +16,29 @@ OneMapSearch _$OneMapSearchFromJson(Map<String, dynamic> json) => OneMapSearch(
       .toList(),
 );
 
-Map<String, dynamic> _$OneMapSearchToJson(OneMapSearch instance) => <String, dynamic>{
-  'totalCount': instance.totalCount,
-  'count': instance.count,
-  'totalPages': instance.totalPages,
-  'page': instance.page,
-  'data': instance.data,
-};
+Map<String, dynamic> _$OneMapSearchToJson(OneMapSearch instance) =>
+    <String, dynamic>{
+      'totalCount': instance.totalCount,
+      'count': instance.count,
+      'totalPages': instance.totalPages,
+      'page': instance.page,
+      'data': instance.data,
+    };
 
-OneMapSearchData _$OneMapSearchDataFromJson(Map<String, dynamic> json) => OneMapSearchData(
-  name: json['name'] as String,
-  address: json['address'] as String,
-  postalCode: json['postalCode'] as String?,
-  latitude: (json['latitude'] as num).toDouble(),
-  longitude: (json['longitude'] as num).toDouble(),
-);
+OneMapSearchData _$OneMapSearchDataFromJson(Map<String, dynamic> json) =>
+    OneMapSearchData(
+      name: json['name'] as String,
+      address: json['address'] as String,
+      postalCode: json['postalCode'] as String?,
+      latitude: (json['latitude'] as num).toDouble(),
+      longitude: (json['longitude'] as num).toDouble(),
+    );
 
-Map<String, dynamic> _$OneMapSearchDataToJson(OneMapSearchData instance) => <String, dynamic>{
-  'name': instance.name,
-  'address': instance.address,
-  'postalCode': instance.postalCode,
-  'latitude': instance.latitude,
-  'longitude': instance.longitude,
-};
+Map<String, dynamic> _$OneMapSearchDataToJson(OneMapSearchData instance) =>
+    <String, dynamic>{
+      'name': instance.name,
+      'address': instance.address,
+      'postalCode': instance.postalCode,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
+    };

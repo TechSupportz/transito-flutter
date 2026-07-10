@@ -18,6 +18,7 @@ import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/app_typography.dart';
+import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
@@ -53,7 +54,9 @@ class BusStopInfoScreen extends StatefulWidget {
 class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
   late Future<List<String>> futureCurrOperatingServices;
   late Future<List<BusStopServiceDetailed>> futureServices;
-  bool isAddedToFavourites = false;
+  Favourite? favourite;
+
+  bool get isAddedToFavourites => favourite != null;
 
   // function to fetch all services of a bus stop
   Future<List<BusStopServiceDetailed>> fetchServices() async {
@@ -84,6 +87,19 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
     final int? minutesToArrival = minutesUntilBusArrival(arrivalTime);
     return minutesToArrival != null && minutesToArrival <= 99;
+  }
+
+  Future<void> _loadFavourite(String userId) async {
+    final Favourite? currentFavourite = await FavouritesService().getFavouriteByBusStopCode(
+      userId,
+      widget.code,
+    );
+    if (!mounted) return;
+
+    setState(() {
+      favourite = currentFavourite;
+      debugPrint('isAddedToFavourites: $isAddedToFavourites');
+    });
   }
 
   Future<void> openMaps(LatLng navigationLocation) async {
@@ -170,12 +186,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
     futureServices = fetchServices();
 
     var userId = context.read<User?>()?.uid;
-    FavouritesService().isAddedToFavourites(widget.code, userId!).then((value) {
-      setState(() {
-        isAddedToFavourites = value;
-        debugPrint('isAddedToFavourites: $isAddedToFavourites');
-      });
-    });
+    _loadFavourite(userId!);
   }
 
   @override
@@ -211,12 +222,30 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          widget.name,
-                          overflow: TextOverflow.fade,
-                          maxLines: 1,
-                          softWrap: false,
-                          style: AppTypography.screenHeading,
+                        Row(
+                          textBaseline: TextBaseline.alphabetic,
+                          crossAxisAlignment: .baseline,
+                          spacing: 8,
+                          children: [
+                            Text(
+                              widget.name,
+                              overflow: TextOverflow.fade,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: AppTypography.screenHeading,
+                            ),
+                            if (favourite?.alias case final String alias) ...[
+                              Text(
+                                alias,
+                                overflow: TextOverflow.fade,
+                                maxLines: 1,
+                                softWrap: false,
+                                style: AppTypography.caption.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(
                           height: 4,

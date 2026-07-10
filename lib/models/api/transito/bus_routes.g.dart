@@ -12,11 +12,12 @@ BusSchedule _$BusScheduleFromJson(Map<String, dynamic> json) => BusSchedule(
   sunday: json['sunday'] as String,
 );
 
-Map<String, dynamic> _$BusScheduleToJson(BusSchedule instance) => <String, dynamic>{
-  'weekdays': instance.weekdays,
-  'saturday': instance.saturday,
-  'sunday': instance.sunday,
-};
+Map<String, dynamic> _$BusScheduleToJson(BusSchedule instance) =>
+    <String, dynamic>{
+      'weekdays': instance.weekdays,
+      'saturday': instance.saturday,
+      'sunday': instance.sunday,
+    };
 
 BusRouteInfo _$BusRouteInfoFromJson(Map<String, dynamic> json) => BusRouteInfo(
   busStop: BusStop.fromJson(json['busStop'] as Map<String, dynamic>),
@@ -27,11 +28,12 @@ BusRouteInfo _$BusRouteInfoFromJson(Map<String, dynamic> json) => BusRouteInfo(
   lastBus: BusSchedule.fromJson(json['lastBus'] as Map<String, dynamic>),
 );
 
-Map<String, dynamic> _$BusRouteInfoToJson(BusRouteInfo instance) => <String, dynamic>{
-  'busStop': instance.busStop.toJson(),
-  'direction': instance.direction,
-  'sequence': instance.sequence,
-  'distance': instance.distance,
-  'firstBus': instance.firstBus.toJson(),
-  'lastBus': instance.lastBus.toJson(),
-};
+Map<String, dynamic> _$BusRouteInfoToJson(BusRouteInfo instance) =>
+    <String, dynamic>{
+      'busStop': instance.busStop.toJson(),
+      'direction': instance.direction,
+      'sequence': instance.sequence,
+      'distance': instance.distance,
+      'firstBus': instance.firstBus.toJson(),
+      'lastBus': instance.lastBus.toJson(),
+    };

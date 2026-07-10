@@ -39,15 +39,13 @@ class FavouritesService {
     String userId,
     String busStopCode,
   ) async {
-    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
-    var favouritesList = FavouritesList.fromFirestore(
-      await _favouritesCollection.doc(userId).get(),
-    ).favouritesList;
+    final Favourite? favourite = await getFavouriteByBusStopCode(userId, busStopCode);
+    if (favourite == null) {
+      throw StateError('$busStopCode was not found in favourites');
+    }
 
     Map<String?, List<String?>> initialSelectedChildren = {
-      'Bus Services': favouritesList
-          .firstWhere((element) => element.busStopCode == busStopCode)
-          .services,
+      'Bus Services': favourite.services,
     };
 
     return initialSelectedChildren;
@@ -55,7 +53,13 @@ class FavouritesService {
 
   Future<void> addFavourite(Favourite favourite, String userId) async {
     await _userProvisioningService.ensureFavouritesDocumentExists(userId);
-    return _favouritesCollection
+    final List<Favourite> favourites = await getFavourites(userId);
+    if (favourites.any((element) => element.busStopCode == favourite.busStopCode)) {
+      debugPrint('✔️ ${favourite.busStopCode} is already in favourites');
+      return;
+    }
+
+    await _favouritesCollection
         .doc(userId)
         .update({
           'favouritesList': FieldValue.arrayUnion([favourite.toJson()]),
@@ -74,32 +78,29 @@ class FavouritesService {
 
   Future<void> removeFavouriteByBusStopCode(String busStopCode, String userId) async {
     await _userProvisioningService.ensureFavouritesDocumentExists(userId);
-    _favouritesCollection.doc(userId).get().then(
-      (snapshot) {
-        if (snapshot.exists) {
-          List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
-          favouritesList.removeWhere((element) => element.busStopCode == busStopCode);
+    final DocumentSnapshot snapshot = await _favouritesCollection.doc(userId).get();
+    if (!snapshot.exists) return;
 
-          _favouritesCollection
-              .doc(userId)
-              .update({
-                'favouritesList': favouritesList.map((element) => element.toJson()).toList(),
-              })
-              .then(
-                (_) => debugPrint('✔️ Removed $busStopCode from favourites'),
-              )
-              .catchError(
-                (error) => debugPrint('❌ Error removing favourite from Firestore: $error'),
-              );
-        }
-      },
-    );
+    final List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
+    favouritesList.removeWhere((element) => element.busStopCode == busStopCode);
+
+    await _favouritesCollection
+        .doc(userId)
+        .update({
+          'favouritesList': favouritesList.map((element) => element.toJson()).toList(),
+        })
+        .then(
+          (_) => debugPrint('✔️ Removed $busStopCode from favourites'),
+        )
+        .catchError(
+          (error) => debugPrint('❌ Error removing favourite from Firestore: $error'),
+        );
   }
 
   Future<void> reorderFavourites(List<Favourite> favourites, String userId) async {
     await _userProvisioningService.ensureFavouritesDocumentExists(userId);
     if (favourites.isNotEmpty) {
-      _favouritesCollection
+      await _favouritesCollection
           .doc(userId)
           .update({'favouritesList': favourites.map((favourite) => favourite.toJson()).toList()})
           .then(
@@ -117,44 +118,44 @@ class FavouritesService {
 
   Future<void> updateFavourite(Favourite favourite, String userId) async {
     await _userProvisioningService.ensureFavouritesDocumentExists(userId);
-    _favouritesCollection.doc(userId).get().then(
-      (snapshot) {
-        if (snapshot.exists) {
-          List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
-          final int favouriteIndex = favouritesList.indexWhere(
-            (element) => element.busStopCode == favourite.busStopCode,
-          );
+    final DocumentSnapshot snapshot = await _favouritesCollection.doc(userId).get();
+    if (!snapshot.exists) return;
 
-          if (favouriteIndex == -1) {
-            debugPrint('❌ ${favourite.busStopCode} was not found in favourites');
-            return;
-          }
-
-          favouritesList[favouriteIndex] = favourite;
-
-          _favouritesCollection
-              .doc(userId)
-              .update({
-                'favouritesList': favouritesList.map((element) => element.toJson()).toList(),
-              })
-              .then(
-                (_) => debugPrint('✔️ Updated ${favourite.busStopCode}\'s favourites'),
-              )
-              .catchError(
-                (error) => debugPrint('❌ Error updating favourite in Firestore: $error'),
-              );
-        }
-      },
+    final List<Favourite> favouritesList = FavouritesList.fromFirestore(snapshot).favouritesList;
+    final int favouriteIndex = favouritesList.indexWhere(
+      (element) => element.busStopCode == favourite.busStopCode,
     );
+
+    if (favouriteIndex == -1) {
+      debugPrint('❌ ${favourite.busStopCode} was not found in favourites');
+      return;
+    }
+
+    favouritesList[favouriteIndex] = favourite;
+
+    await _favouritesCollection
+        .doc(userId)
+        .update({
+          'favouritesList': favouritesList.map((element) => element.toJson()).toList(),
+        })
+        .then(
+          (_) => debugPrint('✔️ Updated ${favourite.busStopCode}\'s favourites'),
+        )
+        .catchError(
+          (error) => debugPrint('❌ Error updating favourite in Firestore: $error'),
+        );
+  }
+
+  Future<Favourite?> getFavouriteByBusStopCode(String userId, String busStopCode) async {
+    final List<Favourite> favouritesList = await getFavourites(userId);
+    for (final Favourite favourite in favouritesList) {
+      if (favourite.busStopCode == busStopCode) return favourite;
+    }
+
+    return null;
   }
 
   Future<bool> isAddedToFavourites(String busStopCode, String userId) async {
-    await _userProvisioningService.ensureFavouritesDocumentExists(userId);
-    final favouritesList = await _favouritesCollection
-        .doc(userId)
-        .get()
-        .then((snapshot) => FavouritesList.fromFirestore(snapshot).favouritesList);
-
-    return favouritesList.any((favourite) => favourite.busStopCode == busStopCode);
+    return await getFavouriteByBusStopCode(userId, busStopCode) != null;
   }
 }

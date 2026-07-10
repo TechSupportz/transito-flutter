@@ -107,7 +107,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                             key: Key(favouritesList[index].busStopCode),
                             padding: const EdgeInsets.only(bottom: 18),
                             child: FavouriteNameCard(
-                              busStopName: favouritesList[index].busStopName,
+                              busStopName: favouritesList[index].displayName,
                               onTap: () => goToEditFavouritesScreen(context, favouritesList[index]),
                             ),
                           );

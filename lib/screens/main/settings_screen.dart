@@ -560,6 +560,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         SettingsCardOption(value: false, label: "Road name of bus stops"),
                       ],
                     ),
+                    SettingsRadioCard<bool>(
+                      title: "Favourite cards",
+                      initialValue: snapshot.data!.defaultCollapsedFavourites,
+                      firebaseFieldName: 'defaultCollapsedFavourites',
+                      options: [
+                        SettingsCardOption(value: false, label: "Expanded by default"),
+                        SettingsCardOption(value: true, label: "Collapsed by default"),
+                      ],
+                    ),
                     if (snapshot.data!.betaServer.enabled)
                       BetaServerSettingsCard(
                         usingBetaServer: snapshot.data!.betaServer.using,

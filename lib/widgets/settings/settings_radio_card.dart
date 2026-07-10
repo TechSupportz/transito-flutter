@@ -46,6 +46,12 @@ class SettingsRadioCard<T> extends StatelessWidget {
             newValue: newValue as bool,
           );
           break;
+        case 'defaultCollapsedFavourites':
+          SettingsService().updateDefaultCollapsedFavourites(
+            userId: user?.uid,
+            newValue: newValue as bool,
+          );
+          break;
         case 'themeMode':
           SettingsService().updateThemeMode(
             userId: user?.uid,
@@ -61,7 +67,7 @@ class SettingsRadioCard<T> extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.only(left: 16, right:16, top: 12, bottom: 16),
+      padding: const EdgeInsets.only(left: 16, right: 16, top: 12, bottom: 16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surfaceContainer,
         borderRadius: BorderRadius.circular(12),

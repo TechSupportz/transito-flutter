@@ -11,6 +11,8 @@ UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
   isETAminutes: json['isETAminutes'] as bool,
   isNearbyGrid: json['isNearbyGrid'] as bool,
   showNearbyDistance: json['showNearbyDistance'] as bool? ?? true,
+  defaultCollapsedFavourites:
+      json['defaultCollapsedFavourites'] as bool? ?? false,
   themeMode:
       $enumDecodeNullable(
         _$AppThemeModeEnumMap,
@@ -25,14 +27,16 @@ UserSettings _$UserSettingsFromJson(Map<String, dynamic> json) => UserSettings(
         ),
 );
 
-Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) => <String, dynamic>{
-  'accentColour': instance.accentColour,
-  'isETAminutes': instance.isETAminutes,
-  'isNearbyGrid': instance.isNearbyGrid,
-  'showNearbyDistance': instance.showNearbyDistance,
-  'themeMode': _$AppThemeModeEnumMap[instance.themeMode]!,
-  'betaServer': instance.betaServer.toJson(),
-};
+Map<String, dynamic> _$UserSettingsToJson(UserSettings instance) =>
+    <String, dynamic>{
+      'accentColour': instance.accentColour,
+      'isETAminutes': instance.isETAminutes,
+      'isNearbyGrid': instance.isNearbyGrid,
+      'showNearbyDistance': instance.showNearbyDistance,
+      'defaultCollapsedFavourites': instance.defaultCollapsedFavourites,
+      'themeMode': _$AppThemeModeEnumMap[instance.themeMode]!,
+      'betaServer': instance.betaServer.toJson(),
+    };
 
 const _$AppThemeModeEnumMap = {
   AppThemeMode.LIGHT: 'LIGHT',
@@ -40,12 +44,11 @@ const _$AppThemeModeEnumMap = {
   AppThemeMode.SYSTEM: 'SYSTEM',
 };
 
-BetaServerSettings _$BetaServerSettingsFromJson(Map<String, dynamic> json) => BetaServerSettings(
-  enabled: json['enabled'] as bool? ?? false,
-  using: json['using'] as bool? ?? false,
-);
+BetaServerSettings _$BetaServerSettingsFromJson(Map<String, dynamic> json) =>
+    BetaServerSettings(
+      enabled: json['enabled'] as bool? ?? false,
+      using: json['using'] as bool? ?? false,
+    );
 
-Map<String, dynamic> _$BetaServerSettingsToJson(BetaServerSettings instance) => <String, dynamic>{
-  'enabled': instance.enabled,
-  'using': instance.using,
-};
+Map<String, dynamic> _$BetaServerSettingsToJson(BetaServerSettings instance) =>
+    <String, dynamic>{'enabled': instance.enabled, 'using': instance.using};

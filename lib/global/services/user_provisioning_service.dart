@@ -24,6 +24,7 @@ class UserProvisioningService {
     'isETAminutes': true,
     'isNearbyGrid': true,
     'showNearbyDistance': true,
+    'defaultCollapsedFavourites': false,
     'themeMode': 'SYSTEM',
   };
 
@@ -33,6 +34,7 @@ class UserProvisioningService {
       isETAminutes: defaultSettingsData['isETAminutes'] as bool,
       isNearbyGrid: defaultSettingsData['isNearbyGrid'] as bool,
       showNearbyDistance: defaultSettingsData['showNearbyDistance'] as bool,
+      defaultCollapsedFavourites: defaultSettingsData['defaultCollapsedFavourites'] as bool,
       themeMode: AppThemeMode.SYSTEM,
     );
   }

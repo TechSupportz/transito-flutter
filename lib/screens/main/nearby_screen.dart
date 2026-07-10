@@ -336,6 +336,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                         isActive: widget.isActive,
                         code: snapshot.data![index].busStopInfo.busStopCode,
                         name: snapshot.data![index].busStopInfo.busStopName,
+                        alias: snapshot.data![index].busStopInfo.alias,
                         address: snapshot.data![index].busStopInfo.busStopAddress,
                         busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
                         services: snapshot.data![index].busStopInfo.services,

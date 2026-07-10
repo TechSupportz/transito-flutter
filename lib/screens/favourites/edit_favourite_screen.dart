@@ -16,6 +16,7 @@ import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/chekbox_skeleton.dart';
+import 'package:transito/widgets/favourites/favourite_alias_field.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
   const EditFavouritesScreen({
@@ -39,7 +40,10 @@ class EditFavouritesScreen extends StatefulWidget {
 }
 
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _aliasController = TextEditingController();
   late Future<Map<String?, List<String?>>> futureFavouriteServicesList;
+  late Future<List<Favourite>> futureFavouritesList;
   late Future<List<String>> futureBusServicesList;
   late Future<BusStop?> futureCurrentBusStop;
   bool _currentBusStopMissing = false;
@@ -98,7 +102,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     }
   }
 
-  Future<Favourite> _buildFavourite(List<String?> selectedServices) async {
+  Future<Favourite> _buildFavourite(List<String?> selectedServices, String? alias) async {
     final BusStop? currentBusStop = await futureCurrentBusStop;
 
     if (currentBusStop != null) {
@@ -108,6 +112,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         busStopAddress: currentBusStop.roadName,
         busStopLocation: LatLng(currentBusStop.latitude, currentBusStop.longitude),
         services: selectedServices,
+        alias: Favourite.normalizeAlias(alias),
         sources: currentBusStop.sources,
       );
     }
@@ -118,8 +123,39 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
       busStopAddress: widget.busStopAddress,
       busStopLocation: widget.busStopLocation,
       services: selectedServices,
+      alias: Favourite.normalizeAlias(alias),
       sources: widget.sources ?? BusStopProviderSources(lta: widget.busStopCode),
     );
+  }
+
+  Favourite _findFavourite(List<Favourite> favourites) {
+    return favourites.firstWhere((favourite) => favourite.busStopCode == widget.busStopCode);
+  }
+
+  Future<Map<String?, List<String?>>> _getFavouriteServices() async {
+    final Favourite favourite = _findFavourite(await futureFavouritesList);
+    return {'Bus Services': favourite.services};
+  }
+
+  String? _validateAlias(String? value, List<Favourite>? favourites) {
+    if (favourites == null) return null;
+
+    return Favourite.isAliasInUse(
+          favourites: favourites,
+          alias: value,
+          excludingBusStopCode: widget.busStopCode,
+        )
+        ? 'This alias is already in use'
+        : null;
+  }
+
+  Future<void> _initializeAlias() async {
+    try {
+      final List<Favourite> favourites = await futureFavouritesList;
+      _aliasController.text = _findFavourite(favourites).alias ?? '';
+    } catch (error) {
+      debugPrint('Failed to load Favourite Alias: $error');
+    }
   }
 
   Future<void> _showMissingBusStopDialog(String userId) async {
@@ -171,11 +207,10 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     super.initState();
     final String userId = context.read<User?>()!.uid;
     futureCurrentBusStop = fetchCurrentBusStop();
-    futureFavouriteServicesList = FavouritesService().getFavouriteServicesByBusStopCode(
-      userId,
-      widget.busStopCode,
-    );
+    futureFavouritesList = FavouritesService().getFavourites(userId);
+    futureFavouriteServicesList = _getFavouriteServices();
     futureBusServicesList = fetchServicesList();
+    _initializeAlias();
     futureCurrentBusStop.then((_) {
       if (!_currentBusStopMissing) {
         return;
@@ -185,6 +220,12 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
         _showMissingBusStopDialog(userId);
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _aliasController.dispose();
+    super.dispose();
   }
 
   @override
@@ -253,16 +294,33 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
       // check if user wants to edit or remove favourites
       if (selectedServices.isNotEmpty) {
-        final Favourite favourite = await _buildFavourite(selectedServices);
+        try {
+          await futureFavouritesList;
+        } catch (error) {
+          debugPrint('Failed to load favourites before updating: $error');
+          _showSnackBar("Couldn't validate the favourite. Please try again.");
+          return;
+        }
+
+        if (!context.mounted || !(_formKey.currentState?.validate() ?? false)) {
+          return;
+        }
+
+        final Favourite favourite = await _buildFavourite(
+          selectedServices,
+          _aliasController.text,
+        );
         if (!context.mounted) {
           return;
         }
 
         // if services were selected then update the favourites list
-        FavouritesService().updateFavourite(
+        await FavouritesService().updateFavourite(
           favourite,
           userId!,
         );
+        if (!context.mounted) return;
+
         _showSnackBar('Updated favourites for ${widget.busStopName}');
         // debugPrint("$favouriteServicesList");
         // navigate to main screen
@@ -293,180 +351,189 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  widget.busStopName,
-                  style: AppTypography.screenHeading,
-                ),
-                const SizedBox(
-                  height: 4,
-                ),
-                Row(
-                  spacing: 8,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primary,
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        widget.busStopCode,
-                        style: AppBusTypography.busInfoChipLabel.copyWith(
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      widget.busStopAddress,
-                      style: AppTypography.body.copyWith(
-                        color: Theme.of(context).colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(
-                  height: 16,
-                ),
-                Text(
-                  "Select the bus services you would like to add to your favourites in this bus stop",
-                  style: AppTypography.body.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  "Unselecting all the bus services will remove this bus stop from your favourites",
-                  style: AppTypography.body.copyWith(
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(
-                  height: 8,
-                ),
-              ],
-            ),
-            FutureBuilder(
-              future: Future.wait([futureFavouriteServicesList, futureBusServicesList]),
-              builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-                Widget servicesChecklist = Expanded(child: const SizedBox());
-
-                if (snapshot.hasData) {
-                  var initialChildrenValue = snapshot.data![0] as Map<String?, List<String?>>;
-                  var busServicesList = snapshot.data![1] as List<String>;
-
-                  // this filters out services which have stopped operating but are still in the user's favourites
-                  if (initialChildrenValue["Bus Services"] != null &&
-                      !initialChildrenValue["Bus Services"]!.every(
-                        (service) => busServicesList.contains(service),
-                      )) {
-                    initialChildrenValue["Bus Services"] = initialChildrenValue["Bus Services"]!
-                        .where(
-                          (service) => busServicesList.contains(service),
-                        )
-                        .toList();
-                  }
-
-                  servicesChecklist = ShaderMask(
-                    shaderCallback: (Rect bounds) {
-                      return LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Theme.of(context).colorScheme.surface,
-                          Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                          Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                          Theme.of(context).colorScheme.surface,
-                        ],
-                        stops: [0.0, 0.05, 0.95, 1.0],
-                      ).createShader(bounds);
-                    },
-                    blendMode: BlendMode.dstOut,
-                    child: Align(
-                      alignment: Alignment.topCenter,
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.only(top: 8, bottom: 16),
-                        child: Column(
-                          children: [
-                            ParentChildCheckbox(
-                              parent: const Text(
-                                "Bus Services",
-                                style: AppTypography.checkboxLabel,
-                              ),
-                              // initialParentValue: {'Bus Services': true},
-                              initialChildrenValue: initialChildrenValue,
-                              parentCheckboxScale: 1.35,
-                              childrenCheckboxScale: 1.35,
-                              gap: 2,
-                              children: [
-                                for (var service in busServicesList)
-                                  Text(service, style: AppTypography.checkboxLabel),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                }
-
-                return Expanded(
-                  child: Skeleton(
-                    isLoading:
-                        snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData,
-                    skeleton: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        children: [
-                          CheckboxSkeleton(),
-                          SizedBox(
-                            height: 2,
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(left: 15),
-                              child: SkeletonListView(
-                                spacing: 10,
-                                item: CheckboxSkeleton(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    child: servicesChecklist,
-                  ),
-                );
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 28),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  FilledButton(
-                    onPressed: () => updateFavorites(),
-                    child: const Text("Save changes"),
+                  Text(
+                    widget.busStopName,
+                    style: AppTypography.screenHeading,
+                  ),
+                  const SizedBox(
+                    height: 4,
+                  ),
+                  Row(
+                    spacing: 8,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.primary,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          widget.busStopCode,
+                          style: AppBusTypography.busInfoChipLabel.copyWith(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        widget.busStopAddress,
+                        style: AppTypography.body.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    "Select the bus services you would like to add to your favourites in this bus stop",
+                    style: AppTypography.body.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
                   ),
                   const SizedBox(
                     height: 8,
                   ),
-                  FilledButton.tonal(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Cancel'),
+                  Text(
+                    "Unselecting all the bus services will remove this bus stop from your favourites",
+                    style: AppTypography.body.copyWith(
+                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 16,
                   ),
                 ],
               ),
-            ),
-          ],
+              FutureBuilder<List<Favourite>>(
+                future: futureFavouritesList,
+                builder: (context, snapshot) => FavouriteAliasField(
+                  controller: _aliasController,
+                  enabled: snapshot.hasData,
+                  validator: (value) => _validateAlias(value, snapshot.data),
+                ),
+              ),
+              FutureBuilder(
+                future: Future.wait([futureFavouriteServicesList, futureBusServicesList]),
+                builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
+                  Widget servicesChecklist = Expanded(child: const SizedBox());
+
+                  if (snapshot.hasData) {
+                    var initialChildrenValue = snapshot.data![0] as Map<String?, List<String?>>;
+                    var busServicesList = snapshot.data![1] as List<String>;
+
+                    // this filters out services which have stopped operating but are still in the user's favourites
+                    if (initialChildrenValue["Bus Services"] != null &&
+                        !initialChildrenValue["Bus Services"]!.every(
+                          (service) => busServicesList.contains(service),
+                        )) {
+                      initialChildrenValue["Bus Services"] = initialChildrenValue["Bus Services"]!
+                          .where(
+                            (service) => busServicesList.contains(service),
+                          )
+                          .toList();
+                    }
+
+                    servicesChecklist = ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            Theme.of(context).colorScheme.surface,
+                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
+                            Theme.of(context).colorScheme.surface,
+                          ],
+                          stops: [0.0, 0.05, 0.95, 1.0],
+                        ).createShader(bounds);
+                      },
+                      blendMode: BlendMode.dstOut,
+                      child: Align(
+                        alignment: Alignment.topCenter,
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.only(top: 8, bottom: 16),
+                          child: Column(
+                            children: [
+                              ParentChildCheckbox(
+                                parent: const Text(
+                                  "Bus Services",
+                                  style: AppTypography.checkboxLabel,
+                                ),
+                                // initialParentValue: {'Bus Services': true},
+                                initialChildrenValue: initialChildrenValue,
+                                parentCheckboxScale: 1.35,
+                                childrenCheckboxScale: 1.35,
+                                gap: 2,
+                                children: [
+                                  for (var service in busServicesList)
+                                    Text(service, style: AppTypography.checkboxLabel),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Expanded(
+                    child: Skeleton(
+                      isLoading:
+                          snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData,
+                      skeleton: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            CheckboxSkeleton(),
+                            SizedBox(
+                              height: 2,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 15),
+                                child: SkeletonListView(
+                                  spacing: 10,
+                                  item: CheckboxSkeleton(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      child: servicesChecklist,
+                    ),
+                  );
+                },
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 28),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    FilledButton(
+                      onPressed: () => updateFavorites(),
+                      child: const Text("Save changes"),
+                    ),
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    FilledButton.tonal(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancel'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

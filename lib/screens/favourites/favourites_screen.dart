@@ -6,7 +6,9 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
+import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
+import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
@@ -82,56 +84,67 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
         title: const Text('Favourites'),
       ),
       // if the user has favourites display them via the favourites_timing_card widget, otherwise display a message
-      body: StreamBuilder<List<Favourite>>(
-        stream: FavouritesService().streamFavourites(userId),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            List<Favourite> favouritesList = snapshot.data!;
+      body: StreamBuilder<UserSettings>(
+        stream: SettingsService().streamSettings(userId),
+        builder: (context, settingsSnapshot) {
+          final bool initiallyExpanded =
+              !(settingsSnapshot.data?.defaultCollapsedFavourites ?? false);
 
-            return favouritesList.isNotEmpty
-                // notification listener to hide or show the FAB depending if the user is scrolling or not
-                ? NotificationListener<UserScrollNotification>(
-                    onNotification: (notification) => hideFabOnScroll(notification),
-                    child: ListView.separated(
-                      itemBuilder: (context, int index) {
-                        return FavouritesTimingCard(
-                          key: ValueKey(favouritesList[index].busStopCode),
-                          isActive: widget.isActive,
-                          code: favouritesList[index].busStopCode,
-                          name: favouritesList[index].busStopName,
-                          address: favouritesList[index].busStopAddress,
-                          busStopLocation: favouritesList[index].busStopLocation,
-                          services: favouritesList[index].services,
-                          sources: favouritesList[index].sources,
-                        );
-                      },
-                      padding: EdgeInsets.only(
-                        top: 12,
-                        bottom: supportsLiquidGlass ? 115 : 32,
-                        left: 12,
-                        right: 12,
-                      ),
-                      separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                        height: 16,
-                      ),
-                      itemCount: favouritesList.length,
-                    ),
-                  )
-                // if the user has no favourites display a message
-                : const ErrorText(
-                    title: "This place is real empty",
-                    message: "Try adding some favourites!",
-                    icon: Symbols.heart_plus_rounded,
-                  );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text('Error: ${snapshot.error}'),
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(strokeWidth: 3),
-            );
-          }
+          return StreamBuilder<List<Favourite>>(
+            stream: FavouritesService().streamFavourites(userId),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                List<Favourite> favouritesList = snapshot.data!;
+
+                return favouritesList.isNotEmpty
+                    // notification listener to hide or show the FAB depending if the user is scrolling or not
+                    ? NotificationListener<UserScrollNotification>(
+                        onNotification: (notification) => hideFabOnScroll(notification),
+                        child: ListView.separated(
+                          itemBuilder: (context, int index) {
+                            return FavouritesTimingCard(
+                              key: ValueKey(favouritesList[index].busStopCode),
+                              isActive: widget.isActive,
+                              code: favouritesList[index].busStopCode,
+                              name: favouritesList[index].busStopName,
+                              alias: favouritesList[index].alias,
+                              address: favouritesList[index].busStopAddress,
+                              busStopLocation: favouritesList[index].busStopLocation,
+                              services: favouritesList[index].services,
+                              sources: favouritesList[index].sources,
+                              isCollapsible: true,
+                              initiallyExpanded: initiallyExpanded,
+                            );
+                          },
+                          padding: EdgeInsets.only(
+                            top: 12,
+                            bottom: supportsLiquidGlass ? 115 : 32,
+                            left: 12,
+                            right: 12,
+                          ),
+                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
+                            height: 16,
+                          ),
+                          itemCount: favouritesList.length,
+                        ),
+                      )
+                    // if the user has no favourites display a message
+                    : const ErrorText(
+                        title: "This place is real empty",
+                        message: "Try adding some favourites!",
+                        icon: Symbols.heart_plus_rounded,
+                      );
+              } else if (snapshot.hasError) {
+                return Center(
+                  child: Text('Error: ${snapshot.error}'),
+                );
+              } else {
+                return const Center(
+                  child: CircularProgressIndicator(strokeWidth: 3),
+                );
+              }
+            },
+          );
         },
       ),
       // floating action button to open the manage favourites screen
