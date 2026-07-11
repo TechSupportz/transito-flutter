@@ -4,7 +4,6 @@ import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -20,6 +19,7 @@ import 'package:transito/screens/bus_info/bus_timing_screen.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/favourites/favourite_card_header.dart';
+import 'package:transito/widgets/favourites/favourite_timing_rows_skeleton.dart';
 
 class FavouritesTimingCard extends StatefulWidget {
   const FavouritesTimingCard({
@@ -34,6 +34,11 @@ class FavouritesTimingCard extends StatefulWidget {
     this.alias,
     this.isCollapsible = false,
     this.initiallyExpanded = true,
+    this.placeholderTimingRowCount,
+    this.onDisplayedTimingRowCountChanged,
+    this.isExpanded,
+    this.onExpansionChanged,
+    this.settingsSnapshot,
   });
 
   final String code;
@@ -46,6 +51,11 @@ class FavouritesTimingCard extends StatefulWidget {
   final ValueListenable<bool> isActive;
   final bool isCollapsible;
   final bool initiallyExpanded;
+  final int? placeholderTimingRowCount;
+  final ValueChanged<int>? onDisplayedTimingRowCountChanged;
+  final bool? isExpanded;
+  final ValueChanged<bool>? onExpansionChanged;
+  final AsyncSnapshot<UserSettings>? settingsSnapshot;
 
   @override
   State<FavouritesTimingCard> createState() => _FavouritesTimingCardState();
@@ -55,10 +65,14 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   late Future<List<ServiceInfo>> futureBusArrivalInfo;
   late bool _isExpanded;
   Timer? _timer;
+  int? _lastReportedTimingRowCount;
 
   bool get _shouldFetchArrivals => widget.isActive.value && (!widget.isCollapsible || _isExpanded);
 
   String get _displayName => widget.alias ?? widget.name;
+
+  int get _reservedTimingRowCount =>
+      _lastReportedTimingRowCount ?? widget.placeholderTimingRowCount ?? widget.services.length;
 
   // function to fetch bus arrival info
   Future<BusArrivalInfo> fetchArrivalTimings({
@@ -134,7 +148,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   @override
   void initState() {
     super.initState();
-    _isExpanded = !widget.isCollapsible || widget.initiallyExpanded;
+    _isExpanded = widget.isExpanded ?? (!widget.isCollapsible || widget.initiallyExpanded);
     futureBusArrivalInfo = _shouldFetchArrivals
         ? _getFilteredArrivalTimings()
         : Future<List<ServiceInfo>>.value(const <ServiceInfo>[]);
@@ -147,14 +161,23 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   @override
   void didUpdateWidget(covariant FavouritesTimingCard oldWidget) {
     super.didUpdateWidget(oldWidget);
+    final bool arrivalQueryChanged = _arrivalQueryChanged(oldWidget);
+    final bool controlledExpansionChanged =
+        widget.isExpanded != null && oldWidget.isExpanded != widget.isExpanded;
+
+    if (controlledExpansionChanged) {
+      _isExpanded = widget.isExpanded!;
+    }
+
     if (oldWidget.isActive != widget.isActive) {
       oldWidget.isActive.removeListener(_handleActivityChanged);
       widget.isActive.addListener(_handleActivityChanged);
       _handleActivityChanged();
     }
 
-    if (oldWidget.isCollapsible != widget.isCollapsible ||
-        oldWidget.initiallyExpanded != widget.initiallyExpanded) {
+    if (widget.isExpanded == null &&
+        (oldWidget.isCollapsible != widget.isCollapsible ||
+            oldWidget.initiallyExpanded != widget.initiallyExpanded)) {
       _isExpanded = !widget.isCollapsible || widget.initiallyExpanded;
       if (_shouldFetchArrivals) {
         futureBusArrivalInfo = _getFilteredArrivalTimings();
@@ -165,13 +188,32 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
       }
     }
 
-    if (_arrivalQueryChanged(oldWidget) && _shouldFetchArrivals) {
+    if (controlledExpansionChanged) {
+      if (_shouldFetchArrivals) {
+        futureBusArrivalInfo = _getFilteredArrivalTimings();
+        _startTimer();
+      } else {
+        _timer?.cancel();
+        _timer = null;
+      }
+    }
+
+    if (arrivalQueryChanged) {
+      _lastReportedTimingRowCount = null;
+    }
+
+    if (arrivalQueryChanged && _shouldFetchArrivals) {
       futureBusArrivalInfo = _getFilteredArrivalTimings();
     }
   }
 
   void _toggleExpansion() {
     if (!widget.isCollapsible) return;
+
+    if (widget.onExpansionChanged != null) {
+      widget.onExpansionChanged!(!_isExpanded);
+      return;
+    }
 
     setState(() {
       _isExpanded = !_isExpanded;
@@ -220,6 +262,23 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     );
   }
 
+  void _reportDisplayedTimingRowCount(int rowCount) {
+    if (rowCount == 0 || rowCount == _lastReportedTimingRowCount) return;
+
+    _lastReportedTimingRowCount = rowCount;
+    final ValueChanged<int>? onChanged = widget.onDisplayedTimingRowCountChanged;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) onChanged?.call(rowCount);
+    });
+  }
+
+  Widget _buildReservedTimingMessage(Widget child) {
+    return SizedBox(
+      height: favouriteTimingRowsHeight(_reservedTimingRowCount),
+      child: Center(child: child),
+    );
+  }
+
   @override
   void dispose() {
     widget.isActive.removeListener(_handleActivityChanged);
@@ -230,15 +289,17 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
   Widget _buildArrivalContent(AsyncSnapshot<UserSettings> settingsSnapshot) {
     if (settingsSnapshot.hasError) {
       debugPrint('<=== ERROR ${settingsSnapshot.error} ===>');
-      return const ErrorText(
-        enableBackground: true,
-        style: ErrorTextStyle.inline,
-        icon: Symbols.error_rounded,
+      return _buildReservedTimingMessage(
+        const ErrorText(
+          enableBackground: true,
+          style: ErrorTextStyle.inline,
+          icon: Symbols.error_rounded,
+        ),
       );
     }
 
     if (!settingsSnapshot.hasData) {
-      return const Center(child: CircularProgressIndicator(strokeWidth: 3));
+      return FavouriteTimingRowsSkeleton(rowCount: _reservedTimingRowCount);
     }
 
     final UserSettings userSettings = settingsSnapshot.data!;
@@ -246,27 +307,37 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
       future: futureBusArrivalInfo,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
+          if (snapshot.data!.isNotEmpty) {
+            _reportDisplayedTimingRowCount(snapshot.data!.length);
+          }
+
           return snapshot.data!.isNotEmpty
-              ? ListView.separated(
-                  itemBuilder: (context, int index) {
-                    return Transform.scale(
-                      scale: 0.9,
-                      child: BusTimingRow(
-                        busStopCode: widget.code,
-                        serviceInfo: snapshot.data![index],
-                        userLatLng: widget.busStopLocation,
-                        isETAminutes: userSettings.isETAminutes,
-                      ),
-                    );
-                  },
-                  separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 4),
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.only(bottom: 16),
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.length,
+              ? Padding(
+                  padding: const EdgeInsets.only(bottom: favouriteTimingRowsBottomPadding),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      for (int index = 0; index < snapshot.data!.length; index++) ...[
+                        ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: favouriteTimingRowExtent),
+                          child: Transform.scale(
+                            scale: 0.9,
+                            child: BusTimingRow(
+                              busStopCode: widget.code,
+                              serviceInfo: snapshot.data![index],
+                              userLatLng: widget.busStopLocation,
+                              isETAminutes: userSettings.isETAminutes,
+                            ),
+                          ),
+                        ),
+                        if (index < snapshot.data!.length - 1)
+                          const SizedBox(height: favouriteTimingRowSpacing),
+                      ],
+                    ],
+                  ),
                 )
-              : Center(
-                  child: Padding(
+              : _buildReservedTimingMessage(
+                  Padding(
                     padding: const EdgeInsets.only(
                       top: 8,
                       bottom: 24,
@@ -284,30 +355,14 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                 );
         } else if (snapshot.hasError) {
           debugPrint('<=== ERROR ${snapshot.error} ===>');
-          return const Padding(
-            padding: EdgeInsets.only(top: 8.0, bottom: 24.0),
-            child: ErrorText(
+          return _buildReservedTimingMessage(
+            const ErrorText(
               style: ErrorTextStyle.inline,
               title: "Couldn't load timings",
             ),
           );
         } else if (snapshot.connectionState == ConnectionState.waiting) {
-          return ListView.separated(
-            itemBuilder: (context, index) => const SkeletonItem(
-              child: SkeletonLine(
-                style: SkeletonLineStyle(
-                  height: 55,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1.5),
-                ),
-              ),
-            ),
-            separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 12),
-            physics: const NeverScrollableScrollPhysics(),
-            padding: const EdgeInsets.only(bottom: 18),
-            shrinkWrap: true,
-            itemCount: widget.services.length,
-          );
+          return FavouriteTimingRowsSkeleton(rowCount: _reservedTimingRowCount);
         } else {
           return const SizedBox(height: 10);
         }
@@ -315,66 +370,72 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
     );
   }
 
+  Widget _buildCard(BuildContext context, AsyncSnapshot<UserSettings> settingsSnapshot) {
+    return Tooltip(
+      preferBelow: false,
+      decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
+      textStyle: AppBusTypography.favouriteStopTooltip,
+      showDuration: const Duration(milliseconds: 350),
+      message: _displayName,
+      child: Material(
+        color: Theme.of(context).colorScheme.surfaceContainer,
+        borderRadius: BorderRadius.circular(12),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FavouriteCardHeader(
+              busStopName: widget.name,
+              alias: widget.alias,
+              isExpanded: _isExpanded,
+              isCollapsible: widget.isCollapsible,
+              onNameTap: _openBusStopInfoScreen,
+              onToggle: widget.isCollapsible ? _toggleExpansion : null,
+            ),
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 450),
+              reverseDuration: const Duration(milliseconds: 300),
+              switchInCurve: Easing.emphasizedDecelerate,
+              switchOutCurve: Easing.emphasizedAccelerate,
+              transitionBuilder: (child, animation) => ClipRect(
+                child: SizeTransition(
+                  sizeFactor: animation,
+                  axisAlignment: -1,
+                  child: FadeTransition(opacity: animation, child: child),
+                ),
+              ),
+              child: _isExpanded
+                  ? KeyedSubtree(
+                      key: const ValueKey('expanded-arrivals'),
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: _openBusTimingScreen,
+                        child: _buildArrivalContent(settingsSnapshot),
+                      ),
+                    )
+                  : const SizedBox(
+                      key: ValueKey('collapsed-arrivals'),
+                      height: 6,
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final User? user = context.watch<User?>();
+    final AsyncSnapshot<UserSettings>? settingsSnapshot = widget.settingsSnapshot;
+    if (settingsSnapshot != null) {
+      return _buildCard(context, settingsSnapshot);
+    }
 
+    final User? user = context.watch<User?>();
     return StreamBuilder<UserSettings>(
       stream: SettingsService().streamSettings(user?.uid),
-      builder: (context, settingsSnapshot) {
-        return Tooltip(
-          preferBelow: false,
-          decoration: BoxDecoration(color: Theme.of(context).colorScheme.surfaceContainer),
-          textStyle: AppBusTypography.favouriteStopTooltip,
-          showDuration: const Duration(milliseconds: 350),
-          message: _displayName,
-          child: Material(
-            color: Theme.of(context).colorScheme.surfaceContainer,
-            borderRadius: BorderRadius.circular(12),
-            clipBehavior: Clip.antiAlias,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FavouriteCardHeader(
-                  busStopName: widget.name,
-                  alias: widget.alias,
-                  isExpanded: _isExpanded,
-                  isCollapsible: widget.isCollapsible,
-                  onNameTap: _openBusStopInfoScreen,
-                  onToggle: widget.isCollapsible ? _toggleExpansion : null,
-                ),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 450),
-                  reverseDuration: const Duration(milliseconds: 300),
-                  switchInCurve: Easing.emphasizedDecelerate,
-                  switchOutCurve: Easing.emphasizedAccelerate,
-                  transitionBuilder: (child, animation) => ClipRect(
-                    child: SizeTransition(
-                      sizeFactor: animation,
-                      axisAlignment: -1,
-                      child: FadeTransition(opacity: animation, child: child),
-                    ),
-                  ),
-                  child: _isExpanded
-                      ? KeyedSubtree(
-                          key: const ValueKey('expanded-arrivals'),
-                          child: GestureDetector(
-                            behavior: HitTestBehavior.opaque,
-                            onTap: _openBusTimingScreen,
-                            child: _buildArrivalContent(settingsSnapshot),
-                          ),
-                        )
-                      : const SizedBox(
-                          key: ValueKey('collapsed-arrivals'),
-                          height: 6,
-                        ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (context, snapshot) => _buildCard(context, snapshot),
     );
   }
 }

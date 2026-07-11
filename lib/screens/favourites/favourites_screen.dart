@@ -12,6 +12,8 @@ import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/manage_favourites_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
+import 'package:transito/widgets/favourites/favourite_card_header.dart';
+import 'package:transito/widgets/favourites/favourite_timing_rows_skeleton.dart';
 import 'package:transito/widgets/favourites/favourites_timing_card.dart';
 
 class FavouritesScreenController extends ChangeNotifier {
@@ -28,15 +30,15 @@ class FavouritesScreen extends StatefulWidget {
 }
 
 class _FavouritesScreenState extends State<FavouritesScreen> {
-  bool isFabVisible = true;
   late final VoidCallback _controllerListener;
+  final ValueNotifier<bool> _isFabVisible = ValueNotifier<bool>(true);
 
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
     if (notification.direction == ScrollDirection.forward) {
-      !isFabVisible ? setState(() => isFabVisible = true) : null;
+      _isFabVisible.value = true;
     } else if (notification.direction == ScrollDirection.reverse) {
-      isFabVisible ? setState(() => isFabVisible = false) : null;
+      _isFabVisible.value = false;
     }
     return true;
   }
@@ -71,6 +73,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
   @override
   void dispose() {
     widget.controller?.removeListener(_controllerListener);
+    _isFabVisible.dispose();
     super.dispose();
   }
 
@@ -94,45 +97,28 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
             stream: FavouritesService().streamFavourites(userId),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List<Favourite> favouritesList = snapshot.data!;
+                final List<Favourite> favouritesList = snapshot.data!;
+                if (favouritesList.isEmpty) {
+                  return const ErrorText(
+                    title: "This place is real empty",
+                    message: "Try adding some favourites!",
+                    icon: Symbols.heart_plus_rounded,
+                  );
+                }
 
-                return favouritesList.isNotEmpty
-                    // notification listener to hide or show the FAB depending if the user is scrolling or not
-                    ? NotificationListener<UserScrollNotification>(
-                        onNotification: (notification) => hideFabOnScroll(notification),
-                        child: ListView.separated(
-                          itemBuilder: (context, int index) {
-                            return FavouritesTimingCard(
-                              key: ValueKey(favouritesList[index].busStopCode),
-                              isActive: widget.isActive,
-                              code: favouritesList[index].busStopCode,
-                              name: favouritesList[index].busStopName,
-                              alias: favouritesList[index].alias,
-                              address: favouritesList[index].busStopAddress,
-                              busStopLocation: favouritesList[index].busStopLocation,
-                              services: favouritesList[index].services,
-                              sources: favouritesList[index].sources,
-                              isCollapsible: true,
-                              initiallyExpanded: initiallyExpanded,
-                            );
-                          },
-                          padding: EdgeInsets.only(
-                            top: 12,
-                            bottom: supportsLiquidGlass ? 115 : 32,
-                            left: 12,
-                            right: 12,
-                          ),
-                          separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                            height: 16,
-                          ),
-                          itemCount: favouritesList.length,
-                        ),
-                      )
-                    // if the user has no favourites display a message
-                    : const ErrorText(
-                        title: "This place is real empty",
-                        message: "Try adding some favourites!",
-                        icon: Symbols.heart_plus_rounded,
+                final Widget favourites = _FavouriteCardsList(
+                  favourites: favouritesList,
+                  isActive: widget.isActive,
+                  initiallyExpanded: initiallyExpanded,
+                  settingsSnapshot: settingsSnapshot,
+                  bottomPadding: supportsLiquidGlass ? 115 : 32,
+                );
+
+                return supportsLiquidGlass
+                    ? favourites
+                    : NotificationListener<UserScrollNotification>(
+                        onNotification: hideFabOnScroll,
+                        child: favourites,
                       );
               } else if (snapshot.hasError) {
                 return Center(
@@ -148,13 +134,225 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
         },
       ),
       // floating action button to open the manage favourites screen
-      floatingActionButton: isFabVisible && !supportsLiquidGlass
-          ? FloatingActionButton(
-              heroTag: 'favouritesFAB',
-              onPressed: () => goToManageFavouritesScreen(context),
-              child: const AppSymbol(Symbols.edit_rounded, fill: true),
-            )
-          : null,
+      floatingActionButton: supportsLiquidGlass
+          ? null
+          : ValueListenableBuilder<bool>(
+              valueListenable: _isFabVisible,
+              builder: (context, isVisible, child) => isVisible ? child! : const SizedBox.shrink(),
+              child: FloatingActionButton(
+                heroTag: 'favouritesFAB',
+                onPressed: () => goToManageFavouritesScreen(context),
+                child: const AppSymbol(Symbols.edit_rounded, fill: true),
+              ),
+            ),
     );
   }
+}
+
+class _FavouriteCardsList extends StatefulWidget {
+  const _FavouriteCardsList({
+    required this.favourites,
+    required this.isActive,
+    required this.initiallyExpanded,
+    required this.settingsSnapshot,
+    required this.bottomPadding,
+  });
+
+  final List<Favourite> favourites;
+  final ValueListenable<bool> isActive;
+  final bool initiallyExpanded;
+  final AsyncSnapshot<UserSettings> settingsSnapshot;
+  final double bottomPadding;
+
+  @override
+  State<_FavouriteCardsList> createState() => _FavouriteCardsListState();
+}
+
+class _FavouriteCardsListState extends State<_FavouriteCardsList> with TickerProviderStateMixin {
+  static const double _cardSpacing = 16;
+  static const double _collapsedTimingBodyExtent = 6;
+
+  final Map<String, _TimingRowCountCacheEntry> _timingRowCountCache = {};
+  final Map<String, bool> _expandedByBusStopCode = {};
+  final Map<String, double> _expansionProgressByBusStopCode = {};
+  final Map<String, AnimationController> _expansionControllers = {};
+
+  int _placeholderTimingRowCount(Favourite favourite) {
+    final _TimingRowCountCacheEntry? entry = _timingRowCountCache[favourite.busStopCode];
+    if (entry == null || entry.selectedServiceCount != favourite.services.length) {
+      return favourite.services.length;
+    }
+
+    return entry.displayedRowCount;
+  }
+
+  void _cacheDisplayedTimingRowCount(Favourite favourite, int displayedRowCount) {
+    if (displayedRowCount == 0) return;
+
+    final _TimingRowCountCacheEntry nextEntry = _TimingRowCountCacheEntry(
+      selectedServiceCount: favourite.services.length,
+      displayedRowCount: displayedRowCount,
+    );
+    final _TimingRowCountCacheEntry? currentEntry = _timingRowCountCache[favourite.busStopCode];
+    if (currentEntry?.selectedServiceCount == nextEntry.selectedServiceCount &&
+        currentEntry?.displayedRowCount == nextEntry.displayedRowCount) {
+      return;
+    }
+
+    setState(() {
+      _timingRowCountCache[favourite.busStopCode] = nextEntry;
+    });
+  }
+
+  bool _isExpanded(Favourite favourite) {
+    return _expandedByBusStopCode.putIfAbsent(
+      favourite.busStopCode,
+      () => widget.initiallyExpanded,
+    );
+  }
+
+  double _expansionProgress(Favourite favourite) {
+    return _expansionProgressByBusStopCode.putIfAbsent(
+      favourite.busStopCode,
+      () => _isExpanded(favourite) ? 1 : 0,
+    );
+  }
+
+  AnimationController _replaceExpansionController(Favourite favourite) {
+    _expansionControllers.remove(favourite.busStopCode)?.dispose();
+    late final AnimationController controller;
+    controller =
+        AnimationController(
+          vsync: this,
+          value: _expansionProgress(favourite),
+        )..addListener(() {
+          _expansionProgressByBusStopCode[favourite.busStopCode] = controller.value;
+          if (mounted) setState(() {});
+        });
+    _expansionControllers[favourite.busStopCode] = controller;
+    return controller;
+  }
+
+  void _handleExpansionChanged(Favourite favourite, bool isExpanded) {
+    final AnimationController controller = _replaceExpansionController(favourite);
+    setState(() {
+      _expandedByBusStopCode[favourite.busStopCode] = isExpanded;
+    });
+
+    controller.animateTo(
+      isExpanded ? 1 : 0,
+      duration: Duration(milliseconds: isExpanded ? 450 : 300),
+      curve: isExpanded ? Easing.emphasizedDecelerate : Easing.emphasizedAccelerate,
+    );
+  }
+
+  double _itemExtent(int index, SliverLayoutDimensions dimensions) {
+    final Favourite favourite = widget.favourites[index];
+    final double expansionProgress = _expansionProgress(favourite);
+    final double headerExtent = favouriteCardHeaderHeight(hasAlias: favourite.alias != null);
+    final double expandedExtent =
+        headerExtent + favouriteTimingRowsHeight(_placeholderTimingRowCount(favourite));
+    final double collapsedExtent = headerExtent + _collapsedTimingBodyExtent;
+    final double cardExtent =
+        collapsedExtent + ((expandedExtent - collapsedExtent) * expansionProgress);
+    final double spacing = index < widget.favourites.length - 1 ? _cardSpacing : 0;
+    return cardExtent + spacing;
+  }
+
+  int? _findChildIndex(Key key) {
+    if (key is! ValueKey<String>) return null;
+    final int index = widget.favourites.indexWhere(
+      (Favourite favourite) => favourite.busStopCode == key.value,
+    );
+    return index == -1 ? null : index;
+  }
+
+  void _disposeExpansionControllers() {
+    for (final AnimationController controller in _expansionControllers.values) {
+      controller.dispose();
+    }
+    _expansionControllers.clear();
+  }
+
+  @override
+  void didUpdateWidget(covariant _FavouriteCardsList oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initiallyExpanded != widget.initiallyExpanded) {
+      _disposeExpansionControllers();
+      _expandedByBusStopCode.clear();
+      _expansionProgressByBusStopCode.clear();
+    }
+
+    final Set<String> currentCodes = widget.favourites
+        .map((Favourite favourite) => favourite.busStopCode)
+        .toSet();
+    final List<String> removedCodes = _expandedByBusStopCode.keys
+        .where((String code) => !currentCodes.contains(code))
+        .toList();
+    for (final String code in removedCodes) {
+      _expansionControllers.remove(code)?.dispose();
+      _expandedByBusStopCode.remove(code);
+      _expansionProgressByBusStopCode.remove(code);
+      _timingRowCountCache.remove(code);
+    }
+  }
+
+  @override
+  void dispose() {
+    _disposeExpansionControllers();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemExtentBuilder: _itemExtent,
+      findChildIndexCallback: _findChildIndex,
+      itemBuilder: (context, int index) {
+        final Favourite favourite = widget.favourites[index];
+        final bool isExpanded = _isExpanded(favourite);
+        final double bottomSpacing = index < widget.favourites.length - 1 ? _cardSpacing : 0;
+
+        return Padding(
+          key: ValueKey<String>(favourite.busStopCode),
+          padding: EdgeInsets.only(bottom: bottomSpacing),
+          child: FavouritesTimingCard(
+            isActive: widget.isActive,
+            code: favourite.busStopCode,
+            name: favourite.busStopName,
+            alias: favourite.alias,
+            address: favourite.busStopAddress,
+            busStopLocation: favourite.busStopLocation,
+            services: favourite.services,
+            sources: favourite.sources,
+            isCollapsible: true,
+            initiallyExpanded: widget.initiallyExpanded,
+            isExpanded: isExpanded,
+            onExpansionChanged: (bool expanded) => _handleExpansionChanged(favourite, expanded),
+            placeholderTimingRowCount: _placeholderTimingRowCount(favourite),
+            onDisplayedTimingRowCountChanged: (int rowCount) =>
+                _cacheDisplayedTimingRowCount(favourite, rowCount),
+            settingsSnapshot: widget.settingsSnapshot,
+          ),
+        );
+      },
+      padding: EdgeInsets.only(
+        top: 12,
+        bottom: widget.bottomPadding,
+        left: 12,
+        right: 12,
+      ),
+      itemCount: widget.favourites.length,
+    );
+  }
+}
+
+class _TimingRowCountCacheEntry {
+  const _TimingRowCountCacheEntry({
+    required this.selectedServiceCount,
+    required this.displayedRowCount,
+  });
+
+  final int selectedServiceCount;
+  final int displayedRowCount;
 }

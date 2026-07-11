@@ -4,6 +4,12 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
+const double favouriteCardHeaderExtent = 56;
+const double favouriteCardHeaderWithAliasExtent = 66;
+
+double favouriteCardHeaderHeight({required bool hasAlias}) =>
+    hasAlias ? favouriteCardHeaderWithAliasExtent : favouriteCardHeaderExtent;
+
 class FavouriteCardHeader extends StatelessWidget {
   const FavouriteCardHeader({
     super.key,
@@ -27,8 +33,8 @@ class FavouriteCardHeader extends StatelessWidget {
     final String displayName = alias ?? busStopName;
     final bool showBusStopName = isExpanded && alias != null;
 
-    return ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: 56),
+    return SizedBox(
+      height: favouriteCardHeaderHeight(hasAlias: alias != null),
       child: Padding(
         padding: const EdgeInsets.only(left: 16, right: 16, top: 12),
         child: Row(
@@ -55,7 +61,8 @@ class FavouriteCardHeader extends StatelessWidget {
                         ),
                       ),
                       AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
+                        duration: const Duration(milliseconds: 450),
+                        reverseDuration: const Duration(milliseconds: 300),
                         switchInCurve: Easing.emphasizedDecelerate,
                         switchOutCurve: Easing.emphasizedAccelerate,
                         transitionBuilder: (child, animation) => ClipRect(
