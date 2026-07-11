@@ -120,6 +120,7 @@ CommonProvider.scaffoldMessengerKey.currentState?.showSnackBar(...);
 ```
 docs/
 └── adr/                      # Architecture decision records
+tool/                         # Local development utilities
 lib/
 ├── main.dart                 # App entry point
 ├── firebase_options.dart     # Firebase configuration
