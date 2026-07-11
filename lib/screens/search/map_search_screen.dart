@@ -61,6 +61,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
   final ValueNotifier<Marker?> searchLocationPin = ValueNotifier<Marker?>(null);
   Timer? _debounce;
   StreamSubscription<List<Favourite>>? _favouritesSubscription;
+  StreamSubscription<Position?>? _userLocationSubscription;
+  bool _isMapReady = false;
 
   Future<List<NearbyBusStop>> fetchNearbyBusStops(LatLng position) async {
     final List<NearbyBusStop> stops = await TransitoApiService().getNearbyBusStops(position);
@@ -95,10 +97,6 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 200), () async {
       _isMarkersLoading.value = true;
-
-      if (context.read<CommonProvider>().isUserCenter) {
-        updateIsUserCenter(position);
-      }
 
       List<NearbyBusStop> nearbyBusStops = await fetchNearbyBusStops(position);
 
@@ -235,19 +233,17 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     if (mounted) context.read<CommonProvider>().setIsUserCenter(true);
   }
 
-  void updateIsUserCenter(LatLng position) async {
-    final Position? userPosition = await LocationService().getCurrentPosition();
-    if (!mounted) return;
-    final common = context.read<CommonProvider>();
-    if (userPosition == null) {
-      common.setIsUserCenter(false);
+  void _followUserLocation(Position? position) {
+    if (!mounted ||
+        !_isMapReady ||
+        position == null ||
+        !context.read<CommonProvider>().isUserCenter) {
       return;
     }
 
-    final isCentered =
-        userPosition.latitude == position.latitude && userPosition.longitude == position.longitude;
-
-    common.setIsUserCenter(isCentered);
+    _animatedMapController.animateTo(
+      dest: LatLng(position.latitude, position.longitude),
+    );
   }
 
   Marker buildLocationMarker(LatLng position) {
@@ -302,10 +298,15 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (initialMapPinLocation != null) {
+        context.read<CommonProvider>().setIsUserCenter(false);
+      }
+
       LatLng initialCameraCenter = await _initialCameraCenter;
       _onMapPositionChanged(initialCameraCenter);
     });
 
+    _userLocationSubscription = LocationService().positionStream.listen(_followUserLocation);
     widget.controller?.addListener(animateToUserLocation);
   }
 
@@ -319,6 +320,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     _animatedMapController.dispose();
     _debounce?.cancel();
     _favouritesSubscription?.cancel();
+    _userLocationSubscription?.cancel();
     widget.controller?.removeListener(animateToUserLocation);
     super.dispose();
   }
@@ -363,7 +365,11 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                     backgroundColor: appColors.brightness == Brightness.dark
                         ? Color(0xFF003653)
                         : Color(0xFF6DA7E3),
+                    onMapReady: () => _isMapReady = true,
                     onPositionChanged: (camera, hasGesture) {
+                      if (hasGesture) {
+                        context.read<CommonProvider>().setIsUserCenter(false);
+                      }
                       _onMapPositionChanged(camera.center);
                       mapRotation.value = camera.rotation;
                     },
