@@ -416,7 +416,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                     )
                   : const SizedBox(
                       key: ValueKey('collapsed-arrivals'),
-                      height: 6,
+                      height: 8,
                     ),
             ),
           ],

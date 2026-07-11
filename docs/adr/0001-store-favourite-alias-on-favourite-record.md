@@ -37,6 +37,8 @@ user-authored text into official search, map, and detail surfaces.
   Stop name.
 - Use the Favourite Display Name on Favourite-specific surfaces: Favourites cards, collapsed
   Favourites headers, Nearby Favourites cards, and Manage Favourites.
+- In Manage Favourites, show the alias as the primary name and the canonical Bus Stop name as
+  caption-style supporting text. Show only the canonical name when no alias exists.
 - When an alias exists, show it as the expanded card's primary heading and show the canonical Bus
   Stop name beneath it using caption-style supporting text. Hide the canonical caption when the card
   is collapsed. Do not repeat the canonical name when no alias is present.

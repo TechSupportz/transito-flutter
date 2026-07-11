@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
@@ -22,6 +23,17 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
   bool isFabVisible = true;
   late Future<List<Favourite>> _futureFavouritesList;
   List<Favourite> reorderedFavouritesList = [];
+
+  Widget _buildReorderProxy(Widget child, int index, Animation<double> animation) {
+    return AnimatedBuilder(
+      animation: animation,
+      child: child,
+      builder: (context, child) => Transform.scale(
+        scale: 1 + (animation.value * 0.015),
+        child: child,
+      ),
+    );
+  }
 
   // function to route to edit favourites screen
   Future<void> goToEditFavouritesScreen(BuildContext context, Favourite favourite) async {
@@ -102,12 +114,15 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                     child: NotificationListener<UserScrollNotification>(
                       onNotification: (notification) => hideFabOnScroll(notification),
                       child: ReorderableListView.builder(
+                        proxyDecorator: _buildReorderProxy,
+                        onReorderStart: (int index) => HapticFeedback.selectionClick(),
                         itemBuilder: (context, index) {
                           return Padding(
                             key: Key(favouritesList[index].busStopCode),
                             padding: const EdgeInsets.only(bottom: 18),
                             child: FavouriteNameCard(
-                              busStopName: favouritesList[index].displayName,
+                              busStopName: favouritesList[index].busStopName,
+                              alias: favouritesList[index].alias,
                               onTap: () => goToEditFavouritesScreen(context, favouritesList[index]),
                             ),
                           );

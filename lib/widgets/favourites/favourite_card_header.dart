@@ -5,7 +5,7 @@ import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
 const double favouriteCardHeaderExtent = 56;
-const double favouriteCardHeaderWithAliasExtent = 66;
+const double favouriteCardHeaderWithAliasExtent = 76;
 
 double favouriteCardHeaderHeight({required bool hasAlias}) =>
     hasAlias ? favouriteCardHeaderWithAliasExtent : favouriteCardHeaderExtent;
@@ -31,7 +31,7 @@ class FavouriteCardHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String displayName = alias ?? busStopName;
-    final bool showBusStopName = isExpanded && alias != null;
+    final bool showBusStopName = alias != null;
 
     return SizedBox(
       height: favouriteCardHeaderHeight(hasAlias: alias != null),

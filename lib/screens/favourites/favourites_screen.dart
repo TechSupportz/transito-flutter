@@ -170,7 +170,7 @@ class _FavouriteCardsList extends StatefulWidget {
 
 class _FavouriteCardsListState extends State<_FavouriteCardsList> with TickerProviderStateMixin {
   static const double _cardSpacing = 16;
-  static const double _collapsedTimingBodyExtent = 6;
+  static const double _collapsedTimingBodyExtent = 8;
 
   final Map<String, _TimingRowCountCacheEntry> _timingRowCountCache = {};
   final Map<String, bool> _expandedByBusStopCode = {};
@@ -306,7 +306,8 @@ class _FavouriteCardsListState extends State<_FavouriteCardsList> with TickerPro
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemExtentBuilder: _itemExtent,
+      itemExtentBuilder: (int index, SliverLayoutDimensions dimensions) =>
+          _itemExtent(index, dimensions),
       findChildIndexCallback: _findChildIndex,
       itemBuilder: (context, int index) {
         final Favourite favourite = widget.favourites[index];
