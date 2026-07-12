@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
@@ -116,6 +117,12 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
 
   // a function that send the user to the bus timing screen
   void goToBusTimingScreen() {
+    final QuickStartTargetRegistry? tutorial = QuickStartTargetScope.maybeOf(context);
+    if (tutorial != null) {
+      tutorial.activate(QuickStartTarget.stopInfoReturn);
+      Navigator.of(context).pop();
+      return;
+    }
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -210,6 +217,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
         ],
       ),
       body: Stack(
+        key: QuickStartTargetScope.keyOf(context, QuickStartTarget.stopInfoPage),
         children: [
           SingleChildScrollView(
             padding: const EdgeInsets.only(bottom: 160, left: 12, right: 12, top: 16),
@@ -576,6 +584,7 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                 spacing: 8,
                 children: [
                   FilledButton(
+                    key: QuickStartTargetScope.keyOf(context, QuickStartTarget.stopInfoReturn),
                     onPressed: () => goToBusTimingScreen(),
                     child: const Text('View Bus Timings'),
                   ),

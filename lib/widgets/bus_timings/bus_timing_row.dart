@@ -18,12 +18,16 @@ class BusTimingRow extends StatefulWidget {
     required this.serviceInfo,
     required this.userLatLng,
     required this.isETAminutes,
+    this.serviceInfoKey,
+    this.onServiceInfoTap,
   });
 
   final String busStopCode;
   final ServiceInfo serviceInfo;
   final LatLng userLatLng; // user's current latitude and longitude
   final bool isETAminutes; // whether to display ETA in minutes or exact time
+  final Key? serviceInfoKey;
+  final VoidCallback? onServiceInfoTap;
 
   @override
   State<BusTimingRow> createState() => _BusTimingRowState();
@@ -75,6 +79,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
 
   Future<void> goToBusServiceInfoScreen() async {
     if (!context.mounted) return;
+    widget.onServiceInfoTap?.call();
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -84,6 +89,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
           destinationStopCode: widget.serviceInfo.nextBus.destinationCode,
           currentStopCode: widget.busStopCode,
         ),
+        settings: const RouteSettings(name: 'BusServiceInfoScreen'),
       ),
     );
   }
@@ -97,6 +103,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
         Expanded(
           flex: 3,
           child: InkWell(
+            key: widget.serviceInfoKey,
             borderRadius: BorderRadius.circular(8),
             onTap: goToBusServiceInfoScreen,
             child: Column(

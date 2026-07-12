@@ -12,8 +12,11 @@ class QuickStartTourOverlay extends StatefulWidget {
   State<QuickStartTourOverlay> createState() => _QuickStartTourOverlayState();
 }
 
-class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
+class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
+    with SingleTickerProviderStateMixin {
   Timer? _refreshTimer;
+  late final AnimationController _pagePulseController;
+  late final Animation<double> _pagePulseOpacity;
   Rect? _targetRect;
   Rect? _candidateRect;
   bool _revealingTarget = false;
@@ -27,10 +30,21 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
   @override
   void initState() {
     super.initState();
+    _pagePulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 650),
+    );
+    _pagePulseOpacity = TweenSequence<double>([
+      TweenSequenceItem<double>(tween: Tween<double>(begin: 0, end: 1), weight: 30),
+      TweenSequenceItem<double>(tween: Tween<double>(begin: 1, end: 0), weight: 70),
+    ]).animate(CurvedAnimation(parent: _pagePulseController, curve: Curves.easeOut));
     _observedStepIndex = widget.controller.stepIndex;
     _visibleStepIndex = _observedStepIndex;
     widget.controller.addListener(_handleControllerChanged);
-    _refreshTimer = Timer.periodic(const Duration(milliseconds: 100), (_) {
+    _refreshTimer = Timer.periodic(const Duration(milliseconds: 60), (_) {
+      if (widget.controller.step.highlightBehavior == QuickStartHighlightBehavior.pagePulse) {
+        return;
+      }
       if (_targetRect == null) {
         _revealAndRefresh();
       } else {
@@ -70,6 +84,10 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
   }
 
   Future<void> _revealAndRefresh() async {
+    if (widget.controller.step.highlightBehavior == QuickStartHighlightBehavior.pagePulse) {
+      _showPageStep();
+      return;
+    }
     if (_revealingTarget || !mounted) return;
     _revealingTarget = true;
     final BuildContext? targetContext = widget.controller.registry
@@ -80,7 +98,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
         targetContext,
         duration: MediaQuery.disableAnimationsOf(context)
             ? Duration.zero
-            : const Duration(milliseconds: 300),
+            : const Duration(milliseconds: 180),
         curve: Easing.emphasizedDecelerate,
         alignment: 0.35,
       );
@@ -93,13 +111,16 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
 
   void _refreshTarget() {
     if (!mounted) return;
+    if (widget.controller.step.highlightBehavior == QuickStartHighlightBehavior.pagePulse) {
+      return;
+    }
     final BuildContext? targetContext = widget.controller.registry
         .keyFor(widget.controller.step.target)
         .currentContext;
     final RenderObject? renderObject = targetContext?.findRenderObject();
     if (renderObject is! RenderBox || !renderObject.hasSize) {
       _missingTargetSamples++;
-      if (_missingTargetSamples >= 7 && _visibleStepIndex != _observedStepIndex) {
+      if (_missingTargetSamples >= 5 && _visibleStepIndex != _observedStepIndex) {
         setState(() => _visibleStepIndex = _observedStepIndex);
       }
       return;
@@ -114,7 +135,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
     }
 
     if (!_spotlightReady) {
-      if (_stableRectSamples < 2) return;
+      if (_stableRectSamples < 1) return;
       _showTarget(nextRect);
       return;
     }
@@ -142,6 +163,32 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
     });
   }
 
+  void _showPageStep() {
+    if (!mounted) return;
+    final Alignment nextAlignment = switch (widget.controller.step.coachPlacement) {
+      QuickStartCoachPlacement.top => Alignment.topCenter,
+      QuickStartCoachPlacement.bottom => Alignment.bottomCenter,
+      QuickStartCoachPlacement.automatic => Alignment.bottomCenter,
+    };
+    final bool waitForCoach =
+        _visibleStepIndex != _observedStepIndex &&
+        nextAlignment != _coachAlignment &&
+        !MediaQuery.disableAnimationsOf(context);
+
+    setState(() {
+      _targetRect = null;
+      _candidateRect = null;
+      _spotlightReady = true;
+      _coachAlignment = nextAlignment;
+      if (!waitForCoach) {
+        _visibleStepIndex = _observedStepIndex;
+      }
+    });
+    if (!MediaQuery.disableAnimationsOf(context)) {
+      _pagePulseController.forward(from: 0);
+    }
+  }
+
   void _handleCoachAlignmentEnd() {
     if (!mounted || _visibleStepIndex == _observedStepIndex) return;
     setState(() => _visibleStepIndex = _observedStepIndex);
@@ -155,6 +202,14 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
   }
 
   Alignment _alignmentFor(Rect target) {
+    switch (widget.controller.step.coachPlacement) {
+      case QuickStartCoachPlacement.top:
+        return Alignment.topCenter;
+      case QuickStartCoachPlacement.bottom:
+        return Alignment.bottomCenter;
+      case QuickStartCoachPlacement.automatic:
+        break;
+    }
     return target.center.dy > MediaQuery.sizeOf(context).height * 0.55
         ? Alignment.topCenter
         : Alignment.bottomCenter;
@@ -163,6 +218,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
   @override
   void dispose() {
     _refreshTimer?.cancel();
+    _pagePulseController.dispose();
     widget.controller.removeListener(_handleControllerChanged);
     super.dispose();
   }
@@ -174,16 +230,34 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
     final Rect? target = visibleTarget == null || visibleTarget.isEmpty
         ? null
         : visibleTarget.inflate(8).intersect(Offset.zero & size);
-    final bool spotlightHidden = !_spotlightReady || widget.controller.isSpotlightDismissed;
-    final Color scrim = Colors.black.withValues(alpha: 0.52);
     final QuickStartTourStep activeStep = widget.controller.step;
+    final bool usesSpotlight =
+        activeStep.highlightBehavior == QuickStartHighlightBehavior.spotlight;
+    final bool spotlightHidden =
+        !usesSpotlight || !_spotlightReady || widget.controller.isSpotlightDismissed;
+    final Color scrim = Colors.black.withValues(alpha: 0.52);
     final QuickStartTourStep visibleStep = QuickStartTourController.steps[_visibleStepIndex];
     final bool isCoachMoving = _visibleStepIndex != _observedStepIndex;
+    final bool targetIsVisible = _spotlightReady && target != null;
 
     return Material(
       type: MaterialType.transparency,
       child: Stack(
         children: [
+          if (activeStep.highlightBehavior == QuickStartHighlightBehavior.pagePulse)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: AnimatedBuilder(
+                  animation: _pagePulseOpacity,
+                  builder: (BuildContext context, Widget? child) => ColoredBox(
+                    key: const ValueKey<String>('quick-start-page-pulse'),
+                    color: Theme.of(context).colorScheme.primary.withValues(
+                      alpha: 0.14 * _pagePulseOpacity.value,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           Positioned.fill(
             child: IgnorePointer(
               ignoring: spotlightHidden,
@@ -191,7 +265,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
                 opacity: spotlightHidden ? 0 : 1,
                 duration: MediaQuery.disableAnimationsOf(context)
                     ? Duration.zero
-                    : const Duration(milliseconds: 160),
+                    : const Duration(milliseconds: 110),
                 curve: Easing.standard,
                 child: Stack(
                   children: [
@@ -293,7 +367,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
                     child: AnimatedSwitcher(
                       duration: MediaQuery.disableAnimationsOf(context)
                           ? Duration.zero
-                          : const Duration(milliseconds: 220),
+                          : const Duration(milliseconds: 120),
                       transitionBuilder: (Widget child, Animation<double> animation) =>
                           FadeTransition(opacity: animation, child: child),
                       child: Padding(
@@ -303,37 +377,62 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
                           mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(
-                              '${_visibleStepIndex + 1} of ${QuickStartTourController.steps.length}',
-                              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                                color: Theme.of(context).colorScheme.primary,
-                                fontWeight: FontWeight.w700,
+                            Semantics(
+                              label: 'Quick Start progress',
+                              value: '${(visibleStep.progress * 100).round()} percent',
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  key: const ValueKey<String>('quick-start-progress'),
+                                  value: visibleStep.progress,
+                                  minHeight: 6,
+                                ),
                               ),
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 12),
                             Text(visibleStep.title, style: Theme.of(context).textTheme.titleLarge),
                             const SizedBox(height: 6),
-                            Text(visibleStep.message, style: Theme.of(context).textTheme.bodyLarge),
+                            _QuickStartStepContent(step: visibleStep),
+                            if (widget.controller.primaryError case final String error) ...[
+                              const SizedBox(height: 8),
+                              Text(
+                                error,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                              ),
+                            ],
                             const SizedBox(height: 14),
                             Row(
                               children: [
                                 TextButton(
-                                  onPressed: widget.controller.onFinished,
-                                  child: const Text('Skip'),
+                                  onPressed: widget.controller.isPrimaryActionLoading
+                                      ? null
+                                      : widget.controller.onSecondaryPressed,
+                                  child: Text(visibleStep.secondaryLabel),
                                 ),
                                 const SizedBox(width: 8),
                                 Expanded(
                                   child: Align(
                                     alignment: Alignment.centerRight,
-                                    child: visibleStep.showPrimaryAction
+                                    child: widget.controller.showPrimaryAction
                                         ? FilledButton(
-                                            onPressed: widget.controller.next,
-                                            child: Text(visibleStep.primaryLabel),
+                                            onPressed: widget.controller.isPrimaryActionLoading
+                                                ? null
+                                                : widget.controller.onPrimaryPressed,
+                                            child: widget.controller.isPrimaryActionLoading
+                                                ? const SizedBox.square(
+                                                    dimension: 18,
+                                                    child: CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                                  )
+                                                : Text(widget.controller.primaryLabel),
                                           )
                                         : Text(
-                                            target == null
-                                                ? 'Waiting for this screen…'
-                                                : 'Tap the highlighted control',
+                                            widget.controller.targetInstruction(
+                                              targetIsVisible: targetIsVisible,
+                                            ),
                                             textAlign: TextAlign.end,
                                             style: Theme.of(context).textTheme.labelLarge?.copyWith(
                                               color: Theme.of(
@@ -356,6 +455,85 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _QuickStartStepContent extends StatelessWidget {
+  const _QuickStartStepContent({required this.step});
+
+  final QuickStartTourStep step;
+
+  @override
+  Widget build(BuildContext context) {
+    return switch (step.contentKind) {
+      QuickStartContentKind.text => Text(
+        step.message,
+        style: Theme.of(context).textTheme.bodyLarge,
+      ),
+      QuickStartContentKind.arrivalLegend => const _ArrivalLegend(),
+    };
+  }
+}
+
+class _ArrivalLegend extends StatelessWidget {
+  const _ArrivalLegend();
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color seatsAvailable = isDark ? const Color(0xFF96E2B6) : const Color(0xFF52AD7D);
+    final Color standingAvailable = isDark ? const Color(0xFFFFCEA6) : const Color(0xFFF5A650);
+    final Color limitedStanding = isDark ? const Color(0xFFFFAA8F) : const Color(0xFFF07251);
+    final TextStyle body = Theme.of(context).textTheme.bodyLarge ?? const TextStyle();
+
+    TextSpan legend(Color color, String label, String meaning) => TextSpan(
+      children: [
+        TextSpan(
+          text: label,
+          style: body.copyWith(color: color, fontWeight: FontWeight.w700),
+        ),
+        TextSpan(text: ' — $meaning\n', style: body),
+      ],
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text.rich(
+          TextSpan(
+            children: [
+              legend(seatsAvailable, 'Green', 'seats available'),
+              legend(standingAvailable, 'Amber', 'standing available'),
+              legend(limitedStanding, 'Red', 'limited standing'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text.rich(
+          TextSpan(
+            style: body,
+            children: [
+              const TextSpan(
+                text: 'Italic ETAs',
+                style: TextStyle(fontStyle: FontStyle.italic),
+              ),
+              const TextSpan(text: ' are schedule estimates. The accessibility icon marks '),
+              const TextSpan(
+                text: 'wheelchair-friendly',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+              const TextSpan(text: ' buses, and '),
+              const TextSpan(
+                text: 'Single / Double / Bendy',
+                style: TextStyle(fontWeight: FontWeight.w700),
+              ),
+              const TextSpan(text: ' identifies the bus type.'),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

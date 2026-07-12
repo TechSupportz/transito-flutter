@@ -231,11 +231,17 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
             );
           },
           child: SingleChildScrollView(
+            key: QuickStartTargetScope.keyOf(context, QuickStartTarget.nearbyOverview),
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
             child: ValueListenableBuilder<bool>(
               valueListenable: LocationService().automaticRequestsSuppressed,
               builder: (context, automaticRequestsSuppressed, child) {
                 if (automaticRequestsSuppressed) {
+                  QuickStartTargetScope.reportAvailability(
+                    context,
+                    QuickStartTarget.firstNearbyStop,
+                    false,
+                  );
                   return locationUnavailableMessage();
                 }
 
@@ -299,7 +305,6 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
 
   Column nearbyFavouritesList() {
     return Column(
-      key: QuickStartTargetScope.keyOf(context, QuickStartTarget.nearbyFavourites),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
@@ -431,6 +436,16 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                       BuildContext context,
                       AsyncSnapshot<List<NearbyBusStop>> nearbyBusStopList,
                     ) {
+                      final bool? hasNearbyStop = nearbyBusStopList.hasData
+                          ? nearbyBusStopList.data?.isNotEmpty
+                          : nearbyBusStopList.hasError
+                          ? false
+                          : null;
+                      QuickStartTargetScope.reportAvailability(
+                        context,
+                        QuickStartTarget.firstNearbyStop,
+                        hasNearbyStop,
+                      );
                       Widget busStopsResultsWidget = const SizedBox();
                       // display a loading indicator while the list of nearby bus stops is being fetched
                       if (nearbyBusStopList.hasData && nearbyBusStopList.data != null) {

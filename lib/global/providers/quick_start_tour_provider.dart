@@ -3,11 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 enum QuickStartTarget {
-  nearbyFavourites,
+  nearbyOverview,
   firstNearbyStop,
   firstTimingRow,
-  timingSort,
-  timingFavourite,
+  timingTools,
+  timingStopName,
+  stopInfoPage,
+  stopInfoReturn,
+  timingServiceNumber,
+  serviceInfoPage,
+  serviceInfoBack,
   nearbyTab,
   searchTab,
   searchField,
@@ -18,24 +23,63 @@ enum QuickStartTarget {
   settingsPreferences,
 }
 
+enum QuickStartPhase {
+  nearby,
+  pickStop,
+  readArrivals,
+  timingTools,
+  stopDetailsEntry,
+  stopDetailsOverview,
+  stopDetailsReturn,
+  serviceDetailsEntry,
+  serviceDetailsOverview,
+  serviceDetailsReturn,
+  searchTab,
+  searchField,
+  map,
+  mrtEntry,
+  mrtMap,
+  settingsNearbyTab,
+  settingsButton,
+  settingsPreferences,
+}
+
+enum QuickStartContentKind { text, arrivalLegend }
+
+enum QuickStartMissingTargetAction { none, openFallbackStop, continueTour }
+
+enum QuickStartHighlightBehavior { spotlight, pagePulse }
+
+enum QuickStartCoachPlacement { automatic, top, bottom }
+
 class QuickStartTargetRegistry extends ChangeNotifier {
   QuickStartTargetRegistry({required this.onTargetActivated});
 
   final ValueChanged<QuickStartTarget> onTargetActivated;
   QuickStartTarget? _activeTarget;
   QuickStartTarget? get activeTarget => _activeTarget;
+
   final Map<QuickStartTarget, GlobalKey> _keys = {
     for (final QuickStartTarget target in QuickStartTarget.values)
       target: GlobalKey(debugLabel: target.name),
   };
+  final Map<QuickStartTarget, bool?> _availability = {};
 
   GlobalKey keyFor(QuickStartTarget target) => _keys[target]!;
+
+  bool? availabilityFor(QuickStartTarget target) => _availability[target];
 
   void activate(QuickStartTarget target) => onTargetActivated(target);
 
   void setActiveTarget(QuickStartTarget target) {
     if (_activeTarget == target) return;
     _activeTarget = target;
+    notifyListeners();
+  }
+
+  void setTargetAvailability(QuickStartTarget target, bool? isAvailable) {
+    if (_availability[target] == isAvailable && _availability.containsKey(target)) return;
+    _availability[target] = isAvailable;
     notifyListeners();
   }
 }
@@ -61,157 +105,373 @@ class QuickStartTargetScope extends InheritedWidget {
     maybeOf(context)?.activate(target);
   }
 
+  static void reportAvailability(
+    BuildContext context,
+    QuickStartTarget target,
+    bool? isAvailable,
+  ) {
+    final QuickStartTargetRegistry? registry = maybeOf(context);
+    if (registry == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        registry.setTargetAvailability(target, isAvailable);
+      }
+    });
+  }
+
   @override
   bool updateShouldNotify(QuickStartTargetScope oldWidget) => registry != oldWidget.registry;
 }
 
 class QuickStartTourStep {
   const QuickStartTourStep({
+    required this.phase,
+    required this.visibleMoment,
     required this.target,
     required this.title,
     required this.message,
+    this.contentKind = QuickStartContentKind.text,
+    this.highlightBehavior = QuickStartHighlightBehavior.spotlight,
+    this.coachPlacement = QuickStartCoachPlacement.automatic,
     this.allowsInteraction = false,
     this.primaryLabel = 'Next',
+    this.secondaryLabel = 'Skip',
     this.showPrimaryAction = true,
     this.spotlightRadius = 14,
+    this.missingTargetAction = QuickStartMissingTargetAction.none,
+    this.missingTargetLabel,
+    this.passiveLabel,
   });
 
+  final QuickStartPhase phase;
+  final int visibleMoment;
   final QuickStartTarget target;
   final String title;
   final String message;
+  final QuickStartContentKind contentKind;
+  final QuickStartHighlightBehavior highlightBehavior;
+  final QuickStartCoachPlacement coachPlacement;
   final bool allowsInteraction;
   final String primaryLabel;
+  final String secondaryLabel;
   final bool showPrimaryAction;
   final double spotlightRadius;
+  final QuickStartMissingTargetAction missingTargetAction;
+  final String? missingTargetLabel;
+  final String? passiveLabel;
+
+  double get progress => (visibleMoment + 1) / QuickStartTourController.visibleMomentCount;
 }
 
 class QuickStartTourController extends ChangeNotifier {
-  QuickStartTourController({required this.navigatorKey, required this.onFinished}) {
-    registry = QuickStartTargetRegistry(onTargetActivated: _targetActivated);
+  QuickStartTourController({
+    required this.navigatorKey,
+    required this.onFinished,
+    this.onOpenFallbackStop,
+    QuickStartPhase initialPhase = QuickStartPhase.nearby,
+  }) {
+    registry = QuickStartTargetRegistry(onTargetActivated: _targetActivated)..addListener(_refresh);
+    _stepIndex = steps.indexWhere((QuickStartTourStep step) => step.phase == initialPhase);
+    if (_stepIndex < 0) {
+      _stepIndex = 0;
+    }
     registry.setActiveTarget(step.target);
   }
 
+  static const int visibleMomentCount = 10;
+
   final GlobalKey<NavigatorState> navigatorKey;
   final VoidCallback onFinished;
-  late QuickStartTargetRegistry registry;
+  final Future<void> Function()? onOpenFallbackStop;
+  late final QuickStartTargetRegistry registry;
   Timer? _pendingAdvance;
   QuickStartTarget? _dismissedTarget;
-
-  bool get isSpotlightDismissed => _dismissedTarget == step.target;
+  late int _stepIndex;
+  bool _isOpeningFallback = false;
+  bool _isCustomizing = false;
+  bool _isReturningToRoot = false;
+  String? _primaryError;
 
   static const List<QuickStartTourStep> steps = [
     QuickStartTourStep(
-      target: QuickStartTarget.nearbyFavourites,
-      title: 'Nearby favourites',
-      message: 'Favourites within 750 m appear here with live timings.',
+      phase: QuickStartPhase.nearby,
+      visibleMoment: 0,
+      target: QuickStartTarget.nearbyOverview,
+      title: 'Nearby',
+      message: 'Nearby favourites and bus stops are based on your current location.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.pickStop,
+      visibleMoment: 1,
       target: QuickStartTarget.firstNearbyStop,
-      title: 'Open a nearby stop',
+      title: 'Pick a stop',
       message: 'Tap a stop to view its live arrivals.',
       allowsInteraction: true,
       showPrimaryAction: false,
+      missingTargetAction: QuickStartMissingTargetAction.openFallbackStop,
+      missingTargetLabel: 'Open bus timing screen',
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.readArrivals,
+      visibleMoment: 2,
       target: QuickStartTarget.firstTimingRow,
-      title: 'Read bus arrivals',
-      message:
-          'Colour shows crowding. Icons and tags show wheelchair access and bus type. Italic times are schedule estimates. Tap a service number for its route.',
+      title: 'Read arrivals',
+      message: 'Arrival colours and labels explain what is coming next.',
+      contentKind: QuickStartContentKind.arrivalLegend,
     ),
     QuickStartTourStep(
-      target: QuickStartTarget.timingSort,
-      title: 'Sort arrivals',
-      message: 'Tap to sort by service number or next arrival.',
+      phase: QuickStartPhase.timingTools,
+      visibleMoment: 3,
+      target: QuickStartTarget.timingTools,
+      title: 'Timing tools',
+      message: 'Try sorting by service or arrival time. The heart manages this stop in Favourites.',
       allowsInteraction: true,
-      spotlightRadius: 999,
+      spotlightRadius: 12,
     ),
     QuickStartTourStep(
-      target: QuickStartTarget.timingFavourite,
-      title: 'Save a bus stop',
-      message: 'Use the heart to add this stop to Favourites. Nothing will change during the tour.',
-      primaryLabel: 'Continue to Search',
-      spotlightRadius: 999,
+      phase: QuickStartPhase.stopDetailsEntry,
+      visibleMoment: 4,
+      target: QuickStartTarget.timingStopName,
+      title: 'Stop details',
+      message: 'Tap the stop name to see its address, services, and location details.',
+      allowsInteraction: true,
+      showPrimaryAction: false,
+      spotlightRadius: 10,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.stopDetailsOverview,
+      visibleMoment: 4,
+      target: QuickStartTarget.stopInfoPage,
+      title: 'Stop details',
+      message: 'This page brings the stop address, operating services, map, and timings together.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
+      primaryLabel: 'Continue',
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.stopDetailsReturn,
+      visibleMoment: 4,
+      target: QuickStartTarget.stopInfoReturn,
+      title: 'Stop details',
+      message: 'This page keeps useful stop information together. Return to live timings.',
+      allowsInteraction: true,
+      showPrimaryAction: false,
+      spotlightRadius: 12,
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.serviceDetailsEntry,
+      visibleMoment: 5,
+      target: QuickStartTarget.timingServiceNumber,
+      title: 'Service details',
+      message: 'Tap a service number to inspect its route and stops.',
+      allowsInteraction: true,
+      showPrimaryAction: false,
+      missingTargetAction: QuickStartMissingTargetAction.continueTour,
+      missingTargetLabel: 'Continue to Search',
+      spotlightRadius: 10,
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.serviceDetailsOverview,
+      visibleMoment: 5,
+      target: QuickStartTarget.serviceInfoPage,
+      title: 'Service details',
+      message: 'This page shows the service route, direction, interchanges, and every stop.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
+      showPrimaryAction: false,
+      passiveLabel: 'Route controls appear shortly…',
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.serviceDetailsReturn,
+      visibleMoment: 5,
+      target: QuickStartTarget.serviceInfoBack,
+      title: 'Service details',
+      message: 'Service information shows the full route. Go back when you are ready.',
+      allowsInteraction: true,
+      showPrimaryAction: false,
+      spotlightRadius: 12,
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.searchTab,
+      visibleMoment: 6,
       target: QuickStartTarget.searchTab,
-      title: 'Go to Search',
-      message: 'Tap Search.',
+      title: 'Search',
+      message: 'Tap Search to find a bus stop, road, or place.',
       allowsInteraction: true,
       showPrimaryAction: false,
-      spotlightRadius: 999,
+      spotlightRadius: 12,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.searchField,
+      visibleMoment: 6,
       target: QuickStartTarget.searchField,
-      title: 'Search the map',
-      message: 'Find a bus stop, road, or place.',
-      spotlightRadius: 999,
+      title: 'Search',
+      message: 'Use this field whenever you need to look beyond your current location.',
+      spotlightRadius: 12,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.map,
+      visibleMoment: 7,
       target: QuickStartTarget.searchMap,
-      title: 'Explore the map',
+      title: 'Map',
       message: 'Drag to pan. Pinch to zoom or rotate. Tap the compass to reset north.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
       allowsInteraction: true,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.mrtEntry,
+      visibleMoment: 8,
       target: QuickStartTarget.mrtMapButton,
-      title: 'Open the MRT map',
-      message: 'Tap MRT Map.',
+      title: 'MRT map',
+      message: 'Tap MRT Map for a network-wide rail reference.',
       allowsInteraction: true,
       showPrimaryAction: false,
-      spotlightRadius: 999,
+      spotlightRadius: 12,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.mrtMap,
+      visibleMoment: 8,
       target: QuickStartTarget.mrtMap,
-      title: 'Explore the MRT map',
-      message: 'Drag to pan and pinch to zoom.',
+      title: 'MRT map',
+      message: 'Drag to pan and pinch to zoom around the rail map.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
       allowsInteraction: true,
       primaryLabel: 'Continue',
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.settingsNearbyTab,
+      visibleMoment: 9,
       target: QuickStartTarget.nearbyTab,
-      title: 'Return to Nearby',
-      message: 'Tap Nearby.',
+      title: 'Make it yours',
+      message: 'Return to Nearby to open your app settings.',
       allowsInteraction: true,
       showPrimaryAction: false,
-      spotlightRadius: 999,
+      spotlightRadius: 12,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.settingsButton,
+      visibleMoment: 9,
       target: QuickStartTarget.settingsButton,
-      title: 'Open Settings',
-      message: 'Tap Settings in the top-right corner.',
+      title: 'Make it yours',
+      message: 'Open Settings to choose your defaults.',
       allowsInteraction: true,
       showPrimaryAction: false,
-      spotlightRadius: 999,
+      spotlightRadius: 12,
     ),
     QuickStartTourStep(
+      phase: QuickStartPhase.settingsPreferences,
+      visibleMoment: 9,
       target: QuickStartTarget.settingsPreferences,
-      title: 'Choose your defaults',
-      message:
-          'Change timing format, Nearby layout, theme, colours, and favourite-card behaviour here.',
-      primaryLabel: 'Finish',
+      title: 'Make it yours',
+      message: 'Change timing format, Nearby layout, theme, colours, and card behaviour here.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
+      primaryLabel: 'Customize',
+      secondaryLabel: 'Back to Nearby',
     ),
   ];
 
-  int _stepIndex = 0;
   int get stepIndex => _stepIndex;
   QuickStartTourStep get step => steps[_stepIndex];
+  bool get isSpotlightDismissed => _dismissedTarget == step.target;
+  bool get isOverlayVisible => !_isCustomizing;
+  bool get isPrimaryActionLoading => _isOpeningFallback;
+  String? get primaryError => _primaryError;
+
+  bool get isCurrentTargetUnavailable => registry.availabilityFor(step.target) == false;
+
+  bool get showPrimaryAction {
+    return step.showPrimaryAction ||
+        (isCurrentTargetUnavailable &&
+            step.missingTargetAction != QuickStartMissingTargetAction.none);
+  }
+
+  String get primaryLabel {
+    if (isCurrentTargetUnavailable && step.missingTargetLabel != null) {
+      return step.missingTargetLabel!;
+    }
+    return step.primaryLabel;
+  }
+
+  String targetInstruction({required bool targetIsVisible}) {
+    if (step.highlightBehavior == QuickStartHighlightBehavior.pagePulse) {
+      return step.passiveLabel ?? 'Take a look around';
+    }
+    if (step.phase == QuickStartPhase.pickStop &&
+        registry.availabilityFor(QuickStartTarget.firstNearbyStop) == null) {
+      return 'Finding nearby stops…';
+    }
+    if (!targetIsVisible) {
+      return 'Waiting for this screen…';
+    }
+    return 'Tap the highlighted control';
+  }
+
+  Future<void> onPrimaryPressed() async {
+    _primaryError = null;
+    if (isCurrentTargetUnavailable) {
+      switch (step.missingTargetAction) {
+        case QuickStartMissingTargetAction.openFallbackStop:
+          await _openFallbackStop();
+          return;
+        case QuickStartMissingTargetAction.continueTour:
+          _returnToRootAndSetPhase(QuickStartPhase.searchTab);
+          return;
+        case QuickStartMissingTargetAction.none:
+          break;
+      }
+    }
+    next();
+  }
+
+  void onSecondaryPressed() => onFinished();
 
   void next() {
-    if (_stepIndex == 4) {
-      navigatorKey.currentState?.popUntil((Route<dynamic> route) => route.isFirst);
-      _setStep(5);
-      return;
+    switch (step.phase) {
+      case QuickStartPhase.mrtMap:
+        _returnToRootAndSetPhase(QuickStartPhase.settingsNearbyTab);
+        return;
+      case QuickStartPhase.settingsPreferences:
+        _isCustomizing = true;
+        _dismissCurrentSpotlight();
+        notifyListeners();
+        return;
+      default:
+        if (_stepIndex == steps.length - 1) {
+          onFinished();
+          return;
+        }
+        _setStep(_stepIndex + 1);
     }
-    if (_stepIndex == 9) {
-      navigatorKey.currentState?.popUntil((Route<dynamic> route) => route.isFirst);
-      _setStep(10);
-      return;
+  }
+
+  Future<void> _openFallbackStop() async {
+    final Future<void> Function()? callback = onOpenFallbackStop;
+    if (callback == null || _isOpeningFallback) return;
+    _isOpeningFallback = true;
+    notifyListeners();
+    try {
+      await callback();
+    } catch (error) {
+      _primaryError = 'Could not open the fallback stop. Try again.';
+      debugPrint('Failed to open Quick Start fallback stop: $error');
+    } finally {
+      _isOpeningFallback = false;
+      notifyListeners();
     }
-    if (_stepIndex == steps.length - 1) {
-      onFinished();
-      return;
+  }
+
+  void _refresh() => notifyListeners();
+
+  void _setPhase(QuickStartPhase phase) {
+    final int index = steps.indexWhere((QuickStartTourStep step) => step.phase == phase);
+    if (index >= 0) {
+      _setStep(index);
     }
-    _setStep(_stepIndex + 1);
   }
 
   void _setStep(int index) {
@@ -219,6 +479,7 @@ class QuickStartTourController extends ChangeNotifier {
     _pendingAdvance?.cancel();
     _stepIndex = index;
     _dismissedTarget = null;
+    _primaryError = null;
     registry.setActiveTarget(step.target);
     notifyListeners();
   }
@@ -229,10 +490,33 @@ class QuickStartTourController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _dismissAndScheduleStep(int index) {
+  void _dismissAndSchedulePhase(QuickStartPhase phase) {
     _dismissCurrentSpotlight();
     _pendingAdvance?.cancel();
-    _pendingAdvance = Timer(const Duration(milliseconds: 180), () => _setStep(index));
+    _pendingAdvance = Timer(const Duration(milliseconds: 80), () => _setPhase(phase));
+  }
+
+  void _showServiceDetailsOverview() {
+    _dismissCurrentSpotlight();
+    _pendingAdvance?.cancel();
+    _pendingAdvance = Timer(const Duration(milliseconds: 80), () {
+      _setPhase(QuickStartPhase.serviceDetailsOverview);
+      _pendingAdvance = Timer(
+        const Duration(seconds: 3),
+        () => _setPhase(QuickStartPhase.serviceDetailsReturn),
+      );
+    });
+  }
+
+  void _returnToRootAndSetPhase(QuickStartPhase phase) {
+    _dismissCurrentSpotlight();
+    _pendingAdvance?.cancel();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _isReturningToRoot = true;
+      navigatorKey.currentState?.popUntil((Route<dynamic> route) => route.isFirst);
+      _isReturningToRoot = false;
+      _setPhase(phase);
+    });
   }
 
   void _targetActivated(QuickStartTarget target) {
@@ -240,27 +524,59 @@ class QuickStartTourController extends ChangeNotifier {
     if (step.allowsInteraction) {
       _dismissCurrentSpotlight();
     }
-    if (target == QuickStartTarget.searchTab) {
-      _dismissAndScheduleStep(6);
-    } else if (target == QuickStartTarget.nearbyTab) {
-      _dismissAndScheduleStep(11);
+    switch (target) {
+      case QuickStartTarget.searchTab:
+        _dismissAndSchedulePhase(QuickStartPhase.searchField);
+      case QuickStartTarget.nearbyTab:
+        _dismissAndSchedulePhase(QuickStartPhase.settingsButton);
+      default:
+        break;
     }
   }
 
   void routePushed(String? routeName) {
-    if (routeName == 'BusTimingScreen' && _stepIndex == 1) {
-      _dismissAndScheduleStep(2);
-    } else if (routeName == 'MrtMapScreen' && _stepIndex == 8) {
-      _dismissAndScheduleStep(9);
-    } else if (routeName == 'SettingsScreen' && _stepIndex == 11) {
-      _dismissAndScheduleStep(12);
+    switch ((routeName, step.phase)) {
+      case ('BusTimingScreen', QuickStartPhase.pickStop):
+        _dismissAndSchedulePhase(QuickStartPhase.readArrivals);
+      case ('BusStopInfoScreen', QuickStartPhase.stopDetailsEntry):
+        _dismissAndSchedulePhase(QuickStartPhase.stopDetailsOverview);
+      case ('BusServiceInfoScreen', QuickStartPhase.serviceDetailsEntry):
+        _showServiceDetailsOverview();
+      case ('MrtMapScreen', QuickStartPhase.mrtEntry):
+        _dismissAndSchedulePhase(QuickStartPhase.mrtMap);
+      case ('SettingsScreen', QuickStartPhase.settingsButton):
+        _dismissAndSchedulePhase(QuickStartPhase.settingsPreferences);
+      default:
+        break;
+    }
+  }
+
+  void routePopped(String? routeName) {
+    if (_isReturningToRoot) return;
+    switch (routeName) {
+      case 'BusStopInfoScreen'
+          when step.phase == QuickStartPhase.stopDetailsOverview ||
+              step.phase == QuickStartPhase.stopDetailsReturn:
+        _dismissAndSchedulePhase(QuickStartPhase.serviceDetailsEntry);
+      case 'BusServiceInfoScreen'
+          when step.phase == QuickStartPhase.serviceDetailsOverview ||
+              step.phase == QuickStartPhase.serviceDetailsReturn:
+        _returnToRootAndSetPhase(QuickStartPhase.searchTab);
+      case 'SettingsScreen' when _isCustomizing:
+        onFinished();
+      case 'SettingsScreen' when step.phase == QuickStartPhase.settingsPreferences:
+        _dismissAndSchedulePhase(QuickStartPhase.settingsButton);
+      default:
+        break;
     }
   }
 
   @override
   void dispose() {
     _pendingAdvance?.cancel();
-    registry.dispose();
+    registry
+      ..removeListener(_refresh)
+      ..dispose();
     super.dispose();
   }
 }
@@ -275,6 +591,14 @@ class QuickStartTourNavigatorObserver extends NavigatorObserver {
     super.didPush(route, previousRoute);
     WidgetsBinding.instance.addPostFrameCallback(
       (_) => controller.routePushed(route.settings.name),
+    );
+  }
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
+    super.didPop(route, previousRoute);
+    WidgetsBinding.instance.addPostFrameCallback(
+      (_) => controller.routePopped(route.settings.name),
     );
   }
 }

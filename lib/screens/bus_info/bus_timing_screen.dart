@@ -249,56 +249,76 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
+    final QuickStartTargetRegistry? tutorial = QuickStartTargetScope.maybeOf(context);
+
+    Widget favouriteButton() => isAddedToFavourites
+        ? IconButton(
+            icon: const AppSymbol(Symbols.favorite_rounded, fill: true, grade: 100),
+            onPressed: () => goToEditFavouritesScreen(context),
+          )
+        : IconButton(
+            icon: const AppSymbol(Symbols.favorite_rounded, grade: 100),
+            onPressed: () => goToAddFavouritesScreen(context),
+          );
+
+    final Widget guardedFavouriteButton = tutorial == null
+        ? favouriteButton()
+        : AnimatedBuilder(
+            animation: tutorial,
+            child: favouriteButton(),
+            builder: (BuildContext context, Widget? child) => AbsorbPointer(
+              absorbing: tutorial.activeTarget == QuickStartTarget.timingTools,
+              child: child,
+            ),
+          );
 
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(
-          onTap: () => goToBusStopInfoScreen(context),
+          key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingStopName),
+          onTap: () {
+            QuickStartTargetScope.activate(context, QuickStartTarget.timingStopName);
+            goToBusStopInfoScreen(context);
+          },
           child: Text(widget.name),
         ),
         actions: [
-          IconButton(
-            key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingSort),
-            icon: Row(
-              children: [
-                const AppSymbol(
-                  Symbols.arrow_downward_rounded,
-                  weight: 500,
+          Row(
+            key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingTools),
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: Row(
+                  children: [
+                    const AppSymbol(
+                      Symbols.arrow_downward_rounded,
+                      weight: 500,
+                    ),
+                    sortByArrivalTime
+                        ? const AppSymbol(
+                            Symbols.onetwothree_rounded,
+                            size: 32,
+                            grade: 100,
+                            weight: 500,
+                          )
+                        : const AppSymbol(
+                            Symbols.access_time_rounded,
+                          ),
+                  ],
                 ),
-                sortByArrivalTime
-                    ? const AppSymbol(
-                        Symbols.onetwothree_rounded,
-                        size: 32,
-                        grade: 100,
-                        weight: 500,
-                      )
-                    : const AppSymbol(
-                        Symbols.access_time_rounded,
-                      ),
-              ],
-            ),
-            onPressed: () {
-              QuickStartTargetScope.activate(context, QuickStartTarget.timingSort);
-              setState(() {
-                sortByArrivalTime = !sortByArrivalTime;
-                futureBusArrivalInfo = fetchArrivalTimings().then(
-                  (value) => sortBusArrivalInfo(value),
-                );
-              });
-            },
+                onPressed: () {
+                  QuickStartTargetScope.activate(context, QuickStartTarget.timingTools);
+                  setState(() {
+                    sortByArrivalTime = !sortByArrivalTime;
+                    futureBusArrivalInfo = fetchArrivalTimings().then(
+                      (value) => sortBusArrivalInfo(value),
+                    );
+                  });
+                },
+              ),
+              guardedFavouriteButton,
+            ],
           ),
-          // display different IconButtons depending on whether the bus stop is a favourite or not
-          isAddedToFavourites
-              ? IconButton(
-                  key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingFavourite),
-                  icon: const AppSymbol(Symbols.favorite_rounded, fill: true, grade: 100),
-                  onPressed: () => goToEditFavouritesScreen(context),
-                )
-              : IconButton(
-                  key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingFavourite),
-                  icon: const AppSymbol(Symbols.favorite_rounded, grade: 100),
-                  onPressed: () => goToAddFavouritesScreen(context),
-                ),
           IconButton(
             icon: const AppSymbol(
               Symbols.help_rounded,
@@ -315,6 +335,16 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
             return FutureBuilder(
               future: futureBusArrivalInfo,
               builder: (BuildContext context, AsyncSnapshot<BusArrivalInfo> busArrivalInfoSnapshot) {
+                final bool? hasOperatingService = busArrivalInfoSnapshot.hasData
+                    ? busArrivalInfoSnapshot.data?.services.isNotEmpty
+                    : busArrivalInfoSnapshot.hasError
+                    ? false
+                    : null;
+                QuickStartTargetScope.reportAvailability(
+                  context,
+                  QuickStartTarget.timingServiceNumber,
+                  hasOperatingService,
+                );
                 Widget arrivalInfoResults = Container();
 
                 // check if the snapshot has data, if not then display a loading indicator
@@ -371,6 +401,18 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                           serviceInfo: busArrivalInfoSnapshot.data!.services[index],
                                           userLatLng: widget.busStopLocation,
                                           isETAminutes: userSettings.isETAminutes,
+                                          serviceInfoKey: index == 0
+                                              ? QuickStartTargetScope.keyOf(
+                                                  context,
+                                                  QuickStartTarget.timingServiceNumber,
+                                                )
+                                              : null,
+                                          onServiceInfoTap: index == 0
+                                              ? () => QuickStartTargetScope.activate(
+                                                  context,
+                                                  QuickStartTarget.timingServiceNumber,
+                                                )
+                                              : null,
                                         ),
                                       ),
                                     );

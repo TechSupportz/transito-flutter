@@ -5,6 +5,7 @@ import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:measure_size/measure_size.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
@@ -101,9 +102,17 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
+        leading: BackButton(
+          key: QuickStartTargetScope.keyOf(context, QuickStartTarget.serviceInfoBack),
+          onPressed: () {
+            QuickStartTargetScope.activate(context, QuickStartTarget.serviceInfoBack);
+            Navigator.of(context).maybePop();
+          },
+        ),
         title: const Text('Bus Service Information'),
       ),
       body: Padding(
+        key: QuickStartTargetScope.keyOf(context, QuickStartTarget.serviceInfoPage),
         padding: const EdgeInsets.only(top: 12.0, left: 12, right: 12),
         child: FutureBuilder(
           future: futureBusServiceInfo,
