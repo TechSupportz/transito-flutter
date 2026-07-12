@@ -154,6 +154,7 @@ lib/
     ├── common/              # Shared widgets (AppSymbol, etc.)
     ├── favourites/
     ├── liquid_glass/        # iOS-specific glass effects
+    ├── onboarding/          # Onboarding overlays and widget previews
     ├── search/
     └── settings/
 ```

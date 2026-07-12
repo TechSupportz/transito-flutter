@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:transito/screens/onboarding/quick_start_tour.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 
 class MrtMapScreen extends StatelessWidget {
   const MrtMapScreen({super.key});
@@ -13,6 +13,7 @@ class MrtMapScreen extends StatelessWidget {
       // displays a zoomable mrt map (yes that's literally the only thing this whole screen does)
       body: PhotoView(
         key: QuickStartTargetScope.keyOf(context, QuickStartTarget.mrtMap),
+        onTapDown: (_, _, _) => QuickStartTargetScope.activate(context, QuickStartTarget.mrtMap),
         maxScale: PhotoViewComputedScale.contained * 7.5,
         minScale: PhotoViewComputedScale.contained,
         initialScale: PhotoViewComputedScale.covered,

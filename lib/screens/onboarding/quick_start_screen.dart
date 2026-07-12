@@ -1,12 +1,11 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
-import 'package:transito/screens/main/settings_screen.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/screens/navigator_screen.dart';
-import 'package:transito/screens/onboarding/quick_start_tour.dart';
+import 'package:transito/widgets/onboarding/quick_start_tour_overlay.dart';
 
 class QuickStartScreen extends StatefulWidget {
-  const QuickStartScreen({super.key, this.returnToSettings = false});
-
-  final bool returnToSettings;
+  const QuickStartScreen({super.key});
 
   @override
   State<QuickStartScreen> createState() => _QuickStartScreenState();
@@ -24,15 +23,28 @@ class _QuickStartScreenState extends State<QuickStartScreen> {
 
   void _finish() {
     final NavigatorState navigator = Navigator.of(context);
-    if (widget.returnToSettings) {
-      navigator.pop();
-      return;
-    }
-
     navigator.pushAndRemoveUntil(
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) => const _TutorialHome(),
+      PageRouteBuilder<void>(
         settings: const RouteSettings(name: 'NavigatorScreen'),
+        transitionDuration: const Duration(milliseconds: 300),
+        reverseTransitionDuration: const Duration(milliseconds: 300),
+        pageBuilder:
+            (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+            ) => const NavigatorScreen(),
+        transitionsBuilder:
+            (
+              BuildContext context,
+              Animation<double> animation,
+              Animation<double> secondaryAnimation,
+              Widget child,
+            ) => FadeThroughTransition(
+              animation: animation,
+              secondaryAnimation: secondaryAnimation,
+              child: child,
+            ),
       ),
       (Route<dynamic> route) => false,
     );
@@ -63,30 +75,4 @@ class _QuickStartScreenState extends State<QuickStartScreen> {
       ),
     );
   }
-}
-
-class _TutorialHome extends StatefulWidget {
-  const _TutorialHome();
-
-  @override
-  State<_TutorialHome> createState() => _TutorialHomeState();
-}
-
-class _TutorialHomeState extends State<_TutorialHome> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          builder: (BuildContext context) => const SettingsScreen(),
-          settings: const RouteSettings(name: 'SettingsScreen'),
-        ),
-      );
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) => const NavigatorScreen();
 }

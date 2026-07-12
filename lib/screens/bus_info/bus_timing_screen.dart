@@ -22,7 +22,7 @@ import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
-import 'package:transito/screens/onboarding/quick_start_tour.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
 import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
@@ -278,6 +278,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
               ],
             ),
             onPressed: () {
+              QuickStartTargetScope.activate(context, QuickStartTarget.timingSort);
               setState(() {
                 sortByArrivalTime = !sortByArrivalTime;
                 futureBusArrivalInfo = fetchArrivalTimings().then(

@@ -9,7 +9,7 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
-import 'package:transito/screens/onboarding/quick_start_tour.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:transito/widgets/common/app_symbol.dart';

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widget_previews.dart';
-import 'package:transito/screens/onboarding/quick_start_tour.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
+import 'package:transito/widgets/onboarding/quick_start_tour_overlay.dart';
 
 @Preview(name: 'Quick start coachmark', group: 'Onboarding', size: Size(430, 900))
 Widget quickStartCoachmarkPreview() => const MaterialApp(home: _QuickStartOverlayPreview());

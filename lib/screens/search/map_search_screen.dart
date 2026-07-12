@@ -25,7 +25,7 @@ import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
-import 'package:transito/screens/onboarding/quick_start_tour.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -354,6 +354,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                   key: QuickStartTargetScope.keyOf(context, QuickStartTarget.searchMap),
                   mapController: _animatedMapController.mapController,
                   options: MapOptions(
+                    onPointerDown: (_, _) => QuickStartTargetScope.activate(
+                      context,
+                      QuickStartTarget.searchMap,
+                    ),
                     initialCenter: LatLng(
                       initialCameraCenter.latitude,
                       initialCameraCenter.longitude,
@@ -404,10 +408,15 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                             spiderfyCluster: false,
                             zoomToBoundsOnClick: false,
                             centerMarkerOnClick: false,
-                            animationsOptions: AnimationsOptions(zoom: Duration(milliseconds: 250)),
+                            animationsOptions: AnimationsOptions(
+                              zoom: Duration(milliseconds: 250),
+                            ),
                             onClusterTap: (p0) {
                               _animatedMapController.animateTo(
-                                dest: LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
+                                dest: LatLng(
+                                  p0.bounds.center.latitude,
+                                  p0.bounds.center.longitude,
+                                ),
                                 zoom: 17,
                               );
                             },
@@ -446,10 +455,15 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                             spiderfyCluster: false,
                             zoomToBoundsOnClick: false,
                             centerMarkerOnClick: false,
-                            animationsOptions: AnimationsOptions(zoom: Duration(milliseconds: 250)),
+                            animationsOptions: AnimationsOptions(
+                              zoom: Duration(milliseconds: 250),
+                            ),
                             onClusterTap: (p0) {
                               _animatedMapController.animateTo(
-                                dest: LatLng(p0.bounds.center.latitude, p0.bounds.center.longitude),
+                                dest: LatLng(
+                                  p0.bounds.center.latitude,
+                                  p0.bounds.center.longitude,
+                                ),
                                 zoom: 17,
                               );
                             },
@@ -665,13 +679,19 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                 ),
                                 elevation: WidgetStateProperty.all(3),
                               ),
-                              onPressed: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const MrtMapScreen(),
-                                  settings: const RouteSettings(name: 'MrtMapScreen'),
-                                ),
-                              ),
+                              onPressed: () {
+                                QuickStartTargetScope.activate(
+                                  context,
+                                  QuickStartTarget.mrtMapButton,
+                                );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const MrtMapScreen(),
+                                    settings: const RouteSettings(name: 'MrtMapScreen'),
+                                  ),
+                                );
+                              },
                               icon: const AppSymbol(Symbols.map_rounded, fill: true),
                               label: const Text('MRT Map'),
                             ),
