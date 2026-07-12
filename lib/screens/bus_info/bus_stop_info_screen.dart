@@ -222,10 +222,9 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
+                        Column(
                           textBaseline: TextBaseline.alphabetic,
-                          crossAxisAlignment: .baseline,
-                          spacing: 8,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
                           children: [
                             Text(
                               widget.name,
@@ -235,20 +234,23 @@ class _BusStopInfoScreenState extends State<BusStopInfoScreen> {
                               style: AppTypography.screenHeading,
                             ),
                             if (favourite?.alias case final String alias) ...[
-                              Text(
-                                alias,
-                                overflow: TextOverflow.fade,
-                                maxLines: 1,
-                                softWrap: false,
-                                style: AppTypography.caption.copyWith(
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              Transform.translate(
+                                offset: const Offset(0, -4),
+                                child: Text(
+                                  alias,
+                                  overflow: TextOverflow.fade,
+                                  maxLines: 1,
+                                  softWrap: false,
+                                  style: AppTypography.cardSubtitle.copyWith(
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                  ),
                                 ),
                               ),
                             ],
                           ],
                         ),
                         const SizedBox(
-                          height: 4,
+                          height: 6,
                         ),
                         Row(
                           spacing: 8,
