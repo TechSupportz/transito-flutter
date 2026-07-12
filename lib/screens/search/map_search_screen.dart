@@ -25,6 +25,7 @@ import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_tour.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/search/search_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -350,6 +351,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                 )
               else
                 FlutterMap(
+                  key: QuickStartTargetScope.keyOf(context, QuickStartTarget.searchMap),
                   mapController: _animatedMapController.mapController,
                   options: MapOptions(
                     initialCenter: LatLng(
@@ -531,6 +533,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         GestureDetector(
+                          key: QuickStartTargetScope.keyOf(
+                            context,
+                            QuickStartTarget.searchField,
+                          ),
                           onTap: () {
                             showDialog(
                               context: context,
@@ -648,6 +654,10 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             FilledButton.tonalIcon(
+                              key: QuickStartTargetScope.keyOf(
+                                context,
+                                QuickStartTarget.mrtMapButton,
+                              ),
                               style: ButtonStyle(
                                 backgroundColor: WidgetStateProperty.all(appColors.scheme.primary),
                                 foregroundColor: WidgetStateProperty.all(

@@ -9,6 +9,7 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/screens/favourites/favourites_screen.dart';
 import 'package:transito/screens/main/mrt_map_screen.dart';
 import 'package:transito/screens/main/nearby_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_tour.dart';
 import 'package:transito/screens/search/map_search_screen.dart';
 import 'package:transito/widgets/common/animated_index_stack.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
@@ -77,6 +78,13 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
     for (int page = 0; page < _pageActivity.length; page++) {
       _pageActivity[page].value = page == index;
     }
+
+    final QuickStartTargetRegistry? tutorial = QuickStartTargetScope.maybeOf(context);
+    if (index == 0) {
+      tutorial?.activate(QuickStartTarget.nearbyTab);
+    } else if (index == 2) {
+      tutorial?.activate(QuickStartTarget.searchTab);
+    }
   }
 
   List<Widget> get _mountedPages => List<Widget>.generate(
@@ -102,6 +110,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       shadowColor: Theme.of(context).colorScheme.shadow,
       destinations: <NavigationDestination>[
         NavigationDestination(
+          key: Platform.isIOS
+              ? null
+              : QuickStartTargetScope.keyOf(context, QuickStartTarget.nearbyTab),
           icon: AppSymbol(Symbols.explore_rounded, fill: true),
           label: "Nearby",
         ),
@@ -110,6 +121,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           label: "Favourites",
         ),
         NavigationDestination(
+          key: Platform.isIOS
+              ? null
+              : QuickStartTargetScope.keyOf(context, QuickStartTarget.searchTab),
           icon: GestureDetector(
             child: AppSymbol(Symbols.map_search_rounded, fill: true),
             onTap: () => _selectPage(2),
@@ -130,7 +144,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
       onDestinationSelected: _selectPage,
     );
 
-    var nativeGlassNavBar = NativeGlassNavBar(
+    final QuickStartTargetRegistry? tutorial = QuickStartTargetScope.maybeOf(context);
+    Widget buildNativeGlassNavBar([Key? key]) => NativeGlassNavBar(
+      key: key,
       tabs: [
         NativeGlassNavBarItem(label: 'Nearby', symbol: 'safari.fill'),
         NativeGlassNavBarItem(label: 'Favourites', symbol: 'heart.fill'),
@@ -167,6 +183,20 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           materialNavigationBar, // Fallback to material nav bar if liquid glass is not supported
       onTap: _selectPage,
     );
+
+    final Widget nativeGlassNavBar = tutorial == null
+        ? buildNativeGlassNavBar()
+        : AnimatedBuilder(
+            animation: tutorial,
+            builder: (BuildContext context, Widget? child) {
+              final Key? key = switch (tutorial.activeTarget) {
+                QuickStartTarget.nearbyTab => tutorial.keyFor(QuickStartTarget.nearbyTab),
+                QuickStartTarget.searchTab => tutorial.keyFor(QuickStartTarget.searchTab),
+                _ => null,
+              };
+              return buildNativeGlassNavBar(key);
+            },
+          );
 
     return Scaffold(
       extendBody: supportsLiquidGlass ? true : false,

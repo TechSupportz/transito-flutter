@@ -1,64 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:transito/models/app/app_typography.dart';
+import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
-import 'package:transito/widgets/common/bus_timing_guide.dart';
+import 'package:transito/screens/onboarding/quick_start_tour.dart';
 
-// TODO: Quick start flow should be revamped to be more interactive and engaging, with animations and better design.
-class QuickStartScreen extends StatelessWidget {
-  const QuickStartScreen({super.key});
+class QuickStartScreen extends StatefulWidget {
+  const QuickStartScreen({super.key, this.returnToSettings = false});
+
+  final bool returnToSettings;
+
+  @override
+  State<QuickStartScreen> createState() => _QuickStartScreenState();
+}
+
+class _QuickStartScreenState extends State<QuickStartScreen> {
+  final GlobalKey<NavigatorState> _tourNavigatorKey = GlobalKey<NavigatorState>();
+  late final QuickStartTourController _controller = QuickStartTourController(
+    navigatorKey: _tourNavigatorKey,
+    onFinished: _finish,
+  );
+  late final QuickStartTourNavigatorObserver _observer = QuickStartTourNavigatorObserver(
+    _controller,
+  );
+
+  void _finish() {
+    final NavigatorState navigator = Navigator.of(context);
+    if (widget.returnToSettings) {
+      navigator.pop();
+      return;
+    }
+
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const _TutorialHome(),
+        settings: const RouteSettings(name: 'NavigatorScreen'),
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Almost there...'),
-      ),
-      body: Stack(
+    return QuickStartTargetScope(
+      registry: _controller.registry,
+      child: Stack(
         children: [
-          SingleChildScrollView(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  'How to I decipher the details?',
-                  style: AppTypography.screenHeading.copyWith(height: 1.25),
-                ),
-                const BusTimingGuide(),
-              ],
+          Navigator(
+            key: _tourNavigatorKey,
+            observers: [_observer],
+            onGenerateRoute: (_) => MaterialPageRoute<void>(
+              builder: (BuildContext context) => const NavigatorScreen(),
+              settings: const RouteSettings(name: 'NavigatorScreen'),
             ),
           ),
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.bottomCenter,
-                  end: Alignment.topCenter,
-                  colors: [
-                    Theme.of(context).colorScheme.surface,
-                    Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                  ],
-                  stops: [0.9, 1.0],
-                ),
-              ),
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () => Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const NavigatorScreen(),
-                  ),
-                  (Route<dynamic> route) => false,
-                ),
-                child: const Text("Take me to the home screen!"),
-              ),
-            ),
-          ),
+          QuickStartTourOverlay(controller: _controller),
         ],
       ),
     );
   }
+}
+
+class _TutorialHome extends StatefulWidget {
+  const _TutorialHome();
+
+  @override
+  State<_TutorialHome> createState() => _TutorialHomeState();
+}
+
+class _TutorialHomeState extends State<_TutorialHome> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (BuildContext context) => const SettingsScreen(),
+          settings: const RouteSettings(name: 'SettingsScreen'),
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => const NavigatorScreen();
 }

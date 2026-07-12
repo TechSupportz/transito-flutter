@@ -21,6 +21,7 @@ import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/onboarding/location_access_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_tour.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
@@ -199,6 +200,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
         centerTitle: false,
         actions: [
           IconButton(
+            key: QuickStartTargetScope.keyOf(context, QuickStartTarget.settingsButton),
             onPressed: () => Navigator.push(
               context,
               MaterialPageRoute(
@@ -294,6 +296,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
 
   Column nearbyFavouritesList() {
     return Column(
+      key: QuickStartTargetScope.keyOf(context, QuickStartTarget.nearbyFavourites),
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
@@ -432,11 +435,19 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                           busStopsResultsWidget = renderGridView(
                             [
                               // loop through nearby bus stops and send their data to the BusStopCard widget to display them
-                              for (var data in nearbyBusStopList.data!)
-                                BusStopCard(
-                                  busStopInfo: data.busStop,
-                                  distanceFromUser: data.distanceAway,
-                                  showDistanceFromUser: userSettings.showNearbyDistance,
+                              for (final (int index, data) in nearbyBusStopList.data!.indexed)
+                                KeyedSubtree(
+                                  key: index == 0
+                                      ? QuickStartTargetScope.keyOf(
+                                          context,
+                                          QuickStartTarget.firstNearbyStop,
+                                        )
+                                      : null,
+                                  child: BusStopCard(
+                                    busStopInfo: data.busStop,
+                                    distanceFromUser: data.distanceAway,
+                                    showDistanceFromUser: userSettings.showNearbyDistance,
+                                  ),
                                 ),
                             ],
                           );

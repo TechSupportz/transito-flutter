@@ -22,6 +22,7 @@ import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/favourites/add_favourite_screen.dart';
 import 'package:transito/screens/favourites/edit_favourite_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_tour.dart';
 import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
 import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
@@ -257,6 +258,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
         ),
         actions: [
           IconButton(
+            key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingSort),
             icon: Row(
               children: [
                 const AppSymbol(
@@ -287,10 +289,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
           // display different IconButtons depending on whether the bus stop is a favourite or not
           isAddedToFavourites
               ? IconButton(
+                  key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingFavourite),
                   icon: const AppSymbol(Symbols.favorite_rounded, fill: true, grade: 100),
                   onPressed: () => goToEditFavouritesScreen(context),
                 )
               : IconButton(
+                  key: QuickStartTargetScope.keyOf(context, QuickStartTarget.timingFavourite),
                   icon: const AppSymbol(Symbols.favorite_rounded, grade: 100),
                   onPressed: () => goToAddFavouritesScreen(context),
                 ),
@@ -354,11 +358,19 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                   itemBuilder: (context, int index) {
                                     return Padding(
                                       padding: const EdgeInsets.only(bottom: 8.0),
-                                      child: BusTimingRow(
-                                        busStopCode: widget.code,
-                                        serviceInfo: busArrivalInfoSnapshot.data!.services[index],
-                                        userLatLng: widget.busStopLocation,
-                                        isETAminutes: userSettings.isETAminutes,
+                                      child: KeyedSubtree(
+                                        key: index == 0
+                                            ? QuickStartTargetScope.keyOf(
+                                                context,
+                                                QuickStartTarget.firstTimingRow,
+                                              )
+                                            : null,
+                                        child: BusTimingRow(
+                                          busStopCode: widget.code,
+                                          serviceInfo: busArrivalInfoSnapshot.data!.services[index],
+                                          userLatLng: widget.busStopLocation,
+                                          isETAminutes: userSettings.isETAminutes,
+                                        ),
                                       ),
                                     );
                                   },

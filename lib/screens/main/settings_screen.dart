@@ -20,6 +20,7 @@ import 'package:transito/models/user/user_settings.dart';
 import 'package:transito/screens/auth/login_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/screens/onboarding/quick_start_screen.dart';
+import 'package:transito/screens/onboarding/quick_start_tour.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/error_text.dart';
 import 'package:transito/widgets/common/icon_page_title.dart';
@@ -197,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void goToQuickStart() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const QuickStartScreen(),
+        builder: (context) => const QuickStartScreen(returnToSettings: true),
         settings: const RouteSettings(name: 'QuickStartScreen'),
       ),
     );
@@ -602,6 +603,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               }
 
               return Column(
+                key: QuickStartTargetScope.keyOf(
+                  context,
+                  QuickStartTarget.settingsPreferences,
+                ),
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
