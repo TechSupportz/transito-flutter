@@ -100,9 +100,18 @@ class _QuickStartScreenState extends State<QuickStartScreen> {
           ),
           AnimatedBuilder(
             animation: _controller,
-            builder: (BuildContext context, Widget? child) => _controller.isOverlayVisible
-                ? QuickStartTourOverlay(controller: _controller)
-                : const SizedBox.shrink(),
+            builder: (BuildContext context, Widget? child) => IgnorePointer(
+              ignoring: !_controller.isOverlayVisible,
+              child: AnimatedOpacity(
+                opacity: _controller.isOverlayVisible ? 1 : 0,
+                duration: MediaQuery.disableAnimationsOf(context)
+                    ? Duration.zero
+                    : const Duration(milliseconds: 180),
+                curve: Easing.standard,
+                child: child,
+              ),
+            ),
+            child: QuickStartTourOverlay(controller: _controller),
           ),
         ],
       ),

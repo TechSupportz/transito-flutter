@@ -136,6 +136,7 @@ class QuickStartTourStep {
     this.allowsInteraction = false,
     this.primaryLabel = 'Next',
     this.secondaryLabel = 'Skip',
+    this.showSecondaryAction = true,
     this.showPrimaryAction = true,
     this.spotlightRadius = 14,
     this.missingTargetAction = QuickStartMissingTargetAction.none,
@@ -154,6 +155,7 @@ class QuickStartTourStep {
   final bool allowsInteraction;
   final String primaryLabel;
   final String secondaryLabel;
+  final bool showSecondaryAction;
   final bool showPrimaryAction;
   final double spotlightRadius;
   final QuickStartMissingTargetAction missingTargetAction;
@@ -188,7 +190,7 @@ class QuickStartTourController extends ChangeNotifier {
   QuickStartTarget? _dismissedTarget;
   late int _stepIndex;
   bool _isOpeningFallback = false;
-  bool _isCustomizing = false;
+  bool _isEnding = false;
   bool _isReturningToRoot = false;
   String? _primaryError;
 
@@ -366,19 +368,21 @@ class QuickStartTourController extends ChangeNotifier {
       phase: QuickStartPhase.settingsPreferences,
       visibleMoment: 9,
       target: QuickStartTarget.settingsPreferences,
-      title: 'Make it yours',
-      message: 'Change timing format, Nearby layout, theme, colours, and card behaviour here.',
+      title: 'Quick Start complete',
+      message:
+          'You’re all set. Explore Settings to customise your experience, or return to Nearby.',
       highlightBehavior: QuickStartHighlightBehavior.pagePulse,
-      coachPlacement: QuickStartCoachPlacement.bottom,
-      primaryLabel: 'Customize',
-      secondaryLabel: 'Back to Nearby',
+      coachPlacement: QuickStartCoachPlacement.top,
+      allowsInteraction: true,
+      primaryLabel: 'Back to Nearby',
+      showSecondaryAction: false,
     ),
   ];
 
   int get stepIndex => _stepIndex;
   QuickStartTourStep get step => steps[_stepIndex];
   bool get isSpotlightDismissed => _dismissedTarget == step.target;
-  bool get isOverlayVisible => !_isCustomizing;
+  bool get isOverlayVisible => !_isEnding;
   bool get isPrimaryActionLoading => _isOpeningFallback;
   String? get primaryError => _primaryError;
 
@@ -436,9 +440,7 @@ class QuickStartTourController extends ChangeNotifier {
         _returnToRootAndSetPhase(QuickStartPhase.settingsNearbyTab);
         return;
       case QuickStartPhase.settingsPreferences:
-        _isCustomizing = true;
-        _dismissCurrentSpotlight();
-        notifyListeners();
+        _endTour(returnToNearby: true);
         return;
       default:
         if (_stepIndex == steps.length - 1) {
@@ -496,6 +498,17 @@ class QuickStartTourController extends ChangeNotifier {
     _pendingAdvance = Timer(const Duration(milliseconds: 80), () => _setPhase(phase));
   }
 
+  void _endTour({required bool returnToNearby}) {
+    if (_isEnding) return;
+    _isEnding = true;
+    _dismissCurrentSpotlight();
+    _pendingAdvance?.cancel();
+    notifyListeners();
+    if (returnToNearby) {
+      _pendingAdvance = Timer(const Duration(milliseconds: 180), onFinished);
+    }
+  }
+
   void _showServiceDetailsOverview() {
     _dismissCurrentSpotlight();
     _pendingAdvance?.cancel();
@@ -529,6 +542,8 @@ class QuickStartTourController extends ChangeNotifier {
         _dismissAndSchedulePhase(QuickStartPhase.searchField);
       case QuickStartTarget.nearbyTab:
         _dismissAndSchedulePhase(QuickStartPhase.settingsButton);
+      case QuickStartTarget.settingsPreferences:
+        _endTour(returnToNearby: false);
       default:
         break;
     }
@@ -562,7 +577,7 @@ class QuickStartTourController extends ChangeNotifier {
           when step.phase == QuickStartPhase.serviceDetailsOverview ||
               step.phase == QuickStartPhase.serviceDetailsReturn:
         _returnToRootAndSetPhase(QuickStartPhase.searchTab);
-      case 'SettingsScreen' when _isCustomizing:
+      case 'SettingsScreen' when _isEnding:
         onFinished();
       case 'SettingsScreen' when step.phase == QuickStartPhase.settingsPreferences:
         _dismissAndSchedulePhase(QuickStartPhase.settingsButton);

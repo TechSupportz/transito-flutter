@@ -405,13 +405,15 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
                             const SizedBox(height: 14),
                             Row(
                               children: [
-                                TextButton(
-                                  onPressed: widget.controller.isPrimaryActionLoading
-                                      ? null
-                                      : widget.controller.onSecondaryPressed,
-                                  child: Text(visibleStep.secondaryLabel),
-                                ),
-                                const SizedBox(width: 8),
+                                if (visibleStep.showSecondaryAction) ...[
+                                  TextButton(
+                                    onPressed: widget.controller.isPrimaryActionLoading
+                                        ? null
+                                        : widget.controller.onSecondaryPressed,
+                                    child: Text(visibleStep.secondaryLabel),
+                                  ),
+                                  const SizedBox(width: 8),
+                                ],
                                 Expanded(
                                   child: Align(
                                     alignment: Alignment.centerRight,

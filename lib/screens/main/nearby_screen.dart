@@ -200,7 +200,6 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
         centerTitle: false,
         actions: [
           IconButton(
-            key: QuickStartTargetScope.keyOf(context, QuickStartTarget.settingsButton),
             onPressed: () {
               QuickStartTargetScope.activate(context, QuickStartTarget.settingsButton);
               Navigator.push(
@@ -211,8 +210,9 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                 ),
               );
             },
-            icon: const AppSymbol(
+            icon: AppSymbol(
               Symbols.settings_rounded,
+              key: QuickStartTargetScope.keyOf(context, QuickStartTarget.settingsButton),
               fill: true,
             ),
           ),

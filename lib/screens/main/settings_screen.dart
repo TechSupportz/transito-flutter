@@ -216,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     User? user = context.watch<User?>();
     AppColors appColors = context.watch<AppColors>();
 
-    return Scaffold(
+    final Widget screen = Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
       ),
@@ -767,6 +767,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
+    );
+
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: (_) {
+        final QuickStartTargetRegistry? quickStart = QuickStartTargetScope.maybeOf(context);
+        if (quickStart?.activeTarget == QuickStartTarget.settingsPreferences) {
+          quickStart?.activate(QuickStartTarget.settingsPreferences);
+        }
+      },
+      child: screen,
     );
   }
 }
