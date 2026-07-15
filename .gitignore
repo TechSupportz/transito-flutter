@@ -54,3 +54,6 @@ app.*.map.json
 
 # FVM Version Cache
 .fvm/
+
+# Local teaching materials
+/lesson/
