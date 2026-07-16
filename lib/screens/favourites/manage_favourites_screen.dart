@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -20,7 +19,6 @@ class ManageFavouritesScreen extends StatefulWidget {
 }
 
 class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
-  bool isFabVisible = true;
   late Future<List<Favourite>> _futureFavouritesList;
   List<Favourite> reorderedFavouritesList = [];
 
@@ -54,15 +52,12 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
     );
   }
 
-  // function to hide the fab when the user is scrolling down the list to avoid blocking content
-  bool hideFabOnScroll(UserScrollNotification notification) {
-    if (notification.direction == ScrollDirection.forward) {
-      !isFabVisible ? setState(() => isFabVisible = true) : null;
-    } else if (notification.direction == ScrollDirection.reverse) {
-      isFabVisible ? setState(() => isFabVisible = false) : null;
-    }
-
-    return true;
+  Future<void> _saveReorderedFavourites() async {
+    await FavouritesService().reorderFavourites(
+      reorderedFavouritesList,
+      context.read<User?>()!.uid,
+    );
+    if (mounted) Navigator.pop(context);
   }
 
   @override
@@ -111,39 +106,37 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                 if (snapshot.hasData) {
                   List<Favourite> favouritesList = snapshot.data!;
                   return Expanded(
-                    child: NotificationListener<UserScrollNotification>(
-                      onNotification: (notification) => hideFabOnScroll(notification),
-                      child: ReorderableListView.builder(
-                        proxyDecorator: _buildReorderProxy,
-                        onReorderStart: (int index) => HapticFeedback.selectionClick(),
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            key: Key(favouritesList[index].busStopCode),
-                            padding: const EdgeInsets.only(bottom: 18),
-                            child: FavouriteNameCard(
-                              busStopName: favouritesList[index].busStopName,
-                              alias: favouritesList[index].alias,
-                              onTap: () => goToEditFavouritesScreen(context, favouritesList[index]),
-                            ),
-                          );
-                        },
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        shrinkWrap: true,
-                        buildDefaultDragHandles: true,
-                        itemCount: favouritesList.length,
-                        // calls reorder function in FavouritesProvider to reorder the favourites list
-                        onReorder: (oldIndex, newIndex) {
-                          if (oldIndex < newIndex) {
-                            // removing the item at oldIndex will shorten the list by 1
-                            newIndex--;
-                          }
-                          favouritesList.insert(newIndex, favouritesList.removeAt(oldIndex));
+                    child: ReorderableListView.builder(
+                      proxyDecorator: _buildReorderProxy,
+                      onReorderStart: (int index) => HapticFeedback.selectionClick(),
+                      itemBuilder: (context, index) {
+                        return Padding(
+                          key: Key(favouritesList[index].busStopCode),
+                          padding: const EdgeInsets.only(bottom: 18),
+                          child: FavouriteNameCard(
+                            busStopName: favouritesList[index].busStopName,
+                            alias: favouritesList[index].alias,
+                            reorderIndex: index,
+                            onTap: () => goToEditFavouritesScreen(context, favouritesList[index]),
+                          ),
+                        );
+                      },
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      shrinkWrap: true,
+                      buildDefaultDragHandles: false,
+                      itemCount: favouritesList.length,
+                      // calls reorder function in FavouritesProvider to reorder the favourites list
+                      onReorder: (oldIndex, newIndex) {
+                        if (oldIndex < newIndex) {
+                          // removing the item at oldIndex will shorten the list by 1
+                          newIndex--;
+                        }
+                        favouritesList.insert(newIndex, favouritesList.removeAt(oldIndex));
 
-                          setState(() {
-                            reorderedFavouritesList = favouritesList;
-                          });
-                        },
-                      ),
+                        setState(() {
+                          reorderedFavouritesList = favouritesList;
+                        });
+                      },
                     ),
                   );
                 } else if (snapshot.hasError) {
@@ -156,17 +149,11 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
           ],
         ),
       ),
-      floatingActionButton: isFabVisible
-          ? AdaptiveFloatingActionButton(
-              onPressed: () => FavouritesService()
-                  .reorderFavourites(reorderedFavouritesList, context.read<User?>()!.uid)
-                  .then(
-                    (value) => Navigator.pop(context),
-                  ),
-              materialSymbol: Symbols.done_rounded,
-              cupertinoSymbolString: 'checkmark',
-            )
-          : null,
+      floatingActionButton: AdaptiveFloatingActionButton(
+        onPressed: _saveReorderedFavourites,
+        materialSymbol: Symbols.done_rounded,
+        cupertinoSymbolString: 'checkmark',
+      ),
     );
   }
 }

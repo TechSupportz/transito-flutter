@@ -10,10 +10,12 @@ class FavouriteNameCard extends StatelessWidget {
     required this.busStopName,
     required this.onTap,
     this.alias,
+    this.reorderIndex,
   });
 
   final String busStopName;
   final String? alias;
+  final int? reorderIndex;
 
   // onTap function passed in from parent
   final VoidCallback onTap;
@@ -21,6 +23,10 @@ class FavouriteNameCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String displayName = alias ?? busStopName;
+    final Widget dragHandle = Icon(
+      Symbols.drag_indicator_rounded,
+      color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+    );
 
     return Material(
       color: Theme.of(context).colorScheme.surfaceContainer,
@@ -36,10 +42,10 @@ class FavouriteNameCard extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  Icon(
-                    Symbols.drag_indicator_rounded,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-                  ),
+                  if (reorderIndex case final int index)
+                    ReorderableDragStartListener(index: index, child: dragHandle)
+                  else
+                    dragHandle,
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
