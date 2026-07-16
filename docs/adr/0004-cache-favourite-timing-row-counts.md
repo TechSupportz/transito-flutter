@@ -23,8 +23,10 @@ card below it moves. This is especially visible while slowly scrolling upward.
 - Reuse a cached displayed-row count only while the selected-service count is unchanged. Fall back
   to the current selected-service count after additions or removals invalidate the entry.
 - Have the shared Favourite timing card accept an optional placeholder-row count and report
-  successful positive displayed-row counts. Keep both properties optional so Nearby Favourites and
-  other callers preserve their current behaviour and can opt into caching later.
+  successful positive displayed-row counts. Keep both properties optional so independent callers
+  preserve their current behaviour unless they opt into caching.
+- Keep a separate in-memory timing-row-count cache owned by the Nearby screen, following the same
+  bus-stop-code keying and selected-service-count invalidation rules as the main Favourites screen.
 - Ignore zero-row responses when updating the cache. Show the existing empty-timings message within
   the space reserved by the last cached count, or by the selected-service count when no cached count
   exists.
@@ -61,7 +63,8 @@ card below it moves. This is especially visible while slowly scrolling upward.
   exists yet.
 - Empty and error states can contain additional vertical space in order to preserve surrounding
   layout.
-- Nearby Favourites remains unchanged unless its parent later supplies a session cache.
+- Nearby Favourites reuses its last positive displayed-row count when its cards are reconstructed
+  during the mounted screen session.
 - The sliver can calculate positions for discarded cards without retaining their widgets, arrival
   requests, or polling timers.
 - Alias-bearing headers reserve their expanded caption height even while collapsed so their complete

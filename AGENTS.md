@@ -7,8 +7,10 @@ Flutter conventions.
 ## Non-negotiable constraints
 
 - Never run Shorebird commands (`shorebird release`, `shorebird patch`). The user always runs them.
-- Do not start the development stack directly or run the `dev` script. The user starts it with the
-  fish alias `transito-dev`.
+- Do not start the background development stack directly or run the `dev` script. The user starts
+  those servers and processes with the fish alias `transito-dev`.
+- You may run `flutter run` for app development and hot reload after confirming that no other
+  Flutter build is already running on the same target device.
 - Before asking the user to run `transito-dev`, check that both port 8080 (Transito server) and port
   4000 (Firebase emulator UI) are listening:
   `lsof -nP -iTCP:8080 -sTCP:LISTEN` and `lsof -nP -iTCP:4000 -sTCP:LISTEN`.

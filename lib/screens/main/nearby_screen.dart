@@ -47,8 +47,34 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   late Future<List<NearbyFavourites>> nearbyFavourites;
   StreamSubscription<Position?>? userLocationStream;
   bool _isFabVisible = true;
+  final Map<String, _TimingRowCountCacheEntry> _timingRowCountCache = {};
 
   LatLng _prevUserLocation = LatLng(0, 0);
+
+  int _placeholderTimingRowCount(Favourite favourite) {
+    final _TimingRowCountCacheEntry? entry = _timingRowCountCache[favourite.busStopCode];
+    if (entry == null || entry.selectedServiceCount != favourite.services.length) {
+      return favourite.services.length;
+    }
+
+    return entry.displayedRowCount;
+  }
+
+  void _cacheDisplayedTimingRowCount(Favourite favourite, int displayedRowCount) {
+    if (displayedRowCount == 0) return;
+
+    final _TimingRowCountCacheEntry nextEntry = _TimingRowCountCacheEntry(
+      selectedServiceCount: favourite.services.length,
+      displayedRowCount: displayedRowCount,
+    );
+    final _TimingRowCountCacheEntry? currentEntry = _timingRowCountCache[favourite.busStopCode];
+    if (currentEntry?.selectedServiceCount == nextEntry.selectedServiceCount &&
+        currentEntry?.displayedRowCount == nextEntry.displayedRowCount) {
+      return;
+    }
+
+    _timingRowCountCache[favourite.busStopCode] = nextEntry;
+  }
 
   // sets the state of the FAB to hide or show depending if the user is scrolling in order to prevent blocking content
   bool hideFabOnScroll(UserScrollNotification notification) {
@@ -304,6 +330,14 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   }
 
   Column nearbyFavouritesList() {
+    final bool disableAnimations = MediaQuery.disableAnimationsOf(context);
+    final Duration loadingSizeTransitionDuration = disableAnimations
+        ? Duration.zero
+        : const Duration(milliseconds: 250);
+    final Duration contentFadeDuration = disableAnimations
+        ? Duration.zero
+        : const Duration(milliseconds: 150);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -314,77 +348,116 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
         const SizedBox(
           height: 12,
         ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.ease,
-          child: FutureBuilder(
-            future: nearbyFavourites,
-            builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
-              Widget favouritesListWidget = const SizedBox();
+        FutureBuilder(
+          future: nearbyFavourites,
+          builder: (BuildContext context, AsyncSnapshot<List<NearbyFavourites>> snapshot) {
+            final bool isLoading = snapshot.connectionState == ConnectionState.waiting;
+            Widget favouritesListWidget;
 
-              if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-                // checks if user has any favourites within 750m of their current location and displays them if they do
-                if (snapshot.data!.isEmpty) {
-                  favouritesListWidget = Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainer,
-                      borderRadius: BorderRadius.circular(12),
+            if (isLoading) {
+              favouritesListWidget = const SizedBox.shrink(
+                key: ValueKey<String>('nearby-favourites-loading'),
+              );
+            } else if (snapshot.hasError) {
+              debugPrint("<=== ERROR ${snapshot.error} ===>");
+              favouritesListWidget = const KeyedSubtree(
+                key: ValueKey<String>('nearby-favourites-error'),
+                child: ErrorText(
+                  enableBackground: true,
+                  icon: Symbols.heart_broken_rounded,
+                  title: "Couldn't load favourites",
+                ),
+              );
+            } else if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
+              // checks if user has any favourites within 750m of their current location and displays them if they do
+              if (snapshot.data!.isEmpty) {
+                favouritesListWidget = Container(
+                  key: const ValueKey<String>('nearby-favourites-empty'),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surfaceContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Center(
+                    child: Text(
+                      "No favourites nearby",
+                      style: AppTypography.cardSubtitle,
                     ),
-                    child: const Center(
-                      child: Text(
-                        "No favourites nearby",
-                        style: AppTypography.cardSubtitle,
-                      ),
-                    ),
-                  );
-                } else {
-                  favouritesListWidget = ListView.separated(
+                  ),
+                );
+              } else {
+                favouritesListWidget = KeyedSubtree(
+                  key: const ValueKey<String>('nearby-favourites-results'),
+                  child: ListView.separated(
                     itemBuilder: (context, int index) {
+                      final Favourite favourite = snapshot.data![index].busStopInfo;
+
                       return FavouritesTimingCard(
-                        key: ValueKey(snapshot.data![index].busStopInfo.busStopCode),
+                        key: ValueKey(favourite.busStopCode),
                         isActive: widget.isActive,
-                        code: snapshot.data![index].busStopInfo.busStopCode,
-                        name: snapshot.data![index].busStopInfo.busStopName,
-                        alias: snapshot.data![index].busStopInfo.alias,
-                        address: snapshot.data![index].busStopInfo.busStopAddress,
-                        busStopLocation: snapshot.data![index].busStopInfo.busStopLocation,
-                        services: snapshot.data![index].busStopInfo.services,
-                        sources: snapshot.data![index].busStopInfo.sources,
+                        code: favourite.busStopCode,
+                        name: favourite.busStopName,
+                        alias: favourite.alias,
+                        address: favourite.busStopAddress,
+                        busStopLocation: favourite.busStopLocation,
+                        services: favourite.services,
+                        sources: favourite.sources,
+                        placeholderTimingRowCount: _placeholderTimingRowCount(favourite),
+                        onDisplayedTimingRowCountChanged: (int rowCount) =>
+                            _cacheDisplayedTimingRowCount(favourite, rowCount),
                       );
                     },
-                    separatorBuilder: (BuildContext context, int index) => const SizedBox(
-                      height: 16,
-                    ),
+                    separatorBuilder: (BuildContext context, int index) =>
+                        const SizedBox(height: 16),
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     physics: const NeverScrollableScrollPhysics(),
                     itemCount: snapshot.data!.length,
-                  );
-                }
-              }
-
-              if (snapshot.hasError) {
-                // return Text("${snapshot.error}");
-                debugPrint("<=== ERROR ${snapshot.error} ===>");
-                favouritesListWidget = const ErrorText(
-                  enableBackground: true,
-                  icon: Symbols.heart_broken_rounded,
-                  title: "Couldn't load favourites",
+                  ),
                 );
               }
-
-              return Skeleton(
-                isLoading: snapshot.connectionState == ConnectionState.waiting,
-                skeleton: SkeletonLine(
-                  style: SkeletonLineStyle(height: 128, borderRadius: BorderRadius.circular(12)),
-                ),
-                child: favouritesListWidget,
+            } else {
+              favouritesListWidget = const SizedBox(
+                key: ValueKey<String>('nearby-favourites-loading'),
+                width: double.infinity,
+                height: 128,
               );
-              // display a loading indicator while the list of nearby favourites is being fetched
-            },
-          ),
+            }
+
+            return SizedBox(
+              width: double.infinity,
+              child: AnimatedSize(
+                alignment: Alignment.topCenter,
+                duration: loadingSizeTransitionDuration,
+                curve: Easing.emphasizedDecelerate,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: isLoading ? 128 : null,
+                  child: isLoading
+                      ? const Skeleton(
+                          isLoading: true,
+                          skeleton: SkeletonLine(
+                            style: SkeletonLineStyle(
+                              height: 128,
+                              borderRadius: BorderRadius.all(Radius.circular(12)),
+                            ),
+                          ),
+                          child: SizedBox.shrink(),
+                        )
+                      : TweenAnimationBuilder<double>(
+                          tween: Tween<double>(begin: 0, end: 1),
+                          duration: contentFadeDuration,
+                          curve: Curves.easeOut,
+                          builder: (BuildContext context, double opacity, Widget? child) {
+                            return Opacity(opacity: opacity, child: child);
+                          },
+                          child: favouritesListWidget,
+                        ),
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -538,4 +611,14 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       ],
     );
   }
+}
+
+class _TimingRowCountCacheEntry {
+  const _TimingRowCountCacheEntry({
+    required this.selectedServiceCount,
+    required this.displayedRowCount,
+  });
+
+  final int selectedServiceCount;
+  final int displayedRowCount;
 }

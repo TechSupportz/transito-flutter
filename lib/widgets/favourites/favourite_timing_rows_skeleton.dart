@@ -22,24 +22,28 @@ class FavouriteTimingRowsSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final int reservedRowCount = rowCount < 1 ? 1 : rowCount;
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: favouriteTimingRowsBottomPadding),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          for (int index = 0; index < reservedRowCount; index++) ...[
-            const SkeletonItem(
-              child: SkeletonLine(
-                style: SkeletonLineStyle(
-                  height: favouriteTimingRowExtent - 3,
-                  borderRadius: BorderRadius.all(Radius.circular(10)),
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1.5),
+    return SizedBox(
+      width: double.infinity,
+      height: favouriteTimingRowsHeight(reservedRowCount),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: favouriteTimingRowsBottomPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            for (int index = 0; index < reservedRowCount; index++) ...[
+              const SkeletonItem(
+                child: SkeletonLine(
+                  style: SkeletonLineStyle(
+                    height: favouriteTimingRowExtent - 3,
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 1.5),
+                  ),
                 ),
               ),
-            ),
-            if (index < reservedRowCount - 1) const SizedBox(height: favouriteTimingRowSpacing),
+              if (index < reservedRowCount - 1) const SizedBox(height: favouriteTimingRowSpacing),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
