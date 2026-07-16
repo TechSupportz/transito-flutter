@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
+import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/models/favourites/favourite.dart';
@@ -88,6 +89,7 @@ class _FavouritesScreenState extends State<FavouritesScreen> {
       ),
       // if the user has favourites display them via the favourites_timing_card widget, otherwise display a message
       body: StreamBuilder<UserSettings>(
+        key: QuickStartTargetScope.keyOf(context, QuickStartTarget.favouritesOverview),
         stream: SettingsService().streamSettings(userId),
         builder: (context, settingsSnapshot) {
           final bool initiallyExpanded =

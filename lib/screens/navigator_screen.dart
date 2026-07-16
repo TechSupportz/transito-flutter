@@ -82,6 +82,8 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
     final QuickStartTargetRegistry? tutorial = QuickStartTargetScope.maybeOf(context);
     if (index == 0) {
       tutorial?.activate(QuickStartTarget.nearbyTab);
+    } else if (index == 1) {
+      tutorial?.activate(QuickStartTarget.favouritesTab);
     } else if (index == 2) {
       tutorial?.activate(QuickStartTarget.searchTab);
     }
@@ -117,6 +119,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           label: "Nearby",
         ),
         NavigationDestination(
+          key: Platform.isIOS
+              ? null
+              : QuickStartTargetScope.keyOf(context, QuickStartTarget.favouritesTab),
           icon: AppSymbol(Symbols.favorite_rounded, fill: true),
           label: "Favourites",
         ),
@@ -186,6 +191,9 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
             builder: (BuildContext context, Widget? child) {
               final Key? key = switch (tutorial.activeTarget) {
                 QuickStartTarget.nearbyTab => tutorial.keyFor(QuickStartTarget.nearbyTab),
+                QuickStartTarget.favouritesTab => tutorial.keyFor(
+                  QuickStartTarget.favouritesTab,
+                ),
                 QuickStartTarget.searchTab => tutorial.keyFor(QuickStartTarget.searchTab),
                 _ => null,
               };

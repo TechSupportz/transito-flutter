@@ -22,6 +22,11 @@ Widget quickStartPagePulsePreview() => const MaterialApp(
   home: _QuickStartOverlayPreview(initialPhase: QuickStartPhase.nearby),
 );
 
+@Preview(name: 'Favourites overview', group: 'Onboarding', size: Size(430, 900))
+Widget quickStartFavouritesPreview() => const MaterialApp(
+  home: _QuickStartOverlayPreview(initialPhase: QuickStartPhase.favouritesOverview),
+);
+
 @Preview(name: 'Quick Start complete', group: 'Onboarding', size: Size(430, 900))
 Widget quickStartCompletePreview() => const MaterialApp(
   home: _QuickStartOverlayPreview(initialPhase: QuickStartPhase.settingsPreferences),

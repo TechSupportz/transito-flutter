@@ -14,6 +14,8 @@ enum QuickStartTarget {
   serviceInfoPage,
   serviceInfoBack,
   nearbyTab,
+  favouritesTab,
+  favouritesOverview,
   searchTab,
   searchField,
   searchMap,
@@ -34,6 +36,8 @@ enum QuickStartPhase {
   serviceDetailsEntry,
   serviceDetailsOverview,
   serviceDetailsReturn,
+  favouritesTab,
+  favouritesOverview,
   searchTab,
   searchField,
   map,
@@ -181,7 +185,7 @@ class QuickStartTourController extends ChangeNotifier {
     registry.setActiveTarget(step.target);
   }
 
-  static const int visibleMomentCount = 10;
+  static const int visibleMomentCount = 11;
 
   final GlobalKey<NavigatorState> navigatorKey;
   final VoidCallback onFinished;
@@ -274,7 +278,7 @@ class QuickStartTourController extends ChangeNotifier {
       allowsInteraction: true,
       showPrimaryAction: false,
       missingTargetAction: QuickStartMissingTargetAction.continueTour,
-      missingTargetLabel: 'Continue to Search',
+      missingTargetLabel: 'Continue to Favourites',
       spotlightRadius: 10,
     ),
     QuickStartTourStep(
@@ -299,8 +303,28 @@ class QuickStartTourController extends ChangeNotifier {
       spotlightRadius: 12,
     ),
     QuickStartTourStep(
-      phase: QuickStartPhase.searchTab,
+      phase: QuickStartPhase.favouritesTab,
       visibleMoment: 6,
+      target: QuickStartTarget.favouritesTab,
+      title: 'Favourites',
+      message: 'Tap Favourites to see the bus stops and services you have saved.',
+      allowsInteraction: true,
+      showPrimaryAction: false,
+      spotlightRadius: 12,
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.favouritesOverview,
+      visibleMoment: 6,
+      target: QuickStartTarget.favouritesOverview,
+      title: 'Favourites',
+      message: 'This is where you can see all your favourites and their latest arrival times.',
+      highlightBehavior: QuickStartHighlightBehavior.pagePulse,
+      coachPlacement: QuickStartCoachPlacement.bottom,
+      primaryLabel: 'Continue',
+    ),
+    QuickStartTourStep(
+      phase: QuickStartPhase.searchTab,
+      visibleMoment: 7,
       target: QuickStartTarget.searchTab,
       title: 'Search',
       message: 'Tap Search to find a bus stop, road, or place.',
@@ -310,7 +334,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.searchField,
-      visibleMoment: 6,
+      visibleMoment: 7,
       target: QuickStartTarget.searchField,
       title: 'Search',
       message: 'Use this field whenever you need to look beyond your current location.',
@@ -318,7 +342,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.map,
-      visibleMoment: 7,
+      visibleMoment: 8,
       target: QuickStartTarget.searchMap,
       title: 'Map',
       message: 'Drag to pan. Pinch to zoom or rotate. Tap the compass to reset north.',
@@ -328,7 +352,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.mrtEntry,
-      visibleMoment: 8,
+      visibleMoment: 9,
       target: QuickStartTarget.mrtMapButton,
       title: 'MRT map',
       message: 'Tap MRT Map for a network-wide rail reference.',
@@ -338,7 +362,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.mrtMap,
-      visibleMoment: 8,
+      visibleMoment: 9,
       target: QuickStartTarget.mrtMap,
       title: 'MRT map',
       message: 'Drag to pan and pinch to zoom around the rail map.',
@@ -349,7 +373,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.settingsNearbyTab,
-      visibleMoment: 9,
+      visibleMoment: 10,
       target: QuickStartTarget.nearbyTab,
       title: 'Make it yours',
       message: 'Return to Nearby to open your app settings.',
@@ -359,7 +383,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.settingsButton,
-      visibleMoment: 9,
+      visibleMoment: 10,
       target: QuickStartTarget.settingsButton,
       title: 'Make it yours',
       message: 'Open Settings to choose your defaults.',
@@ -369,7 +393,7 @@ class QuickStartTourController extends ChangeNotifier {
     ),
     QuickStartTourStep(
       phase: QuickStartPhase.settingsPreferences,
-      visibleMoment: 9,
+      visibleMoment: 10,
       target: QuickStartTarget.settingsPreferences,
       title: 'Quick Start complete',
       message:
@@ -441,7 +465,7 @@ class QuickStartTourController extends ChangeNotifier {
           await _openFallbackStop();
           return;
         case QuickStartMissingTargetAction.continueTour:
-          _returnToRootAndSetPhase(QuickStartPhase.searchTab);
+          _returnToRootAndSetPhase(QuickStartPhase.favouritesTab);
           return;
         case QuickStartMissingTargetAction.none:
           break;
@@ -583,6 +607,8 @@ class QuickStartTourController extends ChangeNotifier {
       _dismissCurrentSpotlight();
     }
     switch (target) {
+      case QuickStartTarget.favouritesTab:
+        _dismissAndSchedulePhase(QuickStartPhase.favouritesOverview);
       case QuickStartTarget.searchTab:
         _dismissAndSchedulePhase(QuickStartPhase.searchField);
       case QuickStartTarget.nearbyTab:
@@ -632,7 +658,7 @@ class QuickStartTourController extends ChangeNotifier {
       case 'BusServiceInfoScreen'
           when step.phase == QuickStartPhase.serviceDetailsOverview ||
               step.phase == QuickStartPhase.serviceDetailsReturn:
-        _returnToRootAndSetPhase(QuickStartPhase.searchTab);
+        _returnToRootAndSetPhase(QuickStartPhase.favouritesTab);
       case 'SettingsScreen' when _isEnding:
         onFinished();
       case 'SettingsScreen' when step.phase == QuickStartPhase.settingsPreferences:
