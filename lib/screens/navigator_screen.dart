@@ -127,12 +127,7 @@ class _NavigatorScreenState extends State<NavigatorScreen> {
           icon: GestureDetector(
             child: AppSymbol(Symbols.map_search_rounded, fill: true),
             onTap: () => _selectPage(2),
-            onDoubleTap: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => MrtMapScreen(),
-                settings: RouteSettings(name: 'MrtMapScreen'),
-              ),
-            ),
+            onDoubleTap: () => Navigator.of(context).push(buildMrtMapRoute(context)),
           ),
           label: "Search",
         ),

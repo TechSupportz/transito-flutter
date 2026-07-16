@@ -14,7 +14,11 @@ class QuickStartTourOverlay extends StatefulWidget {
 
 class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
     with SingleTickerProviderStateMixin {
+  static const Duration _coachMoveDuration = Duration(milliseconds: 320);
+  static const Duration _contentTransitionDuration = Duration(milliseconds: 160);
+
   Timer? _refreshTimer;
+  Timer? _pagePulseTimer;
   late final AnimationController _pagePulseController;
   late final Animation<double> _pagePulseOpacity;
   Rect? _targetRect;
@@ -32,12 +36,24 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
     super.initState();
     _pagePulseController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 650),
+      duration: const Duration(milliseconds: 1100),
     );
     _pagePulseOpacity = TweenSequence<double>([
-      TweenSequenceItem<double>(tween: Tween<double>(begin: 0, end: 1), weight: 30),
-      TweenSequenceItem<double>(tween: Tween<double>(begin: 1, end: 0), weight: 70),
-    ]).animate(CurvedAnimation(parent: _pagePulseController, curve: Curves.easeOut));
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: 0,
+          end: 1,
+        ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+        weight: 45,
+      ),
+      TweenSequenceItem<double>(
+        tween: Tween<double>(
+          begin: 1,
+          end: 0,
+        ).chain(CurveTween(curve: Curves.easeInOutCubic)),
+        weight: 55,
+      ),
+    ]).animate(_pagePulseController);
     _observedStepIndex = widget.controller.stepIndex;
     _visibleStepIndex = _observedStepIndex;
     widget.controller.addListener(_handleControllerChanged);
@@ -59,6 +75,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
     super.didUpdateWidget(oldWidget);
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller.removeListener(_handleControllerChanged);
+      _cancelPagePulse();
       _observedStepIndex = widget.controller.stepIndex;
       _visibleStepIndex = _observedStepIndex;
       widget.controller.addListener(_handleControllerChanged);
@@ -74,6 +91,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
     }
 
     _observedStepIndex = widget.controller.stepIndex;
+    _cancelPagePulse();
     setState(() {
       _candidateRect = null;
       _stableRectSamples = 0;
@@ -184,14 +202,50 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
         _visibleStepIndex = _observedStepIndex;
       }
     });
-    if (!MediaQuery.disableAnimationsOf(context)) {
-      _pagePulseController.forward(from: 0);
+    if (!waitForCoach) {
+      _schedulePagePulse();
     }
   }
 
   void _handleCoachAlignmentEnd() {
     if (!mounted || _visibleStepIndex == _observedStepIndex) return;
     setState(() => _visibleStepIndex = _observedStepIndex);
+    _schedulePagePulse();
+  }
+
+  void _schedulePagePulse() {
+    _pagePulseTimer?.cancel();
+    if (MediaQuery.disableAnimationsOf(context) ||
+        widget.controller.step.highlightBehavior != QuickStartHighlightBehavior.pagePulse ||
+        _visibleStepIndex != _observedStepIndex) {
+      return;
+    }
+    final int expectedStepIndex = _observedStepIndex;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted ||
+          _observedStepIndex != expectedStepIndex ||
+          widget.controller.step.highlightBehavior != QuickStartHighlightBehavior.pagePulse ||
+          _visibleStepIndex != _observedStepIndex) {
+        return;
+      }
+      _pagePulseTimer = Timer(_contentTransitionDuration, () {
+        if (!mounted ||
+            _observedStepIndex != expectedStepIndex ||
+            widget.controller.step.highlightBehavior != QuickStartHighlightBehavior.pagePulse ||
+            _visibleStepIndex != _observedStepIndex) {
+          return;
+        }
+        _pagePulseController.forward(from: 0);
+      });
+    });
+  }
+
+  void _cancelPagePulse() {
+    _pagePulseTimer?.cancel();
+    _pagePulseController
+      ..stop()
+      ..reset();
   }
 
   bool _rectsAreClose(Rect first, Rect second, {required double tolerance}) {
@@ -218,6 +272,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
   @override
   void dispose() {
     _refreshTimer?.cancel();
+    _pagePulseTimer?.cancel();
     _pagePulseController.dispose();
     widget.controller.removeListener(_handleControllerChanged);
     super.dispose();
@@ -252,7 +307,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
                   builder: (BuildContext context, Widget? child) => ColoredBox(
                     key: const ValueKey<String>('quick-start-page-pulse'),
                     color: Theme.of(context).colorScheme.primary.withValues(
-                      alpha: 0.14 * _pagePulseOpacity.value,
+                      alpha: 0.12 * _pagePulseOpacity.value,
                     ),
                   ),
                 ),
@@ -350,9 +405,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
           ),
           AnimatedAlign(
             alignment: _coachAlignment,
-            duration: MediaQuery.disableAnimationsOf(context)
-                ? Duration.zero
-                : const Duration(milliseconds: 220),
+            duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : _coachMoveDuration,
             curve: Easing.emphasizedDecelerate,
             onEnd: _handleCoachAlignmentEnd,
             child: SafeArea(
@@ -367,7 +420,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
                     child: AnimatedSwitcher(
                       duration: MediaQuery.disableAnimationsOf(context)
                           ? Duration.zero
-                          : const Duration(milliseconds: 120),
+                          : _contentTransitionDuration,
                       transitionBuilder: (Widget child, Animation<double> animation) =>
                           FadeTransition(opacity: animation, child: child),
                       child: Padding(
@@ -417,7 +470,7 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
                                 Expanded(
                                   child: Align(
                                     alignment: Alignment.centerRight,
-                                    child: widget.controller.showPrimaryAction
+                                    child: widget.controller.showPrimaryActionFor(visibleStep)
                                         ? FilledButton(
                                             onPressed: widget.controller.isPrimaryActionLoading
                                                 ? null
@@ -429,10 +482,13 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
                                                       strokeWidth: 2,
                                                     ),
                                                   )
-                                                : Text(widget.controller.primaryLabel),
+                                                : Text(
+                                                    widget.controller.primaryLabelFor(visibleStep),
+                                                  ),
                                           )
                                         : Text(
-                                            widget.controller.targetInstruction(
+                                            widget.controller.targetInstructionFor(
+                                              visibleStep,
                                               targetIsVisible: targetIsVisible,
                                             ),
                                             textAlign: TextAlign.end,

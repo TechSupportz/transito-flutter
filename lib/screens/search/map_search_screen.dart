@@ -684,13 +684,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                                   context,
                                   QuickStartTarget.mrtMapButton,
                                 );
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const MrtMapScreen(),
-                                    settings: const RouteSettings(name: 'MrtMapScreen'),
-                                  ),
-                                );
+                                Navigator.push(context, buildMrtMapRoute(context));
                               },
                               icon: const AppSymbol(Symbols.map_rounded, fill: true),
                               label: const Text('MRT Map'),

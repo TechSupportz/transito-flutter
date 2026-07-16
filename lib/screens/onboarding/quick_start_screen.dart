@@ -5,6 +5,7 @@ import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/screens/bus_info/bus_timing_screen.dart';
+import 'package:transito/screens/main/settings_screen.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/onboarding/quick_start_tour_overlay.dart';
 
@@ -21,6 +22,7 @@ class _QuickStartScreenState extends State<QuickStartScreen> {
     navigatorKey: _tourNavigatorKey,
     onFinished: _finish,
     onOpenFallbackStop: _openFallbackStop,
+    onOpenSettings: _openSettings,
   );
   late final QuickStartTourNavigatorObserver _observer = QuickStartTourNavigatorObserver(
     _controller,
@@ -45,6 +47,20 @@ class _QuickStartScreenState extends State<QuickStartScreen> {
           busStopLocation: LatLng(stop.latitude, stop.longitude),
         ),
         settings: const RouteSettings(name: 'BusTimingScreen'),
+      ),
+    );
+  }
+
+  void _openSettings() {
+    final NavigatorState? navigator = _tourNavigatorKey.currentState;
+    if (navigator == null) {
+      _finish();
+      return;
+    }
+    navigator.push(
+      MaterialPageRoute<void>(
+        builder: (BuildContext context) => const SettingsScreen(),
+        settings: const RouteSettings(name: 'SettingsScreen'),
       ),
     );
   }

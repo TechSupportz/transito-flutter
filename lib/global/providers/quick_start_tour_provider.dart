@@ -135,7 +135,7 @@ class QuickStartTourStep {
     this.coachPlacement = QuickStartCoachPlacement.automatic,
     this.allowsInteraction = false,
     this.primaryLabel = 'Next',
-    this.secondaryLabel = 'Skip',
+    this.secondaryLabel = 'Skip to end',
     this.showSecondaryAction = true,
     this.showPrimaryAction = true,
     this.spotlightRadius = 14,
@@ -170,6 +170,7 @@ class QuickStartTourController extends ChangeNotifier {
     required this.navigatorKey,
     required this.onFinished,
     this.onOpenFallbackStop,
+    this.onOpenSettings,
     QuickStartPhase initialPhase = QuickStartPhase.nearby,
   }) {
     registry = QuickStartTargetRegistry(onTargetActivated: _targetActivated)..addListener(_refresh);
@@ -185,6 +186,7 @@ class QuickStartTourController extends ChangeNotifier {
   final GlobalKey<NavigatorState> navigatorKey;
   final VoidCallback onFinished;
   final Future<void> Function()? onOpenFallbackStop;
+  final VoidCallback? onOpenSettings;
   late final QuickStartTargetRegistry registry;
   Timer? _pendingAdvance;
   QuickStartTarget? _dismissedTarget;
@@ -192,6 +194,7 @@ class QuickStartTourController extends ChangeNotifier {
   bool _isOpeningFallback = false;
   bool _isEnding = false;
   bool _isReturningToRoot = false;
+  QuickStartPhase? _phaseAfterReturningToRoot;
   String? _primaryError;
 
   static const List<QuickStartTourStep> steps = [
@@ -386,26 +389,41 @@ class QuickStartTourController extends ChangeNotifier {
   bool get isPrimaryActionLoading => _isOpeningFallback;
   String? get primaryError => _primaryError;
 
-  bool get isCurrentTargetUnavailable => registry.availabilityFor(step.target) == false;
+  bool get isCurrentTargetUnavailable => isTargetUnavailable(step);
 
-  bool get showPrimaryAction {
-    return step.showPrimaryAction ||
-        (isCurrentTargetUnavailable &&
-            step.missingTargetAction != QuickStartMissingTargetAction.none);
+  bool isTargetUnavailable(QuickStartTourStep candidate) {
+    return registry.availabilityFor(candidate.target) == false;
   }
 
-  String get primaryLabel {
-    if (isCurrentTargetUnavailable && step.missingTargetLabel != null) {
-      return step.missingTargetLabel!;
+  bool get showPrimaryAction => showPrimaryActionFor(step);
+
+  bool showPrimaryActionFor(QuickStartTourStep candidate) {
+    return candidate.showPrimaryAction ||
+        (isTargetUnavailable(candidate) &&
+            candidate.missingTargetAction != QuickStartMissingTargetAction.none);
+  }
+
+  String get primaryLabel => primaryLabelFor(step);
+
+  String primaryLabelFor(QuickStartTourStep candidate) {
+    if (isTargetUnavailable(candidate) && candidate.missingTargetLabel != null) {
+      return candidate.missingTargetLabel!;
     }
-    return step.primaryLabel;
+    return candidate.primaryLabel;
   }
 
   String targetInstruction({required bool targetIsVisible}) {
-    if (step.highlightBehavior == QuickStartHighlightBehavior.pagePulse) {
-      return step.passiveLabel ?? 'Take a look around';
+    return targetInstructionFor(step, targetIsVisible: targetIsVisible);
+  }
+
+  String targetInstructionFor(
+    QuickStartTourStep candidate, {
+    required bool targetIsVisible,
+  }) {
+    if (candidate.highlightBehavior == QuickStartHighlightBehavior.pagePulse) {
+      return candidate.passiveLabel ?? 'Take a look around';
     }
-    if (step.phase == QuickStartPhase.pickStop &&
+    if (candidate.phase == QuickStartPhase.pickStop &&
         registry.availabilityFor(QuickStartTarget.firstNearbyStop) == null) {
       return 'Finding nearby stops…';
     }
@@ -432,7 +450,29 @@ class QuickStartTourController extends ChangeNotifier {
     next();
   }
 
-  void onSecondaryPressed() => onFinished();
+  void onSecondaryPressed() {
+    final VoidCallback? openSettings = onOpenSettings;
+    if (openSettings == null) {
+      onFinished();
+      return;
+    }
+
+    _dismissCurrentSpotlight();
+    _pendingAdvance?.cancel();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final NavigatorState? navigator = navigatorKey.currentState;
+      if (navigator == null) {
+        onFinished();
+        return;
+      }
+
+      _isReturningToRoot = true;
+      navigator.popUntil((Route<dynamic> route) => route.isFirst);
+      _isReturningToRoot = false;
+      _setPhase(QuickStartPhase.settingsPreferences);
+      WidgetsBinding.instance.addPostFrameCallback((_) => openSettings());
+    });
+  }
 
   void next() {
     switch (step.phase) {
@@ -525,10 +565,15 @@ class QuickStartTourController extends ChangeNotifier {
     _dismissCurrentSpotlight();
     _pendingAdvance?.cancel();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      final NavigatorState? navigator = navigatorKey.currentState;
+      if (navigator == null || !navigator.canPop()) {
+        _setPhase(phase);
+        return;
+      }
+
       _isReturningToRoot = true;
-      navigatorKey.currentState?.popUntil((Route<dynamic> route) => route.isFirst);
-      _isReturningToRoot = false;
-      _setPhase(phase);
+      _phaseAfterReturningToRoot = phase;
+      navigator.popUntil((Route<dynamic> route) => route.isFirst);
     });
   }
 
@@ -567,7 +612,18 @@ class QuickStartTourController extends ChangeNotifier {
   }
 
   void routePopped(String? routeName) {
-    if (_isReturningToRoot) return;
+    if (_isReturningToRoot) {
+      final NavigatorState? navigator = navigatorKey.currentState;
+      if (navigator?.canPop() ?? false) return;
+
+      _isReturningToRoot = false;
+      final QuickStartPhase? nextPhase = _phaseAfterReturningToRoot;
+      _phaseAfterReturningToRoot = null;
+      if (nextPhase != null) {
+        _setPhase(nextPhase);
+      }
+      return;
+    }
     switch (routeName) {
       case 'BusStopInfoScreen'
           when step.phase == QuickStartPhase.stopDetailsOverview ||
@@ -612,8 +668,11 @@ class QuickStartTourNavigatorObserver extends NavigatorObserver {
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) => controller.routePopped(route.settings.name),
-    );
+    final completion = route is TransitionRoute<dynamic> ? route.completed : route.popped;
+    completion.then((_) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => controller.routePopped(route.settings.name),
+      );
+    });
   }
 }

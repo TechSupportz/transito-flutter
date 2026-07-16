@@ -2,6 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
 
+Route<void> buildMrtMapRoute(BuildContext context) {
+  const settings = RouteSettings(name: 'MrtMapScreen');
+
+  if (Theme.of(context).platform != TargetPlatform.iOS) {
+    return MaterialPageRoute<void>(
+      builder: (_) => const MrtMapScreen(),
+      settings: settings,
+    );
+  }
+
+  return PageRouteBuilder<void>(
+    settings: settings,
+    transitionDuration: const Duration(milliseconds: 320),
+    reverseTransitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (_, _, _) => const MrtMapScreen(),
+    transitionsBuilder: (_, animation, _, child) {
+      final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+        reverseCurve: Curves.easeInCubic,
+      );
+
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1, 0),
+          end: Offset.zero,
+        ).animate(curvedAnimation),
+        child: child,
+      );
+    },
+  );
+}
+
 class MrtMapScreen extends StatelessWidget {
   const MrtMapScreen({super.key});
 
