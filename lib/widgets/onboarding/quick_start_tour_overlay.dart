@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
+import 'package:transito/widgets/common/bus_arrival_legend.dart';
 
 class QuickStartTourOverlay extends StatefulWidget {
   const QuickStartTourOverlay({super.key, required this.controller});
@@ -443,7 +444,12 @@ class _QuickStartTourOverlayState extends State<QuickStartTourOverlay>
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Text(visibleStep.title, style: Theme.of(context).textTheme.titleLarge),
+                            Text(
+                              visibleStep.title,
+                              style: Theme.of(
+                                context,
+                              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                            ),
                             const SizedBox(height: 6),
                             _QuickStartStepContent(step: visibleStep),
                             if (widget.controller.primaryError case final String error) ...[
@@ -529,70 +535,8 @@ class _QuickStartStepContent extends StatelessWidget {
         step.message,
         style: Theme.of(context).textTheme.bodyLarge,
       ),
-      QuickStartContentKind.arrivalLegend => const _ArrivalLegend(),
+      QuickStartContentKind.arrivalLegend => const BusArrivalLegend(),
     };
-  }
-}
-
-class _ArrivalLegend extends StatelessWidget {
-  const _ArrivalLegend();
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color seatsAvailable = isDark ? const Color(0xFF96E2B6) : const Color(0xFF52AD7D);
-    final Color standingAvailable = isDark ? const Color(0xFFFFCEA6) : const Color(0xFFF5A650);
-    final Color limitedStanding = isDark ? const Color(0xFFFFAA8F) : const Color(0xFFF07251);
-    final TextStyle body = Theme.of(context).textTheme.bodyLarge ?? const TextStyle();
-
-    TextSpan legend(Color color, String label, String meaning) => TextSpan(
-      children: [
-        TextSpan(
-          text: label,
-          style: body.copyWith(color: color, fontWeight: FontWeight.w700),
-        ),
-        TextSpan(text: ' — $meaning\n', style: body),
-      ],
-    );
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text.rich(
-          TextSpan(
-            children: [
-              legend(seatsAvailable, 'Green', 'seats available'),
-              legend(standingAvailable, 'Amber', 'standing available'),
-              legend(limitedStanding, 'Red', 'limited standing'),
-            ],
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text.rich(
-          TextSpan(
-            style: body,
-            children: [
-              const TextSpan(
-                text: 'Italic ETAs',
-                style: TextStyle(fontStyle: FontStyle.italic),
-              ),
-              const TextSpan(text: ' are schedule estimates. The accessibility icon marks '),
-              const TextSpan(
-                text: 'wheelchair-friendly',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-              const TextSpan(text: ' buses, and '),
-              const TextSpan(
-                text: 'Single / Double / Bendy',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-              const TextSpan(text: ' identifies the bus type.'),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }
 

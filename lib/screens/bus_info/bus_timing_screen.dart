@@ -27,7 +27,7 @@ import 'package:transito/widgets/bus_info/bus_service_chip.dart';
 import 'package:transito/widgets/bus_timings/bus_timing_row.dart';
 import 'package:transito/widgets/common/adaptive_floating_action_button.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
-import 'package:transito/widgets/common/bus_timing_guide.dart';
+import 'package:transito/widgets/common/bus_arrival_legend.dart';
 import 'package:transito/widgets/common/error_text.dart';
 
 import 'bus_stop_info_screen.dart';
@@ -204,8 +204,13 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text("Bus Timing Guide"),
-          content: const BusTimingGuide(),
+          title: Text(
+            'Read arrivals',
+            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          content: const BusArrivalLegend(),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
