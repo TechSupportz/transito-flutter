@@ -25,24 +25,23 @@ class _LoginScreenState extends State<LoginScreen> {
   final Color _lightModeGradientColor = const Color(0xAA9466FF);
 
   void onGoogleBtnPress() async {
-    AuthenticationService().signInWithGoogle().then(
-      (err) {
-        if (err == null) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => _defaultHome,
-            ),
-            (Route<dynamic> route) => false,
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong... Please try again'),
-            ),
-          );
-        }
-      },
-    );
+    final String? error = await AuthenticationService().signInWithGoogle();
+    if (!mounted) return;
+
+    if (error == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => _defaultHome,
+        ),
+        (Route<dynamic> route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong... Please try again'),
+        ),
+      );
+    }
   }
 
   void onAppleBtnPress() async {
@@ -61,24 +60,23 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    AuthenticationService().signInWithApple().then(
-      (err) {
-        if (err == null) {
-          Navigator.of(context).pushAndRemoveUntil(
-            MaterialPageRoute(
-              builder: (context) => _defaultHome,
-            ),
-            (Route<dynamic> route) => false,
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Something went wrong... Please try again'),
-            ),
-          );
-        }
-      },
-    );
+    final String? error = await AuthenticationService().signInWithApple();
+    if (!mounted) return;
+
+    if (error == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => _defaultHome,
+        ),
+        (Route<dynamic> route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong... Please try again'),
+        ),
+      );
+    }
   }
 
   void onEmailBtnPress() async {
@@ -90,23 +88,24 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void onGuestLoginBtnPress() {
-    AuthenticationService().signInAnonymously().then((err) {
-      if (err == null) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => _defaultHome,
-          ),
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Something went wrong... Please try again'),
-          ),
-        );
-      }
-    });
+  void onGuestLoginBtnPress() async {
+    final String? error = await AuthenticationService().signInAnonymously();
+    if (!mounted) return;
+
+    if (error == null) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => _defaultHome,
+        ),
+        (Route<dynamic> route) => false,
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Something went wrong... Please try again'),
+        ),
+      );
+    }
   }
 
   void showGuestLoginDialog() {
@@ -116,7 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  initialiseDefaultHome() async {
+  Future<void> initialiseDefaultHome() async {
     bool isFirstRun = await IsFirstRun.isFirstRun();
     bool hasLocationPermission = await LocationService().hasLocationPermission();
     if (!isFirstRun && hasLocationPermission) {

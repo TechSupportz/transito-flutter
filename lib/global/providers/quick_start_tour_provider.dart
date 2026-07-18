@@ -207,7 +207,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 0,
       target: QuickStartTarget.nearbyOverview,
       title: 'Nearby',
-      message: 'Here\'s where you can see your nearby favourites and stops. Great to decide if you need to start running 😉',
+      message:
+          'Here\'s where you can see your nearby favourites and stops. Great to decide if you need to start running 😉',
       highlightBehavior: QuickStartHighlightBehavior.pagePulse,
       coachPlacement: QuickStartCoachPlacement.bottom,
     ),
@@ -235,7 +236,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 3,
       target: QuickStartTarget.timingTools,
       title: 'Quick tools',
-      message: 'Sort arrivals by time or service number, the heart icon saves the stop to your favourites',
+      message:
+          'Sort arrivals by time or service number, the heart icon saves the stop to your favourites',
       allowsInteraction: true,
       spotlightRadius: 12,
     ),
@@ -254,7 +256,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 4,
       target: QuickStartTarget.stopInfoPage,
       title: 'Stop details',
-      message: 'This page brings the stop address information such as the location and operating services.',
+      message:
+          'This page brings the stop address information such as the location and operating services.',
       highlightBehavior: QuickStartHighlightBehavior.pagePulse,
       coachPlacement: QuickStartCoachPlacement.bottom,
       primaryLabel: 'Continue',
@@ -286,7 +289,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 5,
       target: QuickStartTarget.serviceInfoPage,
       title: 'Service details',
-      message: 'This page shows the service routes, interchanges and first and last timing information.',
+      message:
+          'This page shows the service routes, interchanges and first and last timing information.',
       highlightBehavior: QuickStartHighlightBehavior.pagePulse,
       coachPlacement: QuickStartCoachPlacement.bottom,
       showPrimaryAction: false,
@@ -297,7 +301,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 5,
       target: QuickStartTarget.serviceInfoBack,
       title: 'Service details',
-      message: 'This page shows the service routes, interchanges and first and last timing information.',
+      message:
+          'This page shows the service routes, interchanges and first and last timing information.',
       allowsInteraction: true,
       showPrimaryAction: false,
       passiveLabel: 'Go back to the bus timing screen when you are ready.',
@@ -318,7 +323,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 6,
       target: QuickStartTarget.favouritesOverview,
       title: 'Favourites',
-      message: 'This is where you can see all your favourites together with their live arrival timings.',
+      message:
+          'This is where you can see all your favourites together with their live arrival timings.',
       highlightBehavior: QuickStartHighlightBehavior.pagePulse,
       coachPlacement: QuickStartCoachPlacement.bottom,
       primaryLabel: 'Continue',
@@ -366,7 +372,8 @@ class QuickStartTourController extends ChangeNotifier {
       visibleMoment: 9,
       target: QuickStartTarget.mrtMap,
       title: 'MRT map',
-      message: 'Drag to pan and pinch to zoom around the map. Adapts to your device\'s dark mode setting.',
+      message:
+          'Drag to pan and pinch to zoom around the map. Adapts to your device\'s dark mode setting.',
       highlightBehavior: QuickStartHighlightBehavior.pagePulse,
       coachPlacement: QuickStartCoachPlacement.bottom,
       allowsInteraction: true,
@@ -580,7 +587,7 @@ class QuickStartTourController extends ChangeNotifier {
     _pendingAdvance = Timer(const Duration(milliseconds: 80), () {
       _setPhase(QuickStartPhase.serviceDetailsOverview);
       _pendingAdvance = Timer(
-        const Duration(seconds: 3),
+        const Duration(milliseconds: 1200),
         () => _setPhase(QuickStartPhase.serviceDetailsReturn),
       );
     });
@@ -589,17 +596,15 @@ class QuickStartTourController extends ChangeNotifier {
   void _returnToRootAndSetPhase(QuickStartPhase phase) {
     _dismissCurrentSpotlight();
     _pendingAdvance?.cancel();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final NavigatorState? navigator = navigatorKey.currentState;
-      if (navigator == null || !navigator.canPop()) {
-        _setPhase(phase);
-        return;
-      }
+    final NavigatorState? navigator = navigatorKey.currentState;
+    if (navigator == null || !navigator.canPop()) {
+      _setPhase(phase);
+      return;
+    }
 
-      _isReturningToRoot = true;
-      _phaseAfterReturningToRoot = phase;
-      navigator.popUntil((Route<dynamic> route) => route.isFirst);
-    });
+    _isReturningToRoot = true;
+    _phaseAfterReturningToRoot = phase;
+    navigator.popUntil((Route<dynamic> route) => route.isFirst);
   }
 
   void _targetActivated(QuickStartTarget target) {
@@ -696,10 +701,6 @@ class QuickStartTourNavigatorObserver extends NavigatorObserver {
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     super.didPop(route, previousRoute);
     final completion = route is TransitionRoute<dynamic> ? route.completed : route.popped;
-    completion.then((_) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => controller.routePopped(route.settings.name),
-      );
-    });
+    completion.then((_) => controller.routePopped(route.settings.name));
   }
 }

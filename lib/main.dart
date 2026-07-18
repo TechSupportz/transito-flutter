@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -88,6 +90,50 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  StreamSubscription<UserSettings>? _settingsSubscription;
+  String? _settingsUserId;
+  bool _hasSettingsSubscription = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final String? userId = context.watch<User?>()?.uid;
+    if (_hasSettingsSubscription && userId == _settingsUserId) return;
+
+    _hasSettingsSubscription = true;
+    _settingsUserId = userId;
+    unawaited(_settingsSubscription?.cancel());
+    _settingsSubscription = SettingsService().streamSettings(userId).listen((userSettings) {
+      if (userId == _settingsUserId) {
+        _applySettings(userSettings);
+      }
+    });
+  }
+
+  void _applySettings(UserSettings userSettings) {
+    if (!mounted) return;
+
+    final AppColors appColors = context.read<AppColors>();
+    final Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
+        ? Brightness.dark
+        : userSettings.themeMode == AppThemeMode.LIGHT
+        ? Brightness.light
+        : MediaQuery.platformBrightnessOf(context);
+    final Color seedColor = Color(int.parse(userSettings.accentColour));
+
+    if (seedColor != appColors.accentColour || brightness != appColors.brightness) {
+      appColors.updateLocalColorScheme(seedColor, brightness);
+    }
+
+    TransitoApiService().updateUsingBetaServer(userSettings.betaServer.isUsingBetaServer);
+  }
+
+  @override
+  void dispose() {
+    unawaited(_settingsSubscription?.cancel());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     User? user = context.watch<User?>();
@@ -98,21 +144,6 @@ class _MyAppState extends State<MyApp> {
 
     AppColors appColors = context.watch<AppColors>();
 
-    SettingsService().streamSettings(user?.uid).listen((UserSettings userSettings) {
-      Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
-          ? Brightness.dark
-          : userSettings.themeMode == AppThemeMode.LIGHT
-          ? Brightness.light
-          : MediaQuery.platformBrightnessOf(context);
-      Color seedColor = Color(int.parse(userSettings.accentColour));
-
-      if (seedColor != appColors.accentColour || brightness != appColors.brightness) {
-        appColors.updateLocalColorScheme(seedColor, brightness);
-      }
-
-      TransitoApiService().updateUsingBetaServer(userSettings.betaServer.isUsingBetaServer);
-    });
-
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(
@@ -120,149 +151,144 @@ class _MyAppState extends State<MyApp> {
       ),
     );
 
-    return StreamBuilder<UserSettings>(
-      stream: SettingsService().streamSettings(user?.uid),
-      builder: (context, snapshot) {
-        return SkeletonTheme(
-          darkShimmerGradient: LinearGradient(
-            colors: [
-              appColors.scheme.surfaceContainerLow,
-              appColors.scheme.surfaceContainerHigh,
-              appColors.scheme.surfaceContainerLow,
-            ],
+    return SkeletonTheme(
+      darkShimmerGradient: LinearGradient(
+        colors: [
+          appColors.scheme.surfaceContainerLow,
+          appColors.scheme.surfaceContainerHigh,
+          appColors.scheme.surfaceContainerLow,
+        ],
+      ),
+      shimmerGradient: LinearGradient(
+        colors: [
+          appColors.scheme.surfaceContainerLow,
+          appColors.scheme.surfaceContainerHigh,
+          appColors.scheme.surfaceContainerLow,
+        ],
+      ),
+      child: MaterialApp(
+        title: "Transito",
+        supportedLocales: const [Locale('en', 'US')],
+        scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
+        debugShowCheckedModeBanner: false,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          FormBuilderLocalizations.delegate,
+        ],
+        navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
+        theme: ThemeData(
+          fontFamily: "DMSans",
+          textTheme: const TextTheme(
+            displayLarge: TextStyle(letterSpacing: -0.5),
+            displayMedium: TextStyle(letterSpacing: -0.5),
+            displaySmall: TextStyle(letterSpacing: -0.5),
+            headlineLarge: TextStyle(letterSpacing: -0.5),
+            headlineMedium: TextStyle(letterSpacing: -0.5),
+            headlineSmall: TextStyle(letterSpacing: -0.5),
+            titleLarge: TextStyle(letterSpacing: -0.5),
+            titleMedium: TextStyle(letterSpacing: -0.5),
+            titleSmall: TextStyle(letterSpacing: -0.5),
+            bodyLarge: TextStyle(letterSpacing: -0.5),
+            bodyMedium: TextStyle(letterSpacing: -0.5),
+            bodySmall: TextStyle(letterSpacing: -0.5),
+            labelLarge: TextStyle(letterSpacing: -0.5),
+            labelMedium: TextStyle(letterSpacing: -0.5),
+            labelSmall: TextStyle(letterSpacing: -0.5),
           ),
-          shimmerGradient: LinearGradient(
-            colors: [
-              appColors.scheme.surfaceContainerLow,
-              appColors.scheme.surfaceContainerHigh,
-              appColors.scheme.surfaceContainerLow,
-            ],
+          colorScheme: appColors.scheme,
+          splashFactory: InkSparkle.splashFactory,
+          tooltipTheme: TooltipThemeData(
+            textStyle: TextStyle(
+              color: appColors.scheme.onSurface,
+              fontWeight: FontWeight.w500,
+            ),
+            decoration: BoxDecoration(
+              color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
-          child: MaterialApp(
-            title: "Transito",
-            supportedLocales: const [Locale('en', 'US')],
-            scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
-            debugShowCheckedModeBanner: false,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              FormBuilderLocalizations.delegate,
-            ],
-            navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
-            theme: ThemeData(
-              fontFamily: "DMSans",
-              textTheme: const TextTheme(
-                displayLarge: TextStyle(letterSpacing: -0.5),
-                displayMedium: TextStyle(letterSpacing: -0.5),
-                displaySmall: TextStyle(letterSpacing: -0.5),
-                headlineLarge: TextStyle(letterSpacing: -0.5),
-                headlineMedium: TextStyle(letterSpacing: -0.5),
-                headlineSmall: TextStyle(letterSpacing: -0.5),
-                titleLarge: TextStyle(letterSpacing: -0.5),
-                titleMedium: TextStyle(letterSpacing: -0.5),
-                titleSmall: TextStyle(letterSpacing: -0.5),
-                bodyLarge: TextStyle(letterSpacing: -0.5),
-                bodyMedium: TextStyle(letterSpacing: -0.5),
-                bodySmall: TextStyle(letterSpacing: -0.5),
-                labelLarge: TextStyle(letterSpacing: -0.5),
-                labelMedium: TextStyle(letterSpacing: -0.5),
-                labelSmall: TextStyle(letterSpacing: -0.5),
-              ),
-              colorScheme: appColors.scheme,
-              splashFactory: InkSparkle.splashFactory,
-              tooltipTheme: TooltipThemeData(
-                textStyle: TextStyle(
-                  color: appColors.scheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-                decoration: BoxDecoration(
-                  color: appColors.scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
-              appBarTheme: AppBarTheme(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ), //NOTE - This is a workaround to make tint elevation animate.
-                shadowColor: appColors.scheme.shadow.withValues(alpha: 0.2),
-                toolbarHeight: 72
-              ),
-              checkboxTheme: CheckboxThemeData(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-              ),
-              textButtonTheme: TextButtonThemeData(
-                style: ButtonStyle(
-                  textStyle: WidgetStateProperty.all(
-                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
-                  ),
-                ),
-              ),
-              filledButtonTheme: FilledButtonThemeData(
-                style: ButtonStyle(
-                  textStyle: WidgetStateProperty.all(
-                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
-                  ),
-                ),
-              ),
-              elevatedButtonTheme: ElevatedButtonThemeData(
-                style: ButtonStyle(
-                  textStyle: WidgetStateProperty.all(
-                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
-                  ),
-                ),
-              ),
-              outlinedButtonTheme: OutlinedButtonThemeData(
-                style: ButtonStyle(
-                  textStyle: WidgetStateProperty.all(
-                    const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
-                  ),
-                ),
-              ),
-              dialogTheme: DialogThemeData(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
-                titleTextStyle: TextStyle(
-                  color: appColors.scheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 24,
-                  letterSpacing: -0.5,
-                ),
-              ),
-              snackBarTheme: SnackBarThemeData(
-                //FIXME - Animation is non-existant
-                backgroundColor: appColors.scheme.surfaceContainerHighest,
-                behavior: SnackBarBehavior.floating,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                contentTextStyle: TextStyle(
-                  color: appColors.scheme.onSurface,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              inputDecorationTheme: InputDecorationTheme(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(width: 1.75),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                floatingLabelStyle: TextStyle(fontWeight: FontWeight.w600),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                filled: true,
+          appBarTheme: AppBarTheme(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ), //NOTE - This is a workaround to make tint elevation animate.
+            shadowColor: appColors.scheme.shadow.withValues(alpha: 0.2),
+            toolbarHeight: 72,
+          ),
+          checkboxTheme: CheckboxThemeData(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+          ),
+          textButtonTheme: TextButtonThemeData(
+            style: ButtonStyle(
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
               ),
             ),
-            home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
-            builder: (context, child) {
-              return MediaQuery(
-                data: MediaQuery.of(context).copyWith(
-                  textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
-                ),
-                child: SafeArea(top: false, bottom: false, child: child!),
-              );
-            },
           ),
-        );
-      },
+          filledButtonTheme: FilledButtonThemeData(
+            style: ButtonStyle(
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+              ),
+            ),
+          ),
+          elevatedButtonTheme: ElevatedButtonThemeData(
+            style: ButtonStyle(
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+              ),
+            ),
+          ),
+          outlinedButtonTheme: OutlinedButtonThemeData(
+            style: ButtonStyle(
+              textStyle: WidgetStateProperty.all(
+                const TextStyle(fontWeight: FontWeight.w600, letterSpacing: -0.25),
+              ),
+            ),
+          ),
+          dialogTheme: DialogThemeData(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+            titleTextStyle: TextStyle(
+              color: appColors.scheme.onSurface,
+              fontWeight: FontWeight.w500,
+              fontSize: 24,
+              letterSpacing: -0.5,
+            ),
+          ),
+          snackBarTheme: SnackBarThemeData(
+            //FIXME - Animation is non-existant
+            backgroundColor: appColors.scheme.surfaceContainerHighest,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            contentTextStyle: TextStyle(
+              color: appColors.scheme.onSurface,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          inputDecorationTheme: InputDecorationTheme(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(width: 1.75),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            floatingLabelStyle: TextStyle(fontWeight: FontWeight.w600),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            filled: true,
+          ),
+        ),
+        home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
+        builder: (context, child) {
+          return MediaQuery(
+            data: MediaQuery.of(context).copyWith(
+              textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
+            ),
+            child: SafeArea(top: false, bottom: false, child: child!),
+          );
+        },
+      ),
     );
   }
 }

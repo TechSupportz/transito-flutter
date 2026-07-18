@@ -49,7 +49,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   bool _isFabVisible = true;
   final Map<String, _TimingRowCountCacheEntry> _timingRowCountCache = {};
 
-  LatLng _prevUserLocation = LatLng(0, 0);
+  LatLng? _prevUserLocation;
 
   int _placeholderTimingRowCount(Favourite favourite) {
     final _TimingRowCountCacheEntry? entry = _timingRowCountCache[favourite.busStopCode];
@@ -146,48 +146,74 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
     if (userLocation == null) {
       return;
     }
+    if (!mounted) return;
 
+    _prevUserLocation = LatLng(userLocation.latitude, userLocation.longitude);
     setState(() {
       nearbyBusStops = getNearbyBusStops(currentLocation: userLocation);
       nearbyFavourites = getNearbyFavourites(currentLocation: userLocation);
     });
 
     if (userInitiated) {
-      streamUserLocation(userInitiated: true);
+      await streamUserLocation(userInitiated: true);
     }
   }
 
-  void streamUserLocation({bool userInitiated = false}) async {
+  Future<void> streamUserLocation({bool userInitiated = false}) async {
     final canUseLocation = await LocationService().canUseLocation(userInitiated: userInitiated);
-    if (!canUseLocation) {
+    if (!canUseLocation || !mounted) {
       return;
     }
 
     await userLocationStream?.cancel();
+    if (!mounted) return;
     userLocationStream = LocationService().positionStream.listen((Position? position) {
-      if (position == null) {
+      if (position == null || !mounted) {
         return;
       }
 
-      if (_prevUserLocation.latitude == position.latitude &&
-          _prevUserLocation.longitude == position.longitude) {
+      final LatLng currentLocation = LatLng(position.latitude, position.longitude);
+      final LatLng? previousLocation = _prevUserLocation;
+      if (previousLocation != null &&
+          distance.as(LengthUnit.Meter, previousLocation, currentLocation) < 50) {
         return;
       }
+      _prevUserLocation = currentLocation;
       setState(() {
         nearbyBusStops = getNearbyBusStops(currentLocation: position);
         nearbyFavourites = getNearbyFavourites(currentLocation: position);
-        _prevUserLocation = LatLng(position.latitude, position.longitude);
       });
     });
+  }
+
+  void _initialiseNearby() {
+    final Future<Position?> initialPosition = LocationService().getCurrentPosition();
+    nearbyBusStops = initialPosition.then((Position? position) {
+      if (position == null) return <NearbyBusStop>[];
+      return getNearbyBusStops(currentLocation: position);
+    });
+    nearbyFavourites = initialPosition.then((Position? position) {
+      if (position == null) return <NearbyFavourites>[];
+      return getNearbyFavourites(currentLocation: position);
+    });
+    unawaited(_startLocationStreamAfter(initialPosition));
+  }
+
+  Future<void> _startLocationStreamAfter(Future<Position?> initialPosition) async {
+    final Position? position = await initialPosition;
+    if (!mounted) return;
+
+    if (position != null) {
+      _prevUserLocation = LatLng(position.latitude, position.longitude);
+    }
+    await streamUserLocation();
   }
 
   @override
   void initState() {
     super.initState();
     debugPrint("Initializing bus stops");
-    nearbyBusStops = getNearbyBusStops();
-    nearbyFavourites = getNearbyFavourites();
-    streamUserLocation();
+    _initialiseNearby();
 
     WidgetsBinding.instance.addObserver(this);
 
