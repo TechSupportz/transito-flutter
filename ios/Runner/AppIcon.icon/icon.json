@@ -1,5 +1,9 @@
 {
   "color-space-for-untagged-svg-colors" : "display-p3",
+  "features" : [
+    "refractivity",
+    "specular-location"
+  ],
   "fill-specializations" : [
     {
       "value" : {
@@ -15,21 +19,26 @@
   ],
   "groups" : [
     {
-      "blur-material" : null,
+      "blur-material" : 0.5,
       "layers" : [
         {
           "blend-mode" : "normal",
-          "fill-specializations" : [
-            {
-              "value" : "automatic"
-            },
-            {
-              "appearance" : "tinted",
-              "value" : {
-                "solid" : "extended-gray:0.75000,1.00000"
+          "fill" : {
+            "linear-gradient" : [
+              "display-p3:0.37573,0.30493,0.96387,0.90000",
+              "display-p3:0.55176,0.52441,0.96777,1.00000"
+            ],
+            "orientation" : {
+              "start" : {
+                "x" : 0.6779131167993765,
+                "y" : 0.33947914866984436
+              },
+              "stop" : {
+                "x" : 0,
+                "y" : 1
               }
             }
-          ],
+          },
           "glass" : true,
           "hidden" : false,
           "image-name" : "Transito-Icon.svg",
@@ -37,22 +46,55 @@
           "position" : {
             "scale" : 1.45,
             "translation-in-points" : [
-              0,
-              0
+              7,
+              -0.18487668723616935
             ]
           }
         }
       ],
       "lighting" : "individual",
+      "name" : "Group",
+      "refractivity" : {
+        "depth" : 0.5,
+        "enabled" : true,
+        "strength" : 0
+      },
       "shadow" : {
         "kind" : "layer-color",
-        "opacity" : 0.35
+        "opacity" : 0.6
       },
-      "specular" : true,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0.35
-      }
+      "specular-specializations" : [
+        {
+          "value" : "outside"
+        },
+        {
+          "appearance" : "light",
+          "value" : "inside"
+        },
+        {
+          "appearance" : "dark",
+          "value" : "outside"
+        },
+        {
+          "appearance" : "tinted",
+          "value" : "inside"
+        }
+      ],
+      "translucency-specializations" : [
+        {
+          "value" : {
+            "enabled" : true,
+            "value" : 0.5
+          }
+        },
+        {
+          "appearance" : "tinted",
+          "value" : {
+            "enabled" : true,
+            "value" : 0.25
+          }
+        }
+      ]
     }
   ],
   "supported-platforms" : {
