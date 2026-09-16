@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:animations/animations.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -47,6 +47,14 @@ class _EmailScreenState extends State<EmailScreen> {
     setState(() {
       _isLoading = true;
     });
+    _emailLoginFieldKey.currentState?.validate(
+      clearCustomError: true,
+      focusOnInvalid: false,
+    );
+    _passwordLoginFieldKey.currentState?.validate(
+      clearCustomError: true,
+      focusOnInvalid: false,
+    );
     _loginFormKey.currentState!.saveAndValidate();
     if (_loginFormKey.currentState!.isValid) {
       AuthenticationService()
@@ -118,7 +126,7 @@ class _EmailScreenState extends State<EmailScreen> {
 
   void onSendPasswordResetBtnPress() async {
     _forgotPasswordEmailFieldKey.currentState!.save();
-    _forgotPasswordEmailFieldKey.currentState!.validate();
+    _forgotPasswordEmailFieldKey.currentState!.validate(clearCustomError: true);
     if (_forgotPasswordEmailFieldKey.currentState!.isValid) {
       await AuthenticationService()
           .sendPasswordResetEmail(_forgotPasswordEmailFieldKey.currentState!.value)
@@ -155,6 +163,14 @@ class _EmailScreenState extends State<EmailScreen> {
     setState(() {
       _isLoading = true;
     });
+    _emailRegisterFieldKey.currentState?.validate(
+      clearCustomError: true,
+      focusOnInvalid: false,
+    );
+    _passwordRegisterFieldKey.currentState?.validate(
+      clearCustomError: true,
+      focusOnInvalid: false,
+    );
     _registerFormKey.currentState!.saveAndValidate();
     if (_registerFormKey.currentState!.validate()) {
       AuthenticationService()

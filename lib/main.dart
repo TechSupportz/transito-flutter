@@ -4,9 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -171,9 +170,8 @@ class _MyAppState extends State<MyApp> {
         supportedLocales: const [Locale('en', 'US')],
         scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
+        localizationsDelegates: [
+          ...GlobalMaterialLocalizations.delegates,
           FormBuilderLocalizations.delegate,
         ],
         navigatorObservers: kDebugMode ? [] : [PosthogObserver()],
@@ -281,11 +279,13 @@ class _MyAppState extends State<MyApp> {
         ),
         home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
         builder: (context, child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(
-              textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
+          return MaterialUiCompatibilityBridge(
+            child: MediaQuery(
+              data: MediaQuery.of(context).copyWith(
+                textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
+              ),
+              child: SafeArea(top: false, bottom: false, child: child!),
             ),
-            child: SafeArea(top: false, bottom: false, child: child!),
           );
         },
       ),

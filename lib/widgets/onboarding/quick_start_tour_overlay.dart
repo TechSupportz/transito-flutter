@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/widgets/common/bus_arrival_legend.dart';
 

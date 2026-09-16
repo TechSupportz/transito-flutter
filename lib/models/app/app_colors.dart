@@ -1,6 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
 
 class AppColors with ChangeNotifier {

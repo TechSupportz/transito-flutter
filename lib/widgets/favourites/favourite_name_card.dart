@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:transito/models/app/app_typography.dart';

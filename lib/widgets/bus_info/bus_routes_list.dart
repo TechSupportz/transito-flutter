@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:smooth_highlight/smooth_highlight.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/widgets/bus_info/bus_stop_card.dart';

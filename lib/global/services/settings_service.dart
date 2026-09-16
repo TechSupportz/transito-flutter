@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:transito/global/services/user_provisioning_service.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/app_theme_mode_enum.dart';

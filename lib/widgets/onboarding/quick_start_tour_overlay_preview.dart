@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/widget_previews.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/widgets/onboarding/quick_start_tour_overlay.dart';
