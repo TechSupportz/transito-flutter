@@ -57,3 +57,8 @@ app.*.map.json
 
 # Local teaching materials
 /lesson/
+
+# Flutter Demon user preferences (not tracked)
+.fdemon/settings.local.toml
+.fdemon/config.toml
+.zed/debug.json
