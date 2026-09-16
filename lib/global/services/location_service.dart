@@ -12,6 +12,7 @@ class LocationService {
   Future<Position?>? _activePositionRequest;
   StreamController<Position?>? _positionController;
   StreamSubscription<Position>? _positionSubscription;
+  Position? _latestPosition;
   final ValueNotifier<bool> _automaticRequestsSuppressed = ValueNotifier<bool>(false);
 
   ValueListenable<bool> get automaticRequestsSuppressed => _automaticRequestsSuppressed;
@@ -40,7 +41,16 @@ class LocationService {
       onCancel: _stopPositionStream,
     );
 
-    return _positionController!.stream;
+    return Stream<Position?>.multi((controller) {
+      final subscription = _positionController!.stream.listen(
+        controller.add,
+        onError: controller.addError,
+        onDone: controller.close,
+      );
+      final position = _latestPosition;
+      if (position != null) controller.add(position);
+      controller.onCancel = subscription.cancel;
+    }, isBroadcast: true);
   }
 
   Future<bool> canUseLocation({bool userInitiated = false}) async {
@@ -104,7 +114,7 @@ class LocationService {
           accuracy: LocationAccuracy.best,
         ),
       );
-      _positionController?.add(position);
+      _publishPosition(position);
       return position;
     } on LocationServiceDisabledException catch (error) {
       _suppressAutomaticRequests();
@@ -147,7 +157,7 @@ class LocationService {
             distanceFilter: 50,
           ),
         ).listen(
-          (position) => _positionController?.add(position),
+          _publishPosition,
           onError: (Object error) {
             _suppressAutomaticRequests();
             debugPrint('Location stream failed: $error');
@@ -162,8 +172,14 @@ class LocationService {
   }
 
   void _suppressAutomaticRequests() {
+    _latestPosition = null;
     _setAutomaticRequestsSuppressed(true);
     unawaited(_stopPositionStream());
+  }
+
+  void _publishPosition(Position position) {
+    _latestPosition = position;
+    _positionController?.add(position);
   }
 
   void _setAutomaticRequestsSuppressed(bool value) {
