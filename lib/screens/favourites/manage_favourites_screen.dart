@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -126,11 +126,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
                       buildDefaultDragHandles: false,
                       itemCount: favouritesList.length,
                       // calls reorder function in FavouritesProvider to reorder the favourites list
-                      onReorder: (oldIndex, newIndex) {
-                        if (oldIndex < newIndex) {
-                          // removing the item at oldIndex will shorten the list by 1
-                          newIndex--;
-                        }
+                      onReorderItem: (oldIndex, newIndex) {
                         favouritesList.insert(newIndex, favouritesList.removeAt(oldIndex));
 
                         setState(() {

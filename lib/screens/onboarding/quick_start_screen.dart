@@ -1,5 +1,5 @@
 import 'package:animations/animations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/global/services/transito_api_service.dart';

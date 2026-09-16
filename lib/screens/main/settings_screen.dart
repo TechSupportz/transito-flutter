@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -48,7 +48,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     });
 
     _nameFieldKey.currentState?.save();
-    _nameFieldKey.currentState?.validate();
+    _nameFieldKey.currentState?.validate(clearCustomError: true);
 
     if (_nameFieldKey.currentState!.isValid && user != null) {
       if (user.displayName != _nameFieldKey.currentState!.value) {
@@ -125,7 +125,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void updateAccentColour(User? user) async {
     _accentColourFieldKey.currentState?.save();
-    _accentColourFieldKey.currentState?.validate();
+    _accentColourFieldKey.currentState?.validate(clearCustomError: true);
 
     if (_accentColourFieldKey.currentState!.isValid && user != null) {
       Color newColour = _accentColourFieldKey.currentState!.value as Color;
@@ -133,7 +133,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       SettingsService()
           .updateAccentColour(
             userId: user.uid,
-            newValue: '0x${newColour.value.toRadixString(16).toUpperCase()}',
+            newValue: '0x${newColour.toARGB32().toRadixString(16).toUpperCase()}',
           )
           .then(
             (_) => showDialog(

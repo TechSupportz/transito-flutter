@@ -1,10 +1,9 @@
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/api_exceptions.dart';
 import 'package:transito/global/services/favourites_service.dart';
@@ -16,6 +15,8 @@ import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/chekbox_skeleton.dart';
+import 'package:transito/widgets/common/error_text.dart';
+import 'package:transito/widgets/favourites/bus_service_checklist.dart';
 import 'package:transito/widgets/favourites/favourite_alias_field.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
@@ -42,10 +43,12 @@ class EditFavouritesScreen extends StatefulWidget {
 class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _aliasController = TextEditingController();
-  late Future<Map<String?, List<String?>>> futureFavouriteServicesList;
+  late Future<List<String?>> futureFavouriteServicesList;
   late Future<List<Favourite>> futureFavouritesList;
   late Future<List<String>> futureBusServicesList;
   late Future<BusStop?> futureCurrentBusStop;
+  late final Future<List<String>> _futureServiceSelection;
+  Set<String>? _selectedServices;
   bool _currentBusStopMissing = false;
 
   // function to display snackbar
@@ -60,10 +63,10 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
   // function to properly sort the bus arrival info according to the Bus Service number
   BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
-    var _value = value;
-    _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
+    var value0 = value;
+    value0.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
 
-    return _value;
+    return value0;
   }
 
   // function to fetch the list of services available at the bus stop
@@ -81,8 +84,8 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     }
 
     debugPrint("Retrieving services from saved favourite");
-    final Map<String?, List<String?>> favouriteServices = await futureFavouriteServicesList;
-    return favouriteServices['Bus Services']!.whereType<String>().toList();
+    final List<String?> favouriteServices = await futureFavouriteServicesList;
+    return favouriteServices.whereType<String>().toList();
   }
 
   Future<BusStop?> fetchCurrentBusStop() async {
@@ -132,9 +135,24 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     return favourites.firstWhere((favourite) => favourite.busStopCode == widget.busStopCode);
   }
 
-  Future<Map<String?, List<String?>>> _getFavouriteServices() async {
+  Future<List<String?>> _getFavouriteServices() async {
     final Favourite favourite = _findFavourite(await futureFavouritesList);
-    return {'Bus Services': favourite.services};
+    return favourite.services;
+  }
+
+  Future<List<String>> _initializeServiceSelection() async {
+    final (savedServices, availableServices) = await (
+      futureFavouriteServicesList,
+      futureBusServicesList,
+    ).wait;
+
+    if (mounted) {
+      setState(() {
+        // Exclude services that no longer operate without changing the saved favourite.
+        _selectedServices = availableServices.where(savedServices.contains).toSet();
+      });
+    }
+    return availableServices;
   }
 
   String? _validateAlias(String? value, List<Favourite>? favourites) {
@@ -210,6 +228,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     futureFavouritesList = FavouritesService().getFavourites(userId);
     futureFavouriteServicesList = _getFavouriteServices();
     futureBusServicesList = fetchServicesList();
+    _futureServiceSelection = _initializeServiceSelection();
     _initializeAlias();
     futureCurrentBusStop.then((_) {
       if (!_currentBusStopMissing) {
@@ -234,9 +253,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
 
     Future<void> deleteFavorites() async {
       // retrieve the list of services that the user initially had in their favourites
-      List<String?> initialServices = await futureFavouriteServicesList.then((value) {
-        return value['Bus Services']!;
-      });
+      final List<String?> initialServices = await futureFavouriteServicesList;
 
       // if no services were selected then remove the bus stop from favourites list
       if (context.mounted) {
@@ -287,10 +304,10 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
     }
 
     Future<void> updateFavorites() async {
-      // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
-      debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
-
-      List<String?> selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
+      final List<String>? selectedServices = _selectedServices?.toList();
+      if (selectedServices == null) {
+        return;
+      }
 
       // check if user wants to edit or remove favourites
       if (selectedServices.isNotEmpty) {
@@ -420,27 +437,23 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   validator: (value) => _validateAlias(value, snapshot.data),
                 ),
               ),
-              FutureBuilder(
-                future: Future.wait([futureFavouriteServicesList, futureBusServicesList]),
-                builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
-                  Widget servicesChecklist = Expanded(child: const SizedBox());
+              FutureBuilder<List<String>>(
+                future: _futureServiceSelection,
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return const Expanded(
+                      child: Center(
+                        child: ErrorText(
+                          title: "Couldn't load bus services",
+                          message: 'Please reopen this favourite to try again.',
+                        ),
+                      ),
+                    );
+                  }
+
+                  Widget servicesChecklist = const SizedBox.shrink();
 
                   if (snapshot.hasData) {
-                    var initialChildrenValue = snapshot.data![0] as Map<String?, List<String?>>;
-                    var busServicesList = snapshot.data![1] as List<String>;
-
-                    // this filters out services which have stopped operating but are still in the user's favourites
-                    if (initialChildrenValue["Bus Services"] != null &&
-                        !initialChildrenValue["Bus Services"]!.every(
-                          (service) => busServicesList.contains(service),
-                        )) {
-                      initialChildrenValue["Bus Services"] = initialChildrenValue["Bus Services"]!
-                          .where(
-                            (service) => busServicesList.contains(service),
-                          )
-                          .toList();
-                    }
-
                     servicesChecklist = ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return LinearGradient(
@@ -460,24 +473,10 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                         alignment: Alignment.topCenter,
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.only(top: 8, bottom: 16),
-                          child: Column(
-                            children: [
-                              ParentChildCheckbox(
-                                parent: const Text(
-                                  "Bus Services",
-                                  style: AppTypography.checkboxLabel,
-                                ),
-                                // initialParentValue: {'Bus Services': true},
-                                initialChildrenValue: initialChildrenValue,
-                                parentCheckboxScale: 1.35,
-                                childrenCheckboxScale: 1.35,
-                                gap: 2,
-                                children: [
-                                  for (var service in busServicesList)
-                                    Text(service, style: AppTypography.checkboxLabel),
-                                ],
-                              ),
-                            ],
+                          child: BusServiceChecklist(
+                            services: snapshot.data!,
+                            selectedServices: _selectedServices!,
+                            onChanged: (selection) => setState(() => _selectedServices = selection),
                           ),
                         ),
                       ),
@@ -519,7 +518,7 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     FilledButton(
-                      onPressed: () => updateFavorites(),
+                      onPressed: _selectedServices == null ? null : updateFavorites,
                       child: const Text("Save changes"),
                     ),
                     const SizedBox(

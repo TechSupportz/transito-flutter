@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -187,7 +187,7 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
     );
   }
 
-  showClearAlertDialog(BuildContext context) {
+  Future<dynamic> showClearAlertDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -692,8 +692,8 @@ class _MapSearchScreenState extends State<MapSearchScreen> with TickerProviderSt
                             ValueListenableBuilder(
                               valueListenable: mapRotation,
                               builder: (context, rotation, child) {
-                                int _cameraRotation = rotation.floor().abs();
-                                bool isRotated = !(_cameraRotation < 2 || _cameraRotation > 358);
+                                int cameraRotation = rotation.floor().abs();
+                                bool isRotated = !(cameraRotation < 2 || cameraRotation > 358);
 
                                 return AnimatedOpacity(
                                   opacity: isRotated ? 1.0 : 0.0,

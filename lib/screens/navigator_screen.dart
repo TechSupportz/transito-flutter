@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:animations/animations.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import "package:native_glass_navbar/native_glass_navbar.dart";
 import 'package:provider/provider.dart';

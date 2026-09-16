@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:parent_child_checkbox/parent_child_checkbox.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
@@ -9,6 +8,7 @@ import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
+import 'package:transito/widgets/favourites/bus_service_checklist.dart';
 import 'package:transito/widgets/favourites/favourite_alias_field.dart';
 
 class AddFavouritesScreen extends StatefulWidget {
@@ -35,6 +35,7 @@ class AddFavouritesScreen extends StatefulWidget {
 class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _aliasController = TextEditingController();
+  Set<String> _selectedServices = {};
   bool _isAddingFavourite = false;
   late final Future<List<Favourite>> _futureFavouritesList;
 
@@ -104,10 +105,7 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
         return;
       }
 
-      // debugPrint('isParentSelected: ${ParentChildCheckbox.isParentSelected}');
-      debugPrint('selectedChildren ${ParentChildCheckbox.selectedChildrens}');
-
-      List<String?> selectedServices = ParentChildCheckbox.selectedChildrens['Bus Services']!;
+      final List<String> selectedServices = _selectedServices.toList();
 
       // check if any bus services are selected
       if (selectedServices.isEmpty) {
@@ -262,19 +260,10 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
                   blendMode: BlendMode.dstOut,
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.only(top: 8, bottom: 16),
-                    child: Column(
-                      children: [
-                        ParentChildCheckbox(
-                          parent: const Text("Bus Services", style: AppTypography.checkboxLabel),
-                          parentCheckboxScale: 1.35,
-                          childrenCheckboxScale: 1.35,
-                          gap: 2,
-                          children: [
-                            for (var service in widget.busServicesList)
-                              Text(service, style: AppTypography.checkboxLabel),
-                          ],
-                        ),
-                      ],
+                    child: BusServiceChecklist(
+                      services: widget.busServicesList,
+                      selectedServices: _selectedServices,
+                      onChanged: (selection) => setState(() => _selectedServices = selection),
                     ),
                   ),
                 ),

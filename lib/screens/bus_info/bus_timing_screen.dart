@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
 import 'package:latlong2/latlong.dart';
@@ -97,10 +97,10 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
 
   // function to properly sort the bus arrival info according to the Bus Service number
   BusArrivalInfo sortBusArrivalInfo(BusArrivalInfo value) {
-    var _value = value;
+    var value0 = value;
 
     if (sortByArrivalTime) {
-      _value.services.sort((a, b) {
+      value0.services.sort((a, b) {
         final DateTime? aArrival = parseBusArrivalTime(a.nextBus.estimatedArrival);
         final DateTime? bArrival = parseBusArrivalTime(b.nextBus.estimatedArrival);
 
@@ -113,12 +113,12 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
         return aArrival.compareTo(bArrival);
       });
 
-      return _value;
+      return value0;
     }
 
-    _value.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
+    value0.services.sort((a, b) => compareNatural(a.serviceNum, b.serviceNum));
 
-    return _value;
+    return value0;
   }
 
   // function to get the list of bus services that are currently operating at that bus stop and route to the add favourites screen
@@ -531,7 +531,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                   );
                 }
 
-                Animation<double> _animation = Tween(
+                Animation<double> animation = Tween(
                   begin: 0.0,
                   end: 0.5,
                 ).animate(_animationController);
@@ -549,7 +549,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                       busArrivalInfoSnapshot.connectionState == ConnectionState.waiting &&
                           !busArrivalInfoSnapshot.hasData
                       ? FadeTransition(
-                          opacity: _animation,
+                          opacity: animation,
                           child: const SkeletonLine(
                             style: SkeletonLineStyle(
                               height: double.infinity,
