@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_ui/material_ui.dart';
-import 'package:transito/widgets/favourites/bus_service_checklist.dart';
+import 'package:transito/widgets/common/parent_child_checkbox_list.dart';
 
 void main() {
-  testWidgets('renders in material_ui and keeps parent and service selections in sync', (
+  testWidgets('renders in material_ui and keeps parent and child selections in sync', (
     tester,
   ) async {
     Set<String> selection = {};
@@ -11,9 +11,11 @@ void main() {
       MaterialApp(
         home: Scaffold(
           body: StatefulBuilder(
-            builder: (context, setState) => BusServiceChecklist(
-              services: const ['10', '14'],
-              selectedServices: selection,
+            builder: (context, setState) => ParentChildCheckboxList<String>(
+              parent: const Text('Options'),
+              children: const ['Alpha', 'Beta'],
+              selectedChildren: selection,
+              childBuilder: (context, child) => Text(child),
               onChanged: (value) => setState(() => selection = value),
             ),
           ),
@@ -30,7 +32,7 @@ void main() {
 
     await tester.tap(find.byType(Checkbox).first);
     await tester.pump();
-    expect(selection, {'10', '14'});
+    expect(selection, {'Alpha', 'Beta'});
     expect(values(), [true, true, true]);
 
     await tester.tap(find.byType(Checkbox).first);
@@ -42,7 +44,7 @@ void main() {
     await tester.tap(find.byType(Checkbox).at(1));
     await tester.pump();
     expect(previousSelection, isEmpty, reason: 'Callbacks must not mutate the screen snapshot.');
-    expect(selection, {'10'});
+    expect(selection, {'Alpha'});
     expect(values(), [null, true, false]);
 
     await tester.tap(find.byType(Checkbox).at(2));
@@ -51,7 +53,7 @@ void main() {
 
     await tester.tap(find.byType(Checkbox).at(1));
     await tester.pump();
-    expect(selection, {'14'});
+    expect(selection, {'Beta'});
     expect(values(), [null, false, true]);
 
     // Preserve the fork's partial-selection -> clear behavior.
@@ -61,11 +63,11 @@ void main() {
     expect(values(), [false, false, false]);
   });
 
-  testWidgets('saved and updated screen selections remain independent between checklists', (
+  testWidgets('selection remains independent between checklists', (
     tester,
   ) async {
-    final Set<String> savedServices = {'14'};
-    Set<String> selection = savedServices;
+    final Set<int> savedChildren = {2};
+    Set<int> selection = savedChildren;
     late StateSetter rebuild;
 
     await tester.pumpWidget(
@@ -76,15 +78,23 @@ void main() {
               rebuild = setState;
               return Column(
                 children: [
-                  BusServiceChecklist(
-                    services: const ['10', '14'],
-                    selectedServices: selection,
-                    onChanged: (value) => setState(() => selection = value),
+                  Expanded(
+                    child: ParentChildCheckboxList<int>(
+                      parent: const Text('Numbers'),
+                      children: const [1, 2],
+                      selectedChildren: selection,
+                      childBuilder: (context, child) => Text('$child'),
+                      onChanged: (value) => setState(() => selection = value),
+                    ),
                   ),
-                  BusServiceChecklist(
-                    services: const ['D1'],
-                    selectedServices: const {'D1'},
-                    onChanged: (_) {},
+                  Expanded(
+                    child: ParentChildCheckboxList<String>(
+                      parent: const Text('Letters'),
+                      children: const ['A'],
+                      selectedChildren: const {'A'},
+                      childBuilder: (context, child) => Text(child),
+                      onChanged: (_) {},
+                    ),
                   ),
                 ],
               );
@@ -100,7 +110,7 @@ void main() {
     expect(values(), [null, false, true, true, true]);
     await tester.tap(find.byType(Checkbox).at(2));
     await tester.pump();
-    expect(savedServices, {'14'});
+    expect(savedChildren, {2});
     expect(selection, isEmpty);
     expect(values(), [false, false, false, true, true]);
 
@@ -108,19 +118,21 @@ void main() {
     await tester.pump();
     expect(values(), [false, false, false, true, true]);
 
-    rebuild(() => selection = {'10', '14'});
+    rebuild(() => selection = {1, 2});
     await tester.pump();
     expect(values(), [true, true, true, true, true]);
   });
 
-  testWidgets('an empty service list has a disabled unchecked parent', (tester) async {
+  testWidgets('an empty child list has a disabled unchecked parent', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(
-          body: BusServiceChecklist(
-            services: const [],
-            selectedServices: const {},
-            onChanged: (_) => fail('There are no services to select.'),
+          body: ParentChildCheckboxList<String>(
+            parent: const Text('Options'),
+            children: const [],
+            selectedChildren: const {},
+            childBuilder: (context, child) => Text(child),
+            onChanged: (_) => fail('There are no children to select.'),
           ),
         ),
       ),
@@ -130,5 +142,37 @@ void main() {
     expect(parent.value, false);
     expect(parent.onChanged, isNull);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('keeps the parent fixed while the children scroll', (tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            height: 220,
+            child: ParentChildCheckboxList<int>(
+              parent: const Text('Options'),
+              children: List.generate(10, (index) => index),
+              selectedChildren: const {},
+              childBuilder: (context, child) => Text('Item $child'),
+              onChanged: (_) {},
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final double parentTop = tester.getTopLeft(find.text('Options')).dy;
+    expect(find.text('Item 0'), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Item 9'),
+      100,
+      scrollable: find.byType(Scrollable),
+    );
+
+    expect(tester.getTopLeft(find.text('Options')).dy, parentTop);
+    expect(find.text('Item 0'), findsNothing);
+    expect(find.text('Item 9'), findsOneWidget);
   });
 }
