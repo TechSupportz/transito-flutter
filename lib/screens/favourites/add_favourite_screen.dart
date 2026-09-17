@@ -8,7 +8,7 @@ import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/models/favourites/favourite.dart';
 import 'package:transito/screens/navigator_screen.dart';
-import 'package:transito/widgets/favourites/bus_service_checklist.dart';
+import 'package:transito/widgets/common/parent_child_checkbox_list.dart';
 import 'package:transito/widgets/favourites/favourite_alias_field.dart';
 
 class AddFavouritesScreen extends StatefulWidget {
@@ -243,29 +243,13 @@ class _AddFavouritesScreenState extends State<AddFavouritesScreen> {
               ),
               const SizedBox(height: 8),
               Expanded(
-                child: ShaderMask(
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Theme.of(context).colorScheme.surface,
-                        Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                        Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                        Theme.of(context).colorScheme.surface,
-                      ],
-                      stops: [0.0, 0.05, 0.95, 1.0],
-                    ).createShader(bounds);
-                  },
-                  blendMode: BlendMode.dstOut,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(top: 8, bottom: 16),
-                    child: BusServiceChecklist(
-                      services: widget.busServicesList,
-                      selectedServices: _selectedServices,
-                      onChanged: (selection) => setState(() => _selectedServices = selection),
-                    ),
-                  ),
+                child: ParentChildCheckboxList<String>(
+                  parent: const Text('Bus Services', style: AppTypography.checkboxLabel),
+                  children: widget.busServicesList,
+                  selectedChildren: _selectedServices,
+                  childBuilder: (context, service) =>
+                      Text(service, style: AppTypography.checkboxLabel),
+                  onChanged: (selection) => setState(() => _selectedServices = selection),
                 ),
               ),
               Padding(

@@ -16,7 +16,7 @@ import 'package:transito/screens/navigator_screen.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 import 'package:transito/widgets/common/chekbox_skeleton.dart';
 import 'package:transito/widgets/common/error_text.dart';
-import 'package:transito/widgets/favourites/bus_service_checklist.dart';
+import 'package:transito/widgets/common/parent_child_checkbox_list.dart';
 import 'package:transito/widgets/favourites/favourite_alias_field.dart';
 
 class EditFavouritesScreen extends StatefulWidget {
@@ -454,32 +454,13 @@ class _EditFavouritesScreenState extends State<EditFavouritesScreen> {
                   Widget servicesChecklist = const SizedBox.shrink();
 
                   if (snapshot.hasData) {
-                    servicesChecklist = ShaderMask(
-                      shaderCallback: (Rect bounds) {
-                        return LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            Theme.of(context).colorScheme.surface,
-                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                            Theme.of(context).colorScheme.surface.withValues(alpha: 0.0),
-                            Theme.of(context).colorScheme.surface,
-                          ],
-                          stops: [0.0, 0.05, 0.95, 1.0],
-                        ).createShader(bounds);
-                      },
-                      blendMode: BlendMode.dstOut,
-                      child: Align(
-                        alignment: Alignment.topCenter,
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.only(top: 8, bottom: 16),
-                          child: BusServiceChecklist(
-                            services: snapshot.data!,
-                            selectedServices: _selectedServices!,
-                            onChanged: (selection) => setState(() => _selectedServices = selection),
-                          ),
-                        ),
-                      ),
+                    servicesChecklist = ParentChildCheckboxList<String>(
+                      parent: const Text('Bus Services', style: AppTypography.checkboxLabel),
+                      children: snapshot.data!,
+                      selectedChildren: _selectedServices!,
+                      childBuilder: (context, service) =>
+                          Text(service, style: AppTypography.checkboxLabel),
+                      onChanged: (selection) => setState(() => _selectedServices = selection),
                     );
                   }
 
