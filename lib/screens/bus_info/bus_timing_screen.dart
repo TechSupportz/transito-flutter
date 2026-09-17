@@ -571,6 +571,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
           }
         },
       ),
+      floatingActionButtonLocation: AdaptiveFloatingActionButton.locationOf(context),
       floatingActionButton: isFabVisible
           ? AdaptiveFloatingActionButton(
               materialSymbol: Symbols.refresh_rounded,
