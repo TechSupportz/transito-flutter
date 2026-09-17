@@ -18,8 +18,8 @@ class NativeGlassButton extends StatelessWidget {
     AppColors appColors = context.watch<AppColors>();
 
     return SizedBox(
-      width: 56.0,
-      height: 56.0,
+      width: 64.0,
+      height: 64.0,
       child: UiKitView(
         viewType: 'GlassButton',
         layoutDirection: TextDirection.ltr,

@@ -145,6 +145,7 @@ class _ManageFavouritesScreenState extends State<ManageFavouritesScreen> {
           ],
         ),
       ),
+      floatingActionButtonLocation: AdaptiveFloatingActionButton.locationOf(context),
       floatingActionButton: AdaptiveFloatingActionButton(
         onPressed: _saveReorderedFavourites,
         materialSymbol: Symbols.done_rounded,
