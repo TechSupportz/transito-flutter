@@ -89,7 +89,6 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
     final BusArrivalInfo info = await BusArrivalService().getBusArrival(
       widget.code,
       sources: widget.sources,
-      isBusTimingScreen: true,
     );
     debugPrint("Timing fetched");
     return info;

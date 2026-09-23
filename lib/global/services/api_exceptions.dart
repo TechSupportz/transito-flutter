@@ -19,11 +19,14 @@ class ApiException implements Exception {
 }
 
 class NetworkException implements Exception {
-  NetworkException(this.message, {this.uri, this.cause});
+  NetworkException(this.message, {this.uri, this.cause, this.isTimeout = false});
 
   final String message;
   final Uri? uri;
   final Object? cause;
+
+  /// Timeouts are never treated as an Outage, since they usually come from the user's own network.
+  final bool isTimeout;
 
   @override
   String toString() {

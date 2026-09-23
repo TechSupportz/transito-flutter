@@ -10,6 +10,9 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/widgets/alerts/alerts_button.dart';
+import 'package:transito/widgets/alerts/critical_announcement_banner.dart';
+import 'package:transito/global/providers/alerts_provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/services/favourites_service.dart';
 import 'package:transito/global/services/location_service.dart';
@@ -141,6 +144,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
   // function to get the list of all nearby bus stops
   void getAllNearby({bool userInitiated = false}) async {
     debugPrint("Getting all nearby");
+    if (userInitiated) AlertsProvider().refreshAnnouncements();
     final Position? userLocation = await LocationService().getCurrentPosition(
       userInitiated: userInitiated,
     );
@@ -252,6 +256,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
         title: Text('Welcome ${user?.displayName ?? ''}'),
         centerTitle: false,
         actions: [
+          const AlertsButton(),
           IconButton(
             onPressed: () {
               QuickStartTargetScope.activate(context, QuickStartTarget.settingsButton);
@@ -286,28 +291,35 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
           child: SingleChildScrollView(
             key: QuickStartTargetScope.keyOf(context, QuickStartTarget.nearbyOverview),
             padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
-            child: ValueListenableBuilder<bool>(
-              valueListenable: LocationService().automaticRequestsSuppressed,
-              builder: (context, automaticRequestsSuppressed, child) {
-                if (automaticRequestsSuppressed) {
-                  QuickStartTargetScope.reportAvailability(
-                    context,
-                    QuickStartTarget.firstNearbyStop,
-                    false,
-                  );
-                  return locationUnavailableMessage();
-                }
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const CriticalAnnouncementBanner(),
+                ValueListenableBuilder<bool>(
+                  valueListenable: LocationService().automaticRequestsSuppressed,
+                  builder: (context, automaticRequestsSuppressed, child) {
+                    if (automaticRequestsSuppressed) {
+                      QuickStartTargetScope.reportAvailability(
+                        context,
+                        QuickStartTarget.firstNearbyStop,
+                        false,
+                      );
+                      return locationUnavailableMessage();
+                    }
 
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  spacing: 16,
-                  children: [
-                    nearbyFavouritesList(),
-                    nearbyBusStopsGrid(),
-                  ],
-                );
-              },
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: 16,
+                      children: [
+                        nearbyFavouritesList(),
+                        nearbyBusStopsGrid(),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),

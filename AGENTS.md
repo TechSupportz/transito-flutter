@@ -76,8 +76,10 @@ an abstraction should add behavior, enforce a boundary, or meaningfully improve 
 
 - API exceptions are defined in `lib/global/services/api_exceptions.dart` (`ApiException`,
   `NetworkException`, and `ApiParsingException`).
-- When an LTA API call fails in a flow that needs maintenance feedback, preserve the established
-  `showLtaMaintenanceWarningSnackbar()` behavior.
+- LTA, NUS, and Transito server failures are reported to `AlertsProvider` as Outages, which surface
+  in the Nearby alert inbox. New API calls to these dependencies should report success and failure
+  the same way rather than showing their own snackbars. See transito-server's
+  `docs/adr/0001-detect-outages-per-device.md`.
 - Use `ErrorText` for consistent error presentation in `FutureBuilder` and equivalent async states.
 
 ## Canonical examples
@@ -85,7 +87,7 @@ an abstraction should add behavior, enforce a boundary, or meaningfully improve 
 - API singleton and LTA failure handling: `lib/global/services/lta_api_service.dart`
 - Backend API service: `lib/global/services/transito_api_service.dart`
 - Screen controller: `lib/screens/main/nearby_screen.dart`
-- Global snackbar access: `lib/widgets/common/lta_maintenance_warning_snackbar.dart`
+- Outage and Announcement state: `lib/global/providers/alerts_provider.dart`
 - Shared async error UI: `lib/widgets/common/error_text.dart`
 - Shared app state and device layout information: `lib/global/providers/common_provider.dart`
 
