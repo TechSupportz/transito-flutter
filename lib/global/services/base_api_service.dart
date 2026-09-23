@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -18,12 +19,21 @@ abstract class BaseApiService {
         );
       }
       return response;
+    } on TimeoutException catch (error) {
+      throw NetworkException('Request timed out', uri: uri, cause: error, isTimeout: true);
     } on SocketException catch (error) {
-      throw NetworkException('Network error', uri: uri, cause: error);
+      throw NetworkException('Network error', uri: uri, cause: error, isTimeout: _isTimeout(error));
     } on http.ClientException catch (error) {
-      throw NetworkException('HTTP client error', uri: uri, cause: error);
+      throw NetworkException(
+        'HTTP client error',
+        uri: uri,
+        cause: error,
+        isTimeout: _isTimeout(error),
+      );
     }
   }
+
+  bool _isTimeout(Object error) => error.toString().toLowerCase().contains('timed out');
 
   Map<String, dynamic> decodeJson(String body, Uri uri) {
     try {

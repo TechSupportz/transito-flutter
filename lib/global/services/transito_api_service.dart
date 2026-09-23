@@ -1,6 +1,10 @@
+import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
+import 'package:transito/global/providers/alerts_provider.dart';
+import 'package:transito/global/services/api_exceptions.dart';
 import 'package:transito/global/services/base_api_service.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
+import 'package:transito/models/api/transito/announcements.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
@@ -18,10 +22,46 @@ class TransitoApiService extends BaseApiService {
   bool _usingBetaServer = false;
 
   void updateUsingBetaServer(bool usingBetaServer) {
+    if (_usingBetaServer == usingBetaServer) return;
     _usingBetaServer = usingBetaServer;
+    AlertsProvider().resetServerState();
   }
 
   String get _baseUrl => _usingBetaServer ? Secret.BETA_API_URL : Secret.API_URL;
+
+  @override
+  Future<http.Response> get(Uri uri, {Map<String, String>? headers}) async {
+    try {
+      final response = await super.get(uri, headers: headers);
+      AlertsProvider().reportSuccess(OutageSource.server);
+      return response;
+    } catch (error) {
+      // A NUS upstream failure still means the server itself responded
+      if (AlertsProvider.isNusUpstreamFailure(error)) {
+        AlertsProvider().reportSuccess(OutageSource.server);
+      } else {
+        AlertsProvider().reportFailure(OutageSource.server, error);
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  Map<String, dynamic> decodeJson(String body, Uri uri) {
+    try {
+      return super.decodeJson(body, uri);
+    } on ApiParsingException catch (error) {
+      AlertsProvider().reportFailure(OutageSource.server, error);
+      rethrow;
+    }
+  }
+
+  Future<List<Announcement>> getAnnouncements() async {
+    final Uri uri = Uri.parse('$_baseUrl/alerts');
+    final response = await get(uri);
+    final Map<String, dynamic> data = decodeJson(response.body, uri);
+    return AlertsApiResponse.fromJson(data).data.announcements;
+  }
 
   Future<List<BusStopServiceDetailed>> getBusStopServices(String code) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-stop/$code/services');
@@ -83,8 +123,27 @@ class TransitoApiService extends BaseApiService {
 
   Future<BusArrivalInfo> getNUSBusArrival(String busStopCode) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-arrivals/nus/${Uri.encodeComponent(busStopCode)}');
-    final response = await get(uri);
+    final http.Response response;
+    try {
+      response = await get(uri);
+    } catch (error) {
+      AlertsProvider().reportFailure(OutageSource.nus, error);
+      rethrow;
+    }
+
+    // The server has already validated the NUS response, so a malformed body here is the server's
     final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusArrivalInfo.fromJson(data);
+    final BusArrivalInfo info;
+    try {
+      info = BusArrivalInfo.fromJson(data);
+    } catch (error) {
+      AlertsProvider().reportFailure(
+        OutageSource.server,
+        ApiParsingException('Unexpected response shape', uri: uri, cause: error),
+      );
+      rethrow;
+    }
+    AlertsProvider().reportSuccess(OutageSource.nus);
+    return info;
   }
 }

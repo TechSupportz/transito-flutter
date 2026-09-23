@@ -14,7 +14,6 @@ class BusArrivalService {
   Future<BusArrivalInfo> getBusArrival(
     String busStopCode, {
     required BusStopProviderSources? sources,
-    bool isBusTimingScreen = false,
   }) async {
     final List<Future<_BusArrivalFetchResult>> fetches = [];
 
@@ -22,8 +21,7 @@ class BusArrivalService {
       fetches.add(
         _fetchArrival(
           providerName: 'LTA',
-          fetch: () =>
-              LtaApiService().getLTABusArrival(busStopCode, isBusTimingScreen: isBusTimingScreen),
+          fetch: () => LtaApiService().getLTABusArrival(busStopCode),
         ),
       );
     } else {
@@ -34,8 +32,7 @@ class BusArrivalService {
         fetches.add(
           _fetchArrival(
             providerName: 'LTA',
-            fetch: () =>
-                LtaApiService().getLTABusArrival(ltaCode, isBusTimingScreen: isBusTimingScreen),
+            fetch: () => LtaApiService().getLTABusArrival(ltaCode),
           ),
         );
       }

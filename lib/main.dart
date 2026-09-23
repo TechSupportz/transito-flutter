@@ -13,6 +13,7 @@ import 'package:form_builder_validators/localization/l10n.dart';
 import 'package:is_first_run/is_first_run.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/providers/alerts_provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
@@ -73,6 +74,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => FavouritesProvider()),
         ChangeNotifierProvider(create: (context) => SearchProvider()),
+        ChangeNotifierProvider.value(value: AlertsProvider()..start()),
       ],
       child: MyApp(defaultHome: defaultHome),
     ),
