@@ -117,14 +117,15 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       return [];
     }
 
-    // searches through the list of favourites and returns those within 750m to the user's current location sorted by nearest to farthest
+    // Show NUS favourites within 500m and other favourites within 750m, nearest first.
     for (var favourite in favouritesList) {
       double distanceAway = distance.as(
         LengthUnit.Meter,
         LatLng(userLocation.latitude, userLocation.longitude),
         favourite.busStopLocation,
       );
-      if (distanceAway <= 750) {
+      final double radius = favourite.sources?.nus?.isNotEmpty == true ? 500 : 750;
+      if (distanceAway <= radius) {
         nearbyFavourites.add(
           NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway),
         );
@@ -395,7 +396,7 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
                 ),
               );
             } else if (snapshot.hasData && snapshot.connectionState == ConnectionState.done) {
-              // checks if user has any favourites within 750m of their current location and displays them if they do
+              // Displays favourites within their provider-specific nearby radius.
               if (snapshot.data!.isEmpty) {
                 favouritesListWidget = Container(
                   key: const ValueKey<String>('nearby-favourites-empty'),
