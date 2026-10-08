@@ -21,129 +21,110 @@ class TransitoApiService extends BaseApiService {
 
   bool _usingBetaServer = false;
 
+  /// Bumped on every server switch so responses from the previous server cannot change Outages.
+  int _serverGeneration = 0;
+
   void updateUsingBetaServer(bool usingBetaServer) {
     if (_usingBetaServer == usingBetaServer) return;
     _usingBetaServer = usingBetaServer;
+    _serverGeneration++;
     AlertsProvider().resetServerState();
   }
 
   String get _baseUrl => _usingBetaServer ? Secret.BETA_API_URL : Secret.API_URL;
 
-  @override
-  Future<http.Response> get(Uri uri, {Map<String, String>? headers}) async {
+  /// Fetches and parses [uri], reporting the server (and [upstream], when the server proxies it) as
+  /// available only once the response has parsed into a usable model.
+  Future<T> _fetch<T>(
+    Uri uri,
+    T Function(Map<String, dynamic> json) parse, {
+    OutageSource? upstream,
+  }) async {
+    final int generation = _serverGeneration;
+    final AlertsProvider alerts = AlertsProvider();
+
     try {
-      final response = await super.get(uri, headers: headers);
-      AlertsProvider().reportSuccess(OutageSource.server);
-      return response;
+      final http.Response response = await get(uri);
+      final T result = _parse(uri, () => parse(decodeJson(response.body, uri)));
+      if (generation == _serverGeneration) {
+        alerts.reportSuccess(OutageSource.server);
+        if (upstream != null) alerts.reportSuccess(upstream);
+      }
+      return result;
     } catch (error) {
-      // A NUS upstream failure still means the server itself responded
-      if (AlertsProvider.isNusUpstreamFailure(error)) {
-        AlertsProvider().reportSuccess(OutageSource.server);
-      } else {
-        AlertsProvider().reportFailure(OutageSource.server, error);
+      if (generation == _serverGeneration) {
+        // A NUS upstream failure or timeout still means the server itself responded
+        if (AlertsProvider.isNusUpstreamResponse(error)) {
+          alerts.reportSuccess(OutageSource.server);
+        } else {
+          alerts.reportFailure(OutageSource.server, error);
+        }
+        if (upstream != null) alerts.reportFailure(upstream, error);
       }
       rethrow;
     }
   }
 
-  @override
-  Map<String, dynamic> decodeJson(String body, Uri uri) {
+  /// A response that decodes but does not match the expected model is the server's fault.
+  T _parse<T>(Uri uri, T Function() parse) {
     try {
-      return super.decodeJson(body, uri);
-    } on ApiParsingException catch (error) {
-      AlertsProvider().reportFailure(OutageSource.server, error);
+      return parse();
+    } on ApiParsingException {
       rethrow;
+    } catch (error) {
+      throw ApiParsingException('Unexpected response shape', uri: uri, cause: error);
     }
   }
 
   Future<List<Announcement>> getAnnouncements() async {
     final Uri uri = Uri.parse('$_baseUrl/alerts');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return AlertsApiResponse.fromJson(data).data.announcements;
+    return _fetch(uri, (data) => AlertsApiResponse.fromJson(data).data.announcements);
   }
 
   Future<List<BusStopServiceDetailed>> getBusStopServices(String code) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-stop/$code/services');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusStopServicesApiResponse.fromJson(data).data;
+    return _fetch(uri, (data) => BusStopServicesApiResponse.fromJson(data).data);
   }
 
   Future<BusStop> getBusStop(String code) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-stop/$code');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusStopDetailsApiResponse.fromJson(data).data;
+    return _fetch(uri, (data) => BusStopDetailsApiResponse.fromJson(data).data);
   }
 
   Future<List<NearbyBusStop>> getNearbyBusStops(LatLng position) async {
     final Uri uri = Uri.parse(
       '$_baseUrl/bus-stops/nearby?latitude=${position.latitude}&longitude=${position.longitude}',
     );
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return NearbyBusStopsApiResponse.fromJson(data).data;
+    return _fetch(uri, (data) => NearbyBusStopsApiResponse.fromJson(data).data);
   }
 
   Future<OneMapSearch> searchPlaces(String query, int page) async {
     final Uri uri = Uri.parse('$_baseUrl/onemap/search?query=$query&page=$page');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return OneMapSearch.fromJson(data);
+    return _fetch(uri, (data) => OneMapSearch.fromJson(data));
   }
 
   Future<BusStopSearchApiResponse> searchBusStops(String query) async {
     final Uri uri = Uri.parse('$_baseUrl/search/bus-stops?query=$query');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusStopSearchApiResponse.fromJson(data);
+    return _fetch(uri, (data) => BusStopSearchApiResponse.fromJson(data));
   }
 
   Future<BusServiceSearchApiResponse> searchBusServices(String query) async {
     final Uri uri = Uri.parse('$_baseUrl/search/bus-services?query=$query');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusServiceSearchApiResponse.fromJson(data);
+    return _fetch(uri, (data) => BusServiceSearchApiResponse.fromJson(data));
   }
 
   Future<BusService> getBusService(String serviceNo) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-service/$serviceNo');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusServiceDetailsApiResponse.fromJson(data).data;
+    return _fetch(uri, (data) => BusServiceDetailsApiResponse.fromJson(data).data);
   }
 
   Future<List<List<BusRouteInfo>>> getBusRoutes(String serviceNo) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-service/$serviceNo?includeRoutes');
-    final response = await get(uri);
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    return BusServiceDetailsApiResponse.fromJson(data).data.routes!;
+    return _fetch(uri, (data) => BusServiceDetailsApiResponse.fromJson(data).data.routes!);
   }
 
   Future<BusArrivalInfo> getNUSBusArrival(String busStopCode) async {
     final Uri uri = Uri.parse('$_baseUrl/bus-arrivals/nus/${Uri.encodeComponent(busStopCode)}');
-    final http.Response response;
-    try {
-      response = await get(uri);
-    } catch (error) {
-      AlertsProvider().reportFailure(OutageSource.nus, error);
-      rethrow;
-    }
-
-    // The server has already validated the NUS response, so a malformed body here is the server's
-    final Map<String, dynamic> data = decodeJson(response.body, uri);
-    final BusArrivalInfo info;
-    try {
-      info = BusArrivalInfo.fromJson(data);
-    } catch (error) {
-      AlertsProvider().reportFailure(
-        OutageSource.server,
-        ApiParsingException('Unexpected response shape', uri: uri, cause: error),
-      );
-      rethrow;
-    }
-    AlertsProvider().reportSuccess(OutageSource.nus);
-    return info;
+    return _fetch(uri, BusArrivalInfo.fromJson, upstream: OutageSource.nus);
   }
 }
