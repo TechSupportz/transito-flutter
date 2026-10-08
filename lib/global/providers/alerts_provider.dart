@@ -31,6 +31,10 @@ class AlertsProvider extends ChangeNotifier with WidgetsBindingObserver {
   static const Duration resumeRefreshAfter = Duration(minutes: 30);
   static const Duration outageRefreshCooldown = Duration(minutes: 1);
 
+  /// A hung Announcement request is abandoned after this long so later refreshes can run. Like any
+  /// timeout, it is not an Outage.
+  static const Duration announcementFetchTimeout = Duration(seconds: 15);
+
   /// Critical Announcements block part of Nearby, so while one is shown the app checks for it being
   /// withdrawn early.
   static const Duration criticalRefreshInterval = Duration(minutes: 5);
@@ -51,8 +55,11 @@ class AlertsProvider extends ChangeNotifier with WidgetsBindingObserver {
   List<Announcement> _announcements = [];
   DateTime? _backgroundedAt;
   DateTime? _lastRefreshAt;
-  bool _isRefreshing = false;
   int _serverGeneration = 0;
+
+  /// The server generation whose Announcements are being fetched, so a request stuck on a previous
+  /// server never blocks fetching from the current one.
+  int? _refreshingGeneration;
   Timer? _expiryTimer;
   Timer? _criticalRefreshTimer;
 
@@ -124,14 +131,16 @@ class AlertsProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> refreshAnnouncements() async {
-    if (_isRefreshing) return;
-    _isRefreshing = true;
-    _lastRefreshAt = _clock();
     final int generation = _serverGeneration;
+    if (_refreshingGeneration == generation) return;
+    _refreshingGeneration = generation;
+    _lastRefreshAt = _clock();
 
     try {
       final List<Announcement> announcements =
-          await (fetchAnnouncements ?? TransitoApiService().getAnnouncements)();
+          await (fetchAnnouncements ?? TransitoApiService().getAnnouncements)().timeout(
+            announcementFetchTimeout,
+          );
       if (generation == _serverGeneration) {
         _setAnnouncements(announcements);
       }
@@ -139,11 +148,8 @@ class AlertsProvider extends ChangeNotifier with WidgetsBindingObserver {
       // Keep the last known Announcements; the request failure is reported as a server Outage.
       debugPrint('Failed to fetch announcements: $error');
     } finally {
-      _isRefreshing = false;
+      if (_refreshingGeneration == generation) _refreshingGeneration = null;
     }
-
-    // The server changed mid-request, so fetch again from the new one
-    if (generation != _serverGeneration) refreshAnnouncements();
   }
 
   /// Clears server-reported state when the app switches between the production and beta servers.
@@ -222,14 +228,15 @@ class AlertsProvider extends ChangeNotifier with WidgetsBindingObserver {
       OutageSource.nus => isNusUpstreamFailure(error),
       OutageSource.lta || OutageSource.server =>
         error is ApiParsingException ||
-            (error is ApiException && error.statusCode >= 500 && !isNusUpstreamFailure(error)),
+            (error is ApiException && error.statusCode >= 500 && !isNusUpstreamResponse(error)),
     };
   }
 
-  /// Transito's server marks NUS failures with a 502 and `provider: "nus"`; any other 502, such as
-  /// one from the tunnel in front of the server, is a server failure.
-  static bool isNusUpstreamFailure(Object error) {
-    if (error is! ApiException || error.statusCode != 502) return false;
+  /// Transito's server marks NUS failures with `provider: "nus"`, so any such response means the
+  /// server itself responded; any other 5xx, such as one from the tunnel in front of it, is the
+  /// server's.
+  static bool isNusUpstreamResponse(Object error) {
+    if (error is! ApiException) return false;
 
     try {
       final Object? body = jsonDecode(error.responseBody ?? '');
@@ -237,5 +244,10 @@ class AlertsProvider extends ChangeNotifier with WidgetsBindingObserver {
     } on FormatException {
       return false;
     }
+  }
+
+  /// A NUS Outage is a 502; the server reports NUS timeouts as a 504, which is never an Outage.
+  static bool isNusUpstreamFailure(Object error) {
+    return error is ApiException && error.statusCode == 502 && isNusUpstreamResponse(error);
   }
 }

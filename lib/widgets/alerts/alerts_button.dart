@@ -3,6 +3,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/alerts_provider.dart';
 import 'package:transito/models/api/transito/announcements.dart';
+import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/app_typography.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
@@ -12,10 +13,43 @@ class AlertsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final AppColors appColors = context.watch<AppColors>();
     final AlertsProvider alerts = context.watch<AlertsProvider>();
-    if (!alerts.hasAlerts) return const SizedBox.shrink();
+
+    return AnimatedSwitcher(
+      duration: MediaQuery.disableAnimationsOf(context)
+          ? Duration.zero
+          : const Duration(milliseconds: 250),
+      switchInCurve: Easing.emphasizedDecelerate,
+      switchOutCurve: Easing.emphasizedAccelerate,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: ScaleTransition(scale: animation, child: child),
+      ),
+      child: alerts.hasAlerts
+          ? _buildButton(context, appColors, alerts)
+          : const SizedBox.shrink(key: ValueKey('none')),
+    );
+  }
+
+  Widget _buildButton(BuildContext context, AppColors appColors, AlertsProvider alerts) {
+    final List<Announcement> announcements = alerts.announcements;
+    final Color badgeColor;
+    if (alerts.outages.isNotEmpty ||
+        announcements.any(
+          (announcement) => announcement.severity == AnnouncementSeverity.CRITICAL,
+        )) {
+      badgeColor = appColors.scheme.error;
+    } else if (announcements.any(
+      (announcement) => announcement.severity == AnnouncementSeverity.WARNING,
+    )) {
+      badgeColor = appColors.notReallyYellow;
+    } else {
+      badgeColor = appColors.accentColour;
+    }
 
     return IconButton(
+      key: const ValueKey('alerts'),
       tooltip: 'Alerts',
       onPressed: () => showModalBottomSheet<void>(
         context: context,
@@ -25,7 +59,12 @@ class AlertsButton extends StatelessWidget {
       ),
       icon: Badge(
         smallSize: 8,
-        child: const AppSymbol(Symbols.notifications_rounded, fill: true),
+        backgroundColor: badgeColor,
+        child: AppSymbol(
+          alerts.outages.isNotEmpty ? Symbols.cloud_alert_rounded : Symbols.notifications_rounded,
+          fill: true,
+          color: alerts.outages.isNotEmpty ? appColors.scheme.error : null,
+        ),
       ),
     );
   }
@@ -37,7 +76,11 @@ class _AlertsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final AlertsProvider alerts = context.watch<AlertsProvider>();
+    final AppColors appColors = context.watch<AppColors>();
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    // Most severe first, so a critical Announcement is never below the fold
+    final List<Announcement> announcements = alerts.announcements
+      ..sort((a, b) => b.severity.index.compareTo(a.severity.index));
 
     return SafeArea(
       child: ConstrainedBox(
@@ -60,12 +103,14 @@ class _AlertsSheet extends StatelessWidget {
                 title: _outageTitle(outage),
                 body: _outageBody(outage),
               ),
-            for (final Announcement announcement in alerts.announcements)
+            for (final Announcement announcement in announcements)
               _AlertTile(
                 icon: _announcementIcon(announcement.severity),
-                color: announcement.severity == AnnouncementSeverity.INFO
-                    ? colorScheme.primary
-                    : colorScheme.error,
+                color: switch (announcement.severity) {
+                  AnnouncementSeverity.INFO => colorScheme.primary,
+                  AnnouncementSeverity.WARNING => appColors.notReallyYellow,
+                  AnnouncementSeverity.CRITICAL => colorScheme.error,
+                },
                 title: announcement.title,
                 body: announcement.body,
               ),
@@ -112,7 +157,6 @@ class _AlertTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         spacing: 12,
         children: [
           AppSymbol(icon, color: color, fill: true),

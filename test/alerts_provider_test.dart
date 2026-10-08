@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:transito/global/providers/alerts_provider.dart';
 import 'package:transito/global/services/api_exceptions.dart';
@@ -37,6 +39,7 @@ void main() {
 
     test('does not treat a NUS upstream 502 as a server outage', () {
       alerts.reportFailure(OutageSource.server, status(502, '{"provider":"nus"}'));
+      alerts.reportFailure(OutageSource.server, status(504, '{"provider":"nus"}'));
       expect(alerts.outages, isEmpty);
 
       alerts.reportFailure(OutageSource.server, status(502, '<html>Bad gateway</html>'));
@@ -84,6 +87,7 @@ void main() {
 
   test('raises a NUS outage only for the NUS upstream marker', () {
     alerts.reportFailure(OutageSource.nus, status(500));
+    alerts.reportFailure(OutageSource.nus, status(504, '{"provider":"nus"}'));
     expect(alerts.outages, isEmpty);
 
     alerts.reportFailure(OutageSource.nus, status(502, '{"provider":"nus"}'));
@@ -125,5 +129,31 @@ void main() {
 
     expect(alerts.hasAlerts, isTrue);
     expect(alerts.criticalAnnouncements.map((announcement) => announcement.id), ['b']);
+  });
+
+  test('a request hung on the previous server does not block fetching from the new one', () async {
+    final Completer<List<Announcement>> hung = Completer();
+    int calls = 0;
+    alerts = AlertsProvider.test(
+      clock: () => now,
+      fetchAnnouncements: () {
+        calls++;
+        if (calls == 1) return hung.future;
+        return Future.value([
+          Announcement(id: 'a', title: 'A', body: 'a', severity: AnnouncementSeverity.INFO),
+        ]);
+      },
+    );
+
+    unawaited(alerts.refreshAnnouncements());
+    alerts.resetServerState();
+    await pumpEventQueue();
+    expect(alerts.announcements.map((announcement) => announcement.id), ['a']);
+
+    // The stale response arriving late must not replace the new server's Announcements
+    hung.complete([]);
+    await pumpEventQueue();
+    expect(alerts.announcements, hasLength(1));
+    expect(calls, 2);
   });
 }

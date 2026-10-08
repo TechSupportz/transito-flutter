@@ -290,7 +290,8 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
           },
           child: SingleChildScrollView(
             key: QuickStartTargetScope.keyOf(context, QuickStartTarget.nearbyOverview),
-            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 12),
+            // CriticalAnnouncementBanner adds the rest of the top spacing when it is hidden
+            padding: const EdgeInsets.only(left: 12, right: 12, bottom: 32, top: 4),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
