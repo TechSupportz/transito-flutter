@@ -325,7 +325,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
                             child: BusTimingRow(
                               busStopCode: widget.code,
                               serviceInfo: snapshot.data![index],
-                              userLatLng: widget.busStopLocation,
+                              busStopLocation: widget.busStopLocation,
                               isETAminutes: userSettings.isETAminutes,
                             ),
                           ),

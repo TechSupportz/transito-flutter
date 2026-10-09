@@ -55,6 +55,8 @@ dependencies:
     material_symbols_icons: ^4.2928.1
     native_glass_navbar: ^1.1.0
     material_ui: ^1.3.0
+    firebase_storage: ^13.6.0
+    path_provider: ^2.1.6
 dev_dependencies:
     flutter_test:
         sdk: flutter

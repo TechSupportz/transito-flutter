@@ -403,7 +403,7 @@ class _BusTimingScreenState extends State<BusTimingScreen> with SingleTickerProv
                                         child: BusTimingRow(
                                           busStopCode: widget.code,
                                           serviceInfo: busArrivalInfoSnapshot.data!.services[index],
-                                          userLatLng: widget.busStopLocation,
+                                          busStopLocation: widget.busStopLocation,
                                           isETAminutes: userSettings.isETAminutes,
                                           serviceInfoKey: index == 0
                                               ? QuickStartTargetScope.keyOf(

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter/services.dart';
@@ -18,6 +19,7 @@ import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/favourites_provider.dart';
 import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/location_service.dart';
+import 'package:transito/global/services/route_distance_service.dart';
 import 'package:transito/global/services/settings_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/models/app/app_colors.dart';
@@ -45,12 +47,15 @@ void main() async {
     try {
       FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8088);
       await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+      await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
       Posthog().debug(true);
       debugPrint("Connected to the firebase emulators");
     } on Exception catch (e) {
       debugPrint('Failed to connect to the emulators: $e');
     }
   }
+
+  RouteDistanceService().start();
 
   // load all svg assets
   final assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
@@ -171,7 +176,7 @@ class _MyAppState extends State<MyApp> {
         title: "Transito",
         supportedLocales: const [Locale('en', 'US')],
         scaffoldMessengerKey: CommonProvider.scaffoldMessengerKey,
-        debugShowCheckedModeBanner: false,
+        debugShowCheckedModeBanner: true,
         localizationsDelegates: [
           ...GlobalMaterialLocalizations.delegates,
           FormBuilderLocalizations.delegate,
