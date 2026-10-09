@@ -2,7 +2,9 @@ import 'package:material_ui/material_ui.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
+import 'package:transito/global/services/route_distance_service.dart';
 import 'package:transito/global/utils/bus_arrival_time.dart';
+import 'package:transito/global/utils/bus_distance.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/app_typography.dart';
@@ -16,7 +18,7 @@ class BusTimingRow extends StatefulWidget {
     super.key,
     required this.busStopCode,
     required this.serviceInfo,
-    required this.userLatLng,
+    required this.busStopLocation,
     required this.isETAminutes,
     this.serviceInfoKey,
     this.onServiceInfoTap,
@@ -24,7 +26,7 @@ class BusTimingRow extends StatefulWidget {
 
   final String busStopCode;
   final ServiceInfo serviceInfo;
-  final LatLng userLatLng; // user's current latitude and longitude
+  final LatLng busStopLocation;
   final bool isETAminutes; // whether to display ETA in minutes or exact time
   final Key? serviceInfoKey;
   final VoidCallback? onServiceInfoTap;
@@ -34,8 +36,6 @@ class BusTimingRow extends StatefulWidget {
 }
 
 class _BusTimingRowState extends State<BusTimingRow> {
-  final Distance distance = const Distance();
-
   // formats the arrival time into minutes or exact time depending on user's settings
   String formatArrivalTime(String? arrivalTime) {
     if (!widget.isETAminutes) {
@@ -56,25 +56,20 @@ class _BusTimingRowState extends State<BusTimingRow> {
     }
   }
 
-  // computes and returns the distance between user and bus either in meters or kilometers
+  // distance between the next bus and this bus stop, following the route where possible
   String calculateDistanceAway() {
-    if (widget.serviceInfo.nextBus.latitude == 0 || widget.serviceInfo.nextBus.longitude == 0) {
-      return '???';
-    } else {
-      double distanceAway = distance.as(
-        LengthUnit.Meter,
-        LatLng(
-          widget.serviceInfo.nextBus.latitude,
-          widget.serviceInfo.nextBus.longitude,
-        ),
-        widget.userLatLng,
-      );
-      if (distanceAway < 1000) {
-        return '${(distanceAway).toStringAsFixed(0)}m';
-      } else {
-        return '${(distanceAway / 1000).toStringAsFixed(1)}km';
-      }
-    }
+    final IndivArrivalInfo nextBus = widget.serviceInfo.nextBus;
+    final double? distanceAway = busDistanceAway(
+      busLocation: LatLng(nextBus.latitude, nextBus.longitude),
+      busStopLocation: widget.busStopLocation,
+      serviceNo: widget.serviceInfo.serviceNum,
+      busStopCode: widget.busStopCode,
+      originCode: nextBus.originCode,
+      // transito-server always reports the first visit for NUS arrivals
+      visitNumber: widget.serviceInfo.busOperator == .NUS ? null : nextBus.visitNumber,
+      index: RouteDistanceService().index,
+    );
+    return distanceAway == null ? '???' : formatDistance(distanceAway);
   }
 
   Future<void> goToBusServiceInfoScreen() async {
