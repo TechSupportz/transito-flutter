@@ -401,7 +401,7 @@ class _FavouritesTimingCardState extends State<FavouritesTimingCard> {
               transitionBuilder: (child, animation) => ClipRect(
                 child: SizeTransition(
                   sizeFactor: animation,
-                  alignment: Alignment.topCenter,
+                  alignment: AlignmentDirectional.topStart,
                   child: FadeTransition(opacity: animation, child: child),
                 ),
               ),
