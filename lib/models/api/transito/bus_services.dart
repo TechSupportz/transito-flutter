@@ -94,6 +94,7 @@ class BusService {
   bool isSingleRoute;
   List<BusStop> interchanges;
   List<List<BusRouteInfo>>? routes;
+  List<String?>? routePolylines;
 
   BusService({
     required this.serviceNo,
@@ -102,6 +103,7 @@ class BusService {
     required this.isSingleRoute,
     required this.interchanges,
     this.routes,
+    this.routePolylines,
   });
 
   factory BusService.fromJson(Map<String, dynamic> json) => _$BusServiceFromJson(json);

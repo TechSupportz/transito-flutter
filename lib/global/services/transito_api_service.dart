@@ -113,14 +113,15 @@ class TransitoApiService extends BaseApiService {
     return _fetch(uri, (data) => BusServiceSearchApiResponse.fromJson(data));
   }
 
-  Future<BusService> getBusService(String serviceNo) async {
-    final Uri uri = Uri.parse('$_baseUrl/bus-service/$serviceNo');
+  Future<BusService> getBusService(String serviceNo, {bool includeRoutes = false}) async {
+    final Uri uri = Uri.parse(
+      '$_baseUrl/bus-service/$serviceNo${includeRoutes ? '?includeRoutes' : ''}',
+    );
     return _fetch(uri, (data) => BusServiceDetailsApiResponse.fromJson(data).data);
   }
 
   Future<List<List<BusRouteInfo>>> getBusRoutes(String serviceNo) async {
-    final Uri uri = Uri.parse('$_baseUrl/bus-service/$serviceNo?includeRoutes');
-    return _fetch(uri, (data) => BusServiceDetailsApiResponse.fromJson(data).data.routes!);
+    return (await getBusService(serviceNo, includeRoutes: true)).routes!;
   }
 
   Future<BusArrivalInfo> getNUSBusArrival(String busStopCode) async {

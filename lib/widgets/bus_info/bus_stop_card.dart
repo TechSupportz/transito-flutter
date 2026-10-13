@@ -20,6 +20,8 @@ class BusStopCard extends StatelessWidget {
     this.searchMode = false,
     this.routeMode = false,
     this.busSchedule,
+    this.onTap,
+    this.isHighlighted = false,
   });
 
   final BusStop busStopInfo;
@@ -28,6 +30,10 @@ class BusStopCard extends StatelessWidget {
   final bool searchMode;
   final bool routeMode;
   final ({BusSchedule firstBus, BusSchedule lastBus})? busSchedule;
+
+  /// Replaces the default navigation when set.
+  final VoidCallback? onTap;
+  final bool isHighlighted;
 
   // function that navigates user to bus timing screen
   void goToBusTimingScreen(
@@ -90,7 +96,6 @@ class BusStopCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final searchProvider = Provider.of<SearchProvider>(context, listen: false);
     return Material(
       color: Colors.transparent,
       child: Tooltip(
@@ -98,34 +103,38 @@ class BusStopCard extends StatelessWidget {
         showDuration: const Duration(milliseconds: 350),
         message: busStopInfo.name,
         child: InkWell(
-          onTap: () {
-            if (searchMode || routeMode) {
-              searchProvider.addRecentSearch(busStopInfo);
-              goToBusStopInfoScreen(
-                context,
-                busStopInfo.code,
-                busStopInfo.name,
-                busStopInfo.roadName,
-                busStopInfo.services,
-                busStopInfo.sources,
-                LatLng(busStopInfo.latitude, busStopInfo.longitude),
-              );
-            } else {
-              goToBusTimingScreen(
-                context,
-                busStopInfo.code,
-                busStopInfo.name,
-                busStopInfo.roadName,
-                busStopInfo.services,
-                busStopInfo.sources,
-                LatLng(busStopInfo.latitude, busStopInfo.longitude),
-              );
-            }
-          },
+          onTap:
+              onTap ??
+              () {
+                if (searchMode || routeMode) {
+                  context.read<SearchProvider>().addRecentSearch(busStopInfo);
+                  goToBusStopInfoScreen(
+                    context,
+                    busStopInfo.code,
+                    busStopInfo.name,
+                    busStopInfo.roadName,
+                    busStopInfo.services,
+                    busStopInfo.sources,
+                    LatLng(busStopInfo.latitude, busStopInfo.longitude),
+                  );
+                } else {
+                  goToBusTimingScreen(
+                    context,
+                    busStopInfo.code,
+                    busStopInfo.name,
+                    busStopInfo.roadName,
+                    busStopInfo.services,
+                    busStopInfo.sources,
+                    LatLng(busStopInfo.latitude, busStopInfo.longitude),
+                  );
+                }
+              },
           customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Ink(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surfaceContainer,
+              color: isHighlighted
+                  ? Theme.of(context).colorScheme.secondaryContainer
+                  : Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -192,7 +201,7 @@ class BusStopCard extends StatelessWidget {
                     ),
                     onPressed: () => showDialog(
                       context: context,
-                      builder: (context) => busScheduleDialog(context),
+                      builder: (context) => BusScheduleDialog(busSchedule: busSchedule!),
                     ),
                     icon: const AppSymbol(Symbols.calendar_clock_rounded, fill: true),
                   ),
@@ -204,8 +213,16 @@ class BusStopCard extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget busScheduleDialog(BuildContext context) {
+/// First and last bus timings for one stop on a Service Route, by day type.
+class BusScheduleDialog extends StatelessWidget {
+  const BusScheduleDialog({super.key, required this.busSchedule});
+
+  final ({BusSchedule firstBus, BusSchedule lastBus}) busSchedule;
+
+  @override
+  Widget build(BuildContext context) {
     String currentDay = Jiffy.now().format(pattern: "E");
     int selectedDay = currentDay == "Sat"
         ? 1
@@ -279,26 +296,26 @@ class BusStopCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (selectedDay == 0 && busSchedule!.firstBus.weekdays != "-")
+                  if (selectedDay == 0 && busSchedule.firstBus.weekdays != "-")
                     Text(
                       Jiffy.parse(
-                        busSchedule!.firstBus.weekdays,
+                        busSchedule.firstBus.weekdays,
                         pattern: 'Hm',
                       ).jm,
                       style: AppTypography.sectionHeading,
                     )
-                  else if (selectedDay == 1 && busSchedule!.firstBus.saturday != "-")
+                  else if (selectedDay == 1 && busSchedule.firstBus.saturday != "-")
                     Text(
                       Jiffy.parse(
-                        busSchedule!.firstBus.saturday,
+                        busSchedule.firstBus.saturday,
                         pattern: 'Hm',
                       ).jm,
                       style: AppTypography.sectionHeading,
                     )
-                  else if (selectedDay == 2 && busSchedule!.firstBus.sunday != "-")
+                  else if (selectedDay == 2 && busSchedule.firstBus.sunday != "-")
                     Text(
                       Jiffy.parse(
-                        busSchedule!.firstBus.sunday,
+                        busSchedule.firstBus.sunday,
                         pattern: 'Hm',
                       ).jm,
                       style: AppTypography.sectionHeading,
@@ -324,26 +341,26 @@ class BusStopCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (selectedDay == 0 && busSchedule!.lastBus.weekdays != "-")
+                  if (selectedDay == 0 && busSchedule.lastBus.weekdays != "-")
                     Text(
                       Jiffy.parse(
-                        busSchedule!.lastBus.weekdays,
+                        busSchedule.lastBus.weekdays,
                         pattern: 'Hm',
                       ).jm,
                       style: AppTypography.sectionHeading,
                     )
-                  else if (selectedDay == 1 && busSchedule!.lastBus.saturday != "-")
+                  else if (selectedDay == 1 && busSchedule.lastBus.saturday != "-")
                     Text(
                       Jiffy.parse(
-                        busSchedule!.lastBus.saturday,
+                        busSchedule.lastBus.saturday,
                         pattern: 'Hm',
                       ).jm,
                       style: AppTypography.sectionHeading,
                     )
-                  else if (selectedDay == 2 && busSchedule!.lastBus.sunday != "-")
+                  else if (selectedDay == 2 && busSchedule.lastBus.sunday != "-")
                     Text(
                       Jiffy.parse(
-                        busSchedule!.lastBus.sunday,
+                        busSchedule.lastBus.sunday,
                         pattern: 'Hm',
                       ).jm,
                       style: AppTypography.sectionHeading,
