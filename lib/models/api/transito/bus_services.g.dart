@@ -70,6 +70,9 @@ BusService _$BusServiceFromJson(Map<String, dynamic> json) => BusService(
             .toList(),
       )
       .toList(),
+  routePolylines: (json['routePolylines'] as List<dynamic>?)
+      ?.map((e) => e as String?)
+      .toList(),
 );
 
 Map<String, dynamic> _$BusServiceToJson(BusService instance) =>
@@ -82,6 +85,7 @@ Map<String, dynamic> _$BusServiceToJson(BusService instance) =>
       'routes': instance.routes
           ?.map((e) => e.map((e) => e.toJson()).toList())
           .toList(),
+      'routePolylines': instance.routePolylines,
     };
 
 const _$BusOperatorEnumMap = {
