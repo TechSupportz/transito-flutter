@@ -9,7 +9,6 @@ import 'package:measure_size/measure_size.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
-import 'package:transito/global/providers/search_provider.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/global/utils/unpack_polyline.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
@@ -17,7 +16,6 @@ import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/enums/bus_operator_enum.dart';
-import 'package:transito/screens/bus_info/bus_stop_info_screen.dart';
 import 'package:transito/widgets/bus_info/bus_route_map.dart';
 import 'package:transito/widgets/bus_info/bus_routes_list.dart';
 import 'package:transito/widgets/bus_info/bus_service_route_header.dart';
@@ -59,6 +57,13 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   int _requestGeneration = 0;
   double _headerHeight = 0;
   double _rowExtent = 72;
+  double _actionsExtent = 0;
+
+  /// How far the list shifts up when a selected row above the new selection collapses.
+  double _pendingScrollCompensation = 0;
+
+  /// Bumped by every reveal, direction change and user drag so stale reveal corrections give up.
+  int _revealGeneration = 0;
   double _collapsedSheetHeight = 0.4;
   double _expandedSheetHeight = 1;
   bool _headerPinned = true;
@@ -159,20 +164,50 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
       final controller = _routeScrollController!;
       final index = _pendingScrollIndex!;
       _pendingScrollIndex = null;
+      final compensation = _pendingScrollCompensation;
+      _pendingScrollCompensation = 0;
+      // Keep the visible rows still when the previous selection above collapsed this frame.
+      if (compensation > 0) {
+        controller.jumpTo(
+          (controller.offset - compensation).clamp(0.0, controller.position.maxScrollExtent),
+        );
+      }
       _lastScrollIndex = index;
-      // A pinned header overlaps the list, so offset `i * extent` puts row `i` right below it.
+      final generation = ++_revealGeneration;
       unawaited(
-        controller.animateTo(
-          (index * _rowExtent + (_headerPinned ? 0 : _headerHeight + 8)).clamp(
-            0.0,
-            controller.position.maxScrollExtent,
-          ),
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeInOutCubicEmphasized,
-        ),
+        controller
+            .animateTo(
+              _listOffsetOf(index).clamp(0.0, controller.position.maxScrollExtent),
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeInOutCubicEmphasized,
+            )
+            .then((_) => _settleReveal(index, generation)),
       );
     });
   }
+
+  /// Corrects the reveal once the sheet and the selected row have reached their final sizes,
+  /// which the first animation can't know, e.g. selecting the last stop from an expanded sheet.
+  /// Skipped if a newer reveal, a direction change, or a user drag has happened since.
+  Future<void> _settleReveal(int index, int generation) async {
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+    final controller = _routeScrollController;
+    if (!mounted || generation != _revealGeneration || controller?.hasClients != true) return;
+    final target = _listOffsetOf(index).clamp(0.0, controller!.position.maxScrollExtent);
+    if ((target - controller.offset).abs() <= 1) return;
+    await controller.animateTo(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  // Not a setState: only the next selection's scroll compensation reads it.
+  void _onActionsExtentChanged(double extent) => _actionsExtent = extent;
+
+  /// Scroll offset that puts unselected-height row [index] just below the header.
+  /// A pinned header overlaps the list, so no header height is added in that case.
+  double _listOffsetOf(int index) => index * _rowExtent + (_headerPinned ? 0 : _headerHeight + 8);
 
   void _onRowExtentChanged(double extent) {
     if (!mounted || extent <= 0 || (extent - _rowExtent).abs() < 0.5) return;
@@ -184,6 +219,14 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   void _selectStop(int index, {bool focusMap = false}) {
     final stop = _routes[index].busStop;
+    // The previous selection collapses at once. Only the part of its actions already scrolled
+    // past the top of the list shifts the visible rows, so compensate for just that part.
+    final previous = _selectedStopIndex;
+    final controller = _routeScrollController;
+    if (previous != null && previous != index && controller?.hasClients == true) {
+      final actionsTop = _listOffsetOf(previous) + (_headerPinned ? 8 : 0) + _rowExtent;
+      _pendingScrollCompensation = (controller!.offset - actionsTop).clamp(0.0, _actionsExtent);
+    }
     setState(() {
       _selectedStopIndex = index;
       _selectedStopCode = stop.code;
@@ -193,24 +236,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     if (focusMap) _map.focusStop(LatLng(stop.latitude, stop.longitude));
   }
 
+  /// Selecting a stop always shows it on the map; its row then offers the stop's actions.
   void _tapStopCard(BusStop stop, {int? index}) {
-    if (_isExpanded) {
-      context.read<SearchProvider>().addRecentSearch(stop);
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          settings: const RouteSettings(name: 'BusStopInfoScreen'),
-          builder: (_) => BusStopInfoScreen(
-            code: stop.code,
-            name: stop.name,
-            address: stop.roadName,
-            services: stop.services,
-            sources: stop.sources,
-            busStopLocation: LatLng(stop.latitude, stop.longitude),
-          ),
-        ),
-      );
-      return;
-    }
+    if (_isExpanded) _animateSheet(_collapsedSheetHeight);
     final routeIndex = index ?? _routes.indexWhere((route) => route.busStop.code == stop.code);
     if (routeIndex >= 0) {
       _selectStop(routeIndex, focusMap: true);
@@ -227,6 +255,8 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     final routeCount = _service?.routes?.length ?? 0;
     if (routeCount < 2) return;
     _collapseForOverview();
+    _revealGeneration++;
+    _pendingScrollCompensation = 0;
     setState(() {
       _directionIndex = (_directionIndex + 1) % routeCount;
       _selectedStopIndex = null;
@@ -280,7 +310,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
           _expandedSheetHeight = ((height - topInset) / height).clamp(0.5, 1.0);
           _headerPinned = _headerHeight <= _expandedSheetHeight * height / 2;
           _collapsedSheetHeight = math
-              .max(0.4, (_headerHeight + _rowExtent + padding.bottom + 8) / height)
+              .max(0.6, (_headerHeight + _rowExtent + padding.bottom + 8) / height)
               .clamp(0.2, _expandedSheetHeight - 0.05);
           return Stack(
             key: QuickStartTargetScope.keyOf(context, QuickStartTarget.serviceInfoPage),
@@ -359,7 +389,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                       ? _switchDirection
                                       : null,
                                 ),
-                                Divider(height: 1, color: scheme.outlineVariant),
+                                Divider(
+                                  height: 1,
+                                  color: scheme.outlineVariant.withValues(alpha: 0.5),
+                                ),
                               ],
                             ),
                           ),
@@ -373,20 +406,27 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                         ),
                         clipBehavior: Clip.antiAlias,
-                        child: CustomScrollView(
-                          controller: scrollController,
-                          slivers: [
-                            // A header taller than half the expanded sheet would leave too little
-                            // room for stops if pinned, e.g. with large text, so it scrolls instead.
-                            if (_headerPinned)
-                              PinnedHeaderSliver(child: header)
-                            else
-                              SliverToBoxAdapter(child: header),
-                            SliverPadding(
-                              padding: EdgeInsets.fromLTRB(8, 8, 8, padding.bottom + 16),
-                              sliver: _buildStopList(),
-                            ),
-                          ],
+                        child: NotificationListener<ScrollStartNotification>(
+                          // A user drag takes over from any pending reveal correction.
+                          onNotification: (notification) {
+                            if (notification.dragDetails != null) _revealGeneration++;
+                            return false;
+                          },
+                          child: CustomScrollView(
+                            controller: scrollController,
+                            slivers: [
+                              // A header taller than half the expanded sheet would leave too little
+                              // room for stops if pinned, e.g. with large text, so it scrolls instead.
+                              if (_headerPinned)
+                                PinnedHeaderSliver(child: header)
+                              else
+                                SliverToBoxAdapter(child: header),
+                              SliverPadding(
+                                padding: EdgeInsets.fromLTRB(8, 8, 8, padding.bottom + 16),
+                                sliver: _buildStopList(),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },
@@ -482,6 +522,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
       currentStopCode: widget.currentStopCode,
       selectedStopIndex: _selectedStopIndex,
       onRowExtentChanged: _onRowExtentChanged,
+      onActionsExtentChanged: _onActionsExtentChanged,
       onStopTap: (index) => _tapStopCard(_routes[index].busStop, index: index),
     );
   }

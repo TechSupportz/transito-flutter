@@ -206,9 +206,13 @@ class _SearchDialogState extends State<SearchDialog> {
             focusNode: _searchFocusNode,
             autofocus: true,
             onChanged: (_) => _onSearchChanged(_textFieldController.text, 1),
-            keyboardType: _searchMode == SearchMode.SERVICES
-                ? TextInputType.numberWithOptions(decimal: false)
-                : TextInputType.text,
+            // Service numbers include letters (NUS shuttles such as D2, suffixes such as 243W),
+            // so services use the full keyboard with capitals and no autocorrect.
+            keyboardType: TextInputType.text,
+            textCapitalization: _searchMode == SearchMode.SERVICES
+                ? TextCapitalization.characters
+                : TextCapitalization.none,
+            autocorrect: _searchMode != SearchMode.SERVICES,
             decoration: InputDecoration(
               hintText: 'Search...',
               isDense: false,
