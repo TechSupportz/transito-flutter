@@ -6,7 +6,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' hide Path;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/services/location_service.dart';
@@ -41,6 +41,7 @@ class BusRouteMap extends StatefulWidget {
     required this.onStopTap,
     this.currentStopCode,
     this.selectedStopIndex,
+    this.busLocation,
   });
 
   final BusRouteMapController controller;
@@ -58,6 +59,7 @@ class BusRouteMap extends StatefulWidget {
   final ValueChanged<int> onStopTap;
   final String? currentStopCode;
   final int? selectedStopIndex;
+  final LatLng? busLocation;
 
   @override
   State<BusRouteMap> createState() => _BusRouteMapState();
@@ -65,6 +67,16 @@ class BusRouteMap extends StatefulWidget {
 
 class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin {
   late final AnimatedMapController _map = AnimatedMapController(vsync: this);
+  late final AnimationController _busMoveController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 800),
+  );
+  late final AnimationController _busFadeController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 200),
+  );
+  LatLng? _displayedBusLocation;
+  LatLngTween? _busLocationTween;
   bool _ready = false;
   bool _awayFromOverview = false;
   bool _placed = false;
@@ -81,6 +93,10 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
   void initState() {
     super.initState();
     widget.controller.addListener(_applyCameraRequest);
+    if (widget.busLocation case final location?) {
+      _displayedBusLocation = location;
+      _busFadeController.value = 1;
+    }
   }
 
   @override
@@ -96,6 +112,47 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
     } else if ((oldWidget.panelHeight - widget.panelHeight).abs() > 1 && !_awayFromOverview) {
       _scheduleFit();
     }
+    if (oldWidget.busLocation != widget.busLocation) {
+      _updateBusLocation(
+        widget.busLocation,
+        routeChanged: oldWidget.routes != widget.routes,
+      );
+    }
+  }
+
+  void _updateBusLocation(LatLng? target, {required bool routeChanged}) {
+    if (target == null) {
+      unawaited(_busFadeController.reverse());
+      return;
+    }
+    final disableAnimations = MediaQuery.maybeDisableAnimationsOf(context) ?? false;
+    if (_displayedBusLocation == null ||
+        _busFadeController.isDismissed ||
+        routeChanged ||
+        disableAnimations) {
+      _busMoveController.stop();
+      _busLocationTween = null;
+      _displayedBusLocation = target;
+      if (disableAnimations) {
+        _busFadeController.value = 1;
+      } else {
+        unawaited(_busFadeController.forward());
+      }
+      return;
+    }
+    final current = _currentBusLocation ?? target;
+    _busLocationTween = LatLngTween(begin: current, end: target);
+    _displayedBusLocation = target;
+    unawaited(_busMoveController.forward(from: 0));
+    unawaited(_busFadeController.forward());
+  }
+
+  LatLng? get _currentBusLocation {
+    final tween = _busLocationTween;
+    if (tween != null && _busMoveController.isAnimating) {
+      return tween.transform(Curves.easeInOutCubic.transform(_busMoveController.value));
+    }
+    return _displayedBusLocation;
   }
 
   void _scheduleFit() {
@@ -194,6 +251,8 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
   @override
   void dispose() {
     widget.controller.removeListener(_applyCameraRequest);
+    _busMoveController.dispose();
+    _busFadeController.dispose();
     _map.dispose();
     super.dispose();
   }
@@ -202,13 +261,14 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
   Widget build(BuildContext context) {
     final colors = context.watch<AppColors>();
     final scheme = Theme.of(context).colorScheme;
+    final isDarkTiles = colors.brightness == Brightness.dark;
     final stops = <String, int>{};
     for (var i = 0; i < widget.routes.length; i++) {
       stops.putIfAbsent(widget.routes[i].busStop.code, () => i);
     }
     // Operator colours are mostly deep shades that sink into the Night tiles, while pale ones such
     // as GAS yellow blend into the Default tiles' yellow main roads.
-    final lineColor = colors.brightness == Brightness.dark
+    final lineColor = isDarkTiles
         ? Color.lerp(widget.routeColor, Colors.white, 0.3)!
         : widget.routeColor.computeLuminance() > 0.4
         ? Color.lerp(widget.routeColor, Colors.black, 0.3)!
@@ -262,9 +322,9 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
           children: [
             TileLayer(
               urlTemplate:
-                  "https://www.onemap.gov.sg/maps/tiles/${colors.brightness == Brightness.dark ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
+                  "https://www.onemap.gov.sg/maps/tiles/${isDarkTiles ? 'Night_HD' : 'Default_HD'}/{z}/{x}/{y}.png",
               fallbackUrl:
-                  "https://www.onemap.gov.sg/maps/tiles/${colors.brightness == Brightness.dark ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
+                  "https://www.onemap.gov.sg/maps/tiles/${isDarkTiles ? 'Night' : 'Default'}/{z}/{x}/{y}.png",
               userAgentPackageName: 'com.tnitish.transito',
               errorImage: const AssetImage('assets/images/mapError.png'),
             ),
@@ -349,6 +409,44 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
                   ),
               ],
             ),
+            AnimatedBuilder(
+              animation: Listenable.merge([_busMoveController, _busFadeController]),
+              builder: (context, _) {
+                final busLocation = _currentBusLocation;
+                if (busLocation == null || _busFadeController.isDismissed) {
+                  return const SizedBox.shrink();
+                }
+                return IgnorePointer(
+                  child: MarkerLayer(
+                    rotate: true,
+                    markers: [
+                      // The 64x88 box is centred on the GPS coordinate: the pulse expands from the
+                      // centre while the pin floats above it with its tip on the coordinate.
+                      Marker(
+                        key: const ValueKey('next-bus'),
+                        point: busLocation,
+                        width: 64,
+                        height: 88,
+                        child: FadeTransition(
+                          opacity: CurvedAnimation(
+                            parent: _busFadeController,
+                            curve: Curves.easeOutCubic,
+                          ),
+                          child: Semantics(
+                            label: 'Next arriving bus',
+                            child: _BusMarker(
+                              lineColor: lineColor,
+                              isDarkTiles: isDarkTiles,
+                              compact: !_showStopIcons,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ],
         ),
         if (_awayFromOverview && widget.routes.isNotEmpty)
@@ -406,11 +504,7 @@ class _StopMarker extends StatelessWidget {
         : isCurrent || isTerminal || showIcon
         ? 28.0
         : 12.0;
-    // Whichever of white or black has the higher WCAG contrast ratio against the fill.
-    final luminance = lineColor.computeLuminance();
-    final onLine = 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.05
-        ? Colors.white
-        : Colors.black;
+    final onLine = _contrastColor(lineColor);
 
     // Ordinary stops sit on the line like stations on a transit map; filled markers stand out.
     final (Color fill, Color ring, Color icon, IconData symbol) = switch (this) {
@@ -448,4 +542,178 @@ class _StopMarker extends StatelessWidget {
       child: size > 12 ? AppSymbol(symbol, fill: true, size: size * 0.6, color: icon) : null,
     );
   }
+}
+
+/// Whichever of white or black has the higher WCAG contrast ratio against [background].
+Color _contrastColor(Color background) {
+  final luminance = background.computeLuminance();
+  return 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.05 ? Colors.white : Colors.black;
+}
+
+class _BusMarker extends StatefulWidget {
+  const _BusMarker({
+    required this.lineColor,
+    required this.isDarkTiles,
+    required this.compact,
+  });
+
+  final Color lineColor;
+  final bool isDarkTiles;
+  final bool compact;
+
+  @override
+  State<_BusMarker> createState() => _BusMarkerState();
+}
+
+class _BusMarkerState extends State<_BusMarker> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1800),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pulse.stop();
+    } else if (!_pulse.isAnimating) {
+      unawaited(_pulse.repeat());
+    }
+  }
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final disableAnimations = MediaQuery.disableAnimationsOf(context);
+    // Inverted from stops (which use route-coloured fills with white rings) so the moving vehicle
+    // separates from "Your stop" and selected stops at a glance on both map themes.
+    final fill = widget.isDarkTiles ? const Color(0xFFF5EFF7) : const Color(0xFF1D1B20);
+    final iconColor = widget.isDarkTiles ? const Color(0xFF1D1B20) : Colors.white;
+    final haloBase = Color.lerp(
+      widget.lineColor,
+      widget.isDarkTiles ? Colors.white : Colors.black,
+      0.25,
+    )!;
+    final pinWidth = widget.compact ? 24.0 : 36.0;
+    final pinHeight = widget.compact ? 28.0 : 42.0;
+    // Keeps the pin tip (2px above the bottom of the painted box) locked to the centre y=44.
+    final pinTop = 44.0 - (pinHeight - 2.0);
+
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        if (disableAnimations)
+          Container(
+            width: widget.compact ? 18 : 24,
+            height: widget.compact ? 18 : 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: haloBase.withValues(alpha: 0.25),
+            ),
+          )
+        else
+          AnimatedBuilder(
+            animation: _pulse,
+            builder: (context, _) {
+              final t = Curves.easeOut.transform(_pulse.value);
+              final minSize = widget.compact ? 10.0 : 14.0;
+              final span = widget.compact ? 24.0 : 34.0;
+              final size = minSize + span * t;
+              return Container(
+                width: size,
+                height: size,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: haloBase.withValues(alpha: (1 - t) * 0.35),
+                ),
+              );
+            },
+          ),
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOutCubic,
+          top: pinTop,
+          width: pinWidth,
+          height: pinHeight,
+          child: CustomPaint(
+            painter: _BusPinPainter(fill: fill, ring: widget.lineColor),
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SizedBox.square(
+                dimension: pinWidth,
+                child: Center(
+                  child: AppSymbol(
+                    Symbols.departure_board_rounded,
+                    fill: true,
+                    size: widget.compact ? 13 : 20,
+                    color: iconColor,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// A teardrop pin whose tip points to the bus's GPS position on the route line, keeping both the
+/// bus and any stop marker beneath it visible.
+class _BusPinPainter extends CustomPainter {
+  const _BusPinPainter({required this.fill, required this.ring});
+
+  final Color fill;
+  final Color ring;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.width / 2;
+    final r = (size.width - 4) / 2;
+    final d = size.height - cy - 2;
+    final theta = math.asin((r / d).clamp(-1.0, 1.0));
+    const tipRadius = 2.0;
+
+    final path = Path()
+      ..arcTo(
+        Rect.fromCircle(center: Offset(cx, cy), radius: r),
+        math.pi - theta,
+        math.pi + 2 * theta,
+        false,
+      )
+      ..lineTo(cx + tipRadius * math.sin(theta), cy + d - tipRadius * math.cos(theta))
+      ..quadraticBezierTo(
+        cx,
+        cy + d,
+        cx - tipRadius * math.sin(theta),
+        cy + d - tipRadius * math.cos(theta),
+      )
+      ..close();
+
+    canvas.drawPath(
+      path.shift(const Offset(0, 1)),
+      Paint()
+        ..color = Colors.black.withValues(alpha: 0.35)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3),
+    );
+    canvas.drawPath(path, Paint()..color = fill);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = ring
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.5
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_BusPinPainter oldDelegate) =>
+      oldDelegate.fill != fill || oldDelegate.ring != ring;
 }
