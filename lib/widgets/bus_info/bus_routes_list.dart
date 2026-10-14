@@ -99,8 +99,12 @@ class BusRouteStopRow extends StatelessWidget {
           children: [
             MeasureSize(
               onChange: (size) => onBaseExtentChanged?.call(size.height),
+              // The selection fill acknowledges a tap; a ripple would stop short of the actions
+              // that open below the row.
               child: InkWell(
                 onTap: onTap,
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
                 child: Stack(
                   children: [
                     Positioned(

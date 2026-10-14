@@ -54,7 +54,6 @@ Widget _preview(Brightness brightness, {bool loop = false}) {
         : stops,
   );
   var direction = 0;
-  String? selected;
   return ChangeNotifierProvider(
     create: (_) => AppColors()..updateLocalColorScheme(AppColors.veryPurple, brightness),
     child: MaterialApp(
@@ -71,8 +70,7 @@ Widget _preview(Brightness brightness, {bool loop = false}) {
               service: service,
               routes: const [],
               directionIndex: direction,
-              selectedStopCode: selected,
-              onStopTap: (stop) => setState(() => selected = stop.code),
+              onStopTap: (_) {},
               onSwitchDirection: loop
                   ? null
                   : () => setState(() => direction = (direction + 1) % 2),

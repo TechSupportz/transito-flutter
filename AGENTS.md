@@ -23,10 +23,18 @@ Level, Service Route, ...) are defined in `CONTEXT.md`; use them in code, commen
 
 ## Verification
 
-- Use the Flutter SDK pinned in `.fvmrc`.
-- After editing a non-generated Dart file, run `dart format <file>`, then `flutter analyze`.
-- `.g.dart` files are generated: change the annotated source and run
-  `dart run build_runner build`.
+The Flutter version is pinned by FVM in `.fvmrc`; build and release with that version. The global
+`flutter` on PATH may differ, so prefix Flutter and Dart commands with `fvm`.
+
+```bash
+fvm dart format <file>                    # After editing any hand-written Dart file
+fvm flutter analyze                       # After Dart changes
+fvm dart run build_runner build           # After changing json_serializable models
+fvm flutter test                          # Logic-heavy test suite
+```
+
+- `.g.dart` files are generated: change the annotated source and regenerate them with
+  `build_runner`; leave them out of manual edits and formatting.
 - Add or update tests for substantial data processing, complex algorithms, or a regression best
   protected by a focused test. Routine UI, model, persistence, and serialization changes are
   verified with formatting, analysis, widget previews, and hot reload instead.
@@ -66,3 +74,11 @@ Level, Service Route, ...) are defined in `CONTEXT.md`; use them in code, commen
   `../transito-server/docs/adr/0001-detect-outages-per-device.md`.
 - Catch async errors only where the catch adds recovery, translation, logging, or user feedback.
 - Show async error states (`FutureBuilder` and equivalents) with `ErrorText`.
+
+## Canonical examples
+
+- API singleton and LTA failure handling: `lib/global/services/lta_api_service.dart`
+- Backend API service: `lib/global/services/transito_api_service.dart`
+- Screen controller: `lib/screens/main/nearby_screen.dart`
+- Outage and Announcement state: `lib/global/providers/alerts_provider.dart`
+- Shared async error UI: `lib/widgets/common/error_text.dart`

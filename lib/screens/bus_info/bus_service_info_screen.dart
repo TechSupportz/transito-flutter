@@ -4,7 +4,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:material_ui/material_ui.dart';
 import 'package:flutter_skeleton_ui/flutter_skeleton_ui.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' hide Path;
 import 'package:measure_size/measure_size.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
@@ -49,7 +49,6 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   List<List<LatLng>> _shapes = const [];
   int _directionIndex = 0;
   int? _selectedStopIndex;
-  String? _selectedStopCode;
   int? _pendingScrollIndex;
   int? _lastScrollIndex;
   bool _loading = true;
@@ -74,6 +73,14 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   }
 
   List<LatLng> get _shape => _directionIndex < _shapes.length ? _shapes[_directionIndex] : const [];
+
+  /// How far the sheet is between collapsed (0) and expanded (1).
+  double get _sheetProgress {
+    if (!_drawer.isAttached || _expandedSheetHeight <= _collapsedSheetHeight) return 0;
+    return ((_drawer.size - _collapsedSheetHeight) / (_expandedSheetHeight - _collapsedSheetHeight))
+        .clamp(0.0, 1.0);
+  }
+
   bool get _isExpanded => _drawer.isAttached && _drawer.size >= _expandedSheetHeight - 0.02;
 
   @override
@@ -116,7 +123,6 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         _shapes = shapes;
         _loading = false;
         _selectedStopIndex = null;
-        _selectedStopCode = null;
         _queueOriginScroll();
       });
       _scheduleListScroll();
@@ -229,7 +235,6 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     }
     setState(() {
       _selectedStopIndex = index;
-      _selectedStopCode = stop.code;
       _pendingScrollIndex = index;
     });
     _scheduleListScroll();
@@ -243,10 +248,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     if (routeIndex >= 0) {
       _selectStop(routeIndex, focusMap: true);
     } else {
-      setState(() {
-        _selectedStopIndex = null;
-        _selectedStopCode = stop.code;
-      });
+      setState(() => _selectedStopIndex = null);
       _map.focusStop(LatLng(stop.latitude, stop.longitude));
     }
   }
@@ -260,7 +262,6 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     setState(() {
       _directionIndex = (_directionIndex + 1) % routeCount;
       _selectedStopIndex = null;
-      _selectedStopCode = null;
       _queueOriginScroll();
     });
     _scheduleListScroll();
@@ -365,36 +366,60 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                       final header = GestureDetector(
                         onVerticalDragUpdate: _headerPinned ? _dragSheet : null,
                         onVerticalDragEnd: _headerPinned ? _settleSheet : null,
-                        child: ColoredBox(
-                          color: scheme.surfaceContainerLow,
-                          child: MeasureSize(
-                            onChange: (size) {
-                              if (mounted && (size.height - _headerHeight).abs() > 0.5) {
-                                setState(() => _headerHeight = size.height);
-                              }
-                            },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                _buildHandle(),
-                                BusServiceRouteHeader(
-                                  serviceNo: widget.serviceNo,
-                                  service: _service,
-                                  routes: _routes,
-                                  directionIndex: _directionIndex,
-                                  selectedStopCode: _selectedStopCode,
-                                  onStopTap: _tapStopCard,
-                                  onSwitchDirection: (_service?.routes?.length ?? 0) > 1
-                                      ? _switchDirection
-                                      : null,
+                        child: MeasureSize(
+                          onChange: (size) {
+                            if (mounted && (size.height - _headerHeight).abs() > 0.5) {
+                              setState(() => _headerHeight = size.height);
+                            }
+                          },
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              ColoredBox(
+                                color: scheme.surfaceContainerLow,
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    _buildHandle(),
+                                    BusServiceRouteHeader(
+                                      serviceNo: widget.serviceNo,
+                                      service: _service,
+                                      routes: _routes,
+                                      directionIndex: _directionIndex,
+                                      onStopTap: _tapStopCard,
+                                      onSwitchDirection: (_service?.routes?.length ?? 0) > 1
+                                          ? _switchDirection
+                                          : null,
+                                    ),
+                                    Divider(
+                                      height: 1,
+                                      indent: 16,
+                                      endIndent: 16,
+                                      color: scheme.outlineVariant.withValues(alpha: 0.5),
+                                    ),
+                                  ],
                                 ),
-                                Divider(
-                                  height: 1,
-                                  color: scheme.outlineVariant.withValues(alpha: 0.5),
+                              ),
+                              // An inset divider marks where the header ends, and stops scrolling
+                              // under it fade out rather than meeting a hard edge.
+                              IgnorePointer(
+                                child: Container(
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        scheme.surfaceContainerLow,
+                                        scheme.surfaceContainerLow.withValues(alpha: 0),
+                                      ],
+                                    ),
+                                  ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       );
@@ -422,7 +447,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                               else
                                 SliverToBoxAdapter(child: header),
                               SliverPadding(
-                                padding: EdgeInsets.fromLTRB(8, 8, 8, padding.bottom + 16),
+                                padding: EdgeInsets.fromLTRB(8, 0, 8, padding.bottom + 16),
                                 sliver: _buildStopList(),
                               ),
                             ],
@@ -453,14 +478,13 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         onVerticalDragUpdate: _dragSheet,
         onVerticalDragEnd: _settleSheet,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 22),
+          padding: const EdgeInsets.symmetric(vertical: 19.5),
           child: Center(
-            child: Container(
-              width: 32,
-              height: 4,
-              decoration: BoxDecoration(
+            child: CustomPaint(
+              size: const Size(30, 9),
+              painter: _SheetHandlePainter(
+                progress: _sheetProgress,
                 color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
               ),
             ),
           ),
@@ -526,4 +550,37 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
       onStopTap: (index) => _tapStopCard(_routes[index].busStop, index: index),
     );
   }
+}
+
+/// A chevron that points up while the sheet is collapsed and bends through a flat bar to point
+/// down as it expands, hinting which way the sheet moves.
+class _SheetHandlePainter extends CustomPainter {
+  const _SheetHandlePainter({required this.progress, required this.color});
+
+  final double progress;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const stroke = 4.0;
+    final bend = (size.height - stroke) / 2 * (1 - 2 * progress);
+    final midY = size.height / 2;
+    final path = Path()
+      ..moveTo(stroke / 2, midY + bend)
+      ..lineTo(size.width / 2, midY - bend)
+      ..lineTo(size.width - stroke / 2, midY + bend);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = color
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_SheetHandlePainter oldDelegate) =>
+      oldDelegate.progress != progress || oldDelegate.color != color;
 }

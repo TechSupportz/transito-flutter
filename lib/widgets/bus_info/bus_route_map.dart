@@ -157,34 +157,33 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
     }
   }
 
-  /// Direction arrowheads along [BusRouteMap.shape], about 50 logical pixels apart at the current
+  /// Direction arrowheads along [BusRouteMap.shape], about 75 logical pixels apart at the current
   /// whole zoom level. Each entry is a point and its compass bearing in degrees.
   List<(LatLng, double)> get _directionArrows {
     if (_arrows != null) return _arrows!;
     const distance = Distance();
+    final shape = widget.shape;
     // Ground resolution at Singapore's latitude; beyond zoom 17 the chevrons spread out on screen
     // rather than multiplying.
     final metresPerPixel =
         156543.03 * math.cos(1.35 * math.pi / 180) / math.pow(2, math.min(_arrowZoom, 17));
-    final spacing = 50 * metresPerPixel;
+    final spacing = 75 * metresPerPixel;
     final arrows = <(LatLng, double)>[];
     var untilNext = spacing / 2;
-    for (var i = 0; i < widget.shape.length - 1; i++) {
-      final a = widget.shape[i];
-      final b = widget.shape[i + 1];
+    for (var i = 0; i < shape.length - 1; i++) {
+      final a = shape[i];
+      final b = shape[i + 1];
       final length = distance.as(LengthUnit.Meter, a, b);
       if (length == 0) continue;
       final bearing = distance.bearing(a, b);
       var travelled = untilNext;
       while (travelled <= length) {
         final t = travelled / length;
-        arrows.add((
-          LatLng(
-            a.latitude + (b.latitude - a.latitude) * t,
-            a.longitude + (b.longitude - a.longitude) * t,
-          ),
-          bearing,
-        ));
+        final point = LatLng(
+          a.latitude + (b.latitude - a.latitude) * t,
+          a.longitude + (b.longitude - a.longitude) * t,
+        );
+        arrows.add((point, bearing));
         travelled += spacing;
       }
       untilNext = travelled - length;
@@ -214,8 +213,13 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
         : widget.routeColor.computeLuminance() > 0.4
         ? Color.lerp(widget.routeColor, Colors.black, 0.3)!
         : widget.routeColor;
-    // A darker shade of the line for its casing and direction arrowheads.
+    // A darker shade of the line for its casing.
     final lineShade = Color.lerp(lineColor, Colors.black, 0.45)!;
+    // Arrowheads contrast with the line as a subtle hint of direction: darker on light lines, but
+    // lighter on deep ones, where darkening barely shows.
+    final arrowShade = lineColor.computeLuminance() > 0.22
+        ? Color.lerp(lineColor, Colors.black, 0.3)!
+        : Color.lerp(lineColor, Colors.white, 0.35)!;
     final selectedCode = widget.selectedStopIndex == null
         ? null
         : widget.routes[widget.selectedStopIndex!].busStop.code;
@@ -285,16 +289,16 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
                     for (final (point, bearing) in _directionArrows)
                       Marker(
                         point: point,
-                        width: 14,
-                        height: 14,
+                        width: 12,
+                        height: 12,
                         child: Transform.rotate(
                           // The arrowhead points east, a compass bearing of 90°.
                           angle: (bearing - 90) * math.pi / 180,
                           child: AppSymbol(
                             Symbols.play_arrow_rounded,
                             fill: true,
-                            size: 14,
-                            color: lineShade,
+                            size: 12,
+                            color: arrowShade,
                           ),
                         ),
                       ),
