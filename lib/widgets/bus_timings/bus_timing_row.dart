@@ -83,6 +83,7 @@ class _BusTimingRowState extends State<BusTimingRow> {
           originStopCode: widget.serviceInfo.nextBus.originCode,
           destinationStopCode: widget.serviceInfo.nextBus.destinationCode,
           currentStopCode: widget.busStopCode,
+          initialNextBus: widget.serviceInfo.nextBus,
         ),
         settings: const RouteSettings(name: 'BusServiceInfoScreen'),
       ),

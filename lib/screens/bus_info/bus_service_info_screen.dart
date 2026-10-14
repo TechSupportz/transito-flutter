@@ -9,8 +9,11 @@ import 'package:measure_size/measure_size.dart';
 import 'package:provider/provider.dart';
 import 'package:transito/global/providers/common_provider.dart';
 import 'package:transito/global/providers/quick_start_tour_provider.dart';
+import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
+import 'package:transito/global/utils/bus_arrival_time.dart';
 import 'package:transito/global/utils/unpack_polyline.dart';
+import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
 import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
@@ -29,6 +32,7 @@ class BusServiceInfoScreen extends StatefulWidget {
     this.destinationStopCode,
     this.currentStopCode,
     this.busService,
+    this.initialNextBus,
   });
 
   final String serviceNo;
@@ -36,6 +40,7 @@ class BusServiceInfoScreen extends StatefulWidget {
   final String? destinationStopCode;
   final String? currentStopCode;
   final BusService? busService;
+  final IndivArrivalInfo? initialNextBus;
 
   @override
   State<BusServiceInfoScreen> createState() => _BusServiceInfoScreenState();
@@ -47,6 +52,11 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   ScrollController? _routeScrollController;
   BusService? _service;
   List<List<LatLng>> _shapes = const [];
+  List<ServiceInfo> _arrivalServices = const [];
+  IndivArrivalInfo? _seededNextBus;
+  DateTime? _lastArrivalUpdate;
+  Timer? _arrivalTimer;
+  int _arrivalFetchGeneration = 0;
   int _directionIndex = 0;
   int? _selectedStopIndex;
   int? _pendingScrollIndex;
@@ -74,6 +84,112 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   List<LatLng> get _shape => _directionIndex < _shapes.length ? _shapes[_directionIndex] : const [];
 
+  BusStop? get _currentStopOnActiveRoute {
+    final code = widget.currentStopCode;
+    if (code == null) return null;
+    for (final stop in _routes) {
+      if (stop.busStop.code == code) return stop.busStop;
+    }
+    return null;
+  }
+
+  LatLng? get _nextBusLocation {
+    final stopCode = widget.currentStopCode;
+    final service = _service;
+    final updatedAt = _lastArrivalUpdate;
+    if (stopCode == null || service == null || _currentStopOnActiveRoute == null) return null;
+    if (updatedAt == null) return null;
+    final now = DateTime.now();
+    if (now.difference(updatedAt) > const Duration(seconds: 60)) return null;
+
+    final allRoutes = service.routes ?? const [];
+    // When the current stop appears in more than one direction (such as an interchange), match the
+    // arrival's terminals so a departing bus isn't shown on the opposite direction.
+    final sharedAcrossDirections =
+        allRoutes.length > 1 &&
+        allRoutes.where((route) => route.any((stop) => stop.busStop.code == stopCode)).length > 1;
+
+    final sequences = <List<IndivArrivalInfo>>[
+      for (final item in _arrivalServices)
+        if (item.serviceNum == widget.serviceNo) [item.nextBus, item.nextBus2, item.nextBus3],
+      if (_arrivalServices.isEmpty && _seededNextBus != null) [_seededNextBus!],
+    ];
+
+    for (final sequence in sequences) {
+      for (final bus in sequence) {
+        if (_hasDeparted(bus, now)) continue;
+        if (sharedAcrossDirections) {
+          final direction = _directionForArrival(
+            service,
+            originStopCode: bus.originCode,
+            destinationStopCode: bus.destinationCode,
+          );
+          if (direction != null && direction != _directionIndex) continue;
+        }
+        // Once we've found the next bus for this direction, don't fall through to nextBus2 if its
+        // live position is unavailable—that would mislabel a later bus as the next one.
+        if (!bus.isMonitored) break;
+        final lat = bus.latitude;
+        final lng = bus.longitude;
+        if (!lat.isFinite ||
+            !lng.isFinite ||
+            lat < 1.1 ||
+            lat > 1.5 ||
+            lng < 103.6 ||
+            lng > 104.1) {
+          break;
+        }
+        final matched = _matchToShape(LatLng(lat, lng), _shape);
+        if (matched != null) return matched;
+        break;
+      }
+    }
+    return null;
+  }
+
+  bool _hasDeparted(IndivArrivalInfo bus, DateTime now) {
+    final arrival = parseBusArrivalTime(bus.estimatedArrival);
+    return arrival != null && now.difference(arrival) > const Duration(seconds: 30);
+  }
+
+  /// Snaps [point] onto [shape] when within 60m, or returns null when [point] is more than 150m
+  /// from the route shape (such as a bus still finishing the opposite direction or in a depot).
+  LatLng? _matchToShape(LatLng point, List<LatLng> shape) {
+    if (shape.length < 2) return point;
+    const metresPerDegreeLat = 110574.0;
+    final metresPerDegreeLng = 111320.0 * math.cos(point.latitudeInRad);
+
+    var bestDistanceSquared = double.infinity;
+    var bestPoint = point;
+
+    for (var i = 0; i < shape.length - 1; i++) {
+      final start = shape[i];
+      final end = shape[i + 1];
+      final endX = (end.longitude - start.longitude) * metresPerDegreeLng;
+      final endY = (end.latitude - start.latitude) * metresPerDegreeLat;
+      final busX = (point.longitude - start.longitude) * metresPerDegreeLng;
+      final busY = (point.latitude - start.latitude) * metresPerDegreeLat;
+
+      final lengthSquared = endX * endX + endY * endY;
+      final t = lengthSquared == 0
+          ? 0.0
+          : ((busX * endX + busY * endY) / lengthSquared).clamp(0.0, 1.0);
+      final offsetX = busX - t * endX;
+      final offsetY = busY - t * endY;
+      final distSquared = offsetX * offsetX + offsetY * offsetY;
+      if (distSquared < bestDistanceSquared) {
+        bestDistanceSquared = distSquared;
+        bestPoint = LatLng(
+          start.latitude + (end.latitude - start.latitude) * t,
+          start.longitude + (end.longitude - start.longitude) * t,
+        );
+      }
+    }
+
+    if (bestDistanceSquared > 150 * 150) return null;
+    return bestDistanceSquared <= 60 * 60 ? bestPoint : point;
+  }
+
   /// How far the sheet is between collapsed (0) and expanded (1).
   double get _sheetProgress {
     if (!_drawer.isAttached || _expandedSheetHeight <= _collapsedSheetHeight) return 0;
@@ -88,17 +204,55 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     super.initState();
     _map.addListener(_onCameraRequest);
     _service = widget.busService;
+    if (widget.initialNextBus case final nextBus?) {
+      _seededNextBus = nextBus;
+      _lastArrivalUpdate = DateTime.now();
+    }
     if (_service != null) _directionIndex = _initialDirection(_service!);
     unawaited(_loadService());
   }
 
-  int _initialDirection(BusService service) {
+  int _initialDirection(BusService service) =>
+      _directionForArrival(
+        service,
+        originStopCode: widget.originStopCode,
+        destinationStopCode: widget.destinationStopCode,
+      ) ??
+      0;
+
+  /// Returns the direction index that [originStopCode] and [destinationStopCode] identify, or null
+  /// when they don't disambiguate a direction (such as a short-working trip with mid-route stops).
+  int? _directionForArrival(
+    BusService service, {
+    String? originStopCode,
+    String? destinationStopCode,
+  }) {
     if (service.isLoopService || service.isSingleRoute || service.interchanges.length < 2) return 0;
-    if (widget.originStopCode == service.interchanges[1].code ||
-        widget.destinationStopCode == service.interchanges[0].code) {
-      return 1;
+    final first = service.interchanges[0].code;
+    final second = service.interchanges[1].code;
+    if (originStopCode == second || destinationStopCode == first) return 1;
+    if (originStopCode == first || destinationStopCode == second) return 0;
+
+    final routes = service.routes;
+    if (routes != null &&
+        originStopCode != null &&
+        originStopCode.isNotEmpty &&
+        destinationStopCode != null &&
+        destinationStopCode.isNotEmpty) {
+      final matches = <int>[
+        for (var i = 0; i < routes.length; i++)
+          if (_hasOrderedStops(routes[i], originStopCode, destinationStopCode)) i,
+      ];
+      if (matches.length == 1) return matches.single;
     }
-    return 0;
+    return null;
+  }
+
+  bool _hasOrderedStops(List<BusRouteInfo> route, String fromCode, String toCode) {
+    final fromIndex = route.indexWhere((stop) => stop.busStop.code == fromCode);
+    if (fromIndex < 0) return false;
+    final toIndex = route.lastIndexWhere((stop) => stop.busStop.code == toCode);
+    return toIndex > fromIndex;
   }
 
   Future<void> _loadService() async {
@@ -126,12 +280,72 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         _queueOriginScroll();
       });
       _scheduleListScroll();
+      _syncArrivalPolling(generation);
     } catch (error) {
       if (!mounted || generation != _requestGeneration) return;
       setState(() {
         _loading = false;
         _loadFailed = true;
       });
+    }
+  }
+
+  void _syncArrivalPolling(int generation) {
+    _arrivalTimer?.cancel();
+    _arrivalTimer = null;
+    if (_currentStopOnActiveRoute == null) return;
+    unawaited(_fetchNextBus(generation));
+    _arrivalTimer = Timer.periodic(const Duration(seconds: 20), (_) {
+      if (!mounted || ModalRoute.of(context)?.isCurrent == false) return;
+      unawaited(_fetchNextBus(generation));
+    });
+  }
+
+  Future<void> _fetchNextBus(int generation) async {
+    final stop = _currentStopOnActiveRoute;
+    final service = _service;
+    if (stop == null || service == null) return;
+    final fetchId = ++_arrivalFetchGeneration;
+
+    final BusStopProviderSources? sources;
+    if (service.operator == BusOperator.NUS) {
+      final nusCode = stop.sources?.nus;
+      if (nusCode == null || nusCode.isEmpty) return;
+      sources = BusStopProviderSources(nus: nusCode);
+    } else if (service.operator != BusOperator.NA) {
+      final ltaCode = stop.sources?.lta;
+      sources = BusStopProviderSources(
+        lta: ltaCode != null && ltaCode.isNotEmpty ? ltaCode : stop.code,
+      );
+    } else {
+      sources = stop.sources;
+    }
+
+    try {
+      final info = await BusArrivalService().getBusArrival(stop.code, sources: sources);
+      if (!mounted || generation != _requestGeneration || fetchId != _arrivalFetchGeneration) {
+        return;
+      }
+      setState(() {
+        _arrivalServices = info.services;
+        _seededNextBus = null;
+        _lastArrivalUpdate = DateTime.now();
+      });
+    } catch (error) {
+      if (kDebugMode) {
+        debugPrint('Could not fetch next bus location for ${widget.serviceNo}: $error');
+      }
+      if (!mounted || generation != _requestGeneration || fetchId != _arrivalFetchGeneration) {
+        return;
+      }
+      final updatedAt = _lastArrivalUpdate;
+      if (updatedAt != null && DateTime.now().difference(updatedAt) > const Duration(seconds: 60)) {
+        setState(() {
+          _arrivalServices = const [];
+          _seededNextBus = null;
+          _lastArrivalUpdate = null;
+        });
+      }
     }
   }
 
@@ -265,6 +479,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
       _queueOriginScroll();
     });
     _scheduleListScroll();
+    _syncArrivalPolling(_requestGeneration);
   }
 
   /// Camera targets are framed above the collapsed sheet, so an expanded sheet would cover them.
@@ -289,6 +504,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   @override
   void dispose() {
+    _arrivalTimer?.cancel();
     _drawer.dispose();
     _map
       ..removeListener(_onCameraRequest)
@@ -327,6 +543,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                   onStopTap: _selectStop,
                   selectedStopIndex: _selectedStopIndex,
                   currentStopCode: widget.currentStopCode,
+                  busLocation: _nextBusLocation,
                 ),
               ),
               Positioned(
