@@ -56,6 +56,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   IndivArrivalInfo? _seededNextBus;
   DateTime? _lastArrivalUpdate;
   Timer? _arrivalTimer;
+
+  /// Rebuilds once the last arrivals go stale, so a hanging request can't keep an old bus shown.
+  Timer? _arrivalExpiryTimer;
   int _arrivalFetchGeneration = 0;
   int _directionIndex = 0;
   int? _selectedStopIndex;
@@ -93,14 +96,17 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     return null;
   }
 
-  LatLng? get _nextBusLocation {
+  static const _arrivalLifetime = Duration(seconds: 60);
+
+  /// The next bus to arrive at the current stop on this direction, snapped onto the route line.
+  ({LatLng location, IndivArrivalInfo arrival})? get _nextBus {
     final stopCode = widget.currentStopCode;
     final service = _service;
     final updatedAt = _lastArrivalUpdate;
     if (stopCode == null || service == null || _currentStopOnActiveRoute == null) return null;
     if (updatedAt == null) return null;
     final now = DateTime.now();
-    if (now.difference(updatedAt) > const Duration(seconds: 60)) return null;
+    if (now.difference(updatedAt) > _arrivalLifetime) return null;
 
     final allRoutes = service.routes ?? const [];
     // When the current stop appears in more than one direction (such as an interchange), match the
@@ -124,7 +130,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
             originStopCode: bus.originCode,
             destinationStopCode: bus.destinationCode,
           );
-          if (direction != null && direction != _directionIndex) continue;
+          // An arrival whose terminals don't identify a direction may belong to either, so it
+          // can't be shown, nor can a later bus be assumed to be the next one.
+          if (direction == null) break;
+          if (direction != _directionIndex) continue;
         }
         // Once we've found the next bus for this direction, don't fall through to nextBus2 if its
         // live position is unavailable—that would mislabel a later bus as the next one.
@@ -140,7 +149,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
           break;
         }
         final matched = _matchToShape(LatLng(lat, lng), _shape);
-        if (matched != null) return matched;
+        if (matched != null) return (location: matched, arrival: bus);
         break;
       }
     }
@@ -190,6 +199,143 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     return bestDistanceSquared <= 60 * 60 ? bestPoint : point;
   }
 
+  /// Each stop's position along the active Route Shape, or null without a shape. Stops are matched
+  /// in order, so a loop's first stop matches the start of the shape rather than its end.
+  List<_ShapePosition>? get _stopPositions {
+    final shape = _shape;
+    final routes = _routes;
+    if (shape.length < 2 || routes.isEmpty) return null;
+    if (_stopPositionsKey == (shape, routes)) return _cachedStopPositions;
+    final positions = <_ShapePosition>[];
+    _ShapePosition? previous;
+    for (final route in routes) {
+      final stop = LatLng(route.busStop.latitude, route.busStop.longitude);
+      // Each stop is no earlier along the shape than the one before, even within one segment, so
+      // stops on a road the route retraces keep their order.
+      final candidates = [
+        for (var i = previous?.segment ?? 0; i < shape.length - 1; i++)
+          _projectOntoSegment(stop, shape, i, minT: i == previous?.segment ? previous!.t : 0),
+      ];
+      final nearest = candidates.map((c) => c.offset).reduce(math.min);
+      // The earliest close match, so a later pass over the same road isn't chosen.
+      final match = candidates.firstWhere((c) => c.offset <= nearest + 25);
+      positions.add(match);
+      previous = match;
+    }
+    _stopPositionsKey = (shape, routes);
+    return _cachedStopPositions = positions;
+  }
+
+  (List<LatLng>, List<BusRouteInfo>)? _stopPositionsKey;
+  List<_ShapePosition>? _cachedStopPositions;
+
+  /// The index of the stop the next bus last passed on its way to the current stop.
+  int? _lastStopPassedBy(({LatLng location, IndivArrivalInfo arrival}) nextBus) {
+    final positions = _stopPositions;
+    if (positions == null) return null;
+    // A route can visit the current stop more than once, such as a loop's terminal. Each visit is
+    // reached through the stretch of route since the previous one.
+    final visits = [
+      for (var i = 0; i < _routes.length; i++)
+        if (_routes[i].busStop.code == widget.currentStopCode) i,
+    ];
+    final sections = [
+      for (var v = 0; v < visits.length; v++)
+        if (visits[v] > 0) (from: v == 0 ? 0 : visits[v - 1], to: visits[v]),
+    ];
+    if (sections.isEmpty) return null;
+
+    ({int from, int to}) section;
+    _ShapePosition? best;
+    // LTA numbers each visit. A loop's terminal departures count as its first visit, which has no
+    // stretch before it, so those and NUS arrivals use the stretch the bus is nearest to.
+    final visitNumber = nextBus.arrival.visitNumber ?? 0;
+    final numbered = visitNumber >= 1 && visitNumber <= visits.length && visits[visitNumber - 1] > 0
+        ? sections.firstWhere((section) => section.to == visits[visitNumber - 1])
+        : null;
+    if (numbered != null) {
+      section = numbered;
+      best = _nearestInSection(nextBus.location, positions, section);
+    } else {
+      section = sections.first;
+      for (final candidate in sections) {
+        final projection = _nearestInSection(nextBus.location, positions, candidate);
+        if (best == null || projection.offset < best.offset) {
+          best = projection;
+          section = candidate;
+        }
+      }
+    }
+
+    final along = math.min(best!.along, positions[section.to].along);
+    var lastPassed = section.from;
+    for (var i = section.from + 1; i < section.to; i++) {
+      if (positions[i].along <= along) lastPassed = i;
+    }
+    return lastPassed;
+  }
+
+  /// The point nearest [point] on the stretch of shape from stop [section.from] to [section.to].
+  _ShapePosition _nearestInSection(
+    LatLng point,
+    List<_ShapePosition> positions,
+    ({int from, int to}) section,
+  ) {
+    final first = section.from == 0 ? 0 : positions[section.from].segment;
+    var best = _projectOntoSegment(point, _shape, first);
+    for (var i = first + 1; i <= positions[section.to].segment; i++) {
+      final candidate = _projectOntoSegment(point, _shape, i);
+      if (candidate.offset < best.offset) best = candidate;
+    }
+    return best;
+  }
+
+  /// Projects [point] onto segment [segment] of [shape], no earlier than fraction [minT] along it,
+  /// measuring in metres.
+  _ShapePosition _projectOntoSegment(
+    LatLng point,
+    List<LatLng> shape,
+    int segment, {
+    double minT = 0,
+  }) {
+    const metresPerDegreeLat = 110574.0;
+    final metresPerDegreeLng = 111320.0 * math.cos(point.latitudeInRad);
+    final cumulative = _shapeDistances(shape);
+    final start = shape[segment];
+    final end = shape[segment + 1];
+    final endX = (end.longitude - start.longitude) * metresPerDegreeLng;
+    final endY = (end.latitude - start.latitude) * metresPerDegreeLat;
+    final pointX = (point.longitude - start.longitude) * metresPerDegreeLng;
+    final pointY = (point.latitude - start.latitude) * metresPerDegreeLat;
+    final lengthSquared = endX * endX + endY * endY;
+    final t = lengthSquared == 0
+        ? 0.0
+        : ((pointX * endX + pointY * endY) / lengthSquared).clamp(minT, 1.0);
+    final offsetX = pointX - t * endX;
+    final offsetY = pointY - t * endY;
+    return (
+      segment: segment,
+      t: t,
+      along: cumulative[segment] + t * (cumulative[segment + 1] - cumulative[segment]),
+      offset: math.sqrt(offsetX * offsetX + offsetY * offsetY),
+    );
+  }
+
+  /// Distance in metres from the start of [shape] to each of its points.
+  List<double> _shapeDistances(List<LatLng> shape) {
+    if (identical(shape, _shapeDistancesFor)) return _cachedShapeDistances;
+    const distance = Distance();
+    final distances = [0.0];
+    for (var i = 0; i < shape.length - 1; i++) {
+      distances.add(distances.last + distance.as(LengthUnit.Meter, shape[i], shape[i + 1]));
+    }
+    _shapeDistancesFor = shape;
+    return _cachedShapeDistances = distances;
+  }
+
+  List<LatLng>? _shapeDistancesFor;
+  List<double> _cachedShapeDistances = const [];
+
   /// How far the sheet is between collapsed (0) and expanded (1).
   double get _sheetProgress {
     if (!_drawer.isAttached || _expandedSheetHeight <= _collapsedSheetHeight) return 0;
@@ -207,6 +353,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     if (widget.initialNextBus case final nextBus?) {
       _seededNextBus = nextBus;
       _lastArrivalUpdate = DateTime.now();
+      _scheduleArrivalExpiry();
     }
     if (_service != null) _directionIndex = _initialDirection(_service!);
     unawaited(_loadService());
@@ -293,19 +440,34 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   void _syncArrivalPolling(int generation) {
     _arrivalTimer?.cancel();
     _arrivalTimer = null;
+    final poll = ++_arrivalFetchGeneration;
     if (_currentStopOnActiveRoute == null) return;
-    unawaited(_fetchNextBus(generation));
-    _arrivalTimer = Timer.periodic(const Duration(seconds: 20), (_) {
-      if (!mounted || ModalRoute.of(context)?.isCurrent == false) return;
-      unawaited(_fetchNextBus(generation));
+    unawaited(_pollNextBus(generation, poll));
+  }
+
+  /// Fetches arrivals, then schedules the next fetch 20 seconds after this one finishes, so only one
+  /// request is ever in flight and a slow response is never discarded by the next.
+  Future<void> _pollNextBus(int generation, int poll) async {
+    if (!mounted || poll != _arrivalFetchGeneration) return;
+    if (ModalRoute.of(context)?.isCurrent != false) await _fetchNextBus(generation, poll);
+    if (!mounted || poll != _arrivalFetchGeneration) return;
+    _arrivalTimer = Timer(
+      const Duration(seconds: 20),
+      () => unawaited(_pollNextBus(generation, poll)),
+    );
+  }
+
+  void _scheduleArrivalExpiry() {
+    _arrivalExpiryTimer?.cancel();
+    _arrivalExpiryTimer = Timer(_arrivalLifetime + const Duration(seconds: 1), () {
+      if (mounted) setState(() {});
     });
   }
 
-  Future<void> _fetchNextBus(int generation) async {
+  Future<void> _fetchNextBus(int generation, int poll) async {
     final stop = _currentStopOnActiveRoute;
     final service = _service;
     if (stop == null || service == null) return;
-    final fetchId = ++_arrivalFetchGeneration;
 
     final BusStopProviderSources? sources;
     if (service.operator == BusOperator.NUS) {
@@ -322,8 +484,11 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     }
 
     try {
-      final info = await BusArrivalService().getBusArrival(stop.code, sources: sources);
-      if (!mounted || generation != _requestGeneration || fetchId != _arrivalFetchGeneration) {
+      // Polling waits for each request, so one that hangs must not stop it.
+      final info = await BusArrivalService()
+          .getBusArrival(stop.code, sources: sources)
+          .timeout(const Duration(seconds: 15));
+      if (!mounted || generation != _requestGeneration || poll != _arrivalFetchGeneration) {
         return;
       }
       setState(() {
@@ -331,20 +496,11 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         _seededNextBus = null;
         _lastArrivalUpdate = DateTime.now();
       });
+      _scheduleArrivalExpiry();
     } catch (error) {
+      // The last arrivals stay shown until they expire.
       if (kDebugMode) {
         debugPrint('Could not fetch next bus location for ${widget.serviceNo}: $error');
-      }
-      if (!mounted || generation != _requestGeneration || fetchId != _arrivalFetchGeneration) {
-        return;
-      }
-      final updatedAt = _lastArrivalUpdate;
-      if (updatedAt != null && DateTime.now().difference(updatedAt) > const Duration(seconds: 60)) {
-        setState(() {
-          _arrivalServices = const [];
-          _seededNextBus = null;
-          _lastArrivalUpdate = null;
-        });
       }
     }
   }
@@ -505,6 +661,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   @override
   void dispose() {
     _arrivalTimer?.cancel();
+    _arrivalExpiryTimer?.cancel();
     _drawer.dispose();
     _map
       ..removeListener(_onCameraRequest)
@@ -519,6 +676,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     final padding = MediaQuery.paddingOf(context);
     // Status bar plus the row of floating controls; the expanded sheet stops below it.
     final topInset = padding.top + 8 + 48 + 8;
+    final nextBus = _nextBus;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: LayoutBuilder(
@@ -543,7 +701,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                   onStopTap: _selectStop,
                   selectedStopIndex: _selectedStopIndex,
                   currentStopCode: widget.currentStopCode,
-                  busLocation: _nextBusLocation,
+                  busLocation: nextBus?.location,
                 ),
               ),
               Positioned(
@@ -620,15 +778,18 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 ),
                               ),
                               // An inset divider marks where the header ends, and stops scrolling
-                              // under it fade out rather than meeting a hard edge.
+                              // under it fade out rather than meeting a hard edge. The solid top
+                              // hides the tail of the row above a revealed stop.
                               IgnorePointer(
                                 child: Container(
-                                  height: 16,
+                                  height: 20,
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
+                                      stops: const [0, 0.4, 1],
                                       colors: [
+                                        scheme.surfaceContainerLow,
                                         scheme.surfaceContainerLow,
                                         scheme.surfaceContainerLow.withValues(alpha: 0),
                                       ],
@@ -665,7 +826,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                                 SliverToBoxAdapter(child: header),
                               SliverPadding(
                                 padding: EdgeInsets.fromLTRB(8, 0, 8, padding.bottom + 16),
-                                sliver: _buildStopList(),
+                                sliver: _buildStopList(nextBus),
                               ),
                             ],
                           ),
@@ -739,7 +900,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   void _toggleSheet() => _animateSheet(_isExpanded ? _collapsedSheetHeight : _expandedSheetHeight);
 
-  Widget _buildStopList() {
+  Widget _buildStopList(({LatLng location, IndivArrivalInfo arrival})? nextBus) {
     if (_loading) {
       return SliverList.separated(
         itemCount: 8,
@@ -758,9 +919,11 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         ),
       );
     }
+    final lastPassed = nextBus == null ? null : _lastStopPassedBy(nextBus);
     return BusRoutesList(
       routes: _routes,
       currentStopCode: widget.currentStopCode,
+      busRowIndex: lastPassed == null ? null : lastPassed + 1,
       selectedStopIndex: _selectedStopIndex,
       onRowExtentChanged: _onRowExtentChanged,
       onActionsExtentChanged: _onActionsExtentChanged,
@@ -801,3 +964,6 @@ class _SheetHandlePainter extends CustomPainter {
   bool shouldRepaint(_SheetHandlePainter oldDelegate) =>
       oldDelegate.progress != progress || oldDelegate.color != color;
 }
+
+/// A point on a Route Shape: its segment, distance along the shape, and distance from the line.
+typedef _ShapePosition = ({int segment, double t, double along, double offset});

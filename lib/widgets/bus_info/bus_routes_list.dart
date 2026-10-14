@@ -24,6 +24,7 @@ class BusRoutesList extends StatelessWidget {
     required this.onStopTap,
     this.currentStopCode,
     this.selectedStopIndex,
+    this.busRowIndex,
     this.onRowExtentChanged,
     this.onActionsExtentChanged,
   });
@@ -32,6 +33,9 @@ class BusRoutesList extends StatelessWidget {
   final ValueChanged<int> onStopTap;
   final String? currentStopCode;
   final int? selectedStopIndex;
+
+  /// The row the next bus is approaching, drawn on the rail just above that row's stop.
+  final int? busRowIndex;
   final ValueChanged<double>? onRowExtentChanged;
 
   /// Height added to a row when it is selected and shows its actions.
@@ -48,6 +52,7 @@ class BusRoutesList extends StatelessWidget {
           isLast: index == routes.length - 1,
           isCurrent: routes[index].busStop.code == currentStopCode,
           isSelected: index == selectedStopIndex,
+          busApproaching: index == busRowIndex,
           onTap: () => onStopTap(index),
           onBaseExtentChanged: onRowExtentChanged,
           onActionsExtentChanged: onActionsExtentChanged,
@@ -65,6 +70,7 @@ class BusRouteStopRow extends StatelessWidget {
     required this.isLast,
     this.isCurrent = false,
     this.isSelected = false,
+    this.busApproaching = false,
     this.onTap,
     this.onBaseExtentChanged,
     this.onActionsExtentChanged,
@@ -77,6 +83,9 @@ class BusRouteStopRow extends StatelessWidget {
   final bool isLast;
   final bool isCurrent;
   final bool isSelected;
+
+  /// Whether the next bus is between the previous stop and this one.
+  final bool busApproaching;
   final VoidCallback? onTap;
 
   // measure_size keeps the callback from a row's first build, so these must not capture per-build
@@ -88,7 +97,7 @@ class BusRouteStopRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final stop = route.busStop;
-    return Semantics(
+    final row = Semantics(
       selected: isSelected,
       child: Material(
         color: isSelected ? scheme.secondaryContainer : Colors.transparent,
@@ -221,6 +230,67 @@ class BusRouteStopRow extends StatelessWidget {
                   : const SizedBox(width: double.infinity),
             ),
           ],
+        ),
+      ),
+    );
+    if (!busApproaching) return row;
+    // Rows paint in order, so overflowing upward draws the bus over the previous row's rail,
+    // on the boundary between the two stops.
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        row,
+        Positioned(
+          top: -_RailBus.size / 2,
+          left: (railWidth - _RailBus.size) / 2,
+          child: const _RailBus(),
+        ),
+      ],
+    );
+  }
+}
+
+/// The next bus on the route rail, inverted like its map pin so it stands apart from stop nodes.
+class _RailBus extends StatelessWidget {
+  const _RailBus();
+
+  static const double size = 24;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return IgnorePointer(
+      child: Semantics(
+        label: 'Next bus',
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: 1),
+          duration: MediaQuery.disableAnimationsOf(context)
+              ? Duration.zero
+              : const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          builder: (context, value, child) => Transform.scale(scale: value, child: child),
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: scheme.inverseSurface,
+              shape: BoxShape.circle,
+              border: Border.all(color: scheme.primary, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 3,
+                  offset: const Offset(0, 1),
+                ),
+              ],
+            ),
+            child: AppSymbol(
+              Symbols.directions_bus_rounded,
+              fill: true,
+              size: 14,
+              color: scheme.onInverseSurface,
+            ),
+          ),
         ),
       ),
     );

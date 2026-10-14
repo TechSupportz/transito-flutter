@@ -75,6 +75,10 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
     vsync: this,
     duration: const Duration(milliseconds: 200),
   );
+  late final CurvedAnimation _busOpacity = CurvedAnimation(
+    parent: _busFadeController,
+    curve: Curves.easeOutCubic,
+  );
   LatLng? _displayedBusLocation;
   LatLngTween? _busLocationTween;
   bool _ready = false;
@@ -252,6 +256,7 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
   void dispose() {
     widget.controller.removeListener(_applyCameraRequest);
     _busMoveController.dispose();
+    _busOpacity.dispose();
     _busFadeController.dispose();
     _map.dispose();
     super.dispose();
@@ -428,10 +433,7 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
                         width: 64,
                         height: 88,
                         child: FadeTransition(
-                          opacity: CurvedAnimation(
-                            parent: _busFadeController,
-                            curve: Curves.easeOutCubic,
-                          ),
+                          opacity: _busOpacity,
                           child: Semantics(
                             label: 'Next arriving bus',
                             child: _BusMarker(
@@ -592,8 +594,9 @@ class _BusMarkerState extends State<_BusMarker> with SingleTickerProviderStateMi
     final disableAnimations = MediaQuery.disableAnimationsOf(context);
     // Inverted from stops (which use route-coloured fills with white rings) so the moving vehicle
     // separates from "Your stop" and selected stops at a glance on both map themes.
-    final fill = widget.isDarkTiles ? const Color(0xFFF5EFF7) : const Color(0xFF1D1B20);
-    final iconColor = widget.isDarkTiles ? const Color(0xFF1D1B20) : Colors.white;
+    final scheme = Theme.of(context).colorScheme;
+    final fill = scheme.inverseSurface;
+    final iconColor = scheme.onInverseSurface;
     final haloBase = Color.lerp(
       widget.lineColor,
       widget.isDarkTiles ? Colors.white : Colors.black,
@@ -635,7 +638,7 @@ class _BusMarkerState extends State<_BusMarker> with SingleTickerProviderStateMi
             },
           ),
         AnimatedPositioned(
-          duration: const Duration(milliseconds: 200),
+          duration: disableAnimations ? Duration.zero : const Duration(milliseconds: 200),
           curve: Curves.easeOutCubic,
           top: pinTop,
           width: pinWidth,
