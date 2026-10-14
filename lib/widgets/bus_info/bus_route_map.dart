@@ -169,9 +169,12 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
     for (var i = 0; i < widget.routes.length; i++) {
       stops.putIfAbsent(widget.routes[i].busStop.code, () => i);
     }
-    // Operator colours are mostly deep shades that sink into the Night tiles.
+    // Operator colours are mostly deep shades that sink into the Night tiles, while pale ones such
+    // as GAS yellow blend into the Default tiles' yellow main roads.
     final lineColor = colors.brightness == Brightness.dark
         ? Color.lerp(widget.routeColor, Colors.white, 0.3)!
+        : widget.routeColor.computeLuminance() > 0.4
+        ? Color.lerp(widget.routeColor, Colors.black, 0.3)!
         : widget.routeColor;
     final selectedCode = widget.selectedStopIndex == null
         ? null
@@ -328,18 +331,16 @@ class _StopMarker extends StatelessWidget {
         : isCurrent || isTerminal || showIcon
         ? 28.0
         : 12.0;
-    final onLine = ThemeData.estimateBrightnessForColor(lineColor) == Brightness.dark
+    // Whichever of white or black has the higher WCAG contrast ratio against the fill.
+    final luminance = lineColor.computeLuminance();
+    final onLine = 1.05 / (luminance + 0.05) >= (luminance + 0.05) / 0.05
         ? Colors.white
         : Colors.black;
 
     // Ordinary stops sit on the line like stations on a transit map; filled markers stand out.
     final (Color fill, Color ring, Color icon, IconData symbol) = switch (this) {
-      _ when isCurrent || isSelected => (
-        lineColor,
-        Colors.white,
-        onLine,
-        Symbols.directions_bus_rounded,
-      ),
+      _ when isCurrent => (lineColor, Colors.white, onLine, Symbols.directions_bus_rounded),
+      // Terminals keep their start/end colours when selected, matching the header and timeline.
       _ when isFirst => (
         colors.prettyGreen,
         Colors.white,
@@ -347,6 +348,7 @@ class _StopMarker extends StatelessWidget {
         Symbols.trip_origin_rounded,
       ),
       _ when isLast => (colors.sortaRed, Colors.white, Colors.black, Symbols.distance_rounded),
+      _ when isSelected => (lineColor, Colors.white, onLine, Symbols.directions_bus_rounded),
       _ => (Colors.white, lineColor, lineColor, Symbols.directions_bus_rounded),
     };
 

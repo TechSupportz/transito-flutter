@@ -74,6 +74,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   @override
   void initState() {
     super.initState();
+    _map.addListener(_onCameraRequest);
     _service = widget.busService;
     if (_service != null) _directionIndex = _initialDirection(_service!);
     unawaited(_loadService());
@@ -225,6 +226,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   void _switchDirection() {
     final routeCount = _service?.routes?.length ?? 0;
     if (routeCount < 2) return;
+    _collapseForOverview();
     setState(() {
       _directionIndex = (_directionIndex + 1) % routeCount;
       _selectedStopIndex = null;
@@ -232,6 +234,15 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
       _queueOriginScroll();
     });
     _scheduleListScroll();
+  }
+
+  /// Camera targets are framed above the collapsed sheet, so an expanded sheet would cover them.
+  void _collapseForOverview() {
+    if (_isExpanded) _animateSheet(_collapsedSheetHeight);
+  }
+
+  void _onCameraRequest() {
+    if (_map.focus == null) _collapseForOverview();
   }
 
   void _animateSheet(double size) {
@@ -248,7 +259,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   @override
   void dispose() {
     _drawer.dispose();
-    _map.dispose();
+    _map
+      ..removeListener(_onCameraRequest)
+      ..dispose();
     super.dispose();
   }
 
@@ -316,11 +329,12 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                     maxChildSize: _expandedSheetHeight,
                     builder: (context, scrollController) {
                       _routeScrollController = scrollController;
-                      // Dragging the header always moves the sheet. Otherwise, once the list
+                      // Dragging a pinned header always moves the sheet. Otherwise, once the list
                       // has scrolled to a stop, upward swipes would scroll it instead of expanding.
+                      // An unpinned header must scroll away, so only its handle drags the sheet.
                       final header = GestureDetector(
-                        onVerticalDragUpdate: _dragSheet,
-                        onVerticalDragEnd: _settleSheet,
+                        onVerticalDragUpdate: _headerPinned ? _dragSheet : null,
+                        onVerticalDragEnd: _headerPinned ? _settleSheet : null,
                         child: ColoredBox(
                           color: scheme.surfaceContainerLow,
                           child: MeasureSize(
@@ -396,8 +410,10 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         behavior: HitTestBehavior.opaque,
         excludeFromSemantics: true,
         onTap: _toggleSheet,
+        onVerticalDragUpdate: _dragSheet,
+        onVerticalDragEnd: _settleSheet,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 22),
           child: Center(
             child: Container(
               width: 32,

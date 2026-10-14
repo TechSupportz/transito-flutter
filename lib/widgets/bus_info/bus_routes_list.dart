@@ -114,16 +114,20 @@ class BusRouteStopRow extends StatelessWidget {
                           Row(
                             spacing: 8,
                             children: [
-                              _Tag(
-                                label: stop.code,
-                                background: scheme.primary,
-                                foreground: scheme.onPrimary,
+                              Flexible(
+                                child: _Tag(
+                                  label: stop.code,
+                                  background: scheme.primary,
+                                  foreground: scheme.onPrimary,
+                                ),
                               ),
                               if (isCurrent)
-                                _Tag(
-                                  label: 'Your stop',
-                                  background: scheme.primaryContainer,
-                                  foreground: scheme.onPrimaryContainer,
+                                Flexible(
+                                  child: _Tag(
+                                    label: 'Your stop',
+                                    background: scheme.primaryContainer,
+                                    foreground: scheme.onPrimaryContainer,
+                                  ),
                                 ),
                               Flexible(
                                 child: Text(
@@ -234,6 +238,9 @@ class _Tag extends StatelessWidget {
       decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(6)),
       child: Text(
         label,
+        maxLines: 1,
+        softWrap: false,
+        overflow: TextOverflow.ellipsis,
         style: AppBusTypography.busInfoChipLabel.copyWith(fontSize: 12, color: foreground),
       ),
     );
