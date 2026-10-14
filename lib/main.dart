@@ -95,10 +95,23 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   StreamSubscription<UserSettings>? _settingsSubscription;
   String? _settingsUserId;
   bool _hasSettingsSubscription = false;
+  UserSettings? _latestSettings;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    final UserSettings? settings = _latestSettings;
+    if (settings != null) _applySettings(settings);
+  }
 
   @override
   void didChangeDependencies() {
@@ -118,13 +131,14 @@ class _MyAppState extends State<MyApp> {
 
   void _applySettings(UserSettings userSettings) {
     if (!mounted) return;
+    _latestSettings = userSettings;
 
     final AppColors appColors = context.read<AppColors>();
     final Brightness brightness = userSettings.themeMode == AppThemeMode.DARK
         ? Brightness.dark
         : userSettings.themeMode == AppThemeMode.LIGHT
         ? Brightness.light
-        : MediaQuery.platformBrightnessOf(context);
+        : WidgetsBinding.instance.platformDispatcher.platformBrightness;
     final Color seedColor = Color(int.parse(userSettings.accentColour));
 
     if (seedColor != appColors.accentColour || brightness != appColors.brightness) {
@@ -136,6 +150,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     unawaited(_settingsSubscription?.cancel());
     super.dispose();
   }
