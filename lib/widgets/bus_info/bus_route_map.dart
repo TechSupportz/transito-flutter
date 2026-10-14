@@ -74,6 +74,8 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
       );
   double _rotation = 0;
   bool _showStopIcons = false;
+  int _arrowZoom = 12;
+  List<(LatLng, double)>? _arrows;
 
   @override
   void initState() {
@@ -88,6 +90,7 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
       oldWidget.controller.removeListener(_applyCameraRequest);
       widget.controller.addListener(_applyCameraRequest);
     }
+    if (oldWidget.shape != widget.shape) _arrows = null;
     if (oldWidget.routes != widget.routes || oldWidget.shape != widget.shape) {
       _scheduleFit();
     } else if ((oldWidget.panelHeight - widget.panelHeight).abs() > 1 && !_awayFromOverview) {
@@ -154,6 +157,41 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
     }
   }
 
+  /// Direction arrowheads along [BusRouteMap.shape], about 50 logical pixels apart at the current
+  /// whole zoom level. Each entry is a point and its compass bearing in degrees.
+  List<(LatLng, double)> get _directionArrows {
+    if (_arrows != null) return _arrows!;
+    const distance = Distance();
+    // Ground resolution at Singapore's latitude; beyond zoom 17 the chevrons spread out on screen
+    // rather than multiplying.
+    final metresPerPixel =
+        156543.03 * math.cos(1.35 * math.pi / 180) / math.pow(2, math.min(_arrowZoom, 17));
+    final spacing = 50 * metresPerPixel;
+    final arrows = <(LatLng, double)>[];
+    var untilNext = spacing / 2;
+    for (var i = 0; i < widget.shape.length - 1; i++) {
+      final a = widget.shape[i];
+      final b = widget.shape[i + 1];
+      final length = distance.as(LengthUnit.Meter, a, b);
+      if (length == 0) continue;
+      final bearing = distance.bearing(a, b);
+      var travelled = untilNext;
+      while (travelled <= length) {
+        final t = travelled / length;
+        arrows.add((
+          LatLng(
+            a.latitude + (b.latitude - a.latitude) * t,
+            a.longitude + (b.longitude - a.longitude) * t,
+          ),
+          bearing,
+        ));
+        travelled += spacing;
+      }
+      untilNext = travelled - length;
+    }
+    return _arrows = arrows;
+  }
+
   @override
   void dispose() {
     widget.controller.removeListener(_applyCameraRequest);
@@ -176,6 +214,8 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
         : widget.routeColor.computeLuminance() > 0.4
         ? Color.lerp(widget.routeColor, Colors.black, 0.3)!
         : widget.routeColor;
+    // A darker shade of the line for its casing and direction arrowheads.
+    final lineShade = Color.lerp(lineColor, Colors.black, 0.45)!;
     final selectedCode = widget.selectedStopIndex == null
         ? null
         : widget.routes[widget.selectedStopIndex!].busStop.code;
@@ -200,13 +240,17 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
             },
             onPositionChanged: (camera, hasGesture) {
               final showIcons = camera.zoom >= 16;
+              final arrowZoom = camera.zoom.round();
               if ((hasGesture && !_awayFromOverview) ||
                   (_rotation - camera.rotation).abs() > 0.1 ||
-                  showIcons != _showStopIcons) {
+                  showIcons != _showStopIcons ||
+                  arrowZoom != _arrowZoom) {
                 setState(() {
                   if (hasGesture) _awayFromOverview = true;
                   _rotation = camera.rotation;
                   _showStopIcons = showIcons;
+                  if (arrowZoom != _arrowZoom) _arrows = null;
+                  _arrowZoom = arrowZoom;
                 });
               }
             },
@@ -226,9 +270,36 @@ class _BusRouteMapState extends State<BusRouteMap> with TickerProviderStateMixin
                   Polyline(
                     points: widget.shape,
                     color: lineColor,
-                    strokeWidth: 5,
+                    strokeWidth: 8,
+                    // Keeps the line distinct from similarly coloured roads on the tiles.
+                    borderStrokeWidth: 1.5,
+                    borderColor: lineShade,
                   ),
                 ],
+              ),
+            if (widget.shape.length > 1)
+              IgnorePointer(
+                child: MarkerLayer(
+                  markers: [
+                    // Unrotated markers turn with the map, so each arrowhead keeps to the line.
+                    for (final (point, bearing) in _directionArrows)
+                      Marker(
+                        point: point,
+                        width: 14,
+                        height: 14,
+                        child: Transform.rotate(
+                          // The arrowhead points east, a compass bearing of 90°.
+                          angle: (bearing - 90) * math.pi / 180,
+                          child: AppSymbol(
+                            Symbols.play_arrow_rounded,
+                            fill: true,
+                            size: 14,
+                            color: lineShade,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             CurrentLocationLayer(
               positionStream: _positionStream,

@@ -20,8 +20,6 @@ class BusStopCard extends StatelessWidget {
     this.searchMode = false,
     this.routeMode = false,
     this.busSchedule,
-    this.onTap,
-    this.isHighlighted = false,
   });
 
   final BusStop busStopInfo;
@@ -30,10 +28,6 @@ class BusStopCard extends StatelessWidget {
   final bool searchMode;
   final bool routeMode;
   final ({BusSchedule firstBus, BusSchedule lastBus})? busSchedule;
-
-  /// Replaces the default navigation when set.
-  final VoidCallback? onTap;
-  final bool isHighlighted;
 
   // function that navigates user to bus timing screen
   void goToBusTimingScreen(
@@ -103,38 +97,34 @@ class BusStopCard extends StatelessWidget {
         showDuration: const Duration(milliseconds: 350),
         message: busStopInfo.name,
         child: InkWell(
-          onTap:
-              onTap ??
-              () {
-                if (searchMode || routeMode) {
-                  context.read<SearchProvider>().addRecentSearch(busStopInfo);
-                  goToBusStopInfoScreen(
-                    context,
-                    busStopInfo.code,
-                    busStopInfo.name,
-                    busStopInfo.roadName,
-                    busStopInfo.services,
-                    busStopInfo.sources,
-                    LatLng(busStopInfo.latitude, busStopInfo.longitude),
-                  );
-                } else {
-                  goToBusTimingScreen(
-                    context,
-                    busStopInfo.code,
-                    busStopInfo.name,
-                    busStopInfo.roadName,
-                    busStopInfo.services,
-                    busStopInfo.sources,
-                    LatLng(busStopInfo.latitude, busStopInfo.longitude),
-                  );
-                }
-              },
+          onTap: () {
+            if (searchMode || routeMode) {
+              context.read<SearchProvider>().addRecentSearch(busStopInfo);
+              goToBusStopInfoScreen(
+                context,
+                busStopInfo.code,
+                busStopInfo.name,
+                busStopInfo.roadName,
+                busStopInfo.services,
+                busStopInfo.sources,
+                LatLng(busStopInfo.latitude, busStopInfo.longitude),
+              );
+            } else {
+              goToBusTimingScreen(
+                context,
+                busStopInfo.code,
+                busStopInfo.name,
+                busStopInfo.roadName,
+                busStopInfo.services,
+                busStopInfo.sources,
+                LatLng(busStopInfo.latitude, busStopInfo.longitude),
+              );
+            }
+          },
           customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Ink(
             decoration: BoxDecoration(
-              color: isHighlighted
-                  ? Theme.of(context).colorScheme.secondaryContainer
-                  : Theme.of(context).colorScheme.surfaceContainer,
+              color: Theme.of(context).colorScheme.surfaceContainer,
               borderRadius: BorderRadius.circular(12),
             ),
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),

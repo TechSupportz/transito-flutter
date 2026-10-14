@@ -7,7 +7,6 @@ import 'package:transito/models/api/transito/bus_services.dart';
 import 'package:transito/models/api/transito/bus_stops.dart';
 import 'package:transito/models/app/app_colors.dart';
 import 'package:transito/models/app/app_typography.dart';
-import 'package:transito/widgets/bus_info/bus_stop_card.dart';
 import 'package:transito/widgets/common/app_symbol.dart';
 
 /// The service summary pinned above the stop list in both sheet positions.
@@ -53,6 +52,7 @@ class BusServiceRouteHeader extends StatelessWidget {
       to = interchanges.last;
     }
     final showDestination = !isLoop && to != null && to.code != from?.code;
+    final hasSwitch = showDestination && onSwitchDirection != null;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -61,12 +61,20 @@ class BusServiceRouteHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         spacing: 12,
         children: [
-          Wrap(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             spacing: 12,
-            runSpacing: 4,
-            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Text('Bus $serviceNo', style: AppTypography.screenHeading),
+              // Fades rather than overflowing at large text sizes.
+              Flexible(
+                child: Text(
+                  'Bus $serviceNo',
+                  maxLines: 1,
+                  softWrap: false,
+                  overflow: TextOverflow.fade,
+                  style: AppTypography.screenHeading,
+                ),
+              ),
               if (busService != null)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
@@ -93,85 +101,191 @@ class BusServiceRouteHeader extends StatelessWidget {
           ),
           if (from == null)
             SkeletonLine(
-              style: SkeletonLineStyle(height: 140, borderRadius: BorderRadius.circular(12)),
+              style: SkeletonLineStyle(height: 112, borderRadius: BorderRadius.circular(20)),
             )
           else
-            IntrinsicHeight(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                spacing: 12,
-                children: [
-                  Expanded(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      spacing: 12,
-                      children: [
-                        _terminalCard(from),
-                        if (showDestination) _terminalCard(to),
-                      ],
-                    ),
-                  ),
-                  if (isLoop || !showDestination)
-                    Center(
-                      child: AppSymbol(
-                        Symbols.sync_rounded,
-                        color: colors.notReallyYellow,
-                        size: 28,
-                      ),
-                    )
-                  else
-                    Column(
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: AppSymbol(
-                              Symbols.trip_origin_rounded,
-                              color: colors.prettyGreen,
-                              size: 28,
-                            ),
+            // One grouped card of stop-card style terminal rows, each led by its origin or
+            // destination icon, with the direction switch on the right.
+            Material(
+              color: scheme.surfaceContainer,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              clipBehavior: Clip.antiAlias,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(4, 4, 8, 4),
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _TerminalRow(
+                            stop: from,
+                            label: showDestination ? 'From' : 'Starts and ends at',
+                            icon: showDestination
+                                ? Symbols.trip_origin_rounded
+                                : Symbols.sync_rounded,
+                            iconColor: showDestination
+                                ? colors.prettyGreen
+                                : colors.notReallyYellow,
+                            isSelected: from.code == selectedStopCode,
+                            onTap: () => onStopTap(from!),
                           ),
-                        ),
-                        if (onSwitchDirection == null)
-                          AppSymbol(Symbols.south_rounded, color: scheme.onSurface, size: 28)
-                        else
-                          IconButton.filled(
-                            tooltip: 'Switch route direction',
-                            style: IconButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                          if (showDestination) ...[
+                            const SizedBox(height: 6),
+                            // A small arrow under the origin icon reads as "from → to"; the
+                            // divider starts after it, level with the stop names.
+                            SizedBox(
+                              height: 9,
+                              child: Row(
+                                children: [
+                                  SizedBox(
+                                    width: 44,
+                                    child: OverflowBox(
+                                      maxHeight: 20,
+                                      child: AppSymbol(
+                                        Symbols.south_rounded,
+                                        size: 18,
+                                        color: scheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Divider(
+                                      height: 9,
+                                      thickness: 1,
+                                      indent: 4,
+                                      endIndent: 8,
+                                      color: scheme.outlineVariant.withValues(alpha: 0.5),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            onPressed: onSwitchDirection,
-                            icon: AnimatedRotation(
-                              turns: directionIndex == 0 ? 0 : -0.5,
-                              duration: const Duration(milliseconds: 200),
-                              child: const AppSymbol(Symbols.swap_vert_rounded, size: 30),
+                            _TerminalRow(
+                              stop: to,
+                              label: 'To',
+                              icon: Symbols.distance_rounded,
+                              iconColor: colors.sortaRed,
+                              isSelected: to.code == selectedStopCode,
+                              onTap: () => onStopTap(to!),
                             ),
-                          ),
-                        Expanded(
-                          child: Center(
-                            child: AppSymbol(
-                              Symbols.distance_rounded,
-                              color: colors.sortaRed,
-                              fill: true,
-                              size: 28,
-                            ),
-                          ),
-                        ),
-                      ],
+                          ],
+                        ],
+                      ),
                     ),
-                ],
+                    if (hasSwitch)
+                      IconButton.filled(
+                        tooltip: 'Switch route direction',
+                        onPressed: onSwitchDirection,
+                        icon: AnimatedRotation(
+                          turns: directionIndex == 0 ? 0 : -0.5,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOutCubicEmphasized,
+                          child: const AppSymbol(Symbols.swap_vert_rounded, size: 30),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
         ],
       ),
     );
   }
+}
 
-  Widget _terminalCard(BusStop stop) => BusStopCard(
-    busStopInfo: stop,
-    routeMode: true,
-    isHighlighted: stop.code == selectedStopCode,
-    onTap: () => onStopTap(stop),
-  );
+/// An interchange laid out like [BusStopCard] content, led by its origin or destination icon.
+class _TerminalRow extends StatelessWidget {
+  const _TerminalRow({
+    required this.stop,
+    required this.label,
+    required this.icon,
+    required this.iconColor,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final BusStop stop;
+
+  /// Spoken role of the terminal, e.g. "From"; the leading icon shows it visually.
+  final String label;
+  final IconData icon;
+  final Color iconColor;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Semantics(
+      label: label,
+      child: Material(
+        color: isSelected ? scheme.secondaryContainer : Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+            child: Row(
+              spacing: 12,
+              children: [
+                AppSymbol(icon, fill: true, size: 28, color: iconColor),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: 4,
+                    children: [
+                      Text(
+                        stop.name,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: TextStyle(
+                          fontSize: 21,
+                          fontWeight: FontWeight.w500,
+                          color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
+                        ),
+                      ),
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: scheme.primary,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              stop.code,
+                              style: AppBusTypography.busInfoChipLabel.copyWith(
+                                color: scheme.onPrimary,
+                              ),
+                            ),
+                          ),
+                          Flexible(
+                            child: Text(
+                              stop.roadName,
+                              maxLines: 1,
+                              softWrap: false,
+                              overflow: TextOverflow.fade,
+                              style: TextStyle(
+                                color: scheme.onSurfaceVariant,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }
