@@ -302,11 +302,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
         builder: (context, child) {
           return MaterialUiCompatibilityBridge(
-            child: MediaQuery(
-              data: MediaQuery.of(context).copyWith(
-                textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
+            // The bridge's legacy Theme supplies its own icon theme, which IconButton mistakes for a
+            // custom colour and paints every icon plain white or black. Restoring the app's own
+            // icon theme lets IconButton apply its themed colours again.
+            child: IconTheme(
+              data: Theme.of(context).iconTheme,
+              child: MediaQuery(
+                data: MediaQuery.of(context).copyWith(
+                  textScaler: isTablet ? const TextScaler.linear(1.25) : TextScaler.noScaling,
+                ),
+                child: SafeArea(top: false, bottom: false, child: child!),
               ),
-              child: SafeArea(top: false, bottom: false, child: child!),
             ),
           );
         },

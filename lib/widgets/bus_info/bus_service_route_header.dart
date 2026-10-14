@@ -19,7 +19,6 @@ class BusServiceRouteHeader extends StatelessWidget {
     required this.directionIndex,
     required this.onStopTap,
     required this.onSwitchDirection,
-    this.selectedStopCode,
   });
 
   final String serviceNo;
@@ -30,7 +29,6 @@ class BusServiceRouteHeader extends StatelessWidget {
   final int directionIndex;
   final ValueChanged<BusStop> onStopTap;
   final VoidCallback? onSwitchDirection;
-  final String? selectedStopCode;
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +65,29 @@ class BusServiceRouteHeader extends StatelessWidget {
             children: [
               // Fades rather than overflowing at large text sizes.
               Flexible(
-                child: Text(
-                  'Bus $serviceNo',
-                  maxLines: 1,
-                  softWrap: false,
-                  overflow: TextOverflow.fade,
-                  style: AppTypography.screenHeading,
+                child: Row(
+                  spacing: 8,
+                  children: [
+                    // NUS shuttles carry their service colour, as on the timings screen.
+                    if (busService?.operator == .NUS)
+                      Container(
+                        width: 4,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: colors.getNUSServiceColor(serviceNo).$1,
+                          borderRadius: const BorderRadius.all(Radius.circular(2)),
+                        ),
+                      ),
+                    Flexible(
+                      child: Text(
+                        serviceNo,
+                        maxLines: 1,
+                        softWrap: false,
+                        overflow: TextOverflow.fade,
+                        style: AppTypography.screenHeading,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               if (busService != null)
@@ -128,7 +143,6 @@ class BusServiceRouteHeader extends StatelessWidget {
                             iconColor: showDestination
                                 ? colors.prettyGreen
                                 : colors.notReallyYellow,
-                            isSelected: from.code == selectedStopCode,
                             onTap: () => onStopTap(from!),
                           ),
                           if (showDestination) ...[
@@ -167,7 +181,6 @@ class BusServiceRouteHeader extends StatelessWidget {
                               label: 'To',
                               icon: Symbols.distance_rounded,
                               iconColor: colors.sortaRed,
-                              isSelected: to.code == selectedStopCode,
                               onTap: () => onStopTap(to!),
                             ),
                           ],
@@ -202,7 +215,6 @@ class _TerminalRow extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.iconColor,
-    required this.isSelected,
     required this.onTap,
   });
 
@@ -212,7 +224,6 @@ class _TerminalRow extends StatelessWidget {
   final String label;
   final IconData icon;
   final Color iconColor;
-  final bool isSelected;
   final VoidCallback onTap;
 
   @override
@@ -221,11 +232,10 @@ class _TerminalRow extends StatelessWidget {
     return Semantics(
       label: label,
       child: Material(
-        color: isSelected ? scheme.secondaryContainer : Colors.transparent,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        clipBehavior: Clip.antiAlias,
+        type: MaterialType.transparency,
         child: InkWell(
           onTap: onTap,
+          customBorder: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
             child: Row(
@@ -245,7 +255,7 @@ class _TerminalRow extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 21,
                           fontWeight: FontWeight.w500,
-                          color: isSelected ? scheme.onSecondaryContainer : scheme.onSurface,
+                          color: scheme.onSurface,
                         ),
                       ),
                       Row(
