@@ -213,7 +213,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
 
   /// Scroll offset that puts unselected-height row [index] just below the header.
   /// A pinned header overlaps the list, so no header height is added in that case.
-  double _listOffsetOf(int index) => index * _rowExtent + (_headerPinned ? 0 : _headerHeight + 8);
+  double _listOffsetOf(int index) => index * _rowExtent + (_headerPinned ? 0 : _headerHeight);
 
   void _onRowExtentChanged(double extent) {
     if (!mounted || extent <= 0 || (extent - _rowExtent).abs() < 0.5) return;
@@ -230,7 +230,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     final previous = _selectedStopIndex;
     final controller = _routeScrollController;
     if (previous != null && previous != index && controller?.hasClients == true) {
-      final actionsTop = _listOffsetOf(previous) + (_headerPinned ? 8 : 0) + _rowExtent;
+      final actionsTop = _listOffsetOf(previous) + _rowExtent;
       _pendingScrollCompensation = (controller!.offset - actionsTop).clamp(0.0, _actionsExtent);
     }
     setState(() {
