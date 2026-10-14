@@ -47,33 +47,35 @@ class FavouriteNameCard extends StatelessWidget {
                   else
                     dragHandle,
                   const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        displayName,
-                        overflow: TextOverflow.fade,
-                        maxLines: 1,
-                        softWrap: false,
-                        style: AppBusTypography.favouriteStopTitle.copyWith(
-                          color: Theme.of(context).colorScheme.onSurface,
-                        ),
-                      ),
-                      if (alias != null)
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                         Text(
-                          busStopName,
+                          displayName,
                           overflow: TextOverflow.fade,
                           maxLines: 1,
                           softWrap: false,
-                          style: AppTypography.body.copyWith(
-                            color: Theme.of(
-                              context,
-                            ).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
-                            fontWeight: FontWeight.w500,
+                          style: AppBusTypography.favouriteStopTitle.copyWith(
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
                         ),
-                    ],
+                        if (alias != null)
+                          Text(
+                            busStopName,
+                            overflow: TextOverflow.fade,
+                            maxLines: 1,
+                            softWrap: false,
+                            style: AppTypography.body.copyWith(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 ],
               ),
