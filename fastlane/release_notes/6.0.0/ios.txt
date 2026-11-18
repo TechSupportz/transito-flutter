@@ -1,0 +1,8 @@
+Route maps
+Bus Service Information is now a full-screen map with a timeline of every stop. Tap a stop to jump to its timings, schedule or info.
+
+Live bus location
+See where the next bus is on the route map and stop timeline.
+
+Bug fixes
+Various fixes and reliability improvements.
