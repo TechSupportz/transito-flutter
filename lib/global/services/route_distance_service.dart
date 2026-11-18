@@ -51,9 +51,14 @@ class RouteDistanceService with WidgetsBindingObserver {
   Future<void> refresh() => _refreshing ??= _refresh().whenComplete(() => _refreshing = null);
 
   Future<void> _refresh() async {
-    final File cacheFile = File(
-      '${(await getApplicationSupportDirectory()).path}/$_cacheFileName',
-    );
+    // Callers don't await the refresh, so a failure here must not escape
+    final File cacheFile;
+    try {
+      cacheFile = File('${(await getApplicationSupportDirectory()).path}/$_cacheFileName');
+    } catch (error) {
+      debugPrint('Failed to locate route distance index cache: $error');
+      return;
+    }
 
     if (!_hasLoadedCache) {
       _hasLoadedCache = true;

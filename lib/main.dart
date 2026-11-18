@@ -301,6 +301,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
         home: isLoggedIn ? widget.defaultHome : const LoginScreen(),
         builder: (context, child) {
+          // Dependencies such as flutter_map still build on package:flutter/material.dart
+          // widgets, which need the bridge's legacy Theme and localizations. package:material_ui
+          // offers no replacement yet; remove the bridge once those dependencies migrate.
+          // ignore: deprecated_member_use
           return MaterialUiCompatibilityBridge(
             // The bridge's legacy Theme supplies its own icon theme, which IconButton mistakes for a
             // custom colour and paints every icon plain white or black. Restoring the app's own

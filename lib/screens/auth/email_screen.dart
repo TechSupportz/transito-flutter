@@ -64,6 +64,7 @@ class _EmailScreenState extends State<EmailScreen> {
           )
           .then(
             (err) async {
+              if (!mounted) return;
               if (err == null) {
                 setState(() {
                   _isLoading = false;
@@ -132,6 +133,7 @@ class _EmailScreenState extends State<EmailScreen> {
           .sendPasswordResetEmail(_forgotPasswordEmailFieldKey.currentState!.value)
           .then(
             (err) {
+              if (!mounted) return;
               if (err == null) {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -180,6 +182,7 @@ class _EmailScreenState extends State<EmailScreen> {
             _passwordRegisterFieldKey.currentState!.value,
           )
           .then((err) {
+            if (!mounted) return;
             if (err == null) {
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(

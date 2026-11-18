@@ -54,6 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       if (user.displayName != _nameFieldKey.currentState!.value) {
         try {
           await user.updateDisplayName(_nameFieldKey.currentState!.value).then((value) {
+            if (!mounted) return;
             setState(() {
               _isNameFieldLoading = false;
             });
@@ -98,17 +99,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: const Text('Yes'),
             onPressed: () {
               if (email != null) {
+                final navigator = Navigator.of(context);
+                final messenger = ScaffoldMessenger.of(context);
                 AuthenticationService().sendPasswordResetEmail(email).then((_) {
-                  Navigator.of(context).pop();
-                  Navigator.pushAndRemoveUntil(
-                    context,
+                  navigator.pop();
+                  navigator.pushAndRemoveUntil(
                     MaterialPageRoute(
                       builder: (context) => const LoginScreen(),
                       settings: const RouteSettings(name: 'LoginScreen'),
                     ),
                     (Route<dynamic> route) => false,
                   );
-                  ScaffoldMessenger.of(context).showSnackBar(
+                  messenger.showSnackBar(
                     SnackBar(
                       content: Text('Password reset email sent to $email'),
                       duration: const Duration(seconds: 2),
@@ -130,63 +132,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (_accentColourFieldKey.currentState!.isValid && user != null) {
       Color newColour = _accentColourFieldKey.currentState!.value as Color;
 
-      SettingsService()
-          .updateAccentColour(
-            userId: user.uid,
-            newValue: '0x${newColour.toARGB32().toRadixString(16).toUpperCase()}',
-          )
-          .then(
-            (_) => showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                title: const Text('Accent colour updated'),
-                content: const Text('A restart may be required for the change to take effect.'),
-                actions: [
-                  TextButton(
-                    child: const Text('Ok'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => const NavigatorScreen(),
-                        ),
-                        (Route<dynamic> route) => false,
-                      );
-                    },
+      await SettingsService().updateAccentColour(
+        userId: user.uid,
+        newValue: '0x${newColour.toARGB32().toRadixString(16).toUpperCase()}',
+      );
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Accent colour updated'),
+          content: const Text('A restart may be required for the change to take effect.'),
+          actions: [
+            TextButton(
+              child: const Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => const NavigatorScreen(),
                   ),
-                ],
-              ),
+                  (Route<dynamic> route) => false,
+                );
+              },
             ),
-          );
+          ],
+        ),
+      );
     }
   }
 
   void resetAccentColour(User? user) async {
-    SettingsService()
-        .updateAccentColour(userId: user?.uid, newValue: '0xFF7E6BFF')
-        .then(
-          (_) => showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Accent colour reset'),
-              content: const Text('A restart may be required for the change to take effect.'),
-              actions: [
-                TextButton(
-                  child: const Text('Ok'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => const NavigatorScreen(),
-                      ),
-                      (Route<dynamic> route) => false,
-                    );
-                  },
+    await SettingsService().updateAccentColour(userId: user?.uid, newValue: '0xFF7E6BFF');
+    if (!mounted) return;
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Accent colour reset'),
+        content: const Text('A restart may be required for the change to take effect.'),
+        actions: [
+          TextButton(
+            child: const Text('Ok'),
+            onPressed: () {
+              Navigator.of(context).pop();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(
+                  builder: (context) => const NavigatorScreen(),
                 ),
-              ],
-            ),
+                (Route<dynamic> route) => false,
+              );
+            },
           ),
-        );
+        ],
+      ),
+    );
   }
 
   Future<PackageInfo> getAppInfo() async {
@@ -314,9 +312,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                     TextButton(
                                       onPressed: () {
+                                        final navigator = Navigator.of(context);
                                         AuthenticationService().logout().then(
-                                          (value) => Navigator.pushAndRemoveUntil(
-                                            context,
+                                          (value) => navigator.pushAndRemoveUntil(
                                             MaterialPageRoute(
                                               builder: (context) => const LoginScreen(),
                                               settings: const RouteSettings(name: 'LoginScreen'),

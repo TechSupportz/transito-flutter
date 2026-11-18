@@ -12,6 +12,7 @@ import 'package:transito/global/providers/quick_start_tour_provider.dart';
 import 'package:transito/global/services/bus_arrival_service.dart';
 import 'package:transito/global/services/transito_api_service.dart';
 import 'package:transito/global/utils/bus_arrival_time.dart';
+import 'package:transito/global/utils/route_timeline.dart';
 import 'package:transito/global/utils/unpack_polyline.dart';
 import 'package:transito/models/api/lta/arrival_info.dart';
 import 'package:transito/models/api/transito/bus_routes.dart';
@@ -60,6 +61,9 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   /// Rebuilds once the last arrivals go stale, so a hanging request can't keep an old bus shown.
   Timer? _arrivalExpiryTimer;
   int _arrivalFetchGeneration = 0;
+
+  /// The arrivals request in flight, which a new poll waits for so requests never overlap.
+  Future<void>? _arrivalFetch;
   int _directionIndex = 0;
   int? _selectedStopIndex;
   int? _pendingScrollIndex;
@@ -199,142 +203,42 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     return bestDistanceSquared <= 60 * 60 ? bestPoint : point;
   }
 
-  /// Each stop's position along the active Route Shape, or null without a shape. Stops are matched
-  /// in order, so a loop's first stop matches the start of the shape rather than its end.
-  List<_ShapePosition>? get _stopPositions {
+  /// The active direction's stops placed along its Route Shape, or null without a shape.
+  RouteTimeline? get _timeline {
     final shape = _shape;
     final routes = _routes;
-    if (shape.length < 2 || routes.isEmpty) return null;
-    if (_stopPositionsKey == (shape, routes)) return _cachedStopPositions;
-    final positions = <_ShapePosition>[];
-    _ShapePosition? previous;
-    for (final route in routes) {
-      final stop = LatLng(route.busStop.latitude, route.busStop.longitude);
-      // Each stop is no earlier along the shape than the one before, even within one segment, so
-      // stops on a road the route retraces keep their order.
-      final candidates = [
-        for (var i = previous?.segment ?? 0; i < shape.length - 1; i++)
-          _projectOntoSegment(stop, shape, i, minT: i == previous?.segment ? previous!.t : 0),
-      ];
-      final nearest = candidates.map((c) => c.offset).reduce(math.min);
-      // The earliest close match, so a later pass over the same road isn't chosen.
-      final match = candidates.firstWhere((c) => c.offset <= nearest + 25);
-      positions.add(match);
-      previous = match;
+    if (_timelineKey case (
+      final keyShape,
+      final keyRoutes,
+    ) when identical(keyShape, shape) && identical(keyRoutes, routes)) {
+      return _cachedTimeline;
     }
-    _stopPositionsKey = (shape, routes);
-    return _cachedStopPositions = positions;
+    _timelineKey = (shape, routes);
+    return _cachedTimeline = RouteTimeline.fromShape(shape, [
+      for (final route in routes) LatLng(route.busStop.latitude, route.busStop.longitude),
+    ]);
   }
 
-  (List<LatLng>, List<BusRouteInfo>)? _stopPositionsKey;
-  List<_ShapePosition>? _cachedStopPositions;
+  (List<LatLng>, List<BusRouteInfo>)? _timelineKey;
+  RouteTimeline? _cachedTimeline;
 
   /// The index of the stop the next bus last passed on its way to the current stop.
   int? _lastStopPassedBy(({LatLng location, IndivArrivalInfo arrival}) nextBus) {
-    final positions = _stopPositions;
-    if (positions == null) return null;
-    // A route can visit the current stop more than once, such as a loop's terminal. Each visit is
-    // reached through the stretch of route since the previous one.
-    final visits = [
-      for (var i = 0; i < _routes.length; i++)
-        if (_routes[i].busStop.code == widget.currentStopCode) i,
-    ];
-    final sections = [
-      for (var v = 0; v < visits.length; v++)
-        if (visits[v] > 0) (from: v == 0 ? 0 : visits[v - 1], to: visits[v]),
-    ];
-    if (sections.isEmpty) return null;
-
-    ({int from, int to}) section;
-    _ShapePosition? best;
-    // LTA numbers each visit. A loop's terminal departures count as its first visit, which has no
-    // stretch before it, so those and NUS arrivals use the stretch the bus is nearest to.
-    final visitNumber = nextBus.arrival.visitNumber ?? 0;
-    final numbered = visitNumber >= 1 && visitNumber <= visits.length && visits[visitNumber - 1] > 0
-        ? sections.firstWhere((section) => section.to == visits[visitNumber - 1])
-        : null;
-    if (numbered != null) {
-      section = numbered;
-      best = _nearestInSection(nextBus.location, positions, section);
-    } else {
-      section = sections.first;
-      for (final candidate in sections) {
-        final projection = _nearestInSection(nextBus.location, positions, candidate);
-        if (best == null || projection.offset < best.offset) {
-          best = projection;
-          section = candidate;
-        }
-      }
-    }
-
-    final along = math.min(best!.along, positions[section.to].along);
-    var lastPassed = section.from;
-    for (var i = section.from + 1; i < section.to; i++) {
-      if (positions[i].along <= along) lastPassed = i;
-    }
-    return lastPassed;
-  }
-
-  /// The point nearest [point] on the stretch of shape from stop [section.from] to [section.to].
-  _ShapePosition _nearestInSection(
-    LatLng point,
-    List<_ShapePosition> positions,
-    ({int from, int to}) section,
-  ) {
-    final first = section.from == 0 ? 0 : positions[section.from].segment;
-    var best = _projectOntoSegment(point, _shape, first);
-    for (var i = first + 1; i <= positions[section.to].segment; i++) {
-      final candidate = _projectOntoSegment(point, _shape, i);
-      if (candidate.offset < best.offset) best = candidate;
-    }
-    return best;
-  }
-
-  /// Projects [point] onto segment [segment] of [shape], no earlier than fraction [minT] along it,
-  /// measuring in metres.
-  _ShapePosition _projectOntoSegment(
-    LatLng point,
-    List<LatLng> shape,
-    int segment, {
-    double minT = 0,
-  }) {
-    const metresPerDegreeLat = 110574.0;
-    final metresPerDegreeLng = 111320.0 * math.cos(point.latitudeInRad);
-    final cumulative = _shapeDistances(shape);
-    final start = shape[segment];
-    final end = shape[segment + 1];
-    final endX = (end.longitude - start.longitude) * metresPerDegreeLng;
-    final endY = (end.latitude - start.latitude) * metresPerDegreeLat;
-    final pointX = (point.longitude - start.longitude) * metresPerDegreeLng;
-    final pointY = (point.latitude - start.latitude) * metresPerDegreeLat;
-    final lengthSquared = endX * endX + endY * endY;
-    final t = lengthSquared == 0
-        ? 0.0
-        : ((pointX * endX + pointY * endY) / lengthSquared).clamp(minT, 1.0);
-    final offsetX = pointX - t * endX;
-    final offsetY = pointY - t * endY;
-    return (
-      segment: segment,
-      t: t,
-      along: cumulative[segment] + t * (cumulative[segment + 1] - cumulative[segment]),
-      offset: math.sqrt(offsetX * offsetX + offsetY * offsetY),
+    final timeline = _timeline;
+    if (timeline == null) return null;
+    final arrival = nextBus.arrival;
+    return timeline.lastStopPassedBy(
+      visits: [
+        for (var i = 0; i < _routes.length; i++)
+          if (_routes[i].busStop.code == widget.currentStopCode) i,
+      ],
+      // transito-server always reports the first visit for NUS arrivals
+      visitNumber: _service?.operator == BusOperator.NUS ? null : arrival.visitNumber,
+      // The marker's position is snapped onto the nearest pass of the shape, which may be a
+      // different visit's stretch, so match the bus's own position.
+      bus: LatLng(arrival.latitude, arrival.longitude),
     );
   }
-
-  /// Distance in metres from the start of [shape] to each of its points.
-  List<double> _shapeDistances(List<LatLng> shape) {
-    if (identical(shape, _shapeDistancesFor)) return _cachedShapeDistances;
-    const distance = Distance();
-    final distances = [0.0];
-    for (var i = 0; i < shape.length - 1; i++) {
-      distances.add(distances.last + distance.as(LengthUnit.Meter, shape[i], shape[i + 1]));
-    }
-    _shapeDistancesFor = shape;
-    return _cachedShapeDistances = distances;
-  }
-
-  List<LatLng>? _shapeDistancesFor;
-  List<double> _cachedShapeDistances = const [];
 
   /// How far the sheet is between collapsed (0) and expanded (1).
   double get _sheetProgress {
@@ -446,10 +350,22 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
   }
 
   /// Fetches arrivals, then schedules the next fetch 20 seconds after this one finishes, so only one
-  /// request is ever in flight and a slow response is never discarded by the next.
+  /// request is ever in flight and a slow response is never discarded by the next. A poll started
+  /// by a direction change waits for the previous direction's request to finish first.
   Future<void> _pollNextBus(int generation, int poll) async {
     if (!mounted || poll != _arrivalFetchGeneration) return;
-    if (ModalRoute.of(context)?.isCurrent != false) await _fetchNextBus(generation, poll);
+    final previous = _arrivalFetch;
+    if (previous != null) await previous;
+    if (!mounted || poll != _arrivalFetchGeneration) return;
+    // Checked after waiting, as another route may have covered this one meanwhile
+    if (ModalRoute.of(context)?.isCurrent != false) {
+      final fetch = _arrivalFetch = _fetchNextBus(generation, poll);
+      try {
+        await fetch;
+      } finally {
+        if (identical(_arrivalFetch, fetch)) _arrivalFetch = null;
+      }
+    }
     if (!mounted || poll != _arrivalFetchGeneration) return;
     _arrivalTimer = Timer(
       const Duration(seconds: 20),
@@ -484,10 +400,8 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     }
 
     try {
-      // Polling waits for each request, so one that hangs must not stop it.
-      final info = await BusArrivalService()
-          .getBusArrival(stop.code, sources: sources)
-          .timeout(const Duration(seconds: 15));
+      // Polling waits for each request; the API services abort and report one that hangs
+      final info = await BusArrivalService().getBusArrival(stop.code, sources: sources);
       if (!mounted || generation != _requestGeneration || poll != _arrivalFetchGeneration) {
         return;
       }
@@ -739,6 +653,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
                       // has scrolled to a stop, upward swipes would scroll it instead of expanding.
                       // An unpinned header must scroll away, so only its handle drags the sheet.
                       final header = GestureDetector(
+                        onVerticalDragStart: _headerPinned ? _startSheetDrag : null,
                         onVerticalDragUpdate: _headerPinned ? _dragSheet : null,
                         onVerticalDragEnd: _headerPinned ? _settleSheet : null,
                         child: MeasureSize(
@@ -853,6 +768,7 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
         behavior: HitTestBehavior.opaque,
         excludeFromSemantics: true,
         onTap: _toggleSheet,
+        onVerticalDragStart: _startSheetDrag,
         onVerticalDragUpdate: _dragSheet,
         onVerticalDragEnd: _settleSheet,
         child: Padding(
@@ -878,6 +794,22 @@ class _BusServiceInfoScreenState extends State<BusServiceInfoScreen> {
     return service.operator == BusOperator.NUS
         ? colors.getNUSServiceColor(service.serviceNo).$1
         : colors.getOperatorColor(service.operator).$1;
+  }
+
+  /// Dragging the sheet by its header takes over from any pending or running list reveal, as a
+  /// drag of the list itself does.
+  void _startSheetDrag(DragStartDetails details) {
+    _revealGeneration++;
+    _pendingScrollIndex = null;
+    // Otherwise a row measured during the drag would retarget the cancelled reveal
+    _lastScrollIndex = null;
+    _pendingScrollCompensation = 0;
+    final controller = _routeScrollController;
+    if (controller != null &&
+        controller.hasClients &&
+        controller.position.isScrollingNotifier.value) {
+      controller.jumpTo(controller.offset);
+    }
   }
 
   void _dragSheet(DragUpdateDetails details) {
@@ -964,6 +896,3 @@ class _SheetHandlePainter extends CustomPainter {
   bool shouldRepaint(_SheetHandlePainter oldDelegate) =>
       oldDelegate.progress != progress || oldDelegate.color != color;
 }
-
-/// A point on a Route Shape: its segment, distance along the shape, and distance from the line.
-typedef _ShapePosition = ({int segment, double t, double along, double offset});

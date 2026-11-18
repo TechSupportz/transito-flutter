@@ -53,6 +53,7 @@ class _LocationAccessScreenState extends State<LocationAccessScreen> {
         permission = await LocationService().requestPermission();
       }
       if (permission == LocationPermission.deniedForever) {
+        if (!context.mounted) return;
         // if the user has denied location permission forever, show a dialog (which is not dismissible) to the user to open the settings app
         showDialog(
           context: context,
