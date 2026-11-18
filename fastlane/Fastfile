@@ -1,0 +1,243 @@
+require "fileutils"
+require "json"
+require "yaml"
+
+# Builds both stores with Shorebird, then submits each build for review with the
+# approved release notes in fastlane/release_notes/<version>/.
+#
+#   bundle exec fastlane check                           # dry run: no build, no upload
+#   bundle exec fastlane release                         # analyze, test, build, submit both, tag
+#   bundle exec fastlane release only:ios skip_build:true  # resume: resubmit one store's existing build
+
+ROOT = File.expand_path("..", __dir__)
+FLUTTER = File.join(ROOT, ".fvm/flutter_sdk/bin/flutter")
+APP_ID = "com.tnitish.transito"
+AAB_PATH = File.join(ROOT, "build/app/outputs/bundle/release/app-release.aab")
+PLATFORMS = %w[android ios].freeze
+PLAY_NOTES_LIMIT = 500
+APP_STORE_NOTES_LIMIT = 4000
+
+lane :release do |options|
+  platforms = options[:only] ? [options[:only].to_s] : PLATFORMS
+  UI.user_error!("only: must be android or ios") unless (platforms - PLATFORMS).empty?
+  skip_build = options[:skip_build]
+
+  version = pubspec_version
+  notes = platforms.to_h { |platform| [platform, release_notes(version[:name], platform)] }
+  check_credentials(android: platforms.include?("android"), ios: platforms.include?("ios"))
+  tag = "v#{version[:name]}"
+  check_git(tag)
+
+  unless skip_build
+    in_root { sh(FLUTTER, "analyze") }
+    in_root { sh(FLUTTER, "test") }
+    # Build every platform before uploading any, so a failed build leaves both stores untouched.
+    platforms.each { |platform| shorebird_release(platform) }
+  end
+
+  submitted = []
+  platforms.each do |platform|
+    begin
+      platform == "android" ? submit_android(version, notes[platform]) : submit_ios(version, notes[platform])
+      submitted << platform
+    rescue StandardError
+      (platforms - submitted).each do |remaining|
+        UI.important("Retry #{remaining} with: bundle exec fastlane release only:#{remaining} skip_build:true")
+      end
+      raise
+    end
+  end
+
+  in_root { sh("git", "tag", tag) } unless tag_at_head?(tag)
+  UI.success("Submitted #{version[:name]}+#{version[:code]} (#{platforms.join(', ')}) and tagged #{tag} (not pushed).")
+end
+
+# Dry run: checks credentials, store access, locales, and Shorebird without building or uploading.
+lane :check do
+  check_credentials(android: true, ios: true)
+
+  flutter = JSON.parse(File.read(File.join(ROOT, ".fvmrc"))).fetch("flutter")
+  shorebird_versions = sh("shorebird", "flutter", "versions", "list", log: false)
+  UI.user_error!("Shorebird has no Flutter #{flutter}.") unless shorebird_versions.include?(flutter)
+  UI.success("Shorebird supports Flutter #{flutter}")
+
+  version = pubspec_version
+  %w[android ios].each do |platform|
+    path = File.join(__dir__, "release_notes", version[:name], "#{platform}.txt")
+    if File.exist?(path)
+      release_notes(version[:name], platform)
+      UI.success("#{platform} notes for #{version[:name]} are valid")
+    else
+      UI.important("No #{platform} notes for #{version[:name]} yet")
+    end
+  end
+
+  failures = []
+  check_step(failures, "Google Play") { check_play(version) }
+  check_step(failures, "App Store Connect") { check_app_store }
+  UI.user_error!("Check failed: #{failures.join('; ')}") unless failures.empty?
+  UI.success("All checks passed")
+end
+
+def check_step(failures, name)
+  yield
+rescue StandardError => e
+  UI.error("#{name}: #{e.message}")
+  failures << name
+end
+
+def check_play(version)
+  require "supply"
+  Supply.config = FastlaneCore::Configuration.create(
+    Supply::Options.available_options,
+    package_name: APP_ID, json_key: env_path("PLAY_JSON_KEY")
+  )
+  play = Supply::Client.make_from_config
+  play.begin_edit(package_name: APP_ID)
+  begin
+    languages = play.listings.map(&:language)
+    production = play.track_version_codes("production")
+  ensure
+    play.abort_current_edit
+  end
+  UI.success("Play access OK; production version codes: #{production.join(', ')}; listings: #{languages.join(', ')}")
+  UI.user_error!("PLAY_LOCALE #{ENV['PLAY_LOCALE']} is not a Play listing language.") unless languages.include?(ENV["PLAY_LOCALE"])
+  if production.map(&:to_i).max.to_i >= version[:code].to_i
+    UI.important("pubspec build number #{version[:code]} is not above Play production; bump it before releasing")
+  end
+end
+
+def check_app_store
+  Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(
+    key_id: env_value("ASC_KEY_ID"),
+    issuer_id: env_value("ASC_ISSUER_ID"),
+    filepath: env_path("ASC_KEY_PATH")
+  )
+  app = Spaceship::ConnectAPI::App.find(APP_ID)
+  UI.user_error!("App Store Connect has no app #{APP_ID}.") if app.nil?
+  live = app.get_live_app_store_version
+  locales = live.get_app_store_version_localizations.map(&:locale)
+  UI.success("App Store access OK; live version #{live.version_string}; locales: #{locales.join(', ')}")
+  UI.user_error!("ASC_LOCALE #{ENV['ASC_LOCALE']} is not an App Store locale.") unless locales.include?(ENV["ASC_LOCALE"])
+  pending = app.get_edit_app_store_version
+  UI.important("App Store already has an editable version #{pending.version_string} (#{pending.app_store_state})") if pending
+end
+
+# The tag must mark exactly what ships: a clean checkout, and the tag unused or already at HEAD
+# (a resumed release).
+def check_git(tag)
+  dirty = in_root { sh("git", "status", "--porcelain", log: false) }.strip
+  UI.user_error!("Commit or stash these changes first, so #{tag} marks what ships:\n#{dirty}") unless dirty.empty?
+  existing = in_root { sh("git", "tag", "--list", tag, log: false) }.strip
+  UI.user_error!("Tag #{tag} already exists on another commit; bump the version.") if !existing.empty? && !tag_at_head?(tag)
+end
+
+def tag_at_head?(tag)
+  in_root do
+    sh("git", "rev-parse", "-q", "--verify", "#{tag}^{commit}", log: false, error_callback: ->(_) {}).strip ==
+      sh("git", "rev-parse", "HEAD", log: false).strip
+  end
+end
+
+def in_root(&block)
+  Dir.chdir(ROOT, &block)
+end
+
+def pubspec_version
+  name, code = YAML.load_file(File.join(ROOT, "pubspec.yaml")).fetch("version").to_s.split("+")
+  UI.user_error!("pubspec.yaml version needs a build number, e.g. 5.3.1+55") if code.nil?
+  { name: name, code: code }
+end
+
+def release_notes(version_name, platform)
+  path = File.join(__dir__, "release_notes", version_name, "#{platform}.txt")
+  UI.user_error!("Missing #{path}. Approve release notes with the release-notes skill first.") unless File.exist?(path)
+
+  notes = File.read(path, encoding: "UTF-8").strip
+  UI.user_error!("#{path} is empty.") if notes.empty?
+
+  if platform == "android"
+    UI.user_error!("#{path} has #{notes.length} characters; Play allows #{PLAY_NOTES_LIMIT}.") if notes.length > PLAY_NOTES_LIMIT
+  else
+    UI.user_error!("#{path} must be ASCII for the App Store.") unless notes.ascii_only?
+    UI.user_error!("#{path} has #{notes.length} characters; App Store allows #{APP_STORE_NOTES_LIMIT}.") if notes.length > APP_STORE_NOTES_LIMIT
+  end
+  notes
+end
+
+def env_path(name)
+  value = ENV[name].to_s
+  UI.user_error!("Set #{name} in fastlane/.env.") if value.empty?
+  path = File.expand_path(value)
+  UI.user_error!("#{name} points to #{path}, which does not exist.") unless File.exist?(path)
+  path
+end
+
+def env_value(name)
+  value = ENV[name].to_s
+  UI.user_error!("Set #{name} in fastlane/.env.") if value.empty?
+  value
+end
+
+def check_credentials(android: false, ios: false)
+  env_path("PLAY_JSON_KEY") if android
+  if ios
+    env_path("ASC_KEY_PATH")
+    env_value("ASC_KEY_ID")
+    env_value("ASC_ISSUER_ID")
+  end
+end
+
+def shorebird_release(platform)
+  flutter = JSON.parse(File.read(File.join(ROOT, ".fvmrc"))).fetch("flutter")
+  in_root { sh("shorebird", "release", platform, "--flutter-version=#{flutter}", "--no-confirm") }
+end
+
+def submit_android(version, notes)
+  UI.user_error!("No AAB at #{AAB_PATH}.") unless File.exist?(AAB_PATH)
+
+  # supply reads changelogs from <metadata>/<locale>/changelogs/<versionCode>.txt.
+  metadata = File.join(ROOT, "build/fastlane/play_metadata")
+  changelogs = File.join(metadata, env_value("PLAY_LOCALE"), "changelogs")
+  FileUtils.rm_rf(metadata)
+  FileUtils.mkdir_p(changelogs)
+  File.write(File.join(changelogs, "#{version[:code]}.txt"), notes)
+
+  upload_to_play_store(
+    package_name: APP_ID,
+    json_key: env_path("PLAY_JSON_KEY"),
+    track: "production",
+    release_status: "completed",
+    aab: AAB_PATH,
+    metadata_path: metadata,
+    skip_upload_metadata: true,
+    skip_upload_images: true,
+    skip_upload_screenshots: true
+  )
+end
+
+def submit_ios(version, notes)
+  ipa = Dir[File.join(ROOT, "build/ios/ipa/*.ipa")].max_by { |path| File.mtime(path) }
+  UI.user_error!("No IPA in build/ios/ipa.") if ipa.nil?
+
+  api_key = app_store_connect_api_key(
+    key_id: env_value("ASC_KEY_ID"),
+    issuer_id: env_value("ASC_ISSUER_ID"),
+    key_filepath: env_path("ASC_KEY_PATH")
+  )
+
+  # Waits for App Store Connect to process the build, then submits it for review.
+  upload_to_app_store(
+    api_key: api_key,
+    app_identifier: APP_ID,
+    ipa: ipa,
+    app_version: version[:name],
+    release_notes: { env_value("ASC_LOCALE") => notes },
+    skip_screenshots: true,
+    submit_for_review: true,
+    automatic_release: true,
+    force: true,
+    run_precheck_before_submit: false,
+    submission_information: { add_id_info_uses_idfa: false }
+  )
+end

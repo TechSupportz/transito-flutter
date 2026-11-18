@@ -1,100 +1,68 @@
 # AGENTS.md - Transito Flutter
 
-Transito is a Flutter bus timing application for Singapore. Use this file as the repository map and
-source of project-specific constraints; inspect nearby code and configuration for ordinary Dart and
-Flutter conventions.
+Transito is a Flutter bus timing app for Singapore. Domain terms (Favourite, Favourite Alias, Crowd
+Level, Service Route, ...) are defined in `CONTEXT.md`; use them in code, comments, and UI copy.
 
-## Non-negotiable constraints
+## Running the app and dev stack
 
-- Never run Shorebird commands (`shorebird release`, `shorebird patch`). The user always runs them.
-- Do not start the background development stack directly or run the `dev` script. The user starts
-  those servers and processes with the fish alias `transito-dev`.
-- You may run `flutter run` for app development and hot reload after confirming that no other
-  Flutter build is already running on the same target device.
-- Before asking the user to run `transito-dev`, check that both port 8080 (Transito server) and port
-  4000 (Firebase emulator UI) are listening:
-  `lsof -nP -iTCP:8080 -sTCP:LISTEN` and `lsof -nP -iTCP:4000 -sTCP:LISTEN`.
-- After editing any non-generated Dart file, run `dart format <file>`.
-- Do not manually edit or format checked-in `.g.dart` files. Regenerate them with
-  `flutter pub run build_runner build`.
+- The dev stack (Transito server on 8080, Firebase emulators with the UI on 4000) runs in the tmux
+  session `transito`. When a task needs it and `tmux has-session -t transito` fails, start it with
+  `fish ~/Developer/Transito/dev-env.fish` (the user's `transito-dev` alias). Read a pane's logs
+  with `tmux capture-pane -p -t transito:0.0` (server) or `transito:0.1` (emulators).
+- `flutter run` is yours for development and hot reload. First check for an existing Flutter
+  session on the target device and reuse it; start a new one only when none is running.
+- Store releases and Shorebird patches ship to production users. Run one only when the user asks
+  for it in the current task, and state the exact command first. A store release is
+  `bundle exec fastlane release`: it needs approved notes in `fastlane/release_notes/<version>/`
+  (the `release-notes` skill writes them) committed with the version bump, then analyzes, tests, builds both platforms with
+  Shorebird, submits both for review, and tags the version. For `shorebird patch`, run
+  `flutter analyze` and `flutter test` first.
+- In T3 Code, do work that needs changes to `../transito-server` in a new thread in the
+  `transito-server` project, with a self-contained brief, rather than editing the server from a
+  Flutter thread.
 
-## Commands and verification
+## Verification
 
-```bash
-flutter --version                         # Flutter 3.41.0 managed by FVM
-flutter pub run build_runner build        # Regenerate JSON serialization code
-flutter analyze                           # Static analysis
-flutter test                              # Logic-heavy test suite
-flutter test test/specific_test.dart      # Relevant logic-heavy test
-flutter build apk                         # Android build when requested/needed
-flutter build ios                         # iOS build when requested/needed
-```
+- Use the Flutter SDK pinned in `.fvmrc`.
+- After editing a non-generated Dart file, run `dart format <file>`, then `flutter analyze`.
+- `.g.dart` files are generated: change the annotated source and run
+  `dart run build_runner build`.
+- Add or update tests for substantial data processing, complex algorithms, or a regression best
+  protected by a focused test. Routine UI, model, persistence, and serialization changes are
+  verified with formatting, analysis, widget previews, and hot reload instead.
+- For layout changes, check both phone and tablet layouts (device state lives in `CommonProvider`).
+- For navigation changes, check both the Material and the iOS Liquid Glass paths
+  (`CommonProvider.supportsLiquidGlass`).
 
-- The formatter contract is defined in `analysis_options.yaml` (`page_width: 100`,
-  `trailing_commas: preserve`). `.vscode/settings.json` mirrors it for VS Code.
-- Run formatting and static analysis after normal Dart changes. Run code generation when annotated
-  models change.
-- Do not add unit or widget tests by default for routine UI, model, persistence, or serialization
-  changes. Add or update tests for substantial data processing, complex algorithms, or a regression
-  best protected by a focused test.
-- For normal UI work, prefer widget previews, hot reload, formatting, and static analysis.
+## Architecture
 
-## Architecture map
+- State is Provider with `ChangeNotifier`. When a parent needs imperative control of a screen, give
+  the screen a `ChangeNotifier` controller, as in `lib/screens/main/nearby_screen.dart`. Add other
+  abstractions only when they add behavior, enforce a boundary, or meaningfully improve reuse.
+- HTTP services extend `BaseApiService` as singletons; follow
+  `lib/global/services/lta_api_service.dart` and `lib/global/services/transito_api_service.dart`.
+  Match the JSON annotations of adjacent models.
+- Before changing Favourite aliases, favourite card expansion, timing row counts, Firestore user
+  access, or bus distance, read the matching record in `docs/adr/`.
 
-- `lib/global/providers/`: shared `ChangeNotifier` state.
-- `lib/global/services/`: API clients and shared business services.
-- `lib/global/utils/`: shared utilities.
-- `lib/models/`: API, app, favourites, user, and enum models.
-- `lib/screens/`: application screens grouped by feature.
-- `lib/widgets/`: reusable widgets grouped by feature; shared widgets live in `widgets/common/`.
-- `docs/adr/`: architecture decision records.
-- `tool/`: local development utilities.
+## Conventions
 
-State management uses Provider with `ChangeNotifier`. API services extend `BaseApiService` and use
-the repository's singleton pattern. JSON API models use `json_serializable` with
-`@JsonSerializable(explicitToJson: true)` where nested objects must be serialized explicitly.
+- Render Material Symbols with `AppSymbol`.
+- Use the text styles in `lib/models/app/app_typography.dart` (DM Sans primary, Itim secondary).
+- Use `Theme.of(context).colorScheme` for theme colors.
+- Log with `debugPrint()`, and guard debug-only behavior with `kDebugMode`.
+- Keep existing enum value names in `lib/models/enums/`, since they are serialized; new enums
+  follow the surrounding convention.
+- Services that need a snackbar without a `BuildContext` use `CommonProvider.scaffoldMessengerKey`.
 
-Use a screen `ChangeNotifier` controller when a parent needs imperative control of the screen. Do
-not introduce a controller or abstraction that merely delegates to an already available dependency;
-an abstraction should add behavior, enforce a boundary, or meaningfully improve reuse.
+## API errors and UI states
 
-## Project-specific conventions
-
-- Use `AppSymbol` instead of a direct `Icon` for Material Symbols.
-- Preserve both Material and iOS-style Liquid Glass navigation behavior.
-- Use DM Sans as the primary font and Itim as the secondary font.
-- Use `CommonProvider.scaffoldMessengerKey` when a service needs to show a snackbar without a
-  `BuildContext`.
-- Catch async errors where the code adds recovery, translation, logging, or user feedback. Otherwise
-  allow errors to propagate.
-- Use `debugPrint()` for debug logging and guard debug-only behavior with `kDebugMode`.
-- Existing API/wire enum values in `lib/models/enums/` use uppercase names. Internal Dart-only enums
-  may follow the local surrounding convention.
-- Use `Theme.of(context).colorScheme` rather than introducing hard-coded theme colors.
-
-## Error handling and UI states
-
-- API exceptions are defined in `lib/global/services/api_exceptions.dart` (`ApiException`,
-  `NetworkException`, and `ApiParsingException`).
-- LTA, NUS, and Transito server failures are reported to `AlertsProvider` as Outages, which surface
-  in the Nearby alert inbox. New API calls to these dependencies should report success and failure
-  the same way rather than showing their own snackbars. See transito-server's
-  `docs/adr/0001-detect-outages-per-device.md`.
-- Use `ErrorText` for consistent error presentation in `FutureBuilder` and equivalent async states.
-
-## Canonical examples
-
-- API singleton and LTA failure handling: `lib/global/services/lta_api_service.dart`
-- Backend API service: `lib/global/services/transito_api_service.dart`
-- Screen controller: `lib/screens/main/nearby_screen.dart`
-- Outage and Announcement state: `lib/global/providers/alerts_provider.dart`
-- Shared async error UI: `lib/widgets/common/error_text.dart`
-- Shared app state and device layout information: `lib/global/providers/common_provider.dart`
-
-## Local environment
-
-- Firebase emulators use ports 9099 (Auth), 8088 (Firestore), and 4000 (Emulator UI).
-- The Node.js/Koa backend uses localhost port 8080.
-- Assets live in `assets/`.
-- The application supports phone and tablet layouts; shared device state is exposed by
-  `CommonProvider`.
+- Throw the types in `lib/global/services/api_exceptions.dart` (`ApiException`,
+  `NetworkException`, `ApiParsingException`).
+- Calls to LTA, NUS, and the Transito server report to `AlertsProvider` with `reportSuccess` after
+  parsing succeeds and `reportFailure` on error, as `lta_api_service.dart` does. `AlertsProvider`
+  decides what becomes an Outage in the Nearby alert inbox, so these calls surface failures there
+  rather than through their own snackbars. Background:
+  `../transito-server/docs/adr/0001-detect-outages-per-device.md`.
+- Catch async errors only where the catch adds recovery, translation, logging, or user feedback.
+- Show async error states (`FutureBuilder` and equivalents) with `ErrorText`.
