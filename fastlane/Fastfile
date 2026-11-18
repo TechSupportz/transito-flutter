@@ -203,6 +203,8 @@ def submit_android(version, notes)
   FileUtils.mkdir_p(changelogs)
   File.write(File.join(changelogs, "#{version[:code]}.txt"), notes)
 
+  # The Play API has no per-release hold: with Managed publishing on in Play Console, an
+  # approved release waits there until it is published by hand.
   upload_to_play_store(
     package_name: APP_ID,
     json_key: env_path("PLAY_JSON_KEY"),
@@ -235,7 +237,8 @@ def submit_ios(version, notes)
     release_notes: { env_value("ASC_LOCALE") => notes },
     skip_screenshots: true,
     submit_for_review: true,
-    automatic_release: true,
+    # Hold the approved version until it is released by hand in App Store Connect.
+    automatic_release: false,
     force: true,
     run_precheck_before_submit: false,
     submission_information: { add_id_info_uses_idfa: false }
