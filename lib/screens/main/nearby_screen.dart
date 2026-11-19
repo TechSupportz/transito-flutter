@@ -120,14 +120,14 @@ class _NearbyScreenState extends State<NearbyScreen> with WidgetsBindingObserver
       return [];
     }
 
-    // Show NUS favourites within 500m and other favourites within 750m, nearest first.
+    // Show NUS favourites within 550m and other favourites within 750m, nearest first.
     for (var favourite in favouritesList) {
       double distanceAway = distance.as(
         LengthUnit.Meter,
         LatLng(userLocation.latitude, userLocation.longitude),
         favourite.busStopLocation,
       );
-      final double radius = favourite.sources?.nus?.isNotEmpty == true ? 500 : 750;
+      final double radius = favourite.sources?.nus?.isNotEmpty == true ? 550 : 750;
       if (distanceAway <= radius) {
         nearbyFavourites.add(
           NearbyFavourites(busStopInfo: favourite, distanceFromUser: distanceAway),
